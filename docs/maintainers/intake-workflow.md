@@ -49,3 +49,15 @@ aprog generate-config <slug> --public ../aprog-public --private ../aprog-private
 - [ ] Generated configs are current
 - [ ] No private material is present in public repo
 - [ ] Public PR and private bundle refer to the same slug
+
+## After merge — deploy to Gradescope
+
+See `maintainers/gradescope-upload.md` for the full upload guide.
+
+Quick sequence:
+
+```bash
+aprog generate-config <slug> --force
+aprog package-gradescope <slug> --public ../aprog-public --private ../aprog-private
+# Upload dist/<slug>-gradescope.zip in Gradescope > Configure Autograder
+```

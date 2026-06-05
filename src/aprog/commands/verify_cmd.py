@@ -55,7 +55,7 @@ def cmd_verify(
     sys.path.insert(0, str(private_repo / "grader" / slug))
 
     try:
-        from grader.pipeline import make_pipeline  # type: ignore[import-not-found]
+        from pipeline import make_pipeline  # type: ignore[import-not-found]
         from lograder.pipeline.config import config
     except ImportError as e:
         console.print(f"[red]Import error:[/red] {e}")

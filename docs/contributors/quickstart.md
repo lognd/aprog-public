@@ -249,21 +249,52 @@ aprog package-private linked-list-insertion \
 
 ---
 
-## 12. After submission
+## 12. After submission (maintainer steps)
 
-The maintainer runs:
+> **Staff / maintainers only.** Requires access to `aprog-private`.
+
+### 12a. Intake the private bundle
 
 ```bash
 aprog intake dist/linked-list-insertion-private.tar.gz \
   --public ../aprog-public \
   --private ../aprog-private
+```
 
+### 12b. Verify the reference solution
+
+```bash
 aprog verify linked-list-insertion \
   --public ../aprog-public \
   --private ../aprog-private
 ```
 
-Verification passes when the reference solution earns full non-extra-credit points on all test cases.
+Verification passes when the reference solution earns full non-extra-credit points on all test cases. If it fails, work with the contributor to fix the solution or grader, then re-intake and re-verify.
+
+### 12c. Build and upload the Gradescope autograder
+
+Once verification passes:
+
+```bash
+# Ensure generated files are current
+aprog generate-config linked-list-insertion --force
+
+# Build the Gradescope zip
+aprog package-gradescope linked-list-insertion \
+  --public ../aprog-public \
+  --private ../aprog-private
+# Output: dist/linked-list-insertion-gradescope.zip
+```
+
+Then in Gradescope:
+
+1. Open the course and find (or create) the programming assignment.
+2. Go to **Configure Autograder** in the left sidebar.
+3. Click **Upload Autograder** and select `dist/linked-list-insertion-gradescope.zip`.
+4. Click **Update Autograder** and wait for the build (1–3 minutes).
+5. Use **Test Autograder** with the reference solution to confirm the score is correct before students submit.
+
+See `docs/maintainers/gradescope-upload.md` for the full upload guide and troubleshooting.
 
 ---
 
@@ -286,4 +317,10 @@ aprog validate linked-list-insertion
 
 # Submit private bundle
 aprog submit linked-list-insertion
+
+# --- Maintainer steps (after intake) ---
+aprog verify linked-list-insertion --public ../aprog-public --private ../aprog-private
+aprog generate-config linked-list-insertion --force
+aprog package-gradescope linked-list-insertion --public ../aprog-public --private ../aprog-private
+# Upload dist/linked-list-insertion-gradescope.zip to Gradescope > Configure Autograder
 ```

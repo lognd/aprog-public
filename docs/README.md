@@ -34,8 +34,9 @@ The grader package is `lograder`. AProg generates the autograder entry point (`r
 ### For maintainers
 
 10. `maintainers/intake-workflow.md` — PR review and intake checklist
-11. `tools/overview.md` — full command reference
-12. `setup/github-and-ci.md` — repository and CI configuration
+11. `maintainers/gradescope-upload.md` — building and uploading the autograder to Gradescope
+12. `tools/overview.md` — full command reference
+13. `setup/github-and-ci.md` — repository and CI configuration
 
 ### For implementers
 
