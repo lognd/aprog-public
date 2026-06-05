@@ -18,5 +18,5 @@ slug = "cpp-header-impl"
 version = "0.1"
 
 [grader]
-visibility = "after_due_date"
+visibility = "visible"
 stdout_visibility = "after_due_date"

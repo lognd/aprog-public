@@ -21,7 +21,7 @@ if __name__ == "__main__":
             score = pipeline()
             score.write_results_json(
                 config=GradescopeConfig(
-                    visibility='after_due_date',
+                    visibility='visible',
                     stdout_visibility='after_due_date',
                 )
             )

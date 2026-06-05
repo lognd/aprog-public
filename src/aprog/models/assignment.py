@@ -70,7 +70,9 @@ class TemplateSection(BaseModel):
 
 
 class GraderDependencies(BaseModel):
-    lograder: str = ">=0.1.0"
+    # git ref (branch, tag, or commit) to install lograder from GitHub.
+    # Empty string means the default branch (main).
+    lograder: str = ""
     extra: list[str] = Field(default_factory=list)
 
 

@@ -143,8 +143,7 @@ def cmd_package_gradescope(
         console.print(f"  Run: aprog generate-config {slug} --force")
         raise typer.Exit(1)
 
-    pipeline_file = private_repo / "grader" / slug / "pipeline.py"
-    if not pipeline_file.exists():
+    if not (private_repo / "grader" / slug / "pipeline.py").exists():
         console.print(
             f"[red]Error:[/red] Grader pipeline missing: grader/{slug}/pipeline.py"
         )
@@ -161,7 +160,10 @@ def cmd_package_gradescope(
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         # setup.sh -- must be executable so Gradescope can run it
         deps = cfg.grader.dependencies
-        lograder_req = f"lograder{deps.lograder}" if deps.lograder else "lograder"
+        _LOGRADER_GITHUB = "git+https://github.com/lognd/lograder.git"
+        lograder_req = (
+            f"{_LOGRADER_GITHUB}@{deps.lograder}" if deps.lograder else _LOGRADER_GITHUB
+        )
         extra = " ".join(deps.extra)
         setup_sh = (
             f"#!/usr/bin/env bash\nset -e\npip install '{lograder_req}' {extra}\n"
@@ -180,11 +182,15 @@ def cmd_package_gradescope(
             info.file_size = src.stat().st_size
             zf.writestr(info, src.read_bytes())
 
-        # grader/pipeline.py
-        info = zipfile.ZipInfo("grader/pipeline.py")
-        info.external_attr = _DATA
-        info.compress_type = zipfile.ZIP_DEFLATED
-        zf.writestr(info, pipeline_file.read_bytes())
+        # full grader directory (pipeline.py + any driver files like main.cpp)
+        grader_dir = private_repo / "grader" / slug
+        for path in sorted(grader_dir.rglob("*")):
+            if path.is_file():
+                arc = f"grader/{path.relative_to(grader_dir)}"
+                info = zipfile.ZipInfo(arc)
+                info.external_attr = _DATA
+                info.compress_type = zipfile.ZIP_DEFLATED
+                zf.writestr(info, path.read_bytes())
 
         # hidden tests
         ht_dir = private_repo / "hidden-tests" / slug
