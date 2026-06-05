@@ -1,6 +1,6 @@
 # Grader Overview
 
-The grader package is `lograder`. It is a Python library — not a CLI and not a service.
+The grader package is `lograder`. It is a Python library -- not a CLI and not a service.
 
 Contributors write a `grader/pipeline.py` file that uses lograder to define how their assignment is graded. AProg generates the surrounding `run_autograder.py` entry point, but the grading logic is entirely in `pipeline.py`.
 
@@ -22,7 +22,7 @@ A `Pipeline` is a sequence of `Step` objects. Each step receives the output of t
 The standard data flow is:
 
 ```
-LocalDirectory → [Build step] → [Test step(s)]
+LocalDirectory -> [Build step] -> [Test step(s)]
 ```
 
 - `LocalDirectory` reads the student submission directory and returns a `Manifest`.
@@ -31,8 +31,8 @@ LocalDirectory → [Build step] → [Test step(s)]
 
 Steps have two return modes:
 
-- `yield Err(...)` — logs a non-fatal error and continues
-- `return Err(...)` — logs a fatal error and stops the pipeline
+- `yield Err(...)` -- logs a non-fatal error and continues
+- `return Err(...)` -- logs a fatal error and stops the pipeline
 
 ## Minimal example (Python, no build)
 
@@ -86,7 +86,7 @@ def make_pipeline() -> Pipeline:
 
 ## Further reference
 
-- `docs/grader/steps.md` — all step types and their case models
-- `docs/grader/scoring.md` — scorers and point configuration
-- `docs/grader/config.md` — EnvironmentConfig and GradescopeConfig
-- `docs/grader/oracle.md` — generating test cases from a reference binary
+- `docs/grader/steps.md` -- all step types and their case models
+- `docs/grader/scoring.md` -- scorers and point configuration
+- `docs/grader/config.md` -- EnvironmentConfig and GradescopeConfig
+- `docs/grader/oracle.md` -- generating test cases from a reference binary

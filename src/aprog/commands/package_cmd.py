@@ -42,7 +42,7 @@ def cmd_package_public(
         if manifest_path.exists():
             tar.add(manifest_path, arcname=f"{slug}/generated/assignment-manifest.json")
 
-    console.print(f"[green]✓[/green] {out}")
+    console.print(f"[green][OK][/green] {out}")
     return out
 
 
@@ -109,7 +109,7 @@ def cmd_package_private(
             _add_dir_to_tar(tar, hidden_tests, f"{slug}/hidden-tests")
         _add_dir_to_tar(tar, grader, f"{slug}/grader")
 
-    console.print(f"[green]✓[/green] {out}")
+    console.print(f"[green][OK][/green] {out}")
     return out
 
 

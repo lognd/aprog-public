@@ -29,7 +29,7 @@ from lograder.pipeline.score import TestCaseScorer
 
 Used with test steps (`OutputCompareTest`, `ValgrindTest`, `FileOutputTest`, `PerformanceTest`, `DifferentialTest`).
 
-Awards points per passing test case. Works via `isinstance` check on `TestSuccess`/`TestFailure` — the scorer is compatible with all test step types.
+Awards points per passing test case. Works via `isinstance` check on `TestSuccess`/`TestFailure` -- the scorer is compatible with all test step types.
 
 ```python
 TestCaseScorer(
@@ -42,7 +42,7 @@ TestCaseScorer(
 )
 ```
 
-**`points_per_case`**: Either a `dict` mapping case name → points, or a flat `float` applied to all cases (requires `num_cases` when flat).
+**`points_per_case`**: Either a `dict` mapping case name -> points, or a flat `float` applied to all cases (requires `num_cases` when flat).
 
 **`extra_credit_cases`**: Cases that award bonus points on pass. They are not counted in `possible`. Use for optional challenges.
 
@@ -128,15 +128,15 @@ score: PipelineScore = pipeline()
 
 **Key attributes:**
 
-- `score.contributions` — `list[tuple[Step, ScoreContribution]]` for all scored steps
-- `score.total()` — `ScoreContribution` summing all contributions
+- `score.contributions` -- `list[tuple[Step, ScoreContribution]]` for all scored steps
+- `score.total()` -- `ScoreContribution` summing all contributions
 
 **`ScoreContribution` attributes:**
 
-- `.earned` — points earned (not including extra credit)
-- `.possible` — total points available
-- `.extra_credit` — extra credit earned
-- `.total` — `earned + extra_credit`
+- `.earned` -- points earned (not including extra credit)
+- `.possible` -- total points available
+- `.extra_credit` -- extra credit earned
+- `.total` -- `earned + extra_credit`
 
 Steps **skipped by early pipeline exit** (e.g., a fatal build failure stops tests from running) still appear in `contributions` with `0/possible`. This means `score.total().possible` is always the full assignment total, regardless of how far the pipeline ran.
 

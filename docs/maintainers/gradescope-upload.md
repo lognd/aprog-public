@@ -11,8 +11,8 @@ This guide is for **maintainers** (staff with access to both `aprog-public` and 
 - Both repositories cloned side-by-side:
   ```
   Projects/
-  ├── aprog-public/
-  └── aprog-private/
+  |-- aprog-public/
+  `-- aprog-private/
   ```
 - `aprog` installed in your environment (`pip install aprog` or via the local venv)
 - Verification already passing for the assignment (`aprog verify`)
@@ -20,7 +20,7 @@ This guide is for **maintainers** (staff with access to both `aprog-public` and 
 
 ---
 
-## Step 1 — Regenerate configs (if stale)
+## Step 1 -- Regenerate configs (if stale)
 
 ```bash
 cd aprog-public
@@ -31,7 +31,7 @@ This ensures `generated/assignments/<slug>/run_autograder` and `run_autograder.p
 
 ---
 
-## Step 2 — Verify the reference solution
+## Step 2 -- Verify the reference solution
 
 If you have not already done so (or if anything changed since last verification):
 
@@ -43,7 +43,7 @@ Verification must pass before deploying. A failed deploy will silently give ever
 
 ---
 
-## Step 3 — Build the Gradescope zip
+## Step 3 -- Build the Gradescope zip
 
 ```bash
 aprog package-gradescope <slug> \
@@ -69,20 +69,20 @@ The zip contains:
 
 ---
 
-## Step 4 — Upload to Gradescope
+## Step 4 -- Upload to Gradescope
 
 1. Go to **gradescope.com** and open the course.
 2. Open (or create) the programming assignment.
 3. Click **Configure Autograder** in the left sidebar.
 4. Click **Upload Autograder** (or **Replace Autograder** if one already exists).
 5. Select `dist/<slug>-gradescope.zip`.
-6. Click **Update Autograder** and wait for the build to finish (usually 1–3 minutes).
+6. Click **Update Autograder** and wait for the build to finish (usually 1-3 minutes).
 
 > **Tip:** After the build completes, use **Test Autograder** with the reference solution to confirm scores before the assignment opens to students.
 
 ---
 
-## Step 5 — Test with the reference solution
+## Step 5 -- Test with the reference solution
 
 In Gradescope, go to **Test Autograder**:
 

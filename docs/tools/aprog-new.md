@@ -30,13 +30,13 @@ Always creates public files under `assignments/<slug>/`:
 
 ```text
 assignments/linked-list-insertion/
-├── assignment.toml
-├── README.md
-├── visible-tests/
-│   └── test_visible.py
-├── expected/
-└── assets/
-    └── starter.py
+|-- assignment.toml
+|-- README.md
+|-- visible-tests/
+|   `-- test_visible.py
+|-- expected/
+`-- assets/
+    `-- starter.py
 ```
 
 The generated `assignment.toml` is pre-filled with the slug, template slug, and any classification flags provided on the command line. Fields that require human input (name, description, author) are left as placeholder strings.
@@ -55,13 +55,13 @@ This creates:
 
 ```text
 ../my-staging/linked-list-insertion/
-├── solution/
-│   └── solution.py
-├── hidden-tests/
-│   └── tests/
-│       └── test_hidden.py
-└── grader/
-    └── pipeline.py
+|-- solution/
+|   `-- solution.py
+|-- hidden-tests/
+|   `-- tests/
+|       `-- test_hidden.py
+`-- grader/
+    `-- pipeline.py
 ```
 
 `pipeline.py` is the template's `grader/pipeline.py.j2` scaffold, ready to be filled in. It is the contributor's responsibility to complete it before packaging the private bundle.

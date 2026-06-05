@@ -56,18 +56,18 @@ def _scan_public_violations(assignment_root: Path) -> list[str]:
         name = path.name
 
         if name in _PROHIBITED_NAMES:
-            violations.append(f"{rel} — prohibited name")
+            violations.append(f"{rel} -- prohibited name")
             continue
 
         for part in parts[:-1]:
             if part in _PRIVATE_DIRS:
-                violations.append(f"{rel} — '{part}/' directory is private")
+                violations.append(f"{rel} -- '{part}/' directory is private")
                 break
 
         if path.is_file():
             for pat in _PROHIBITED_PATTERNS:
                 if name.startswith(pat) or name == pat.rstrip("."):
-                    violations.append(f"{rel} — matches prohibited pattern '{pat}*'")
+                    violations.append(f"{rel} -- matches prohibited pattern '{pat}*'")
                     break
 
     return violations
@@ -151,7 +151,9 @@ def cmd_validate(
     )
     stale = False
     if not manifest_path.exists():
-        errors.append("Generated manifest missing — run: aprog generate-config " + slug)
+        errors.append(
+            "Generated manifest missing -- run: aprog generate-config " + slug
+        )
         stale = True
     else:
         import json
@@ -161,7 +163,7 @@ def cmd_validate(
             current_hash = hash_assignment_public(root, slug)
             if data.get("source_hash") != current_hash:
                 errors.append(
-                    "Generated files are stale — run: aprog generate-config " + slug
+                    "Generated files are stale -- run: aprog generate-config " + slug
                 )
                 stale = True
         except Exception:
@@ -180,10 +182,10 @@ def cmd_validate(
     if errors:
         console.print(f"[red]Validation failed for '{slug}':[/red]")
         for msg in errors:
-            console.print(f"  [red]✗[/red] {msg}")
+            console.print(f"  [red][FAIL][/red] {msg}")
         return 4 if stale and len(errors) == 1 else 1
     else:
-        console.print(f"[green]✓[/green] {slug} — valid")
+        console.print(f"[green][OK][/green] {slug} -- valid")
         return 0
 
 

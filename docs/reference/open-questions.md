@@ -10,7 +10,7 @@ All previously open questions are resolved. This file records the decisions made
 Decision: **Optional.** Not all assignments belong to a course. Requiring it creates friction for general-purpose or reusable assignments.
 
 **Who can add new classification values?**
-Decision: **Maintainers only**, via direct commits to `aprog.toml`. Contributors may request new values via a PR or issue. The validator rejects unknown values — this prevents accidental label sprawl.
+Decision: **Maintainers only**, via direct commits to `aprog.toml`. Contributors may request new values via a PR or issue. The validator rejects unknown values -- this prevents accidental label sprawl.
 
 ---
 

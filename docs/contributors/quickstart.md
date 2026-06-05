@@ -47,26 +47,26 @@ Because `APROG_STAGING_DIR` is set, this creates both:
 
 ```text
 assignments/linked-list-insertion/
-├── assignment.toml
-├── README.md
-├── visible-tests/
-│   └── test_visible.py
-├── expected/
-└── assets/
-    └── starter.py
+|-- assignment.toml
+|-- README.md
+|-- visible-tests/
+|   `-- test_visible.py
+|-- expected/
+`-- assets/
+    `-- starter.py
 ```
 
 **Private** (in `$APROG_STAGING_DIR`):
 
 ```text
 ~/aprog-staging/linked-list-insertion/
-├── solution/
-│   └── solution.py
-├── hidden-tests/
-│   └── tests/
-│       └── test_hidden.py
-└── grader/
-    └── pipeline.py
+|-- solution/
+|   `-- solution.py
+|-- hidden-tests/
+|   `-- tests/
+|       `-- test_hidden.py
+`-- grader/
+    `-- pipeline.py
 ```
 
 ---
@@ -118,7 +118,7 @@ Write the assignment statement. Include:
 
 Edit `assignments/linked-list-insertion/visible-tests/test_visible.py`.
 
-These tests are public — students can see and run them. Keep them representative but not exhaustive.
+These tests are public -- students can see and run them. Keep them representative but not exhaustive.
 
 ```python
 from starter import insert
@@ -291,7 +291,7 @@ Then in Gradescope:
 1. Open the course and find (or create) the programming assignment.
 2. Go to **Configure Autograder** in the left sidebar.
 3. Click **Upload Autograder** and select `dist/linked-list-insertion-gradescope.zip`.
-4. Click **Update Autograder** and wait for the build (1–3 minutes).
+4. Click **Update Autograder** and wait for the build (1-3 minutes).
 5. Use **Test Autograder** with the reference solution to confirm the score is correct before students submit.
 
 See `docs/maintainers/gradescope-upload.md` for the full upload guide and troubleshooting.

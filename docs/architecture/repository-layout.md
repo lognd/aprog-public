@@ -4,52 +4,52 @@
 
 ```text
 aprog-public/
-├── aprog.toml
-├── assignments/
-│   └── <assignment-slug>/
-│       ├── assignment.toml
-│       ├── README.md
-│       ├── visible-tests/
-│       ├── expected/
-│       └── assets/
-├── templates/
-│   └── <template-slug>/
-│       ├── template.toml
-│       ├── README.md
-│       ├── public/
-│       └── private/
-├── generated/
-│   └── assignments/
-│       └── <assignment-slug>/
-│           ├── assignment-manifest.json
-│           ├── run_autograder
-│           └── run_autograder.py
-├── tools/
-├── docs/
-├── scripts/
-└── .github/
+|-- aprog.toml
+|-- assignments/
+|   `-- <assignment-slug>/
+|       |-- assignment.toml
+|       |-- README.md
+|       |-- visible-tests/
+|       |-- expected/
+|       `-- assets/
+|-- templates/
+|   `-- <template-slug>/
+|       |-- template.toml
+|       |-- README.md
+|       |-- public/
+|       `-- private/
+|-- generated/
+|   `-- assignments/
+|       `-- <assignment-slug>/
+|           |-- assignment-manifest.json
+|           |-- run_autograder
+|           `-- run_autograder.py
+|-- tools/
+|-- docs/
+|-- scripts/
+`-- .github/
 ```
 
 ## `aprog-private`
 
 ```text
 aprog-private/
-├── solutions/
-│   └── <assignment-slug>/
-├── hidden-tests/
-│   └── <assignment-slug>/
-│       ├── tests/
-│       ├── expected/
-│       └── assets/
-├── grader/
-│   └── <assignment-slug>/
-│       └── pipeline.py
-├── generated/
-│   └── assignments/
-│       └── <assignment-slug>/
-│           ├── private-assignment-manifest.json
-│           └── verification-config.json
-└── maintainer/
+|-- solutions/
+|   `-- <assignment-slug>/
+|-- hidden-tests/
+|   `-- <assignment-slug>/
+|       |-- tests/
+|       |-- expected/
+|       `-- assets/
+|-- grader/
+|   `-- <assignment-slug>/
+|       `-- pipeline.py
+|-- generated/
+|   `-- assignments/
+|       `-- <assignment-slug>/
+|           |-- private-assignment-manifest.json
+|           `-- verification-config.json
+`-- maintainer/
 ```
 
 ## Naming Convention

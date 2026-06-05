@@ -50,7 +50,7 @@ aprog generate-config <slug> --public ../aprog-public --private ../aprog-private
 - [ ] No private material is present in public repo
 - [ ] Public PR and private bundle refer to the same slug
 
-## After merge — deploy to Gradescope
+## After merge -- deploy to Gradescope
 
 See `maintainers/gradescope-upload.md` for the full upload guide.
 

@@ -4,7 +4,7 @@ Two helpers in `lograder.pipeline.test.oracle` reduce the manual effort of writi
 
 ## When to use oracle helpers
 
-Use **`oracle_cases`** when you have a reference binary and want to pre-capture its outputs as expected values. The expected outputs are stored in the case objects at grader-construction time — no reference binary is needed at Gradescope grading time.
+Use **`oracle_cases`** when you have a reference binary and want to pre-capture its outputs as expected values. The expected outputs are stored in the case objects at grader-construction time -- no reference binary is needed at Gradescope grading time.
 
 Use **`DifferentialTest`** when you want to compare student output against the reference binary live, at grading time. The reference binary must be present on the Gradescope grading server.
 
@@ -18,7 +18,7 @@ Use **`cases_from_matrix`** with either of the above to generate all combination
 from lograder.pipeline.test.oracle import OracleInput
 ```
 
-A partial case specification used as input to both `oracle_cases` and `DifferentialTest`. It does not include `expected_stdout` — that is either captured from the reference binary or compared live.
+A partial case specification used as input to both `oracle_cases` and `DifferentialTest`. It does not include `expected_stdout` -- that is either captured from the reference binary or compared live.
 
 ```python
 OracleInput(
@@ -87,7 +87,7 @@ The default `name_fn` joins the argument tuple with underscores.
 Example:
 
 ```python
-# 3 operations × 3 values = 9 cases
+# 3 operations x 3 values = 9 cases
 inputs = cases_from_matrix(
     ["add", "sub", "mul"],
     ["1", "10", "100"],

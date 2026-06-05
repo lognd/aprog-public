@@ -1,8 +1,8 @@
 # mypy: ignore-errors
 """
-System test: full contributor → maintainer workflow.
+System test: full contributor -> maintainer workflow.
 
-  aprog new → validate → generate-config → package-private → intake → verify
+  aprog new -> validate -> generate-config -> package-private -> intake -> verify
 
 Uses a real lograder pipeline with a Python stdin/stdout assignment so the
 grader actually executes. Marked slow because it spawns a subprocess.

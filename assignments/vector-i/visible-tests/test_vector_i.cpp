@@ -1,4 +1,4 @@
-// Visible smoke test — compile: g++ -std=c++17 -Wall -Wextra -o test_vi test_vector_i.cpp -I../assets
+// Visible smoke test -- compile: g++ -std=c++17 -Wall -Wextra -o test_vi test_vector_i.cpp -I../assets
 // A clean compile with no warnings is a good first indicator your fixes are correct.
 
 #include "../assets/vector_i.hpp"

@@ -26,31 +26,53 @@ from aprog.utils.repo import (
 console = Console()
 
 _RUN_AUTOGRADER_PY_TEMPLATE = """\
+import json
 import sys
+import traceback
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+# /autograder/source/ is the extracted zip root; grader/pipeline.py lives there.
+_SOURCE = Path("/autograder/source")
+sys.path.insert(0, str(_SOURCE))
 
 from lograder.pipeline.config import config
 from lograder.pipeline.score import GradescopeConfig
 
 from grader.pipeline import make_pipeline
 
+_RESULTS = Path("/autograder/results/results.json")
+
 if __name__ == "__main__":
-    with config(root_directory=Path("/autograder/submission")):
-        pipeline = make_pipeline()
-        score = pipeline()
-        score.write_results_json(
-            config=GradescopeConfig(
-                visibility={visibility!r},
-                stdout_visibility={stdout_visibility!r},
+    try:
+        with config(root_directory=Path("/autograder/submission")):
+            pipeline = make_pipeline()
+            score = pipeline()
+            score.write_results_json(
+                config=GradescopeConfig(
+                    visibility={visibility!r},
+                    stdout_visibility={stdout_visibility!r},
+                )
             )
+    except Exception:
+        # Always write results.json so Gradescope receives a structured response
+        # instead of a blank "no results" error.
+        _RESULTS.parent.mkdir(parents=True, exist_ok=True)
+        _RESULTS.write_text(
+            json.dumps({{
+                "score": 0,
+                "output": "Autograder error:\\n\\n" + traceback.format_exc(),
+            }}),
+            encoding="utf-8",
         )
+        sys.exit(1)
 """
 
 _RUN_AUTOGRADER_SH = """\
 #!/usr/bin/env bash
-exec python3 "$(dirname "$0")/run_autograder.py" "$@"
+# run_autograder is copied to /autograder/run_autograder during the Docker
+# image build, while the rest of the zip is extracted to /autograder/source/.
+# Reference run_autograder.py by its known absolute path.
+exec python3 /autograder/source/run_autograder.py "$@"
 """
 
 _GENERATOR_VERSION = "0.1"
@@ -132,7 +154,7 @@ def cmd_generate_config(
     autograder_sh.write_text(_RUN_AUTOGRADER_SH)
     autograder_sh.chmod(0o755)
 
-    console.print(f"[green]✓[/green] Generated configs for '{slug}':")
+    console.print(f"[green][OK][/green] Generated configs for '{slug}':")
     console.print(f"  {manifest_path.relative_to(root)}")
     console.print(f"  {autograder_py.relative_to(root)}")
     console.print(f"  {autograder_sh.relative_to(root)}")

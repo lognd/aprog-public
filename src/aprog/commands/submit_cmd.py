@@ -55,7 +55,7 @@ def cmd_submit(
             raise typer.Exit(1)
         bundle.unlink()
         bundle = encrypted
-        console.print(f"[green]✓[/green] Encrypted: {bundle}")
+        console.print(f"[green][OK][/green] Encrypted: {bundle}")
 
     intake_url = os.environ.get("APROG_INTAKE_URL")
     if intake_url:
@@ -83,7 +83,7 @@ def _upload(bundle: Path, slug: str, url: str) -> None:
             response.raise_for_status()
             data = response.json()
             console.print(
-                f"[green]✓[/green] Received — id: {data.get('id', 'unknown')}"
+                f"[green][OK][/green] Received -- id: {data.get('id', 'unknown')}"
             )
         except httpx.HTTPStatusError as e:
             console.print(f"[red]Upload failed:[/red] HTTP {e.response.status_code}")

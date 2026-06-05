@@ -10,7 +10,7 @@ from lograder.pipeline.input.local_directory import LocalDirectory
 
 Always the first step. Reads the submission directory from `EnvironmentConfig.root_directory` and returns a `Manifest` listing all files.
 
-- Input: `PIPELINE_START` (sentinel — no actual input)
+- Input: `PIPELINE_START` (sentinel -- no actual input)
 - Ok output: `Manifest`
 - Fatal Err output: none (always succeeds)
 
@@ -42,7 +42,7 @@ Fatal on build failure. Returns `dict[str, Artifact]` keyed by CMake target name
 from lograder.pipeline.build.makefile import MakefileBuild
 ```
 
-Runs `make`. Returns `Ok({})` — artifact parsing is not implemented. Use `PrebuiltArtifacts` to specify the output manually.
+Runs `make`. Returns `Ok({})` -- artifact parsing is not implemented. Use `PrebuiltArtifacts` to specify the output manually.
 
 ### `BashScriptBuild`
 

@@ -98,7 +98,7 @@ def cmd_intake(
             )
         _copy_dir(slug_dir / "grader", private_repo / "grader" / slug, force)
 
-        console.print(f"[green]✓[/green] Intake complete for '{slug}'")
+        console.print(f"[green][OK][/green] Intake complete for '{slug}'")
 
     if validate:
         from aprog.commands.validate_cmd import cmd_validate
@@ -122,4 +122,4 @@ def _copy_dir(src: Path, dst: Path, force: bool) -> None:
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(src, dst)
-    console.print(f"  Copied: {src.name}/ → {dst}")
+    console.print(f"  Copied: {src.name}/ -> {dst}")

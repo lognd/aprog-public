@@ -112,4 +112,4 @@ Do not add:
 - `points`, `hidden_cases`
 - `stdout_visibility` at top level (must be under `[grader]`)
 - `deploy_key`, `private_repo`
-- `gradescope` (top-level — use `[grader]` instead)
+- `gradescope` (top-level -- use `[grader]` instead)

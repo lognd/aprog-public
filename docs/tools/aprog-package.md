@@ -59,11 +59,11 @@ dist/<assignment-slug>-private.tar.gz.gpg
 
 ```text
 <assignment-slug>/
-├── package-manifest.json
-├── solution/
-├── hidden-tests/
-└── grader/
-    └── pipeline.py
+|-- package-manifest.json
+|-- solution/
+|-- hidden-tests/
+`-- grader/
+    `-- pipeline.py
 ```
 
 `grader/pipeline.py` is the contributor-authored lograder pipeline definition. It must export `make_pipeline() -> Pipeline`. It is required for `aprog intake` to complete and for `aprog verify` to run.

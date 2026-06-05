@@ -19,8 +19,8 @@ Checks for:
 Output on violation:
 
 ```text
-ERROR: assignments/linked-list-insertion/solution.py — matches prohibited pattern 'solution.*'
-ERROR: assignments/linked-list-insertion/grader/pipeline.py — 'grader/' directory is private
+ERROR: assignments/linked-list-insertion/solution.py -- matches prohibited pattern 'solution.*'
+ERROR: assignments/linked-list-insertion/grader/pipeline.py -- 'grader/' directory is private
 ```
 
 ### Exit codes

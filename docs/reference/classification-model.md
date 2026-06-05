@@ -78,9 +78,9 @@ labels = ["unit-tests"]
 
 ## Required classification fields
 
-- `language` — required
-- `difficulty` — required
-- `topics` — required, non-empty
+- `language` -- required
+- `difficulty` -- required
+- `topics` -- required, non-empty
 
 ## Optional classification fields
 
@@ -98,7 +98,7 @@ Only maintainers may add new values. The process:
 3. CI validates the TOML structure.
 4. A maintainer merges the PR.
 
-Contributors may request new values by opening an issue. Do not add classification values in a PR alongside an assignment — they must be merged to `aprog.toml` first.
+Contributors may request new values by opening an issue. Do not add classification values in a PR alongside an assignment -- they must be merged to `aprog.toml` first.
 
 ## Freeform labels
 

@@ -53,14 +53,14 @@ def _scan_one(assignment_root: Path) -> list[str]:
 
         if name in _PROHIBITED_NAMES:
             violations.append(
-                f"ERROR: {assignment_root.name}/{rel} — prohibited name '{name}'"
+                f"ERROR: {assignment_root.name}/{rel} -- prohibited name '{name}'"
             )
             continue
 
         for part in parts[:-1]:
             if part in _PRIVATE_DIRS:
                 violations.append(
-                    f"ERROR: {assignment_root.name}/{rel} — '{part}/' directory is private"
+                    f"ERROR: {assignment_root.name}/{rel} -- '{part}/' directory is private"
                 )
                 break
 
@@ -68,7 +68,7 @@ def _scan_one(assignment_root: Path) -> list[str]:
             for prefix in _PROHIBITED_PREFIXES:
                 if name.startswith(prefix) or name == prefix.rstrip("."):
                     violations.append(
-                        f"ERROR: {assignment_root.name}/{rel} — matches prohibited pattern '{prefix}*'"
+                        f"ERROR: {assignment_root.name}/{rel} -- matches prohibited pattern '{prefix}*'"
                     )
                     break
 
@@ -100,7 +100,7 @@ def cmd_scan_public(
             console.print(v)
         raise typer.Exit(1)
     else:
-        console.print("[green]✓[/green] No boundary violations found.")
+        console.print("[green][OK][/green] No boundary violations found.")
 
 
 def cmd_check_generated(
@@ -149,4 +149,4 @@ def cmd_check_generated(
     if any_stale:
         raise typer.Exit(1)
     else:
-        console.print("[green]✓[/green] All generated files current.")
+        console.print("[green][OK][/green] All generated files current.")

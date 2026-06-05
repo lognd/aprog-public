@@ -55,8 +55,8 @@ def cmd_verify(
     sys.path.insert(0, str(private_repo / "grader" / slug))
 
     try:
-        from pipeline import make_pipeline  # type: ignore[import-not-found]
         from lograder.pipeline.config import config
+        from pipeline import make_pipeline  # type: ignore[import-not-found]
     except ImportError as e:
         console.print(f"[red]Import error:[/red] {e}")
         raise typer.Exit(1)
@@ -82,11 +82,11 @@ def cmd_verify(
     )
 
     if passed:
-        console.print(f"[green]✓[/green] Verification passed for '{slug}'")
+        console.print(f"[green][OK][/green] Verification passed for '{slug}'")
         _update_verification_state(private_repo, slug, "verified")
     else:
         console.print(
-            f"[red]✗[/red] Verification failed: reference solution did not earn full points"
+            f"[red][FAIL][/red] Verification failed: reference solution did not earn full points"
         )
         raise typer.Exit(1)
 
@@ -124,42 +124,77 @@ def cmd_package_gradescope(
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(1)
 
-    import tarfile
+    import zipfile
+
+    gen_dir = public_root / "generated" / "assignments" / slug
+
+    # Fail early if required generated files are missing rather than silently
+    # producing a broken zip that Gradescope accepts but cannot run.
+    missing_generated = [
+        name
+        for name in ("run_autograder", "run_autograder.py")
+        if not (gen_dir / name).exists()
+    ]
+    if missing_generated:
+        console.print(
+            f"[red]Error:[/red] Generated files missing for '{slug}': "
+            + ", ".join(missing_generated)
+        )
+        console.print(f"  Run: aprog generate-config {slug} --force")
+        raise typer.Exit(1)
+
+    pipeline_file = private_repo / "grader" / slug / "pipeline.py"
+    if not pipeline_file.exists():
+        console.print(
+            f"[red]Error:[/red] Grader pipeline missing: grader/{slug}/pipeline.py"
+        )
+        raise typer.Exit(1)
 
     dist = (output_dir or public_root / "dist").resolve()
     dist.mkdir(parents=True, exist_ok=True)
     out = dist / f"{slug}-gradescope.zip"
 
-    import zipfile
-
-    gen_dir = public_root / "generated" / "assignments" / slug
+    # Unix permission bits stored in the high 16 bits of external_attr.
+    _EXEC = 0o100755 << 16  # rwxr-xr-x executable
+    _DATA = 0o100644 << 16  # rw-r--r-- non-executable
 
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
-        # setup.sh
+        # setup.sh -- must be executable so Gradescope can run it
         deps = cfg.grader.dependencies
         lograder_req = f"lograder{deps.lograder}" if deps.lograder else "lograder"
         extra = " ".join(deps.extra)
         setup_sh = (
             f"#!/usr/bin/env bash\nset -e\npip install '{lograder_req}' {extra}\n"
         )
-        zf.writestr("setup.sh", setup_sh)
+        info = zipfile.ZipInfo("setup.sh")
+        info.external_attr = _EXEC
+        info.compress_type = zipfile.ZIP_DEFLATED
+        zf.writestr(info, setup_sh)
 
-        # run_autograder + run_autograder.py
+        # run_autograder (shell shim) and run_autograder.py -- both executable
         for name in ("run_autograder", "run_autograder.py"):
-            f = gen_dir / name
-            if f.exists():
-                zf.write(f, name)
+            src = gen_dir / name
+            info = zipfile.ZipInfo(name)
+            info.external_attr = _EXEC
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.file_size = src.stat().st_size
+            zf.writestr(info, src.read_bytes())
 
         # grader/pipeline.py
-        pipeline = private_repo / "grader" / slug / "pipeline.py"
-        if pipeline.exists():
-            zf.write(pipeline, "grader/pipeline.py")
+        info = zipfile.ZipInfo("grader/pipeline.py")
+        info.external_attr = _DATA
+        info.compress_type = zipfile.ZIP_DEFLATED
+        zf.writestr(info, pipeline_file.read_bytes())
 
         # hidden tests
         ht_dir = private_repo / "hidden-tests" / slug
         if ht_dir.exists():
             for path in sorted(ht_dir.rglob("*")):
                 if path.is_file():
-                    zf.write(path, f"hidden-tests/{path.relative_to(ht_dir)}")
+                    arc = f"hidden-tests/{path.relative_to(ht_dir)}"
+                    info = zipfile.ZipInfo(arc)
+                    info.external_attr = _DATA
+                    info.compress_type = zipfile.ZIP_DEFLATED
+                    zf.writestr(info, path.read_bytes())
 
-    console.print(f"[green]✓[/green] {out}")
+    console.print(f"[green][OK][/green] {out}")

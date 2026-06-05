@@ -39,7 +39,7 @@ ssh-keygen -t ed25519 -C "aprog-private-ci-deploy-key" -f aprog_private_deploy_k
 Add the public key to `aprog-private`:
 
 ```text
-Settings → Deploy keys → Add deploy key (read-only, no write access)
+Settings -> Deploy keys -> Add deploy key (read-only, no write access)
 ```
 
 Add the private key to `aprog-public` Actions secrets:

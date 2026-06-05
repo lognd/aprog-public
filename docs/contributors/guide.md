@@ -82,9 +82,9 @@ Expected private bundle shape:
 
 ```text
 <slug>/
-├── package-manifest.json
-├── solution/
-├── hidden-tests/
-└── grader/
-    └── pipeline.py
+|-- package-manifest.json
+|-- solution/
+|-- hidden-tests/
+`-- grader/
+    `-- pipeline.py
 ```

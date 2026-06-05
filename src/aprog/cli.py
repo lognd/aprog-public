@@ -19,7 +19,7 @@ _Private = Annotated[
 ]
 
 
-# ── new ───────────────────────────────────────────────────────────────────────
+# -- new -----------------------------------------------------------------------
 
 
 @app.command("new")
@@ -46,7 +46,7 @@ def new(
     )
 
 
-# ── validate ──────────────────────────────────────────────────────────────────
+# -- validate ------------------------------------------------------------------
 
 
 @app.command("validate")
@@ -69,7 +69,7 @@ def validate(
         raise typer.Exit(2)
 
 
-# ── scan-public ───────────────────────────────────────────────────────────────
+# -- scan-public ---------------------------------------------------------------
 
 
 @app.command("scan-public")
@@ -84,7 +84,7 @@ def scan_public(
     cmd_scan_public(slug=slug, all_assignments=all_, public_root=public)
 
 
-# ── check-generated ───────────────────────────────────────────────────────────
+# -- check-generated -----------------------------------------------------------
 
 
 @app.command("check-generated")
@@ -102,7 +102,7 @@ def check_generated(
     )
 
 
-# ── list / info ───────────────────────────────────────────────────────────────
+# -- list / info ---------------------------------------------------------------
 
 
 @app.command("list")
@@ -139,7 +139,7 @@ def info(
     cmd_info(slug, private_repo=private, public_root=public)
 
 
-# ── templates ─────────────────────────────────────────────────────────────────
+# -- templates -----------------------------------------------------------------
 
 
 @templates_app.command("list")
@@ -164,7 +164,7 @@ def templates_info(
     cmd_templates_info(slug, public_root=public)
 
 
-# ── generate-config ───────────────────────────────────────────────────────────
+# -- generate-config -----------------------------------------------------------
 
 
 @app.command("generate-config")
@@ -190,7 +190,7 @@ def generate_config(
         raise typer.Exit(2)
 
 
-# ── package-public ────────────────────────────────────────────────────────────
+# -- package-public ------------------------------------------------------------
 
 
 @app.command("package-public")
@@ -205,7 +205,7 @@ def package_public(
     cmd_package_public(slug, output_dir=output_dir, public_root=public)
 
 
-# ── package-private ───────────────────────────────────────────────────────────
+# -- package-private -----------------------------------------------------------
 
 
 @app.command("package-private")
@@ -230,7 +230,7 @@ def package_private(
     )
 
 
-# ── submit ────────────────────────────────────────────────────────────────────
+# -- submit --------------------------------------------------------------------
 
 
 @app.command("submit")
@@ -255,7 +255,7 @@ def submit(
     )
 
 
-# ── intake ────────────────────────────────────────────────────────────────────
+# -- intake --------------------------------------------------------------------
 
 
 @app.command("intake")
@@ -280,7 +280,7 @@ def intake(
     )
 
 
-# ── verify ────────────────────────────────────────────────────────────────────
+# -- verify --------------------------------------------------------------------
 
 
 @app.command("verify")
@@ -295,7 +295,7 @@ def verify(
     cmd_verify(slug, public_repo=public, private_repo=private)
 
 
-# ── package-gradescope ────────────────────────────────────────────────────────
+# -- package-gradescope --------------------------------------------------------
 
 
 @app.command("package-gradescope")

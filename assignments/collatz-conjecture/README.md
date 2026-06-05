@@ -9,7 +9,7 @@ Take any positive integer **n** and apply the following rules repeatedly:
 - If **n** is odd: `f(n) = 3n + 1`
 
 Repeat, feeding the output back into the input, until the sequence loops.
-The conjecture is that every positive integer eventually falls into the 4 → 2 → 1 loop.
+The conjecture is that every positive integer eventually falls into the 4 -> 2 -> 1 loop.
 
 ## Your task
 

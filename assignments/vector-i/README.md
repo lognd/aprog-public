@@ -1,7 +1,7 @@
 # VectorI: Dynamic Integer Array
 
 For this lab you will use AI or a friend's code to produce a working implementation
-of a dynamic integer array — and then fix it.
+of a dynamic integer array -- and then fix it.
 
 You are given the following **intentionally broken** starter code. It has **several bugs**.
 Your job is to find and fix every one of them so that `VectorI` compiles and behaves correctly.

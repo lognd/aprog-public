@@ -2,7 +2,7 @@
 
 ## `EnvironmentConfig`
 
-`run_autograder.py` sets up `EnvironmentConfig` before calling `make_pipeline()`. Contributors do not need to configure this — it is handled by the generated entry point.
+`run_autograder.py` sets up `EnvironmentConfig` before calling `make_pipeline()`. Contributors do not need to configure this -- it is handled by the generated entry point.
 
 Relevant fields (for awareness when writing `pipeline.py`):
 
@@ -29,7 +29,7 @@ submission_root = config.root_directory
 
 ## `GradescopeConfig`
 
-Used by `run_autograder.py` when calling `score.write_results_json()`. Contributors do not set this directly — it is generated from the `[grader]` section in `assignment.toml`.
+Used by `run_autograder.py` when calling `score.write_results_json()`. Contributors do not set this directly -- it is generated from the `[grader]` section in `assignment.toml`.
 
 Shown here for reference:
 
