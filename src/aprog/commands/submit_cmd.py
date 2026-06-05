@@ -39,7 +39,15 @@ def cmd_submit(
             raise typer.Exit(1)
         encrypted = Path(str(bundle) + ".gpg")
         result = subprocess.run(
-            ["gpg", "--recipient", recipient, "--output", str(encrypted), "--encrypt", str(bundle)],
+            [
+                "gpg",
+                "--recipient",
+                recipient,
+                "--output",
+                str(encrypted),
+                "--encrypt",
+                str(bundle),
+            ],
             capture_output=True,
         )
         if result.returncode != 0:
@@ -54,12 +62,15 @@ def cmd_submit(
         _upload(bundle, slug, intake_url)
     else:
         console.print(f"\nBundle: {bundle}")
-        console.print("\nSubmit this file to your maintainer using the process documented at:")
+        console.print(
+            "\nSubmit this file to your maintainer using the process documented at:"
+        )
         console.print("  https://your-org/instructions")
 
 
 def _upload(bundle: Path, slug: str, url: str) -> None:
     import httpx
+
     console.print(f"Uploading to {url}...")
     with open(bundle, "rb") as f:
         try:
@@ -71,7 +82,9 @@ def _upload(bundle: Path, slug: str, url: str) -> None:
             )
             response.raise_for_status()
             data = response.json()
-            console.print(f"[green]✓[/green] Received — id: {data.get('id', 'unknown')}")
+            console.print(
+                f"[green]✓[/green] Received — id: {data.get('id', 'unknown')}"
+            )
         except httpx.HTTPStatusError as e:
             console.print(f"[red]Upload failed:[/red] HTTP {e.response.status_code}")
             raise typer.Exit(1)

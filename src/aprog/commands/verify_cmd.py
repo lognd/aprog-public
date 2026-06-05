@@ -25,6 +25,7 @@ def cmd_verify(
 
     # Public validation
     from aprog.commands.validate_cmd import cmd_validate
+
     code = cmd_validate(slug, public_root=public_root)
     if code not in (0, 4):
         console.print(f"[red]Public validation failed for '{slug}'[/red]")
@@ -32,12 +33,16 @@ def cmd_verify(
 
     sol_dir = private_repo / "solutions" / slug
     if not sol_dir.exists():
-        console.print(f"[red]Error:[/red] Solution directory missing: solutions/{slug}/")
+        console.print(
+            f"[red]Error:[/red] Solution directory missing: solutions/{slug}/"
+        )
         raise typer.Exit(4)
 
     grader_file = private_repo / "grader" / slug / "pipeline.py"
     if not grader_file.exists():
-        console.print(f"[red]Error:[/red] Grader pipeline missing: grader/{slug}/pipeline.py")
+        console.print(
+            f"[red]Error:[/red] Grader pipeline missing: grader/{slug}/pipeline.py"
+        )
         raise typer.Exit(5)
 
     ht_dir = private_repo / "hidden-tests" / slug
@@ -46,11 +51,12 @@ def cmd_verify(
 
     # Run grader against reference solution
     import sys
+
     sys.path.insert(0, str(private_repo / "grader" / slug))
 
     try:
+        from grader.pipeline import make_pipeline  # type: ignore[import-not-found]
         from lograder.pipeline.config import config
-        from grader.pipeline import make_pipeline  # type: ignore[import]
     except ImportError as e:
         console.print(f"[red]Import error:[/red] {e}")
         raise typer.Exit(1)
@@ -70,20 +76,25 @@ def cmd_verify(
     total = score.total()
     passed = total.earned >= total.possible
 
-    console.print(f"Score: {total.earned}/{total.possible}" + (
-        f" + {total.extra_credit} extra credit" if total.extra_credit else ""
-    ))
+    console.print(
+        f"Score: {total.earned}/{total.possible}"
+        + (f" + {total.extra_credit} extra credit" if total.extra_credit else "")
+    )
 
     if passed:
         console.print(f"[green]✓[/green] Verification passed for '{slug}'")
         _update_verification_state(private_repo, slug, "verified")
     else:
-        console.print(f"[red]✗[/red] Verification failed: reference solution did not earn full points")
+        console.print(
+            f"[red]✗[/red] Verification failed: reference solution did not earn full points"
+        )
         raise typer.Exit(1)
 
 
 def _update_verification_state(private_repo: Path, slug: str, state: str) -> None:
-    vc_path = private_repo / "generated" / "assignments" / slug / "verification-config.json"
+    vc_path = (
+        private_repo / "generated" / "assignments" / slug / "verification-config.json"
+    )
     if not vc_path.exists():
         return
     try:
@@ -106,6 +117,7 @@ def cmd_package_gradescope(
         raise typer.Exit(2)
 
     from aprog.utils.repo import load_assignment_config
+
     try:
         cfg = load_assignment_config(public_root, slug)
     except FileNotFoundError as e:
@@ -113,11 +125,13 @@ def cmd_package_gradescope(
         raise typer.Exit(1)
 
     import tarfile
+
     dist = (output_dir or public_root / "dist").resolve()
     dist.mkdir(parents=True, exist_ok=True)
     out = dist / f"{slug}-gradescope.zip"
 
     import zipfile
+
     gen_dir = public_root / "generated" / "assignments" / slug
 
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -126,9 +140,7 @@ def cmd_package_gradescope(
         lograder_req = f"lograder{deps.lograder}" if deps.lograder else "lograder"
         extra = " ".join(deps.extra)
         setup_sh = (
-            "#!/usr/bin/env bash\n"
-            "set -e\n"
-            f"pip install '{lograder_req}' {extra}\n"
+            f"#!/usr/bin/env bash\nset -e\npip install '{lograder_req}' {extra}\n"
         )
         zf.writestr("setup.sh", setup_sh)
 

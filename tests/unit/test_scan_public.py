@@ -18,12 +18,15 @@ def _make_assignment(tmp_path: Path, files: list[str]) -> Path:
 
 
 def test_clean_assignment_has_no_violations(tmp_path: Path) -> None:
-    root = _make_assignment(tmp_path, [
-        "assignment.toml",
-        "README.md",
-        "visible-tests/test_visible.py",
-        "assets/starter.py",
-    ])
+    root = _make_assignment(
+        tmp_path,
+        [
+            "assignment.toml",
+            "README.md",
+            "visible-tests/test_visible.py",
+            "assets/starter.py",
+        ],
+    )
     assert _scan_public_violations(root) == []
 
 

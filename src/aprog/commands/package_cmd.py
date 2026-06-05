@@ -60,6 +60,7 @@ def cmd_package_private(
     # Resolve paths from staging dir if not provided
     if not solution or not hidden_tests or not grader:
         from aprog.utils.repo import resolve_staging_dir
+
         staging = resolve_staging_dir(None)
         if staging:
             staging_slug = staging / slug
@@ -75,6 +76,9 @@ def cmd_package_private(
     if missing:
         console.print(f"[red]Error:[/red] Missing required paths: {', '.join(missing)}")
         raise typer.Exit(1)
+
+    assert solution is not None
+    assert grader is not None
 
     dist = (output_dir or root / "dist").resolve()
     dist.mkdir(parents=True, exist_ok=True)
@@ -95,9 +99,13 @@ def cmd_package_private(
     )
 
     with tarfile.open(out, "w:gz") as tar:
-        _add_string_to_tar(tar, json.dumps(manifest.model_dump(), indent=2) + "\n", f"{slug}/package-manifest.json")
+        _add_string_to_tar(
+            tar,
+            json.dumps(manifest.model_dump(), indent=2) + "\n",
+            f"{slug}/package-manifest.json",
+        )
         _add_dir_to_tar(tar, solution, f"{slug}/solution")
-        if has_hidden:
+        if has_hidden and hidden_tests is not None:
             _add_dir_to_tar(tar, hidden_tests, f"{slug}/hidden-tests")
         _add_dir_to_tar(tar, grader, f"{slug}/grader")
 
@@ -113,6 +121,7 @@ def _add_dir_to_tar(tar: tarfile.TarFile, src: Path, arcname_prefix: str) -> Non
 
 def _add_string_to_tar(tar: tarfile.TarFile, content: str, arcname: str) -> None:
     import io
+
     data = content.encode()
     info = tarfile.TarInfo(name=arcname)
     info.size = len(data)

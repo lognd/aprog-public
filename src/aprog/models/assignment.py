@@ -83,7 +83,9 @@ class GraderSection(BaseModel):
     @classmethod
     def visibility_is_valid(cls, v: str) -> str:
         if v not in _VISIBILITY_VALUES:
-            raise ValueError(f"visibility must be one of {_VISIBILITY_VALUES}, got {v!r}")
+            raise ValueError(
+                f"visibility must be one of {_VISIBILITY_VALUES}, got {v!r}"
+            )
         return v
 
 

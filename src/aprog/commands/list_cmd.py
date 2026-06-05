@@ -2,16 +2,28 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TypedDict
 
 import typer
 from pydantic import ValidationError
 from rich.console import Console
 from rich.table import Table
 
-from aprog.utils.repo import all_assignment_slugs, find_public_root, load_assignment_config
+from aprog.utils.repo import (
+    all_assignment_slugs,
+    find_public_root,
+    load_assignment_config,
+)
 
 console = Console()
+
+
+class _Row(TypedDict):
+    slug: str
+    language: str
+    difficulty: str
+    topics: list[str]
+    status: str
 
 
 def cmd_list(
@@ -25,7 +37,7 @@ def cmd_list(
     root = public_root or find_public_root()
     slugs = all_assignment_slugs(root)
 
-    results = []
+    results: list[_Row] = []
     for slug in slugs:
         try:
             cfg = load_assignment_config(root, slug)
@@ -97,14 +109,18 @@ def cmd_info(
     t = cfg.template
 
     assignment_root = root / "assignments" / slug
-    manifest_path = root / "generated" / "assignments" / slug / "assignment-manifest.json"
+    manifest_path = (
+        root / "generated" / "assignments" / slug / "assignment-manifest.json"
+    )
 
     hash_status = "missing"
     if manifest_path.exists():
         import json as _json
+
         try:
             manifest_data = _json.loads(manifest_path.read_text())
             from aprog.utils.hashing import hash_assignment_public
+
             current = hash_assignment_public(root, slug)
             stored = manifest_data.get("source_hash", "")
             hash_status = "current" if current == stored else "stale"
@@ -124,7 +140,10 @@ def cmd_info(
     if c.concepts:
         console.print(f"  Concepts:   {', '.join(c.concepts)}")
     console.print()
-    console.print(f"[bold]Template:[/bold]     {t.slug}" + (f" (v{t.version})" if t.version else ""))
+    console.print(
+        f"[bold]Template:[/bold]     {t.slug}"
+        + (f" (v{t.version})" if t.version else "")
+    )
     console.print()
     console.print("[bold]Paths:[/bold]")
     console.print(f"  Root:          assignments/{slug}/")
@@ -132,7 +151,9 @@ def cmd_info(
     console.print(f"  Visible tests: assignments/{slug}/visible-tests/")
     console.print()
     console.print("[bold]Generated:[/bold]")
-    console.print(f"  Manifest:     generated/assignments/{slug}/assignment-manifest.json")
+    console.print(
+        f"  Manifest:     generated/assignments/{slug}/assignment-manifest.json"
+    )
     console.print(f"  Autograder:   generated/assignments/{slug}/run_autograder.py")
     console.print(f"  Hash status:  {hash_status}")
 
@@ -142,13 +163,26 @@ def cmd_info(
         sol = private_repo / "solutions" / slug
         ht = private_repo / "hidden-tests" / slug
         gr = private_repo / "grader" / slug
-        vc = private_repo / "generated" / "assignments" / slug / "verification-config.json"
-        console.print(f"  Solution:     solutions/{slug}/      {'present' if sol.exists() else 'missing'}")
-        console.print(f"  Hidden tests: hidden-tests/{slug}/   {'present' if ht.exists() else 'missing'}")
-        console.print(f"  Grader:       grader/{slug}/          {'present' if gr.exists() else 'missing'}")
+        vc = (
+            private_repo
+            / "generated"
+            / "assignments"
+            / slug
+            / "verification-config.json"
+        )
+        console.print(
+            f"  Solution:     solutions/{slug}/      {'present' if sol.exists() else 'missing'}"
+        )
+        console.print(
+            f"  Hidden tests: hidden-tests/{slug}/   {'present' if ht.exists() else 'missing'}"
+        )
+        console.print(
+            f"  Grader:       grader/{slug}/          {'present' if gr.exists() else 'missing'}"
+        )
         verified = "unknown"
         if vc.exists():
             import json as _json
+
             try:
                 d = _json.loads(vc.read_text())
                 verified = "yes" if d.get("verification_state") == "verified" else "no"

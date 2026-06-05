@@ -19,13 +19,32 @@ from aprog.utils.repo import (
 console = Console()
 
 _PROHIBITED_NAMES = {
-    "solution", "solutions", "hidden", "hidden-tests", "hidden_tests",
-    "private", "private-notes.md", "answer-key.md", "grader", "pipeline.py",
+    "solution",
+    "solutions",
+    "hidden",
+    "hidden-tests",
+    "hidden_tests",
+    "private",
+    "private-notes.md",
+    "answer-key.md",
+    "grader",
+    "pipeline.py",
 }
 _PROHIBITED_PATTERNS = [
-    "solution.", "answer.", "reference-solution.", "reference_solution.",
+    "solution.",
+    "answer.",
+    "reference-solution.",
+    "reference_solution.",
 ]
-_PRIVATE_DIRS = {"solution", "solutions", "hidden", "hidden-tests", "hidden_tests", "private", "grader"}
+_PRIVATE_DIRS = {
+    "solution",
+    "solutions",
+    "hidden",
+    "hidden-tests",
+    "hidden_tests",
+    "private",
+    "grader",
+}
 _SAFE_DIRS = {"visible-tests", "assets", "expected"}
 
 
@@ -86,7 +105,9 @@ def cmd_validate(
 
     # Slug matches directory name
     if a.slug != slug:
-        errors.append(f"Slug mismatch: assignment.toml has '{a.slug}', directory is '{slug}'")
+        errors.append(
+            f"Slug mismatch: assignment.toml has '{a.slug}', directory is '{slug}'"
+        )
 
     # Classification values exist in root config
     if c.language not in root_cfg.classification.languages:
@@ -125,18 +146,23 @@ def cmd_validate(
         errors.append(f"Boundary violation: {v}")
 
     # Generated files currency
-    manifest_path = root / "generated" / "assignments" / slug / "assignment-manifest.json"
+    manifest_path = (
+        root / "generated" / "assignments" / slug / "assignment-manifest.json"
+    )
     stale = False
     if not manifest_path.exists():
         errors.append("Generated manifest missing — run: aprog generate-config " + slug)
         stale = True
     else:
         import json
+
         try:
             data = json.loads(manifest_path.read_text())
             current_hash = hash_assignment_public(root, slug)
             if data.get("source_hash") != current_hash:
-                errors.append("Generated files are stale — run: aprog generate-config " + slug)
+                errors.append(
+                    "Generated files are stale — run: aprog generate-config " + slug
+                )
                 stale = True
         except Exception:
             errors.append("Could not read generated manifest")
@@ -153,8 +179,8 @@ def cmd_validate(
 
     if errors:
         console.print(f"[red]Validation failed for '{slug}':[/red]")
-        for err in errors:
-            console.print(f"  [red]✗[/red] {err}")
+        for msg in errors:
+            console.print(f"  [red]✗[/red] {msg}")
         return 4 if stale and len(errors) == 1 else 1
     else:
         console.print(f"[green]✓[/green] {slug} — valid")

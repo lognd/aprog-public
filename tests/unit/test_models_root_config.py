@@ -4,7 +4,12 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from aprog.models.root_config import ClassificationConfig, DifficultyEntry, LanguageEntry, RootConfig
+from aprog.models.root_config import (
+    ClassificationConfig,
+    DifficultyEntry,
+    LanguageEntry,
+    RootConfig,
+)
 
 
 def _sample_root() -> dict:
@@ -58,7 +63,5 @@ def test_empty_root_config_has_defaults() -> None:
 
 
 def test_label_description_defaults_empty() -> None:
-    cfg = RootConfig.model_validate(
-        {"labels": {"unit-tests": {"name": "Unit Tests"}}}
-    )
+    cfg = RootConfig.model_validate({"labels": {"unit-tests": {"name": "Unit Tests"}}})
     assert cfg.labels["unit-tests"].description == ""

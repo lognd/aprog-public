@@ -4,7 +4,13 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from aprog.models.assignment import AssignmentConfig, AssignmentSection, ClassificationSection, GraderSection, TemplateSection
+from aprog.models.assignment import (
+    AssignmentConfig,
+    AssignmentSection,
+    ClassificationSection,
+    GraderSection,
+    TemplateSection,
+)
 
 
 def _valid_data() -> dict:

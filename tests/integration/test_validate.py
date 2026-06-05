@@ -22,7 +22,9 @@ def test_validate_fails_without_generated_files(public_root: Path) -> None:
 
 def test_validate_fails_unknown_language(public_root: Path) -> None:
     toml = public_root / "assignments" / "linked-list-insertion" / "assignment.toml"
-    toml.write_text(toml.read_text().replace('language = "python"', 'language = "cobol"'))
+    toml.write_text(
+        toml.read_text().replace('language = "python"', 'language = "cobol"')
+    )
     code = cmd_validate("linked-list-insertion", public_root=public_root)
     assert code != 0
 
@@ -36,6 +38,7 @@ def test_validate_fails_missing_readme(public_root: Path) -> None:
 
 def test_validate_fails_missing_visible_tests(public_root: Path) -> None:
     import shutil
+
     vt = public_root / "assignments" / "linked-list-insertion" / "visible-tests"
     shutil.rmtree(vt)
     code = cmd_validate("linked-list-insertion", public_root=public_root)
@@ -50,9 +53,11 @@ def test_validate_fails_on_boundary_violation(public_root: Path) -> None:
 
 def test_validate_fails_slug_mismatch(public_root: Path) -> None:
     toml = public_root / "assignments" / "linked-list-insertion" / "assignment.toml"
-    toml.write_text(toml.read_text().replace(
-        'slug = "linked-list-insertion"', 'slug = "different-slug"'
-    ))
+    toml.write_text(
+        toml.read_text().replace(
+            'slug = "linked-list-insertion"', 'slug = "different-slug"'
+        )
+    )
     code = cmd_validate("linked-list-insertion", public_root=public_root)
     assert code != 0
 

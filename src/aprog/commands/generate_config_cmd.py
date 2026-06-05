@@ -7,13 +7,25 @@ from typing import Optional
 import typer
 from rich.console import Console
 
-from aprog.models.manifest import AssignmentManifest, ManifestAssignment, ManifestClassification, ManifestPaths, ManifestTemplate, PrivateManifest
+from aprog.models.assignment import AssignmentConfig
+from aprog.models.manifest import (
+    AssignmentManifest,
+    ManifestAssignment,
+    ManifestClassification,
+    ManifestPaths,
+    ManifestTemplate,
+    PrivateManifest,
+)
 from aprog.utils.hashing import hash_assignment_public
-from aprog.utils.repo import all_assignment_slugs, find_public_root, load_assignment_config
+from aprog.utils.repo import (
+    all_assignment_slugs,
+    find_public_root,
+    load_assignment_config,
+)
 
 console = Console()
 
-_RUN_AUTOGRADER_PY_TEMPLATE = '''\
+_RUN_AUTOGRADER_PY_TEMPLATE = """\
 import sys
 from pathlib import Path
 
@@ -34,12 +46,12 @@ if __name__ == "__main__":
                 stdout_visibility={stdout_visibility!r},
             )
         )
-'''
+"""
 
-_RUN_AUTOGRADER_SH = '''\
+_RUN_AUTOGRADER_SH = """\
 #!/usr/bin/env bash
 exec python3 "$(dirname "$0")/run_autograder.py" "$@"
-'''
+"""
 
 _GENERATOR_VERSION = "0.1"
 
@@ -63,14 +75,18 @@ def cmd_generate_config(
     autograder_py = gen_dir / "run_autograder.py"
     autograder_sh = gen_dir / "run_autograder"
 
-    source_hash = hash_assignment_public(root, slug, generator_version=_GENERATOR_VERSION)
+    source_hash = hash_assignment_public(
+        root, slug, generator_version=_GENERATOR_VERSION
+    )
 
     # Check if regeneration is needed
     if manifest_path.exists() and not force:
         try:
             existing = json.loads(manifest_path.read_text())
             if existing.get("source_hash") == source_hash:
-                console.print(f"[dim]Generated files for '{slug}' are current. Use --force to regenerate.[/dim]")
+                console.print(
+                    f"[dim]Generated files for '{slug}' are current. Use --force to regenerate.[/dim]"
+                )
                 return
         except Exception:
             pass
@@ -104,9 +120,7 @@ def cmd_generate_config(
         source_hash=source_hash,
     )
 
-    manifest_path.write_text(
-        json.dumps(manifest.model_dump(), indent=2) + "\n"
-    )
+    manifest_path.write_text(json.dumps(manifest.model_dump(), indent=2) + "\n")
 
     autograder_py.write_text(
         _RUN_AUTOGRADER_PY_TEMPLATE.format(
@@ -131,7 +145,7 @@ def _generate_private(
     public_root: Path,
     private_repo: Path,
     slug: str,
-    cfg,
+    cfg: "AssignmentConfig",
     public_hash: str,
 ) -> None:
     import hashlib
@@ -195,7 +209,9 @@ def _generate_private(
     }
     vc_path.write_text(json.dumps(verification_config, indent=2) + "\n")
 
-    console.print(f"  {(gen_dir / 'private-assignment-manifest.json').relative_to(private_repo)} (private)")
+    console.print(
+        f"  {(gen_dir / 'private-assignment-manifest.json').relative_to(private_repo)} (private)"
+    )
     console.print(f"  {vc_path.relative_to(private_repo)} (private)")
 
 
@@ -206,4 +222,6 @@ def cmd_generate_config_all(
 ) -> None:
     root = public_root or find_public_root()
     for slug in all_assignment_slugs(root):
-        cmd_generate_config(slug, private_repo=private_repo, force=force, public_root=root)
+        cmd_generate_config(
+            slug, private_repo=private_repo, force=force, public_root=root
+        )

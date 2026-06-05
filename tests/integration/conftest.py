@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
@@ -46,15 +45,15 @@ def private_root(tmp_path: Path, public_root: Path) -> Path:
 def _write_aprog_toml(root: Path) -> None:
     root.mkdir(parents=True, exist_ok=True)
     (root / "aprog.toml").write_text(
-        "[classification.languages.python]\nname = \"Python\"\n"
-        "[classification.languages.cpp]\nname = \"C++\"\n"
-        "[classification.difficulties.easy]\nname = \"Easy\"\nrank = 1\n"
-        "[classification.difficulties.medium]\nname = \"Medium\"\nrank = 2\n"
-        "[classification.difficulties.hard]\nname = \"Hard\"\nrank = 3\n"
-        "[classification.topics.data-structures]\nname = \"Data Structures\"\n"
-        "[classification.topics.linked-lists]\nname = \"Linked Lists\"\n"
-        "[classification.concepts.mutation]\nname = \"Mutation\"\n"
-        "[labels.unit-tests]\nname = \"Unit Tests\"\ndescription = \"\"\n"
+        '[classification.languages.python]\nname = "Python"\n'
+        '[classification.languages.cpp]\nname = "C++"\n'
+        '[classification.difficulties.easy]\nname = "Easy"\nrank = 1\n'
+        '[classification.difficulties.medium]\nname = "Medium"\nrank = 2\n'
+        '[classification.difficulties.hard]\nname = "Hard"\nrank = 3\n'
+        '[classification.topics.data-structures]\nname = "Data Structures"\n'
+        '[classification.topics.linked-lists]\nname = "Linked Lists"\n'
+        '[classification.concepts.mutation]\nname = "Mutation"\n'
+        '[labels.unit-tests]\nname = "Unit Tests"\ndescription = ""\n'
         "[organization]\n"
         "require_encryption = false\n"
         "require_hidden_tests = true\n"
@@ -68,10 +67,10 @@ def _write_template(root: Path, slug: str, language: str) -> None:
     (tpl / "template.toml").write_text(
         f'[template]\nslug = "{slug}"\nname = "{slug}"\nversion = "0.1"\ndescription = ""\n'
         f'[classification]\nlanguage = "{language}"\ndefault_difficulty = "medium"\n'
-        f'recommended_topics = []\n'
-        f'[outputs.public]\nassignment_toml = true\nreadme = true\nvisible_tests = true\n'
-        f'expected = true\nassets = true\n'
-        f'[outputs.private]\nsolution = true\nhidden_tests = true\ngrader = true\n'
+        f"recommended_topics = []\n"
+        f"[outputs.public]\nassignment_toml = true\nreadme = true\nvisible_tests = true\n"
+        f"expected = true\nassets = true\n"
+        f"[outputs.private]\nsolution = true\nhidden_tests = true\ngrader = true\n"
     )
 
 

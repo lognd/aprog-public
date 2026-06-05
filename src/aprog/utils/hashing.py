@@ -46,11 +46,17 @@ def hash_assignment_public(
 
 def _get_template_slug(public_root: Path, slug: str) -> str | None:
     from aprog.utils.toml import load_toml
+
     assignment_toml = public_root / "assignments" / slug / "assignment.toml"
     if not assignment_toml.exists():
         return None
     try:
         data = load_toml(assignment_toml)
-        return data.get("template", {}).get("slug")
+        tpl = data.get("template")
+        if isinstance(tpl, dict):
+            val = tpl.get("slug")
+            if isinstance(val, str):
+                return val
+        return None
     except Exception:
         return None

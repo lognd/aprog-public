@@ -29,7 +29,9 @@ def load_root_config(public_root: Path) -> RootConfig:
 def load_assignment_config(public_root: Path, slug: str) -> AssignmentConfig:
     path = public_root / "assignments" / slug / "assignment.toml"
     if not path.exists():
-        raise FileNotFoundError(f"Assignment not found: assignments/{slug}/assignment.toml")
+        raise FileNotFoundError(
+            f"Assignment not found: assignments/{slug}/assignment.toml"
+        )
     data = load_toml(path)
     return AssignmentConfig.model_validate(data)
 
@@ -37,7 +39,9 @@ def load_assignment_config(public_root: Path, slug: str) -> AssignmentConfig:
 def load_template_config(public_root: Path, template_slug: str) -> TemplateConfig:
     path = public_root / "templates" / template_slug / "template.toml"
     if not path.exists():
-        raise FileNotFoundError(f"Template not found: templates/{template_slug}/template.toml")
+        raise FileNotFoundError(
+            f"Template not found: templates/{template_slug}/template.toml"
+        )
     data = load_toml(path)
     return TemplateConfig.model_validate(data)
 
@@ -47,13 +51,15 @@ def all_assignment_slugs(public_root: Path) -> list[str]:
     if not assignments_dir.exists():
         return []
     return sorted(
-        d.name for d in assignments_dir.iterdir()
+        d.name
+        for d in assignments_dir.iterdir()
         if d.is_dir() and (d / "assignment.toml").exists()
     )
 
 
 def resolve_staging_dir(staging_flag: Path | None) -> Path | None:
     import os
+
     if staging_flag:
         return staging_flag.resolve()
     env = os.environ.get("APROG_STAGING_DIR")

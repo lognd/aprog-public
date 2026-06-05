@@ -18,7 +18,8 @@ def _all_template_slugs(public_root: Path) -> list[str]:
     if not tpl_dir.exists():
         return []
     return sorted(
-        d.name for d in tpl_dir.iterdir()
+        d.name
+        for d in tpl_dir.iterdir()
         if d.is_dir() and (d / "template.toml").exists()
     )
 
@@ -43,7 +44,9 @@ def cmd_templates_list(
             continue
         if language and cfg.classification.language != language:
             continue
-        table.add_row(cfg.template.slug, cfg.classification.language, cfg.template.description)
+        table.add_row(
+            cfg.template.slug, cfg.classification.language, cfg.template.description
+        )
         found = True
 
     if not found:

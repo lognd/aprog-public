@@ -19,6 +19,7 @@ _SLUG_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
 
 def _render_jinja(source: str, variables: dict) -> str:
     from jinja2 import Template
+
     return Template(source, undefined=StrictUndefined).render(**variables)
 
 
@@ -82,7 +83,9 @@ def cmd_new(
         _write_default_private(staging_slug_dir, variables)
 
     console.print(f"[green]Created:[/green] assignments/{slug}/")
-    console.print(f"[green]Staging:[/green] {staging_slug_dir}   (private working directory)")
+    console.print(
+        f"[green]Staging:[/green] {staging_slug_dir}   (private working directory)"
+    )
     console.print()
     console.print("Next steps:")
     console.print(f"  1. Edit assignments/{slug}/README.md")
@@ -113,26 +116,30 @@ def _write_default_public(dst: Path, v: dict) -> None:
     dst.mkdir(parents=True, exist_ok=True)
     topics_toml = "\n".join(f'  "{t}",' for t in v["topics"])
     (dst / "assignment.toml").write_text(
-        f'[assignment]\n'
+        f"[assignment]\n"
         f'slug = "{v["slug"]}"\n'
         f'name = "{v["assignment_name"]}"\n'
         f'author = "your-github-handle"\n'
         f'description = "TODO: describe this assignment."\n'
         f'version = "0.1.0"\n'
         f'status = "draft"\n\n'
-        f'[classification]\n'
+        f"[classification]\n"
         f'language = "{v["language"]}"\n'
         f'difficulty = "{v["difficulty"]}"\n'
-        f'topics = [\n{topics_toml}\n]\n\n'
-        f'[template]\n'
+        f"topics = [\n{topics_toml}\n]\n\n"
+        f"[template]\n"
         f'slug = "{v["template_slug"]}"\n\n'
-        f'[grader]\n'
+        f"[grader]\n"
         f'visibility = "after_due_date"\n'
         f'stdout_visibility = "after_due_date"\n'
     )
-    (dst / "README.md").write_text(f"# {v['assignment_name']}\n\nTODO: write the assignment statement.\n")
+    (dst / "README.md").write_text(
+        f"# {v['assignment_name']}\n\nTODO: write the assignment statement.\n"
+    )
     (dst / "visible-tests").mkdir(exist_ok=True)
-    (dst / "visible-tests" / "test_visible.py").write_text("# Add visible tests here.\n")
+    (dst / "visible-tests" / "test_visible.py").write_text(
+        "# Add visible tests here.\n"
+    )
     (dst / "expected").mkdir(exist_ok=True)
     (dst / "expected" / ".gitkeep").touch()
     (dst / "assets").mkdir(exist_ok=True)

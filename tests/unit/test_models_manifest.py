@@ -1,7 +1,15 @@
 # mypy: ignore-errors
 from __future__ import annotations
 
-from aprog.models.manifest import AssignmentManifest, ManifestAssignment, ManifestClassification, ManifestPaths, ManifestTemplate, PackageManifest, PrivateManifest
+from aprog.models.manifest import (
+    AssignmentManifest,
+    ManifestAssignment,
+    ManifestClassification,
+    ManifestPaths,
+    ManifestTemplate,
+    PackageManifest,
+    PrivateManifest,
+)
 
 
 def _sample_manifest() -> AssignmentManifest:

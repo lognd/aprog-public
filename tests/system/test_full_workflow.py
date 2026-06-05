@@ -7,6 +7,7 @@ System test: full contributor → maintainer workflow.
 Uses a real lograder pipeline with a Python stdin/stdout assignment so the
 grader actually executes. Marked slow because it spawns a subprocess.
 """
+
 from __future__ import annotations
 
 import json
@@ -30,10 +31,10 @@ def public_root(tmp_path: Path) -> Path:
     root = tmp_path / "aprog-public"
     root.mkdir()
     (root / "aprog.toml").write_text(
-        "[classification.languages.python]\nname = \"Python\"\n"
-        "[classification.difficulties.easy]\nname = \"Easy\"\nrank = 1\n"
-        "[classification.difficulties.medium]\nname = \"Medium\"\nrank = 2\n"
-        "[classification.topics.io]\nname = \"IO\"\n"
+        '[classification.languages.python]\nname = "Python"\n'
+        '[classification.difficulties.easy]\nname = "Easy"\nrank = 1\n'
+        '[classification.difficulties.medium]\nname = "Medium"\nrank = 2\n'
+        '[classification.topics.io]\nname = "IO"\n'
         "[organization]\nrequire_encryption = false\nrequire_hidden_tests = true\n"
         'default_grader_visibility = "after_due_date"\n'
     )
@@ -43,10 +44,10 @@ def public_root(tmp_path: Path) -> Path:
         '[template]\nslug = "python-stdin-stdout"\nname = "Python stdin/stdout"\n'
         'version = "0.1"\ndescription = ""\n'
         '[classification]\nlanguage = "python"\ndefault_difficulty = "medium"\n'
-        'recommended_topics = []\n'
-        '[outputs.public]\nassignment_toml = true\nreadme = true\nvisible_tests = true\n'
-        'expected = true\nassets = true\n'
-        '[outputs.private]\nsolution = true\nhidden_tests = true\ngrader = true\n'
+        "recommended_topics = []\n"
+        "[outputs.public]\nassignment_toml = true\nreadme = true\nvisible_tests = true\n"
+        "expected = true\nassets = true\n"
+        "[outputs.private]\nsolution = true\nhidden_tests = true\ngrader = true\n"
     )
     return root
 
@@ -66,7 +67,13 @@ def test_full_contributor_maintainer_workflow(
     public_root: Path, staging: Path, private_root: Path, tmp_path: Path
 ) -> None:
     # 1. Scaffold
-    cmd_new(SLUG, template="python-stdin-stdout", topics=["io"], staging_dir=staging, public_root=public_root)
+    cmd_new(
+        SLUG,
+        template="python-stdin-stdout",
+        topics=["io"],
+        staging_dir=staging,
+        public_root=public_root,
+    )
     assert (public_root / "assignments" / SLUG / "assignment.toml").exists()
     assert (staging / SLUG / "grader" / "pipeline.py").exists()
 
@@ -117,7 +124,9 @@ def test_full_contributor_maintainer_workflow(
 
     # 4. Generate config
     cmd_generate_config(SLUG, public_root=public_root)
-    manifest = public_root / "generated" / "assignments" / SLUG / "assignment-manifest.json"
+    manifest = (
+        public_root / "generated" / "assignments" / SLUG / "assignment-manifest.json"
+    )
     assert manifest.exists()
 
     # 5. Validate
