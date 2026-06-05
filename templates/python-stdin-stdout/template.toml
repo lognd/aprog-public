@@ -1,8 +1,8 @@
 [template]
 slug = "python-stdin-stdout"
 name = "Python stdin/stdout"
-description = "Python program that reads from stdin and writes to stdout."
 version = "0.1"
+description = "Python program that reads from stdin and writes to stdout."
 
 [classification]
 language = "python"
@@ -20,3 +20,7 @@ assets = true
 solution = true
 hidden_tests = true
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = true

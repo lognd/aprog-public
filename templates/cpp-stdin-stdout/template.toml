@@ -1,8 +1,8 @@
 [template]
 slug = "cpp-stdin-stdout"
 name = "C++ stdin/stdout"
-description = "C++ program that reads from stdin and writes to stdout."
 version = "0.1"
+description = "Single-file C++ program that reads from stdin and writes to stdout."
 
 [classification]
 language = "cpp"
@@ -14,9 +14,13 @@ assignment_toml = true
 readme = true
 visible_tests = true
 expected = true
-assets = true
+assets = false
 
 [outputs.private]
 solution = true
-hidden_tests = true
+hidden_tests = false
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = true

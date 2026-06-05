@@ -1,6 +1,6 @@
 # aprog-public
 
-Public repository for AProg — the assignment programming orchestration system.
+Public repository for AProg  --  the assignment programming orchestration system.
 
 This repository contains assignment definitions, visible tests, contributor templates, generated public configs, and the `aprog` CLI.
 
@@ -17,7 +17,7 @@ docs/                   Full documentation
 
 ## Quick start
 
-**For contributors** — creating and submitting an assignment:
+**For contributors**  --  creating and submitting an assignment:
 
 ```bash
 pip install aprog
@@ -40,7 +40,7 @@ aprog submit my-assignment
 
 See [docs/contributors/quickstart.md](docs/contributors/quickstart.md) for the full walkthrough.
 
-**For maintainers** — intake and verification:
+**For maintainers**  --  intake and verification:
 
 ```bash
 aprog intake dist/my-assignment-private.tar.gz \
@@ -76,27 +76,27 @@ make dev LOGRADER=/path/to/lograder
 
 ```text
 aprog-public/
-├── aprog.toml                          Classification values and org settings
-├── assignments/
-│   └── <slug>/
-│       ├── assignment.toml             Assignment metadata
-│       ├── README.md                   Assignment statement
-│       ├── visible-tests/              Tests students can see and run
-│       ├── expected/                   Expected outputs for visible tests
-│       └── assets/                     Starter files
-├── templates/
-│   └── <template-slug>/
-│       ├── template.toml
-│       ├── public/                     Jinja2 templates for public scaffold
-│       └── private/                    Jinja2 templates for private staging scaffold
-├── generated/
-│   └── assignments/
-│       └── <slug>/
-│           ├── assignment-manifest.json
-│           ├── run_autograder.py       Generated Gradescope entry point
-│           └── run_autograder          Shell shim
-├── src/aprog/                          CLI source
-└── docs/                               Full documentation
++-- aprog.toml                          Classification values and org settings
++-- assignments/
+|   +-- <slug>/
+|       +-- assignment.toml             Assignment metadata
+|       +-- README.md                   Assignment statement
+|       +-- visible-tests/              Tests students can see and run
+|       +-- expected/                   Expected outputs for visible tests
+|       +-- assets/                     Starter files
++-- templates/
+|   +-- <template-slug>/
+|       +-- template.toml
+|       +-- public/                     Jinja2 templates for public scaffold
+|       +-- private/                    Jinja2 templates for private staging scaffold
++-- generated/
+|   +-- assignments/
+|       +-- <slug>/
+|           +-- assignment-manifest.json
+|           +-- run_autograder.py       Generated Gradescope entry point
+|           +-- run_autograder          Shell shim
++-- src/aprog/                          CLI source
++-- docs/                               Full documentation
 ```
 
 Private files (solutions, hidden tests, grader pipelines) live in `aprog-private` and are never committed here.

@@ -1,0 +1,19 @@
+"""
+Visible tests for {{ assignment_name }}.
+
+Run locally:
+    python -m pytest test_visible.py -v
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# FILL IN: import the function(s) under test.
+from {{ artifact_name }} import my_function  # noqa: E402
+
+
+# FILL IN: add visible test cases matching the examples in README.md.
+def test_example_1():
+    assert my_function(TODO) == TODO

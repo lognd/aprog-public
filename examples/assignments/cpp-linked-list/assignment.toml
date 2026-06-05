@@ -1,0 +1,25 @@
+[assignment]
+slug = "cpp-linked-list"
+name = "C++ Singly Linked List"
+author = "your-github-handle"
+description = "Implement a singly linked list in C++ without using STL containers."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "medium"
+topics = ["data-structures", "linked-lists", "memory-management"]
+concepts = ["pointers", "iteration"]
+labels = ["starter-code"]
+
+[template]
+slug = "cpp-header-impl"
+version = "0.1"
+
+[grader]
+visibility = "visible"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "valgrind"]

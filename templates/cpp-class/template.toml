@@ -1,8 +1,8 @@
 [template]
 slug = "cpp-class"
 name = "C++ Class Implementation"
-description = "Student implements or debugs a C++ class."
 version = "0.1"
+description = "Student implements a C++ class declared in a staff-provided header."
 
 [classification]
 language = "cpp"
@@ -13,10 +13,14 @@ recommended_topics = []
 assignment_toml = true
 readme = true
 visible_tests = true
-expected = true
+expected = false
 assets = true
 
 [outputs.private]
 solution = true
 hidden_tests = true
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false

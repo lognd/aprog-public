@@ -1,0 +1,29 @@
+// CLI driver for {{ assignment_name }}.
+//
+// Compiled twice by CMake:
+//   - "{{ artifact_name }}"   -- includes student's header (from grader/ after injection)
+//   - "reference"             -- includes staff solution (from hidden-tests/)
+//
+// This driver reads a command sequence from argv and executes it against the
+// data structure, printing observable state to stdout for OutputCompareTest.
+//
+// FILL IN: implement the command dispatch loop for your specific interface.
+
+#include <iostream>
+#include <string>
+#include "{{ artifact_name }}.hpp"
+
+int main(int argc, char* argv[]) {
+    // FILL IN: create your data structure and dispatch commands from argv.
+    // Example pattern from cpp-linked-list:
+    //
+    //   LinkedList<int> lst;
+    //   for (int i = 1; i < argc; ++i) {
+    //       std::string cmd = argv[i];
+    //       if (cmd == "push_back")  { lst.push_back(std::stoi(argv[++i])); }
+    //       else if (cmd == "print") { lst.print(); }
+    //       else if (cmd == "size")  { std::cout << "size=" << lst.size() << "\n"; }
+    //   }
+
+    return 0;
+}

@@ -1,8 +1,8 @@
 [template]
 slug = "cpp-header-impl"
 name = "C++ Header Implementation"
-description = "Staff provides a header; student fills in function bodies."
 version = "0.1"
+description = "Staff provides a header interface; student fills in the implementation in a matching header or source file."
 
 [classification]
 language = "cpp"
@@ -13,10 +13,14 @@ recommended_topics = []
 assignment_toml = true
 readme = true
 visible_tests = true
-expected = true
+expected = false
 assets = true
 
 [outputs.private]
 solution = true
 hidden_tests = true
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false

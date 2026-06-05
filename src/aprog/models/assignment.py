@@ -72,6 +72,7 @@ class TemplateSection(BaseModel):
 class GraderDependencies(BaseModel):
     lograder: str = ""
     extra: list[str] = Field(default_factory=list)
+    system: list[str] = Field(default_factory=list)
 
 
 class GraderSection(BaseModel):

@@ -1,20 +1,109 @@
+"""
+Grader: {{ assignment_name }}
+{{ "=" * (len("Grader: ") + len(assignment_name)) }}
+
+Pipeline:
+  LocalDirectory    -- reads student submission
+  PytestTest        -- runs visible + hidden pytest suites
+
+Hidden tests live in hidden-tests/ alongside pipeline.py.
+Visible tests are in the public repo under visible-tests/.
+
+Student submits: {{ artifact_name }}.py
+"""
+
+from __future__ import annotations
+
 from pathlib import Path
 
-from lograder.pipeline.build.bash_script import BashScriptBuild
+import lograder.output.layout.pipeline.build  # noqa: F401
+
 from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
 from lograder.pipeline.pipeline import Pipeline
-from lograder.pipeline.score import AllOrNothingScorer
+from lograder.pipeline.score import (
+    GimmeConfig,
+    GradescopeConfig,
+    GradescopeTestConfig,
+    TestCaseScorer,
+)
+from lograder.pipeline.test.pytest import PytestTest
 
-# BashScriptBuild runs hidden-tests/run_tests.sh, which should:
-#   1. Copy student files into a temp directory alongside hidden pytest files.
-#   2. Run pytest and write results.json in Gradescope format.
-# The pipeline only checks that the script exits 0; scoring is driven by pytest output.
-# For finer-grained scoring, replace with OutputCompareTest cases that call the student
-# module directly instead of via pytest.
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+
+_GRADER_DIR = Path(__file__).parent
+_SUBMISSION_DIR = Path("/autograder/submission")
+_HIDDEN_TESTS = _GRADER_DIR.parent / "hidden-tests"
+
+# ---------------------------------------------------------------------------
+# Scoring
+# FILL IN: map each pytest test ID to its point value.
+# IDs follow the pattern: "hidden-tests/test_hidden.py::test_name"
+# ---------------------------------------------------------------------------
+
+_VISIBLE_POINTS: dict[str, float] = {
+    # FILL IN: visible test cases (students see score immediately).
+    "hidden-tests/test_hidden.py::test_hidden_1": 10.0,
+}
+
+_HIDDEN_POINTS: dict[str, float] = {
+    # FILL IN: hidden test cases (revealed after due date).
+}
+
+_EXTRA_CREDIT: dict[str, float] = {
+    # FILL IN: optional bonus tests.
+}
+
+_ALL_POINTS = {**_VISIBLE_POINTS, **_HIDDEN_POINTS}
 
 
-def make_pipeline() -> Pipeline:
-    step = LocalDirectory()
-    build = BashScriptBuild(script=Path(__file__).parent.parent / "hidden-tests" / "run_tests.sh")
-    build.scorer = AllOrNothingScorer(100.0, label="{{ assignment_name }}")
-    return Pipeline([step, build])
+# ---------------------------------------------------------------------------
+# Pipeline factory
+# ---------------------------------------------------------------------------
+
+
+def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    pipeline = Pipeline()
+
+    # -- 1. Read student submission -------------------------------------------
+    pipeline.add(LocalDirectory(root=submission_dir))
+
+    # -- 2. Run pytest suite --------------------------------------------------
+    pipeline.add(pytest_step := PytestTest(test_paths=[_HIDDEN_TESTS]))
+    pytest_step.scorer = TestCaseScorer(
+        _ALL_POINTS,
+        extra_credit_cases=_EXTRA_CREDIT,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=10.0),
+        label="{{ assignment_name }} Tests",
+    )
+    pytest_step.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="1"
+    )
+
+    return pipeline
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from lograder.pipeline.config import config
+
+    metadata = GraderMetadata.from_gradescope(
+        grader_name="{{ assignment_name }}",
+        authors=[StaffAuthor(name="Course Staff", role="Instructor")],
+        notes="Contact course staff within 3 days if you believe there is a grading error.",
+    )
+
+    with config(root_directory=_SUBMISSION_DIR, executable_timeout=30.0):
+        score = make_pipeline()(metadata=metadata)
+
+    score.write_results_json(
+        config=GradescopeConfig(
+            visibility="after_due_date",
+            stdout_visibility="after_due_date",
+        ),
+    )

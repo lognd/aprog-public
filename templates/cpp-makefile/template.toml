@@ -1,8 +1,8 @@
 [template]
 slug = "cpp-makefile"
 name = "C++ Makefile Project"
-description = "C++ project built with a provided Makefile."
 version = "0.1"
+description = "C++ project where students supply a Makefile alongside their source."
 
 [classification]
 language = "cpp"
@@ -14,9 +14,13 @@ assignment_toml = true
 readme = true
 visible_tests = true
 expected = true
-assets = true
+assets = false
 
 [outputs.private]
 solution = true
-hidden_tests = true
+hidden_tests = false
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = true

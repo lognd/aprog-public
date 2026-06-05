@@ -1,0 +1,23 @@
+[assignment]
+slug = "{{ assignment_slug }}"
+name = "{{ assignment_name }}"
+author = "{{ author }}"
+description = "{{ description }}"
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "c"
+difficulty = "{{ difficulty }}"
+topics = []
+
+[template]
+slug = "c-stdin-stdout"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "gcc", "valgrind"]

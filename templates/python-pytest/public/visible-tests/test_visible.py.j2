@@ -1,0 +1,21 @@
+"""
+Visible tests for {{ assignment_name }}.
+
+Run locally:
+    python -m pytest test_visible.py -v
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# FILL IN: import the class/functions under test.
+from {{ artifact_name }} import MyClass  # noqa: E402
+
+
+# FILL IN: add visible test cases matching examples in README.md.
+def test_example_1():
+    obj = MyClass()
+    # assert obj.method() == expected
+    raise NotImplementedError("fill in test body")

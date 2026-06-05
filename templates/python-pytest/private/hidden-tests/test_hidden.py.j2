@@ -1,0 +1,18 @@
+"""
+Hidden tests for {{ assignment_name }}.
+
+Imported by PytestTest at grading time. sys.path already includes
+/autograder/submission so the student's module imports cleanly.
+"""
+
+import sys
+
+sys.path.insert(0, "/autograder/submission")
+
+from {{ artifact_name }} import MyClass  # noqa: E402
+
+
+# FILL IN: comprehensive hidden test cases.
+def test_hidden_1():
+    obj = MyClass()
+    raise NotImplementedError("fill in test body")

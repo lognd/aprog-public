@@ -1,8 +1,8 @@
 [template]
 slug = "cpp-cmake"
 name = "C++ CMake Project"
-description = "Full C++ project built with CMake."
 version = "0.1"
+description = "C++ project where students submit a full CMake build alongside their source."
 
 [classification]
 language = "cpp"
@@ -13,10 +13,14 @@ recommended_topics = []
 assignment_toml = true
 readme = true
 visible_tests = true
-expected = true
+expected = false
 assets = true
 
 [outputs.private]
 solution = true
 hidden_tests = true
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false

@@ -1,0 +1,18 @@
+"""
+Hidden tests for {{ assignment_name }}.
+
+More thorough than visible-tests/; hidden until after the due date.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, "/autograder/submission")
+
+# FILL IN: import the function(s) under test.
+from {{ artifact_name }} import my_function  # noqa: E402
+
+
+# FILL IN: hidden test cases.
+def test_hidden_1():
+    assert my_function(TODO) == TODO

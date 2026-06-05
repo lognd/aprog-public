@@ -1,0 +1,29 @@
+"""
+Hidden tests for {{ assignment_name }}.
+
+These run on Gradescope after the due date. Add more thorough cases here
+than what appears in visible-tests/.
+"""
+
+import subprocess
+import sys
+from pathlib import Path
+
+SUBMISSION = Path("/autograder/submission/{{ artifact_name }}.py")
+
+
+def run(stdin: str, args: list[str] | None = None) -> str:
+    result = subprocess.run(
+        [sys.executable, str(SUBMISSION)] + (args or []),
+        input=stdin,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    return result.stdout
+
+
+# FILL IN: hidden test cases.
+def test_hidden_1():
+    output = run("TODO\n")
+    assert output.strip() == "TODO"

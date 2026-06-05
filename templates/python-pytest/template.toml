@@ -1,8 +1,8 @@
 [template]
 slug = "python-pytest"
 name = "Python pytest"
-description = "Python assignment graded by running pytest against student code."
 version = "0.1"
+description = "Python module graded by a hidden pytest suite."
 
 [classification]
 language = "python"
@@ -13,10 +13,14 @@ recommended_topics = []
 assignment_toml = true
 readme = true
 visible_tests = true
-expected = true
+expected = false
 assets = true
 
 [outputs.private]
 solution = true
 hidden_tests = true
 grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false

@@ -1,0 +1,42 @@
+"""
+Visible tests for {{ assignment_name }}.
+
+Compile and run locally:
+    gcc -std=c11 -Wall -o {{ artifact_name }} {{ artifact_name }}.c
+    echo "TODO" | ./{{ artifact_name }}
+
+These tests are shown to students immediately on submission.
+"""
+
+import subprocess
+from pathlib import Path
+
+
+def compile_binary() -> Path:
+    src = Path(__file__).parent.parent / "{{ artifact_name }}.c"
+    out = Path(__file__).parent / "{{ artifact_name }}"
+    subprocess.run(
+        ["gcc", "-std=c11", "-Wall", "-o", str(out), str(src)],
+        check=True,
+    )
+    return out
+
+
+def run(binary: Path, stdin: str) -> str:
+    result = subprocess.run(
+        [str(binary)],
+        input=stdin,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    return result.stdout
+
+
+BINARY = compile_binary()
+
+
+# FILL IN: visible test cases matching README.md examples.
+def test_example_1():
+    output = run(BINARY, "TODO\n")
+    assert output.strip() == "TODO"

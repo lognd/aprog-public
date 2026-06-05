@@ -1,0 +1,31 @@
+# {{ assignment_name }}
+
+{{ description }}
+
+## Problem Statement
+
+TODO: Describe the project.
+
+## Build Requirements
+
+Your submission must include a `CMakeLists.txt` that builds a target named
+`{{ artifact_name }}`. The grader runs:
+
+```bash
+cmake -B build .
+cmake --build build
+```
+
+## Grading
+
+| Component              | Points |
+|------------------------|--------|
+| Files present          | 0 (required) |
+| Compilation            | 0 (required) |
+| Correctness            | 80     |
+| Memory safety          | 20     |
+
+## Submission
+
+Submit all source files **and** a `CMakeLists.txt`. The CMake target must be
+named `{{ artifact_name }}`.

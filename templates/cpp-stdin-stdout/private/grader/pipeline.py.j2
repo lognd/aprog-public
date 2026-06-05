@@ -1,40 +1,201 @@
+"""
+Grader: {{ assignment_name }}
+{{ "=" * (len("Grader: ") + len(assignment_name)) }}
+
+Pipeline:
+  LocalDirectory          -- reads student submission
+  SourceCheck             -- validates {{ artifact_name }}.cpp submitted
+  InjectStudentIntoStaff  -- copies .cpp into grader dir for CMake
+  CMakeManifestCheck      -- verifies grader CMakeLists.txt
+  CMakeBuild              -- compiles student binary
+  OutputCompareTest       -- visible I/O correctness cases
+  OutputCompareTest       -- hidden I/O correctness cases
+  ValgrindTest            -- memory safety (extra credit)
+
+Student submits: {{ artifact_name }}.cpp
+"""
+
+from __future__ import annotations
+
 from pathlib import Path
 
+import lograder.output.layout.check.source  # noqa: F401
+import lograder.output.layout.pipeline.build  # noqa: F401
+import lograder.output.layout.pipeline.mixin  # noqa: F401
+import lograder.output.layout.project.simple_project  # noqa: F401
+import lograder.output.layout.test.output_compare  # noqa: F401
+import lograder.output.layout.test.valgrind  # noqa: F401
+
 from lograder.pipeline.build.cmake import CMakeBuild
-from lograder.pipeline.check.project.simple_project import make_simple_manifest_checker
-from lograder.pipeline.pipeline import Pipeline
-from lograder.pipeline.score import AllOrNothingScorer, TestCaseScorer
-from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
-
+from lograder.pipeline.check.project.simple_project import (
+    CMakeManifest,
+    CMakeManifestCheck,
+)
+from lograder.pipeline.check.source.source_check import (
+    SourceCheck,
+)
 from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
+from lograder.pipeline.mixin.mixin import InjectStudentIntoStaff
+from lograder.pipeline.pipeline import Pipeline
+from lograder.pipeline.score import (
+    AllOrNothingScorer,
+    CleanRunScorer,
+    GimmeConfig,
+    GradescopeConfig,
+    GradescopeTestConfig,
+    TestCaseScorer,
+)
+from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
+from lograder.pipeline.test.valgrind import ValgrindCase, ValgrindTest
 
-make_simple_manifest_checker("{{ artifact_name }}", ["CMakeLists.txt"])
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
 
-# FILL IN: Add test cases. stdin is fed to the program; expected_stdout is the expected output.
-_CASES = [
+_GRADER_DIR = Path(__file__).parent
+_SUBMISSION_DIR = Path("/autograder/submission")
+
+# ---------------------------------------------------------------------------
+# Visible test cases
+# FILL IN: replace with real cases matching README.md sample examples.
+# ---------------------------------------------------------------------------
+
+_VISIBLE_CASES: list[OutputCompareCase] = [
     OutputCompareCase(
-        name="test_example",
+        name="sample_1",
         args=[],
-        stdin="",
-        expected_stdout="",
+        stdin=b"TODO\n",
+        expected_stdout="TODO\n",
         comparison=ComparisonMode.STRIP,
     ),
 ]
 
-_BUILD_SCORER = AllOrNothingScorer(0.0, label="Build")
+_VISIBLE_POINTS: dict[str, float] = {
+    "sample_1": 20.0,
+}
 
-# FILL IN: Assign point values per case.
-_TEST_SCORER = TestCaseScorer(
-    {"test_example": 10.0},
-    label="{{ assignment_name }} Correctness",
-)
+# ---------------------------------------------------------------------------
+# Hidden test cases
+# FILL IN: thorough cases not shown to students until after due date.
+# ---------------------------------------------------------------------------
+
+_HIDDEN_CASES: list[OutputCompareCase] = [
+    OutputCompareCase(
+        name="hidden_1",
+        args=[],
+        stdin=b"TODO\n",
+        expected_stdout="TODO\n",
+        comparison=ComparisonMode.STRIP,
+    ),
+]
+
+_HIDDEN_POINTS: dict[str, float] = {
+    "hidden_1": 80.0,
+}
+
+# ---------------------------------------------------------------------------
+# Valgrind cases (memory safety -- extra credit)
+# FILL IN: pick representative cases from above.
+# ---------------------------------------------------------------------------
+
+_VALGRIND_CASES: list[ValgrindCase] = [
+    ValgrindCase(name="vg_sample_1", args=[], stdin=b"TODO\n", check_leaks=True),
+]
 
 
-def make_pipeline() -> Pipeline:
-    step = LocalDirectory()
-    check = CMakeManifestCheck()  # noqa: F821 — injected by make_simple_manifest_checker
-    build = CMakeBuild()
-    build.scorer = _BUILD_SCORER
-    tests = OutputCompareTest("{{ artifact_name }}", _CASES)
-    tests.scorer = _TEST_SCORER
-    return Pipeline([step, check, build, tests])
+# ---------------------------------------------------------------------------
+# Pipeline factory
+# ---------------------------------------------------------------------------
+
+
+def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    pipeline = Pipeline()
+
+    # -- 1. Read student submission -------------------------------------------
+    pipeline.add(LocalDirectory(root=submission_dir))
+
+    # -- 2. Source check -- validates file is submitted -----------------------
+    # Add constraints here if you want to forbid specific constructs.
+    pipeline.add(source := SourceCheck(
+        language="cpp",
+        files=["{{ artifact_name }}.cpp"],
+        constraints=[],
+        label="Source File Submitted",
+    ))
+    source.scorer = CleanRunScorer(
+        0.0,
+        max_errors=0,
+        require_ok_return=True,
+        label="Source File Submitted",
+    )
+    source.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
+
+    # -- 3. Inject student source into grader dir for CMake -------------------
+    pipeline.add(InjectStudentIntoStaff(
+        _GRADER_DIR,
+        student_files=["{{ artifact_name }}.cpp"],
+    ))
+
+    # -- 4. CMake manifest check ----------------------------------------------
+    pipeline.add(cmake_check := CMakeManifestCheck())
+    cmake_check.scorer = AllOrNothingScorer(0.0, label="CMake Setup")
+    cmake_check.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
+
+    # -- 5. Build -------------------------------------------------------------
+    pipeline.add(build := CMakeBuild())
+    build.scorer = AllOrNothingScorer(0.0, label="Compilation")
+    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
+
+    # -- 6. Visible correctness tests -----------------------------------------
+    pipeline.add(visible := OutputCompareTest("{{ artifact_name }}", _VISIBLE_CASES))
+    visible.scorer = TestCaseScorer(
+        _VISIBLE_POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=5.0),
+        label="Visible Correctness",
+    )
+    visible.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="4")
+
+    # -- 7. Hidden correctness tests ------------------------------------------
+    pipeline.add(hidden := OutputCompareTest("{{ artifact_name }}", _HIDDEN_CASES))
+    hidden.scorer = TestCaseScorer(
+        _HIDDEN_POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=10.0),
+        label="Hidden Correctness",
+    )
+    hidden.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="5"
+    )
+
+    # -- 8. Memory safety (extra credit) --------------------------------------
+    pipeline.add(vg := ValgrindTest("{{ artifact_name }}", _VALGRIND_CASES))
+    vg.scorer = AllOrNothingScorer(0.0, extra_credit=5.0, label="Memory Safety")
+    vg.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="6"
+    )
+
+    return pipeline
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from lograder.pipeline.config import config
+
+    metadata = GraderMetadata.from_gradescope(
+        grader_name="{{ assignment_name }}",
+        authors=[StaffAuthor(name="Course Staff", role="Instructor")],
+        notes="Contact course staff within 3 days if you believe there is a grading error.",
+    )
+
+    with config(root_directory=Path("/autograder"), executable_timeout=60.0):
+        score = make_pipeline()(metadata=metadata)
+
+    score.write_results_json(
+        config=GradescopeConfig(
+            visibility="after_due_date",
+            stdout_visibility="after_due_date",
+        ),
+    )

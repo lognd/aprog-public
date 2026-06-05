@@ -1,38 +1,105 @@
-from lograder.pipeline.build.prebuilt import PrebuiltArtifacts
+"""
+Grader: {{ assignment_name }}
+{{ "=" * (len("Grader: ") + len(assignment_name)) }}
+
+Pipeline:
+  LocalDirectory    -- reads student submission
+  PytestTest        -- runs hidden pytest suite against the student's module
+
+The hidden test suite lives in hidden-tests/ and imports the student's
+module directly from /autograder/submission/{{ artifact_name }}.py.
+
+Student submits: {{ artifact_name }}.py
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import lograder.output.layout.pipeline.build  # noqa: F401
+
 from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
 from lograder.pipeline.pipeline import Pipeline
-from lograder.pipeline.score import TestCaseScorer
-from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
-from lograder.pipeline.types.artifacts import FileArtifact
+from lograder.pipeline.score import (
+    GimmeConfig,
+    GradescopeConfig,
+    GradescopeTestConfig,
+    TestCaseScorer,
+)
+from lograder.pipeline.test.pytest import PytestTest
 
-# Student submits a Python file. The grader wraps it with a driver that calls
-# the required function(s) and prints results. Place the driver at grader/driver.py.
-_ARTIFACT_NAME = "driver.py"
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
 
-# FILL IN: Add test cases. stdin passes arguments to the driver.
-_CASES = [
-    OutputCompareCase(
-        name="test_example",
-        args=[],
-        stdin="",
-        expected_stdout="",
-        comparison=ComparisonMode.STRIP,
-    ),
-]
+_GRADER_DIR = Path(__file__).parent
+_SUBMISSION_DIR = Path("/autograder/submission")
+_HIDDEN_TESTS = _GRADER_DIR.parent / "hidden-tests"
 
-# FILL IN: Assign point values per case.
-_TEST_SCORER = TestCaseScorer({"test_example": 10.0}, label="{{ assignment_name }} Correctness")
+# ---------------------------------------------------------------------------
+# Scoring
+# FILL IN: list every pytest test ID and its point value.
+# Test IDs are in the format: "hidden-tests/test_hidden.py::test_name"
+# ---------------------------------------------------------------------------
+
+_POINTS: dict[str, float] = {
+    # Visible tests (students see these on submission)
+    "hidden-tests/test_hidden.py::test_hidden_1": 20.0,
+    # FILL IN: add more cases.
+}
+
+_EXTRA_CREDIT: dict[str, float] = {
+    # FILL IN: bonus cases (not counted in possible total).
+    # "hidden-tests/test_hidden.py::test_bonus": 10.0,
+}
 
 
-def make_pipeline() -> Pipeline:
-    from lograder.pipeline.config import get_config
-    from pathlib import Path
+# ---------------------------------------------------------------------------
+# Pipeline factory
+# ---------------------------------------------------------------------------
 
-    grader_dir = Path(__file__).parent
 
-    step = LocalDirectory()
-    # driver.py is staff-authored; it imports the student's module from the submission dir.
-    artifacts = PrebuiltArtifacts({_ARTIFACT_NAME: FileArtifact(grader_dir / _ARTIFACT_NAME)})
-    tests = OutputCompareTest(_ARTIFACT_NAME, _CASES)
-    tests.scorer = _TEST_SCORER
-    return Pipeline([step, artifacts, tests])
+def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    pipeline = Pipeline()
+
+    # -- 1. Read student submission -------------------------------------------
+    pipeline.add(LocalDirectory(root=submission_dir))
+
+    # -- 2. Run hidden pytest suite -------------------------------------------
+    pipeline.add(pytest_step := PytestTest(test_paths=[_HIDDEN_TESTS]))
+    pytest_step.scorer = TestCaseScorer(
+        _POINTS,
+        extra_credit_cases=_EXTRA_CREDIT,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=10.0),
+        label="{{ assignment_name }} Correctness",
+    )
+    pytest_step.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="1"
+    )
+
+    return pipeline
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from lograder.pipeline.config import config
+
+    metadata = GraderMetadata.from_gradescope(
+        grader_name="{{ assignment_name }}",
+        authors=[StaffAuthor(name="Course Staff", role="Instructor")],
+        notes="Contact course staff within 3 days if you believe there is a grading error.",
+    )
+
+    with config(root_directory=_SUBMISSION_DIR, executable_timeout=30.0):
+        score = make_pipeline()(metadata=metadata)
+
+    score.write_results_json(
+        config=GradescopeConfig(
+            visibility="after_due_date",
+            stdout_visibility="after_due_date",
+        ),
+    )

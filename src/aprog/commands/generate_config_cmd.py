@@ -44,8 +44,11 @@ _RESULTS = Path("/autograder/results/results.json")
 
 if __name__ == "__main__":
     try:
-        with config(root_directory=Path("/autograder/submission")):
-            pipeline = make_pipeline()
+        import inspect as _inspect
+        _sig = _inspect.signature(make_pipeline)
+        _kwargs = {{"submission_dir": Path("/autograder/submission")}} if "submission_dir" in _sig.parameters else {{}}
+        with config(root_directory=Path("/autograder")):
+            pipeline = make_pipeline(**_kwargs)
             score = pipeline()
             score.write_results_json(
                 config=GradescopeConfig(

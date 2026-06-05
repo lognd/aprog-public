@@ -64,8 +64,11 @@ def cmd_verify(
     console.print(f"Running grader against reference solution for '{slug}'...")
 
     try:
-        with config(root_directory=sol_dir):
-            pipeline = make_pipeline()
+        import inspect
+        sig = inspect.signature(make_pipeline)
+        kwargs = {"submission_dir": sol_dir} if "submission_dir" in sig.parameters else {}
+        with config(root_directory=private_repo):
+            pipeline = make_pipeline(**kwargs)
             score = pipeline()
     except Exception as e:
         console.print(f"[red]Pipeline error:[/red] {e}")
@@ -162,9 +165,15 @@ def cmd_package_gradescope(
         deps = cfg.grader.dependencies
         lograder_req = f"lograder{deps.lograder}" if deps.lograder else "lograder"
         extra = " ".join(deps.extra)
-        setup_sh = (
-            f"#!/usr/bin/env bash\nset -e\npip install '{lograder_req}' {extra}\n"
-        )
+        lines = ["#!/usr/bin/env bash", "set -e"]
+        if deps.system:
+            pkgs = " ".join(deps.system)
+            lines += [
+                "apt-get update -qq",
+                f"apt-get install -y --no-install-recommends {pkgs}",
+            ]
+        lines.append(f"pip install '{lograder_req}' {extra}")
+        setup_sh = "\n".join(lines) + "\n"
         info = zipfile.ZipInfo("setup.sh")
         info.external_attr = _EXEC
         info.compress_type = zipfile.ZIP_DEFLATED
@@ -181,13 +190,27 @@ def cmd_package_gradescope(
 
         # full grader directory (pipeline.py + any driver files like main.cpp)
         grader_dir = private_repo / "grader" / slug
+        _SKIP_GRADER = {"__pycache__", "build", ".git"}
         for path in sorted(grader_dir.rglob("*")):
-            if path.is_file():
+            if path.is_file() and not any(p in _SKIP_GRADER for p in path.parts):
                 arc = f"grader/{path.relative_to(grader_dir)}"
                 info = zipfile.ZipInfo(arc)
                 info.external_attr = _DATA
                 info.compress_type = zipfile.ZIP_DEFLATED
                 zf.writestr(info, path.read_bytes())
+
+        # visible-tests from the public repo (needed by CMakeLists.txt at build time)
+        visible_dir = public_root / "assignments" / slug / "visible-tests"
+        if not visible_dir.exists():
+            visible_dir = public_root / "examples" / "assignments" / slug / "visible-tests"
+        if visible_dir.exists():
+            for path in sorted(visible_dir.rglob("*")):
+                if path.is_file():
+                    arc = f"visible-tests/{path.relative_to(visible_dir)}"
+                    info = zipfile.ZipInfo(arc)
+                    info.external_attr = _DATA
+                    info.compress_type = zipfile.ZIP_DEFLATED
+                    zf.writestr(info, path.read_bytes())
 
         # hidden tests
         ht_dir = private_repo / "hidden-tests" / slug

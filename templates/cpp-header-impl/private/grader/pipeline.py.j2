@@ -1,77 +1,289 @@
+"""
+Grader: {{ assignment_name }}
+{{ "=" * (len("Grader: ") + len(assignment_name)) }}
+
+Pipeline:
+  SourceCheck               -- validates {{ artifact_name }}.hpp submitted; checks constraints
+  InjectStudentIntoStaff    -- copies header into grader dir so CMake can find it
+  CMakeManifestCheck        -- verifies grader CMakeLists.txt is present
+  CMakeBuild                -- builds four targets:
+                               {{ artifact_name }}_tests        (visible Catch2)
+                               {{ artifact_name }}_hidden_tests (hidden Catch2)
+                               {{ artifact_name }}              (CLI driver -- student impl)
+                               reference                        (CLI driver -- staff impl)
+  Catch2Test (visible)      -- structured parse of visible test cases
+  Catch2Test (hidden)       -- same for hidden cases; visibility: after_due_date
+  ValgrindTest              -- memory leak / error detection
+  OutputCompareTest         -- manual I/O cases with hardcoded expected stdout
+  DifferentialTest          -- extra-credit cases compared against reference binary
+
+Private layout:
+  grader/
+    CMakeLists.txt            (builds all four targets)
+    main.cpp                  (CLI driver, compiled twice)
+    pipeline.py               (this file)
+  hidden-tests/
+    {{ artifact_name }}.hpp   (staff reference implementation)
+    test_hidden.cpp           (hidden Catch2 source)
+
+setup.sh installs: cmake, g++, valgrind
+"""
+
+from __future__ import annotations
+
 from pathlib import Path
 
-from lograder.pipeline.build.bash_script import BashScriptBuild
-from lograder.pipeline.build.prebuilt import PrebuiltArtifacts
+import lograder.output.layout.check.source  # noqa: F401
+import lograder.output.layout.pipeline.build  # noqa: F401
+import lograder.output.layout.pipeline.mixin  # noqa: F401
+import lograder.output.layout.project.simple_project  # noqa: F401
+import lograder.output.layout.test.catch2  # noqa: F401
+import lograder.output.layout.test.differential  # noqa: F401
+import lograder.output.layout.test.output_compare  # noqa: F401
+import lograder.output.layout.test.valgrind  # noqa: F401
+
+from lograder.pipeline.build.cmake import CMakeBuild
+from lograder.pipeline.check.project.simple_project import (
+    CMakeManifest,
+    CMakeManifestCheck,
+)
+from lograder.pipeline.check.source.source_check import (
+    IncludeConstraint,
+    QualifiedNameConstraint,
+    SourceCheck,
+)
 from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
+from lograder.pipeline.mixin.mixin import InjectStudentIntoStaff
 from lograder.pipeline.pipeline import Pipeline
-from lograder.pipeline.score import AllOrNothingScorer, TestCaseScorer
+from lograder.pipeline.score import (
+    AllOrNothingScorer,
+    CleanRunScorer,
+    GimmeConfig,
+    GradescopeConfig,
+    GradescopeTestConfig,
+    TestCaseScorer,
+)
+from lograder.pipeline.test.catch2 import Catch2Test
+from lograder.pipeline.test.differential import DifferentialTest
+from lograder.pipeline.test.oracle import OracleInput
 from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
-from lograder.pipeline.types.artifacts import FileArtifact
+from lograder.pipeline.test.valgrind import ValgrindCase, ValgrindTest
 
-# Staff main.cpp lives alongside pipeline.py; it includes the student's header.
-# The build script compiles: g++ -std=c++17 -o <binary> main.cpp -I<submission_dir>
-# Adjust the filename and flags as needed.
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
 
-_ARTIFACT_NAME = "{{ artifact_name }}"
-_HEADER_FILE = "{{ artifact_name }}.hpp"  # FILL IN: header filename the student submits
+_GRADER_DIR = Path(__file__).parent
+_SUBMISSION_DIR = Path("/autograder/submission")
 
-# FILL IN: Add test cases.
-_CASES = [
-    OutputCompareCase(
-        name="test_example",
-        args=[],
-        stdin="",
-        expected_stdout="",
-        comparison=ComparisonMode.STRIP,
+# ---------------------------------------------------------------------------
+# Catch2 -- visible test cases
+# FILL IN: list every TEST_CASE name and assign points.
+# Key format: "<binary_name>/<TEST_CASE string from test_catch.cpp>"
+# ---------------------------------------------------------------------------
+
+_VISIBLE_CATCH2_POINTS: dict[str, float] = {
+    "{{ artifact_name }}_tests/example test": 5.0,
+    # FILL IN: add one entry per TEST_CASE in visible-tests/test_catch.cpp.
+}  # FILL IN: sum should equal your visible Catch2 point budget.
+
+# ---------------------------------------------------------------------------
+# Catch2 -- hidden test cases
+# FILL IN: list every TEST_CASE in hidden-tests/test_hidden.cpp.
+# ---------------------------------------------------------------------------
+
+_HIDDEN_CATCH2_POINTS: dict[str, float] = {
+    "{{ artifact_name }}_hidden_tests/hidden example test": 5.0,
+    # FILL IN: add one entry per TEST_CASE in hidden-tests/test_hidden.cpp.
+}
+
+# ---------------------------------------------------------------------------
+# Valgrind -- memory safety cases
+# FILL IN: pick representative command sequences from your CLI driver.
+# ---------------------------------------------------------------------------
+
+_VALGRIND_CASES: list[ValgrindCase] = [
+    ValgrindCase(
+        name="vg_basic",
+        args=[],  # FILL IN: argv for your driver
+        stdin=b"",
+        check_leaks=True,
     ),
 ]
 
-_BUILD_SCORER = AllOrNothingScorer(0.0, label="Build")
+_VALGRIND_POINTS: dict[str, float] = {
+    "vg_basic": 5.0,
+    # FILL IN: add points for each ValgrindCase above.
+}
 
-# FILL IN: Assign point values per case.
-_TEST_SCORER = TestCaseScorer(
-    {"test_example": 10.0},
-    label="{{ assignment_name }} Correctness",
-)
+# ---------------------------------------------------------------------------
+# OutputCompareTest -- manual I/O cases
+# FILL IN: hardcode expected stdout for edge cases not covered by Catch2.
+# ---------------------------------------------------------------------------
+
+_MANUAL_CASES: list[OutputCompareCase] = [
+    OutputCompareCase(
+        name="manual_1",
+        args=[],  # FILL IN: argv for your driver
+        stdin=b"",
+        expected_stdout="TODO\n",
+        comparison=ComparisonMode.EXACT,
+    ),
+]
+
+_MANUAL_POINTS: dict[str, float] = {
+    "manual_1": 5.0,
+}
+
+# ---------------------------------------------------------------------------
+# DifferentialTest -- extra-credit cases
+# reference_artifact="reference" resolves the staff binary from CMakeBuild.
+# The "reference" target links against hidden-tests/{{ artifact_name }}.hpp.
+# ---------------------------------------------------------------------------
+
+_DIFF_CASES: list[OracleInput] = [
+    OracleInput(
+        name="diff_bonus_1",
+        args=[],  # FILL IN: argv for your driver
+        stdin=b"",
+    ),
+]
+
+_DIFF_BASE_POINTS: dict[str, float] = {
+    "diff_bonus_1": 0.0,
+}
+
+_DIFF_EXTRA_CREDIT: dict[str, float] = {
+    "diff_bonus_1": 5.0,
+}
 
 
-def make_pipeline() -> Pipeline:
-    from lograder.pipeline.config import get_config
-    from lograder.pipeline.types.parcels import Manifest
-    from lograder.pipeline.types.sentinel import PIPELINE_START
-    from lograder.pipeline.step import Step
-    from lograder.common import Ok, Result
-    from typing import Generator
-    import subprocess, sys
+# ---------------------------------------------------------------------------
+# Pipeline factory
+# ---------------------------------------------------------------------------
 
-    class CompileStep(Step[Manifest, dict, Exception, Manifest, Exception]):
-        def __call__(
-            self, input: Manifest
-        ) -> Generator[Result[Manifest, Exception], None, Result[dict, Exception]]:
-            cfg = get_config()
-            submission = cfg.root_directory
-            grader_dir = Path(__file__).parent
-            binary = submission / _ARTIFACT_NAME
-            result = subprocess.run(
-                [
-                    "g++", "-std=c++17", "-Wall",
-                    str(grader_dir / "main.cpp"),
-                    f"-I{submission}",
-                    "-o", str(binary),
-                ],
-                capture_output=True,
-                text=True,
-            )
-            if result.returncode != 0:
-                from lograder.pipeline.build.build import BuildOutput
-                return Ok({})  # let AllOrNothingScorer pick this up via fatal Err pattern
-            if False:
-                yield Ok(input)
-            return Ok({_ARTIFACT_NAME: FileArtifact(path=binary)})
 
-    step = LocalDirectory()
-    compile_step = CompileStep()
-    compile_step.scorer = _BUILD_SCORER
-    tests = OutputCompareTest(_ARTIFACT_NAME, _CASES)
-    tests.scorer = _TEST_SCORER
-    return Pipeline([step, compile_step, tests])
+def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    pipeline = Pipeline()
+
+    # -- 1. Read student submission -------------------------------------------
+    pipeline.add(LocalDirectory(root=submission_dir))
+
+    # -- 2. Source check ------------------------------------------------------
+    pipeline.add(source := SourceCheck(
+        language="cpp",
+        files=["{{ artifact_name }}.hpp"],
+        constraints=[
+            # FILL IN: add constraints appropriate for your assignment.
+            # Example: forbid STL containers.
+            # IncludeConstraint(
+            #     headers=["<vector>", "<list>", "<deque>"],
+            #     max_count=0,
+            #     label="No STL container headers",
+            # ),
+            # QualifiedNameConstraint(
+            #     qualified_names=["std::vector", "std::list"],
+            #     max_count=0,
+            #     label="No STL qualified names",
+            # ),
+        ],
+        label="Header Submitted",
+    ))
+    source.scorer = CleanRunScorer(
+        0.0,
+        max_errors=0,
+        require_ok_return=True,
+        extra_credit=5.0,
+        label="Code Constraints",
+    )
+    source.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
+
+    # -- 3. Inject student header into grader dir -----------------------------
+    pipeline.add(InjectStudentIntoStaff(
+        _GRADER_DIR,
+        student_files=["{{ artifact_name }}.hpp"],
+    ))
+
+    # -- 4. CMake manifest check ----------------------------------------------
+    pipeline.add(cmake_check := CMakeManifestCheck())
+    cmake_check.scorer = AllOrNothingScorer(0.0, label="CMake Setup")
+    cmake_check.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
+
+    # -- 5. Build -------------------------------------------------------------
+    pipeline.add(build := CMakeBuild())
+    build.scorer = AllOrNothingScorer(0.0, label="Compilation")
+    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
+
+    # -- 6. Visible Catch2 tests ----------------------------------------------
+    pipeline.add(catch2_vis := Catch2Test("{{ artifact_name }}_tests"))
+    catch2_vis.scorer = TestCaseScorer(
+        _VISIBLE_CATCH2_POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=10.0),
+        label="Visible Correctness (Catch2)",
+    )
+    catch2_vis.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="4")
+
+    # -- 7. Hidden Catch2 tests -----------------------------------------------
+    pipeline.add(catch2_hid := Catch2Test("{{ artifact_name }}_hidden_tests"))
+    catch2_hid.scorer = TestCaseScorer(
+        _HIDDEN_CATCH2_POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=5.0),
+        label="Hidden Correctness (Catch2)",
+    )
+    catch2_hid.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="5"
+    )
+
+    # -- 8. Valgrind memory check ---------------------------------------------
+    pipeline.add(vg := ValgrindTest("{{ artifact_name }}", _VALGRIND_CASES))
+    vg.scorer = TestCaseScorer(_VALGRIND_POINTS, label="Memory Safety (Valgrind)")
+    vg.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="6")
+
+    # -- 9. Manual I/O cases --------------------------------------------------
+    pipeline.add(manual := OutputCompareTest("{{ artifact_name }}", _MANUAL_CASES))
+    manual.scorer = TestCaseScorer(_MANUAL_POINTS, label="Hidden Manual Cases")
+    manual.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="7"
+    )
+
+    # -- 10. Differential extra credit ----------------------------------------
+    pipeline.add(diff := DifferentialTest(
+        "{{ artifact_name }}",
+        reference_artifact="reference",
+        test_cases=_DIFF_CASES,
+    ))
+    diff.scorer = TestCaseScorer(
+        _DIFF_BASE_POINTS,
+        extra_credit_cases=_DIFF_EXTRA_CREDIT,
+        label="Extra Credit (Differential)",
+    )
+    diff.scorer.gradescope = GradescopeTestConfig(
+        visibility="after_due_date", number="8"
+    )
+
+    return pipeline
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from lograder.pipeline.config import config
+
+    metadata = GraderMetadata.from_gradescope(
+        grader_name="{{ assignment_name }}",
+        authors=[StaffAuthor(name="Course Staff", role="Instructor")],
+        notes="Contact course staff within 3 days if you believe there is a grading error.",
+    )
+
+    with config(root_directory=Path("/autograder"), executable_timeout=60.0):
+        score = make_pipeline()(metadata=metadata)
+
+    score.write_results_json(
+        config=GradescopeConfig(
+            visibility="visible",
+            stdout_visibility="after_due_date",
+        ),
+    )
