@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aprog"
+version = "0.1.0"
+description = "Assignment programming orchestration CLI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Logan Dapp", email = "logan@logand.app" }
+]
+
+dependencies = [
+    "tomli>=2.0.0; python_version < '3.11'",
+    "pydantic>=2.12.0",
+    "typer>=0.12.0",
+    "jinja2>=3.1.0",
+    "rich>=13.0.0",
+    "httpx>=0.27.0",
+    "lograder>=0.2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-testmon",
+    "mypy",
+    "ruff",
+    "black",
+    "isort",
+    "types-requests",
+]
+
+[project.scripts]
+aprog = "aprog.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/lognd/aprog-public"
+Source = "https://github.com/lognd/aprog-public"
+Issues = "https://github.com/lognd/aprog-public/issues"
+
+[tool.setuptools]
+packages = { find = { where = ["src"] } }
+
+[tool.setuptools.package-data]
+aprog = ["py.typed"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q --testmon"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks integration tests",
+    "system: marks system/end-to-end tests",
+]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+py_version = 310
+src_paths = ["src", "tests"]
+known_first_party = ["aprog"]

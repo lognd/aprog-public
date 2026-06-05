@@ -206,6 +206,9 @@ tempCodeRunnerFile.py
 # Ruff stuff:
 .ruff_cache/
 
+# pytest-testmon
+.testmondata
+
 # PyPI configuration file
 .pypirc
 
@@ -216,3 +219,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+/.testmondata-wal
+/.testmondata-shm
