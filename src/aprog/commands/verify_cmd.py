@@ -160,10 +160,7 @@ def cmd_package_gradescope(
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         # setup.sh -- must be executable so Gradescope can run it
         deps = cfg.grader.dependencies
-        _LOGRADER_GITHUB = "git+https://github.com/lognd/lograder.git"
-        lograder_req = (
-            f"{_LOGRADER_GITHUB}@{deps.lograder}" if deps.lograder else _LOGRADER_GITHUB
-        )
+        lograder_req = f"lograder{deps.lograder}" if deps.lograder else "lograder"
         extra = " ".join(deps.extra)
         setup_sh = (
             f"#!/usr/bin/env bash\nset -e\npip install '{lograder_req}' {extra}\n"
