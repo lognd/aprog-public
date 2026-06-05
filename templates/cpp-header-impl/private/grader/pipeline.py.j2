@@ -1,0 +1,77 @@
+from pathlib import Path
+
+from lograder.pipeline.build.bash_script import BashScriptBuild
+from lograder.pipeline.build.prebuilt import PrebuiltArtifacts
+from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.pipeline import Pipeline
+from lograder.pipeline.score import AllOrNothingScorer, TestCaseScorer
+from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
+from lograder.pipeline.types.artifacts import FileArtifact
+
+# Staff main.cpp lives alongside pipeline.py; it includes the student's header.
+# The build script compiles: g++ -std=c++17 -o <binary> main.cpp -I<submission_dir>
+# Adjust the filename and flags as needed.
+
+_ARTIFACT_NAME = "{{ artifact_name }}"
+_HEADER_FILE = "{{ artifact_name }}.hpp"  # FILL IN: header filename the student submits
+
+# FILL IN: Add test cases.
+_CASES = [
+    OutputCompareCase(
+        name="test_example",
+        args=[],
+        stdin="",
+        expected_stdout="",
+        comparison=ComparisonMode.STRIP,
+    ),
+]
+
+_BUILD_SCORER = AllOrNothingScorer(0.0, label="Build")
+
+# FILL IN: Assign point values per case.
+_TEST_SCORER = TestCaseScorer(
+    {"test_example": 10.0},
+    label="{{ assignment_name }} Correctness",
+)
+
+
+def make_pipeline() -> Pipeline:
+    from lograder.pipeline.config import get_config
+    from lograder.pipeline.types.parcels import Manifest
+    from lograder.pipeline.types.sentinel import PIPELINE_START
+    from lograder.pipeline.step import Step
+    from lograder.common import Ok, Result
+    from typing import Generator
+    import subprocess, sys
+
+    class CompileStep(Step[Manifest, dict, Exception, Manifest, Exception]):
+        def __call__(
+            self, input: Manifest
+        ) -> Generator[Result[Manifest, Exception], None, Result[dict, Exception]]:
+            cfg = get_config()
+            submission = cfg.root_directory
+            grader_dir = Path(__file__).parent
+            binary = submission / _ARTIFACT_NAME
+            result = subprocess.run(
+                [
+                    "g++", "-std=c++17", "-Wall",
+                    str(grader_dir / "main.cpp"),
+                    f"-I{submission}",
+                    "-o", str(binary),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                from lograder.pipeline.build.build import BuildOutput
+                return Ok({})  # let AllOrNothingScorer pick this up via fatal Err pattern
+            if False:
+                yield Ok(input)
+            return Ok({_ARTIFACT_NAME: FileArtifact(path=binary)})
+
+    step = LocalDirectory()
+    compile_step = CompileStep()
+    compile_step.scorer = _BUILD_SCORER
+    tests = OutputCompareTest(_ARTIFACT_NAME, _CASES)
+    tests.scorer = _TEST_SCORER
+    return Pipeline([step, compile_step, tests])

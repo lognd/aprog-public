@@ -1,0 +1,22 @@
+[template]
+slug = "cpp-cmake"
+name = "C++ CMake Project"
+description = "Full C++ project built with CMake."
+version = "0.1"
+
+[classification]
+language = "cpp"
+default_difficulty = "medium"
+recommended_topics = []
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = true
+expected = true
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = true
+grader = true

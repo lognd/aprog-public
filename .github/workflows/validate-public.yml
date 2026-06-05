@@ -1,0 +1,34 @@
+name: Validate Public Assignments
+
+on:
+  pull_request:
+    paths:
+      - "assignments/**"
+      - "aprog.toml"
+      - "templates/**"
+      - "generated/**"
+      - "src/**"
+
+jobs:
+  validate-public:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install AProg
+        run: pip install -e .
+
+      - name: Validate all assignments
+        run: aprog validate --all
+
+      - name: Check generated files
+        run: aprog check-generated --all
+
+      - name: Scan for private file leaks
+        run: aprog scan-public --all

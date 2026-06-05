@@ -1,0 +1,121 @@
+# AProg root configuration.
+# This file is the source of truth for all valid classification values.
+# Only maintainers may add new entries. See docs/reference/classification-model.md.
+
+[classification.languages.python]
+name = "Python"
+
+[classification.languages.cpp]
+name = "C++"
+
+[classification.languages.c]
+name = "C"
+
+[classification.languages.java]
+name = "Java"
+
+[classification.difficulties.easy]
+name = "Easy"
+rank = 1
+
+[classification.difficulties.medium]
+name = "Medium"
+rank = 2
+
+[classification.difficulties.hard]
+name = "Hard"
+rank = 3
+
+[classification.topics.data-structures]
+name = "Data Structures"
+
+[classification.topics.linked-lists]
+name = "Linked Lists"
+
+[classification.topics.trees]
+name = "Trees"
+
+[classification.topics.graphs]
+name = "Graphs"
+
+[classification.topics.sorting]
+name = "Sorting"
+
+[classification.topics.searching]
+name = "Searching"
+
+[classification.topics.dynamic-programming]
+name = "Dynamic Programming"
+
+[classification.topics.algorithms]
+name = "Algorithms"
+
+[classification.topics.strings]
+name = "Strings"
+
+[classification.topics.io]
+name = "I/O"
+
+[classification.topics.systems]
+name = "Systems"
+
+[classification.topics.memory-management]
+name = "Memory Management"
+
+[classification.topics.concurrency]
+name = "Concurrency"
+
+[classification.concepts.recursion]
+name = "Recursion"
+
+[classification.concepts.pointers]
+name = "Pointers"
+
+[classification.concepts.mutation]
+name = "Mutation"
+
+[classification.concepts.iteration]
+name = "Iteration"
+
+[classification.concepts.object-oriented]
+name = "Object-Oriented Programming"
+
+[classification.concepts.functional]
+name = "Functional Programming"
+
+[labels.requires-filesystem]
+name = "Requires filesystem access"
+description = "Assignment expects student code to read or write files."
+
+[labels.performance]
+name = "Performance-sensitive"
+description = "Assignment includes timing or complexity expectations."
+
+[labels.interactive]
+name = "Interactive"
+description = "Assignment involves interactive input/output or a REPL."
+
+[labels.uses-randomness]
+name = "Uses randomness"
+description = "Assignment behavior involves random values."
+
+[labels.requires-network-disabled]
+name = "Requires network disabled"
+description = "Grader must run with network access disabled."
+
+[labels.starter-code]
+name = "Starter code provided"
+description = "Students receive a starter file or skeleton."
+
+[labels.multi-file]
+name = "Multi-file"
+description = "Student submission spans multiple source files."
+
+[labels.unit-tests]
+name = "Unit tests"
+description = "Assignment is graded via unit tests against student-defined functions."
+
+[organization]
+require_encryption = false
+require_hidden_tests = true
+default_grader_visibility = "after_due_date"

@@ -1,0 +1,22 @@
+[assignment]
+slug = "vector-i"
+name = "VectorI: Dynamic Integer Array"
+author = "lognd"
+description = "Debug and complete a dynamic array class for integers."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "easy"
+topics = ["data-structures", "memory-management"]
+concepts = ["object-oriented", "pointers"]
+labels = ["starter-code"]
+
+[template]
+slug = "cpp-class"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"

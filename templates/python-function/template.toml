@@ -1,0 +1,22 @@
+[template]
+slug = "python-function"
+name = "Python Function"
+description = "Student implements one or more Python functions."
+version = "0.1"
+
+[classification]
+language = "python"
+default_difficulty = "medium"
+recommended_topics = []
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = true
+expected = true
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = true
+grader = true

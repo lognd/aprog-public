@@ -1,0 +1,20 @@
+from pathlib import Path
+
+from lograder.pipeline.build.bash_script import BashScriptBuild
+from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.pipeline import Pipeline
+from lograder.pipeline.score import AllOrNothingScorer
+
+# BashScriptBuild runs hidden-tests/run_tests.sh, which should:
+#   1. Copy student files into a temp directory alongside hidden pytest files.
+#   2. Run pytest and write results.json in Gradescope format.
+# The pipeline only checks that the script exits 0; scoring is driven by pytest output.
+# For finer-grained scoring, replace with OutputCompareTest cases that call the student
+# module directly instead of via pytest.
+
+
+def make_pipeline() -> Pipeline:
+    step = LocalDirectory()
+    build = BashScriptBuild(script=Path(__file__).parent.parent / "hidden-tests" / "run_tests.sh")
+    build.scorer = AllOrNothingScorer(100.0, label="{{ assignment_name }}")
+    return Pipeline([step, build])

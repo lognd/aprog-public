@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "collatz-conjecture",
+    "name": "Collatz Conjecture",
+    "author": "lognd",
+    "description": "Implement the Collatz sequence using only bitwise and shift operators."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/collatz-conjecture",
+    "readme": "assignments/collatz-conjecture/README.md",
+    "visible_tests": "assignments/collatz-conjecture/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:ccf3e0aa3faf9bc3ca154c971473b0f820da9c83ddb428809d55bd85db0dc245"
+}

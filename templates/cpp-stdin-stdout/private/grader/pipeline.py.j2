@@ -1,0 +1,40 @@
+from pathlib import Path
+
+from lograder.pipeline.build.cmake import CMakeBuild
+from lograder.pipeline.check.project.simple_project import make_simple_manifest_checker
+from lograder.pipeline.pipeline import Pipeline
+from lograder.pipeline.score import AllOrNothingScorer, TestCaseScorer
+from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
+
+from lograder.pipeline.input.local_directory import LocalDirectory
+
+make_simple_manifest_checker("{{ artifact_name }}", ["CMakeLists.txt"])
+
+# FILL IN: Add test cases. stdin is fed to the program; expected_stdout is the expected output.
+_CASES = [
+    OutputCompareCase(
+        name="test_example",
+        args=[],
+        stdin="",
+        expected_stdout="",
+        comparison=ComparisonMode.STRIP,
+    ),
+]
+
+_BUILD_SCORER = AllOrNothingScorer(0.0, label="Build")
+
+# FILL IN: Assign point values per case.
+_TEST_SCORER = TestCaseScorer(
+    {"test_example": 10.0},
+    label="{{ assignment_name }} Correctness",
+)
+
+
+def make_pipeline() -> Pipeline:
+    step = LocalDirectory()
+    check = CMakeManifestCheck()  # noqa: F821 — injected by make_simple_manifest_checker
+    build = CMakeBuild()
+    build.scorer = _BUILD_SCORER
+    tests = OutputCompareTest("{{ artifact_name }}", _CASES)
+    tests.scorer = _TEST_SCORER
+    return Pipeline([step, check, build, tests])

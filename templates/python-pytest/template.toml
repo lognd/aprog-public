@@ -1,0 +1,22 @@
+[template]
+slug = "python-pytest"
+name = "Python pytest"
+description = "Python assignment graded by running pytest against student code."
+version = "0.1"
+
+[classification]
+language = "python"
+default_difficulty = "medium"
+recommended_topics = []
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = true
+expected = true
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = true
+grader = true
