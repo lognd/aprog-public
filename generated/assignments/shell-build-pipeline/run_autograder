@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# run_autograder is copied to /autograder/run_autograder during the Docker
-# image build, while the rest of the zip is extracted to /autograder/source/.
-# Reference run_autograder.py by its known absolute path.
-exec python3 /autograder/source/run_autograder.py "$@"
