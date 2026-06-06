@@ -14,7 +14,7 @@
 //   - Whitespace is NOT trimmed -- spaces are part of the field value.
 //
 // Implement this function in this file.  Do not change the signature.
-std::vector<std::vector<std::string>> parse_csv(const std::string& text) {
+std::vector<std::vector<std::string>> parse_csv(std::string text) {
     // TODO: implement
     (void)text;
     return {};
