@@ -40,6 +40,7 @@ vector is one field.  Row 0 is the first line of the input.
 | Empty field | `a,,b` produces `{"a", "", "b"}` |
 | Trailing comma | `a,b,` produces `{"a", "b", ""}` |
 | Empty line | Produces a row with zero fields -- do not skip it |
+| Short row | A row with fewer fields than other rows is **not** an error -- return however many fields that line actually contains; do not pad with empty strings |
 | Line endings | Support both `\n` and `\r\n` |
 | Whitespace | Not trimmed -- spaces are part of the field value |
 
@@ -73,6 +74,9 @@ rows[1] = {"Alice", "Portland, OR", "92"   }
 rows[2] = {"Bob",   "Said \"hi\"",  "88"   }
 rows[3] = {"Carol", "",             "75"   }
 ```
+
+Each row is independent -- `rows[i].size()` may differ from `rows[j].size()`.
+The parser does not pad short rows or truncate long ones.
 
 ---
 
