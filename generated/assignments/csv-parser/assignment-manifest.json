@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "csv-parser",
+    "name": "CSV Parser",
+    "author": "lognd",
+    "description": "Implement a CSV parser that handles quoted fields, escaped quotes, missing trailing fields, and empty lines using std::vector<std::vector<std::string>>."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "strings",
+      "data-structures"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/csv-parser",
+    "readme": "assignments/csv-parser/README.md",
+    "visible_tests": "assignments/csv-parser/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:8acd8c89a9153d99a1009cbf5433da1b33e9d9587503af29976c29bb733b7413"
+}
