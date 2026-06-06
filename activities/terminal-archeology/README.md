@@ -21,10 +21,6 @@ Your job is to explore it using only terminal commands -- no GUI file browser, n
 - No opening files in an editor to read through them
 - No IDE, no file manager
 
-## Getting started
-
-You are already in the root of the project. Start exploring.
-
 ## You'll know you're done when...
 
 You can write out a `g++` command, explain why each part of it is there, and produce the passphrase.
