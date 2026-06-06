@@ -7,9 +7,6 @@ Your job is to explore it using only terminal commands -- no GUI file browser, n
 
     sudo python3 launch.py
 
-The program prints the broken function, runs it on the sample text, and shows
-you the garbled output.  It also tells you the exact text and width to use.
-
 ## Your objectives
 
 1. Find every `.cpp` file in the tree.
