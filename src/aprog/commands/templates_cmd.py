@@ -61,7 +61,7 @@ def cmd_templates_info(slug: str, public_root: Optional[Path] = None) -> None:
         cfg = load_template_config(root, slug)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(2)
+        raise typer.Exit(2) from e
 
     t = cfg.template
     c = cfg.classification
@@ -86,7 +86,7 @@ def cmd_templates_info(slug: str, public_root: Optional[Path] = None) -> None:
         pub_outputs.append("expected/")
     if pub.assets:
         pub_outputs.append("assets/")
-    console.print(f"[bold]Public outputs:[/bold]")
+    console.print("[bold]Public outputs:[/bold]")
     console.print(f"  {', '.join(pub_outputs)}")
 
     priv_outputs = []
@@ -96,5 +96,5 @@ def cmd_templates_info(slug: str, public_root: Optional[Path] = None) -> None:
         priv_outputs.append("hidden-tests/")
     if priv.grader:
         priv_outputs.append("grader/pipeline.py")
-    console.print(f"[bold]Private outputs:[/bold]")
+    console.print("[bold]Private outputs:[/bold]")
     console.print(f"  {', '.join(priv_outputs)}")

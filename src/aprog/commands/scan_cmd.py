@@ -11,7 +11,6 @@ from aprog.utils.hashing import hash_assignment_public
 from aprog.utils.repo import (
     all_assignment_slugs,
     find_public_root,
-    load_assignment_config,
 )
 
 console = Console()

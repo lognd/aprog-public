@@ -28,7 +28,6 @@ from lograder.pipeline.score import (
     TestCaseScorer,
 )
 from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
-from lograder.pipeline.types.artifacts import FileArtifact
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -93,9 +92,10 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
     pipeline.add(LocalDirectory(root=submission_dir))
 
     # -- 2. Register the Python file as a runnable artifact -------------------
-    pipeline.add(PrebuiltArtifacts(
-        {_ARTIFACT_NAME: FileArtifact(submission_dir / _ARTIFACT_NAME)}
-    ))
+    # GOTCHA: PrebuiltArtifacts takes a relative path string, not FileArtifact.
+    # GOTCHA: The .py file must have #!/usr/bin/env python3 as its first line
+    #         so the OS can execute it directly. See add-two-numbers for reference.
+    pipeline.add(PrebuiltArtifacts({_ARTIFACT_NAME: _ARTIFACT_NAME}))
 
     # -- 3. Correctness tests -------------------------------------------------
     pipeline.add(tests := OutputCompareTest(_ARTIFACT_NAME, _CASES))

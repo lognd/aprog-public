@@ -1,49 +1,33 @@
 # AProg Documentation
 
-This documentation describes the repository orchestration layer for AProg.
+AProg is the assignment orchestration layer. It owns assignment discovery, classification, template scaffolding, public/private boundary enforcement, contributor upload, maintainer intake, config generation, and CI.
 
-AProg owns:
+The grading pipeline library is [lograder](https://github.com/lognd/lograder). For anything related to writing `pipeline.py` -- step types, build steps, test types, scorers -- see the [lograder documentation](https://github.com/lognd/lograder).
 
-- assignment discovery
-- assignment naming
-- label and category metadata
-- public/private repository boundaries
-- contributor-facing templates
-- assignment scaffolding
-- generated public/private config artifacts
-- contributor upload workflows
-- maintainer intake workflows
-- GitHub Actions and CI/CD repository setup
+---
 
-The grader package is `lograder`. AProg generates the autograder entry point (`run_autograder.py`) but not the grading pipeline itself. The pipeline is contributor-authored via the template's `grader/pipeline.py` scaffold and submitted in the private bundle. See `docs/grader/` for the lograder reference.
+## For contributors
 
-## Recommended reading order
+1. [setup/installation.md](setup/installation.md) -- install AProg and configure your shell
+2. [contributors/quickstart.md](contributors/quickstart.md) -- end-to-end walkthrough
+3. [contributors/guide.md](contributors/guide.md) -- workflow reference
+4. [templates/template-catalog.md](templates/template-catalog.md) -- available templates with demos
+5. [lograder documentation](https://github.com/lognd/lograder) -- writing `pipeline.py`
+6. [reference/assignment-schema.md](reference/assignment-schema.md) -- all `assignment.toml` fields
+7. [reference/classification-model.md](reference/classification-model.md) -- language/difficulty/topic values
 
-### For contributors
+## For maintainers
 
-1. `contributors/quickstart.md` -- end-to-end walkthrough
-2. `contributors/guide.md` -- workflow reference
-3. `reference/assignment-schema.md` -- TOML fields
-4. `reference/classification-model.md` -- language/difficulty/topic values
-5. `templates/template-catalog.md` -- available templates
-6. `grader/overview.md` -- writing `pipeline.py`
-7. `grader/steps.md` -- step types and case models
-8. `grader/scoring.md` -- scorers and point configuration
-9. `grader/oracle.md` -- generating test cases from a reference binary
+8. [maintainers/intake-workflow.md](maintainers/intake-workflow.md) -- PR review and intake checklist
+9. [maintainers/gradescope-upload.md](maintainers/gradescope-upload.md) -- building and uploading the autograder
+10. [tools/overview.md](tools/overview.md) -- full command reference
+11. [setup/github-and-ci.md](setup/github-and-ci.md) -- repository and CI configuration
 
-### For maintainers
+## For implementers
 
-10. `maintainers/intake-workflow.md` -- PR review and intake checklist
-11. `maintainers/gradescope-upload.md` -- building and uploading the autograder to Gradescope
-12. `tools/overview.md` -- full command reference
-13. `setup/github-and-ci.md` -- repository and CI configuration
-
-### For implementers
-
-13. `architecture/overview.md` -- what AProg owns vs. what lograder owns
-14. `architecture/repository-layout.md` -- directory structure
-15. `architecture/generated-configs.md` -- what is generated and how
-16. `architecture/public-private-boundary.md` -- boundary rules and states
-17. `reference/naming-conventions.md` -- names, paths, env vars
-18. `templates/template-system.md` -- template format and validation
-19. `reference/open-questions.md` -- resolved decisions and rationale
+12. [architecture/overview.md](architecture/overview.md) -- AProg vs lograder split, repository structure
+13. [architecture/repository-layout.md](architecture/repository-layout.md) -- directory layout
+14. [architecture/generated-configs.md](architecture/generated-configs.md) -- what is generated and why
+15. [architecture/public-private-boundary.md](architecture/public-private-boundary.md) -- what belongs where
+16. [grader/overview.md](grader/overview.md) -- how `pipeline.py` integrates with AProg
+17. [templates/template-system.md](templates/template-system.md) -- template format and validation

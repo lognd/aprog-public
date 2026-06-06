@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import ValidationError
-
 from aprog.models.assignment import AssignmentConfig
 from aprog.models.root_config import RootConfig
 from aprog.models.template import TemplateConfig

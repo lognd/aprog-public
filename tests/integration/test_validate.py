@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from aprog.commands.generate_config_cmd import cmd_generate_config
 from aprog.commands.validate_cmd import cmd_validate
 

@@ -35,23 +35,27 @@ from lograder.pipeline.test.pytest import PytestTest
 
 _GRADER_DIR = Path(__file__).parent
 _SUBMISSION_DIR = Path("/autograder/submission")
-_HIDDEN_TESTS = _GRADER_DIR.parent / "hidden-tests"
+# GOTCHA: hidden-tests must live INSIDE the grader dir (grader/<slug>/hidden-tests/),
+# not as a sibling. This path works both for local verify and inside the Gradescope zip.
+# See: examples/template-demos/binary-search-staging/ for the expected layout.
+_HIDDEN_TESTS = _GRADER_DIR / "hidden-tests"
 
 # ---------------------------------------------------------------------------
 # Scoring
 # FILL IN: list every pytest test ID and its point value.
-# Test IDs are in the format: "hidden-tests/test_hidden.py::test_name"
+# GOTCHA: Test IDs are "module::function" (e.g. "test_hidden::test_name"),
+# NOT the file path form "hidden-tests/test_hidden.py::test_name".
+# Run `pytest --collect-only` on the hidden-tests dir to confirm the exact IDs.
 # ---------------------------------------------------------------------------
 
 _POINTS: dict[str, float] = {
-    # Visible tests (students see these on submission)
-    "hidden-tests/test_hidden.py::test_hidden_1": 20.0,
-    # FILL IN: add more cases.
+    "test_hidden::test_hidden_1": 20.0,
+    # FILL IN: add one entry per test function in hidden-tests/test_hidden.py.
 }
 
 _EXTRA_CREDIT: dict[str, float] = {
     # FILL IN: bonus cases (not counted in possible total).
-    # "hidden-tests/test_hidden.py::test_bonus": 10.0,
+    # "test_hidden::test_bonus": 10.0,
 }
 
 
@@ -61,13 +65,19 @@ _EXTRA_CREDIT: dict[str, float] = {
 
 
 def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    import os
+    # GOTCHA: hidden-tests/test_hidden.py loads the student module via importlib
+    # using os.environ["SUBMISSION_DIR"]. Set it here so the subprocess inherits it.
+    os.environ["SUBMISSION_DIR"] = str(submission_dir)
+
     pipeline = Pipeline()
 
     # -- 1. Read student submission -------------------------------------------
     pipeline.add(LocalDirectory(root=submission_dir))
 
     # -- 2. Run hidden pytest suite -------------------------------------------
-    pipeline.add(pytest_step := PytestTest(test_paths=[_HIDDEN_TESTS]))
+    # GOTCHA: argument is `paths=`, not `test_paths=`.
+    pipeline.add(pytest_step := PytestTest(paths=[_HIDDEN_TESTS]))
     pytest_step.scorer = TestCaseScorer(
         _POINTS,
         extra_credit_cases=_EXTRA_CREDIT,

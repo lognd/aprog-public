@@ -1,15 +1,25 @@
 """
 Hidden tests for {{ assignment_name }}.
 
-Imported by PytestTest at grading time. sys.path already includes
-/autograder/submission so the student's module imports cleanly.
+Imported by PytestTest at grading time.
 """
 
-import sys
+import importlib.util
+import os
+from pathlib import Path
 
-sys.path.insert(0, "/autograder/submission")
+# GOTCHA: artifact names with hyphens cannot be imported with a plain `import`
+# statement. Use importlib.util to load the file by path instead.
+# GOTCHA: use SUBMISSION_DIR env var (set by make_pipeline) instead of hardcoding
+# /autograder/submission so that `aprog verify` works against the local solution dir.
+_src = Path(os.environ.get("SUBMISSION_DIR", "/autograder/submission")) / "{{ artifact_name }}.py"
+_spec = importlib.util.spec_from_file_location("{{ artifact_name | replace('-', '_') }}_module", _src)
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
 
-from {{ artifact_name }} import MyClass  # noqa: E402
+# FILL IN: import the class(es) under test from _mod.
+# Example: MyClass = _mod.MyClass
+MyClass = _mod.MyClass
 
 
 # FILL IN: comprehensive hidden test cases.

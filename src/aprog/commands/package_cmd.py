@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import tarfile
 from pathlib import Path
 from typing import Optional
@@ -22,10 +21,10 @@ def cmd_package_public(
 ) -> Path:
     root = public_root or find_public_root()
     try:
-        cfg = load_assignment_config(root, slug)
+        load_assignment_config(root, slug)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     dist = (output_dir or root / "dist").resolve()
     dist.mkdir(parents=True, exist_ok=True)
@@ -75,7 +74,7 @@ def cmd_package_private(
         missing.append("--grader")
     if missing:
         console.print(f"[red]Error:[/red] Missing required paths: {', '.join(missing)}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     assert solution is not None
     assert grader is not None
@@ -88,7 +87,7 @@ def cmd_package_private(
     pipeline_file = grader / "pipeline.py"
     if not pipeline_file.exists():
         console.print(f"[red]Error:[/red] grader/pipeline.py not found in {grader}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     manifest = PackageManifest(
         assignment_slug=slug,

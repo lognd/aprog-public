@@ -102,13 +102,12 @@ def cmd_info(
         cfg = load_assignment_config(root, slug)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(2)
+        raise typer.Exit(2) from e
 
     a = cfg.assignment
     c = cfg.classification
     t = cfg.template
 
-    assignment_root = root / "assignments" / slug
     manifest_path = (
         root / "generated" / "assignments" / slug / "assignment-manifest.json"
     )

@@ -4,34 +4,34 @@ Complete walkthrough: creating an assignment from nothing to submitted private b
 
 Uses `linked-list-insertion` (Python, function-based) as the running example.
 
+Before starting, complete [docs/setup/installation.md](../setup/installation.md) so that `aprog` is installed and `APROG_STAGING_DIR` is set.
+
 ---
 
-## 0. Prerequisites
+## 0. Look at the examples first
 
-Install AProg:
+Before writing any code, browse the complete worked examples in this repo. They show exactly what a finished assignment looks like -- including `pipeline.py`, hidden tests, and visible tests.
 
-```bash
-pip install aprog
+```text
+examples/full-assignments/cpp-linked-list/   -- full C++ assignment (cpp-header-impl template)
+examples/template-demos/                     -- one working demo per template
 ```
 
-Set a staging directory for private working files (so they are never in `aprog-public`):
-
-```bash
-export APROG_STAGING_DIR=~/aprog-staging
-```
-
-This persists in your shell profile. `aprog new` will create private skeletons at `$APROG_STAGING_DIR/<slug>/`.
+For `pipeline.py` authoring, the [lograder documentation](https://github.com/lognd/lograder) covers every step type, scorer, and configuration option.
 
 ---
 
 ## 1. Browse available templates
 
 ```bash
+aprog templates list
 aprog templates list --language python
 aprog templates info python-function
 ```
 
-For a Python assignment where students implement functions: `python-function`.
+Choose the template that matches your assignment type. See [docs/templates/template-catalog.md](../templates/template-catalog.md) for descriptions of all available templates and their expected file layouts.
+
+For this walkthrough: `python-function` -- students implement one or more functions in a `.py` file.
 
 ---
 
@@ -41,33 +41,31 @@ For a Python assignment where students implement functions: `python-function`.
 aprog new linked-list-insertion --template python-function
 ```
 
-Because `APROG_STAGING_DIR` is set, this creates both:
+Because `APROG_STAGING_DIR` is set, this creates files in two places:
 
-**Public** (in `aprog-public`):
-
-```text
-assignments/linked-list-insertion/
-|-- assignment.toml
-|-- README.md
-|-- visible-tests/
-|   `-- test_visible.py
-|-- expected/
-`-- assets/
-    `-- starter.py
-```
-
-**Private** (in `$APROG_STAGING_DIR`):
+**Public** (in `aprog-public/assignments/linked-list-insertion/`):
 
 ```text
-~/aprog-staging/linked-list-insertion/
-|-- solution/
-|   `-- solution.py
-|-- hidden-tests/
-|   `-- tests/
-|       `-- test_hidden.py
-`-- grader/
-    `-- pipeline.py
+assignment.toml          Assignment metadata
+README.md                Assignment statement (fill this in)
+visible-tests/
+    test_visible.py      Tests students can see and run locally
+assets/
+    starter.py           Starter file handed to students
 ```
+
+**Private** (in `~/aprog-staging/linked-list-insertion/`):
+
+```text
+solution/
+    linked-list-insertion.py   Reference solution (fill this in)
+hidden-tests/
+    test_hidden.py             Hidden test cases (fill these in)
+grader/
+    pipeline.py                Grader pipeline (fill this in)
+```
+
+The private files are never committed to `aprog-public`. They travel to the maintainer via `aprog submit`.
 
 ---
 
@@ -99,17 +97,16 @@ visibility = "after_due_date"
 stdout_visibility = "after_due_date"
 ```
 
-Edit `author`, `description`, `topics`, `concepts`, and `difficulty`. Use `aprog list --status draft` to see your registered topics. Leave `[grader]` defaults unless you need to change visibility.
+Edit `author`, `description`, `topics`, `concepts`, and `difficulty`. Run `aprog list` to see registered topics. Leave `[grader]` defaults unless you need to change visibility.
 
 ---
 
-## 4. Fill in `README.md`
+## 4. Write the assignment statement (`README.md`)
 
-Write the assignment statement. Include:
+Open `assignments/linked-list-insertion/README.md` and write the student-facing description. Include:
 
-- what the student must implement
-- function signature(s) and types
-- constraints and edge cases
+- what the student must implement (function name, signature, types)
+- constraints and edge cases they must handle
 - example inputs and expected outputs
 
 ---
@@ -118,10 +115,10 @@ Write the assignment statement. Include:
 
 Edit `assignments/linked-list-insertion/visible-tests/test_visible.py`.
 
-These tests are public -- students can see and run them. Keep them representative but not exhaustive.
+These tests are public -- students can see and run them locally. Keep them representative but not exhaustive (save the harder cases for hidden tests).
 
 ```python
-from starter import insert
+from linked_list_insertion import insert
 
 def test_insert_into_empty():
     assert insert([], 1) == [1]
@@ -138,12 +135,12 @@ def test_insert_at_end():
 aprog validate linked-list-insertion
 ```
 
-Common issues:
+Fix any reported issues before opening a PR.
 
 | Error | Fix |
 |---|---|
 | Slug mismatch | Directory name must match `slug` in `assignment.toml` |
-| Unknown language/topic | Add the value to `aprog.toml` (maintainer) |
+| Unknown language/topic | Add the value to `aprog.toml` (maintainer task) or use an existing one |
 | Missing README | Create `assignments/linked-list-insertion/README.md` |
 | Generated files stale | Run `aprog generate-config linked-list-insertion` |
 
@@ -151,80 +148,80 @@ Common issues:
 
 ## 7. Open a public PR
 
-Commit and push the `assignments/linked-list-insertion/` directory to a branch and open a pull request. Do not commit anything from `~/aprog-staging/`.
+Commit and push `assignments/linked-list-insertion/` to a branch and open a pull request. **Do not commit anything from `~/aprog-staging/`.** The CI workflow will run `aprog validate --all` automatically.
 
 ---
 
 ## 8. Write the reference solution
 
-In `~/aprog-staging/linked-list-insertion/solution/solution.py`, implement the correct solution:
+In `~/aprog-staging/linked-list-insertion/solution/linked-list-insertion.py`, implement the correct solution:
 
 ```python
 def insert(lst, value):
     return lst + [value]
 ```
 
-This is what `aprog verify` runs the grader pipeline against.
+This is what `aprog verify` runs the grader pipeline against to confirm the grader works.
 
 ---
 
 ## 9. Write hidden tests
 
-In `~/aprog-staging/linked-list-insertion/hidden-tests/tests/`, add test inputs that students do not see.
+In `~/aprog-staging/linked-list-insertion/hidden-tests/test_hidden.py`, add test cases that students do not see until after the due date.
 
-For a Python function assignment, hidden tests are typically additional inputs the grader passes to the student's code. The exact format depends on how `pipeline.py` invokes the artifact.
+For `python-function` the hidden tests are pytest test functions that import the student's module directly. See the template scaffold and [lograder documentation](https://github.com/lognd/lograder) for the expected format.
 
 ---
 
 ## 10. Fill in `grader/pipeline.py`
 
-Open `~/aprog-staging/linked-list-insertion/grader/pipeline.py`. Replace the placeholder cases:
+Open `~/aprog-staging/linked-list-insertion/grader/pipeline.py`.
+
+The template scaffold contains a working skeleton with placeholder test cases. Replace the placeholders with real inputs and point values.
+
+**Before editing,** read:
+
+- [lograder documentation](https://github.com/lognd/lograder) -- step types, scorers, build steps, and all available configuration
+- [docs/grader/overview.md](../grader/overview.md) -- how the pipeline integrates with AProg
+- `examples/template-demos/binary-search-staging/grader/pipeline.py` -- a complete `python-function` example
+
+**Minimal example:**
 
 ```python
+from pathlib import Path
 from lograder.pipeline.input.local_directory import LocalDirectory
 from lograder.pipeline.pipeline import Pipeline
-from lograder.pipeline.test.output_compare import OutputCompareTest, OutputCompareCase
-from lograder.pipeline.score import TestCaseScorer
+from lograder.pipeline.test.pytest import PytestTest
+from lograder.pipeline.score import TestCaseScorer, GimmeConfig
 
-_CASES = [
-    OutputCompareCase(
-        name="insert_empty",
-        args=[],
-        stdin="[] 1\n",
-        expected_stdout="[1]\n",
-    ),
-    OutputCompareCase(
-        name="insert_end",
-        args=[],
-        stdin="[1, 2] 3\n",
-        expected_stdout="[1, 2, 3]\n",
-    ),
-    OutputCompareCase(
-        name="insert_middle",
-        args=[],
-        stdin="[1, 3] 2\n",
-        expected_stdout="[1, 2, 3]\n",
-    ),
-]
+_GRADER_DIR = Path(__file__).parent
+_HIDDEN_TESTS = _GRADER_DIR / "hidden-tests"
 
-_SCORER = TestCaseScorer(
-    points_per_case={
-        "insert_empty": 10.0,
-        "insert_end": 10.0,
-        "insert_middle": 20.0,
-    },
-    label="Linked List Insertion",
-)
+_POINTS = {
+    "test_hidden::test_insert_into_empty": 10.0,
+    "test_hidden::test_insert_at_end": 10.0,
+    "test_hidden::test_insert_middle": 20.0,
+}
 
+def make_pipeline(submission_dir=Path("/autograder/submission")):
+    import os
+    os.environ["SUBMISSION_DIR"] = str(submission_dir)
 
-def make_pipeline() -> Pipeline:
-    step = LocalDirectory()
-    tests = OutputCompareTest("solution.py", _CASES)
-    tests.scorer = _SCORER
-    return Pipeline([step, tests])
+    pipeline = Pipeline()
+    pipeline.add(LocalDirectory(root=submission_dir))
+    pipeline.add(tests := PytestTest(paths=[_HIDDEN_TESTS]))
+    tests.scorer = TestCaseScorer(
+        _POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=10.0),
+        label="Correctness",
+    )
+    return pipeline
 ```
 
-See `docs/grader/steps.md` and `docs/grader/scoring.md` for the full step and scorer reference.
+> **Gotchas** (see the template scaffold comments for details):
+> - Score keys are `"module::function"` (e.g. `"test_hidden::test_name"`), not file paths.
+> - `hidden-tests/` must live inside `grader/` -- not as a sibling.
+> - PytestTest takes `paths=`, not `test_paths=`.
 
 ---
 
@@ -234,9 +231,9 @@ See `docs/grader/steps.md` and `docs/grader/scoring.md` for the full step and sc
 aprog submit linked-list-insertion
 ```
 
-Because `APROG_STAGING_DIR` is set, `aprog submit` finds the staging directory automatically. It runs `aprog package-private` and either prints the bundle path or uploads it if `APROG_INTAKE_URL` is configured.
+`aprog submit` finds `~/aprog-staging/linked-list-insertion/` automatically (because `APROG_STAGING_DIR` is set). It packages the solution, hidden tests, and grader, then either sends the bundle to the maintainer or writes it to `dist/`.
 
-If the maintainer uses a manual intake process:
+If you need to package manually:
 
 ```bash
 aprog package-private linked-list-insertion \
@@ -244,14 +241,14 @@ aprog package-private linked-list-insertion \
   --hidden-tests ~/aprog-staging/linked-list-insertion/hidden-tests \
   --grader ~/aprog-staging/linked-list-insertion/grader
 # Output: dist/linked-list-insertion-private.tar.gz
-# Send this file to the maintainer.
+# Send this to the maintainer.
 ```
 
 ---
 
-## 12. After submission (maintainer steps)
+## 12. After submission -- maintainer steps
 
-> **Staff / maintainers only.** Requires access to `aprog-private`.
+> **Maintainers only.** Requires access to `aprog-private`.
 
 ### 12a. Intake the private bundle
 
@@ -269,53 +266,50 @@ aprog verify linked-list-insertion \
   --private ../aprog-private
 ```
 
-Verification passes when the reference solution earns full non-extra-credit points on all test cases. If it fails, work with the contributor to fix the solution or grader, then re-intake and re-verify.
+Verification passes when the reference solution earns full non-extra-credit points. If it fails, work with the contributor to fix the solution or grader, then re-intake and re-verify.
 
 ### 12c. Build and upload the Gradescope autograder
 
-Once verification passes:
-
 ```bash
-# Ensure generated files are current
 aprog generate-config linked-list-insertion --force
 
-# Build the Gradescope zip
 aprog package-gradescope linked-list-insertion \
   --public ../aprog-public \
   --private ../aprog-private
 # Output: dist/linked-list-insertion-gradescope.zip
 ```
 
-Then in Gradescope:
-
+In Gradescope:
 1. Open the course and find (or create) the programming assignment.
 2. Go to **Configure Autograder** in the left sidebar.
-3. Click **Upload Autograder** and select `dist/linked-list-insertion-gradescope.zip`.
+3. Click **Upload Autograder** and select the zip file.
 4. Click **Update Autograder** and wait for the build (1-3 minutes).
-5. Use **Test Autograder** with the reference solution to confirm the score is correct before students submit.
+5. Use **Test Autograder** with the reference solution to confirm the score before students submit.
 
-See `docs/maintainers/gradescope-upload.md` for the full upload guide and troubleshooting.
+See [docs/maintainers/gradescope-upload.md](../maintainers/gradescope-upload.md) for the full upload guide.
 
 ---
 
 ## Summary of commands
 
 ```bash
-# One-time setup
+# One-time setup (see docs/setup/installation.md)
+pip install aprog
 export APROG_STAGING_DIR=~/aprog-staging
 
-# Discover templates
+# Browse templates
 aprog templates list --language python
+aprog templates info python-function
 
 # Scaffold
 aprog new linked-list-insertion --template python-function
 
+# (edit assignment.toml, README.md, visible-tests/, solution/, hidden-tests/, grader/pipeline.py)
+
 # Validate public files
 aprog validate linked-list-insertion
 
-# (edit assignment.toml, README.md, visible-tests/, grader/pipeline.py, solution/)
-
-# Submit private bundle
+# Open a PR, then submit the private bundle
 aprog submit linked-list-insertion
 
 # --- Maintainer steps (after intake) ---

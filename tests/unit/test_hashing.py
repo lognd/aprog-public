@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from aprog.utils.hashing import hash_file, hash_paths
 
 

@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from aprog.commands.validate_cmd import _scan_public_violations
 
 

@@ -1,81 +1,33 @@
 # Public/Private Boundary
 
-## Public files
+## What goes in `aprog-public`
 
-These are allowed in `aprog-public`:
+- assignment statements (`README.md`)
+- starter files (`assets/`)
+- visible tests (`visible-tests/`)
+- visible expected outputs (`expected/`)
+- root classification config (`aprog.toml`)
+- assignment templates (`templates/`)
+- generated public manifests and autograder entry points (`generated/`)
+- documentation
 
-- assignment statements
-- starter files
-- visible tests
-- visible expected outputs
-- public assets
-- root classification config
-- assignment templates
-- generated public assignment manifests
-- generated autograder entry points (`run_autograder`, `run_autograder.py`)
-- contributor documentation
+## What stays in `aprog-private`
 
-## Private files
+- reference solutions (`solutions/`)
+- hidden tests (`hidden-tests/`)
+- grader pipelines (`grader/<slug>/pipeline.py`)
+- generated private manifests and verification configs (`generated/`)
 
-These must stay in `aprog-private`:
+## What `aprog scan-public` catches
 
-- reference solutions
-- hidden tests
-- hidden expected outputs
-- contributor-authored grader pipelines (`grader/pipeline.py`)
-- private solution notes
-- maintainer notes
-- generated private verification configs
-- generated private manifests
-- anything that reveals hidden grading behavior
-
-## Mechanical matching
-
-Assignments are matched by slug.
+The scanner rejects suspicious filenames under `assignments/<slug>/`:
 
 ```text
-aprog-public/assignments/<slug>/
-aprog-private/solutions/<slug>/
-aprog-private/hidden-tests/<slug>/
-aprog-private/grader/<slug>/
+solution.py, solution.cpp, solutions/
+hidden-tests/, hidden_tests/, hidden/
+private/, private-notes.md
+answer-key.md, reference-solution.*
+pipeline.py, grader/
 ```
 
-No per-assignment TOML field should manually point to these private paths.
-
-## Prohibited public names
-
-The public validator should reject suspicious names under `assignments/<slug>/`.
-
-Examples:
-
-```text
-solution.py
-solution.cpp
-solutions/
-hidden-tests/
-hidden_tests/
-hidden/
-private/
-private-notes.md
-answer-key.md
-reference-solution.*
-pipeline.py
-grader/
-```
-
-## Intentional exceptions
-
-Some words may be legitimate inside an assignment statement, for example "write a solution" in prose. The leak scanner should focus on paths and filenames first, then optionally scan contents.
-
-Maintainer-only overrides should be explicit and auditable.
-
-## Public assignment states
-
-| State | Meaning |
-|---|---|
-| `draft` | Assignment exists but may be incomplete |
-| `public-valid` | Public files pass validation |
-| `private-missing` | No matching private grader or solution exists yet |
-| `private-present` | Private solution and grader files exist |
-| `verified` | Maintainer verification passes (reference solution earns full points) |
-| `release-ready` | Generated configs are current and assignment is deployable |
+CI runs `aprog scan-public --all` on every PR. If any of the above appear in a public PR, the build fails.

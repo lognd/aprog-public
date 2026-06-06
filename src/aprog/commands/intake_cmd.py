@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import shutil
 import subprocess
 import tarfile
@@ -71,25 +70,25 @@ def cmd_intake(
             )
         except ValidationError as e:
             console.print(f"[red]Invalid package manifest:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
 
         public_assignment = public_root / "assignments" / slug
         if not public_assignment.exists():
             console.print(
                 f"[red]Error:[/red] Assignment '{slug}' not found in public repo"
             )
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
 
         if not pkg_manifest.contains_grader:
             console.print(
                 "[red]Error:[/red] Bundle does not contain grader/pipeline.py"
             )
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
 
         grader_file = slug_dir / "grader" / "pipeline.py"
         if not grader_file.exists():
             console.print("[red]Error:[/red] grader/pipeline.py missing from bundle")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
 
         _copy_dir(slug_dir / "solution", private_repo / "solutions" / slug, force)
         if pkg_manifest.contains_hidden_tests and (slug_dir / "hidden-tests").exists():
@@ -105,7 +104,7 @@ def cmd_intake(
 
         code = cmd_validate(slug, private_repo=private_repo, public_root=public_root)
         if code != 0:
-            raise typer.Exit(code)
+            raise typer.Exit(code) from None
 
     if generate:
         from aprog.commands.generate_config_cmd import cmd_generate_config
@@ -118,7 +117,7 @@ def _copy_dir(src: Path, dst: Path, force: bool) -> None:
         console.print(
             f"[red]Error:[/red] {dst} already exists. Use --force to overwrite."
         )
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(src, dst)

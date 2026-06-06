@@ -13,7 +13,6 @@ from aprog.utils.repo import (
     find_public_root,
     load_assignment_config,
     load_root_config,
-    load_template_config,
 )
 
 console = Console()
@@ -86,19 +85,19 @@ def cmd_validate(
         root_cfg = load_root_config(root)
     except Exception as e:
         console.print(f"[red]Error loading aprog.toml:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     # Load assignment config
     try:
         cfg = load_assignment_config(root, slug)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
     except ValidationError as e:
-        console.print(f"[red]Validation error in assignment.toml:[/red]")
+        console.print("[red]Validation error in assignment.toml:[/red]")
         for err in e.errors():
             console.print(f"  {'.'.join(str(x) for x in err['loc'])}: {err['msg']}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     a = cfg.assignment
     c = cfg.classification
@@ -174,10 +173,10 @@ def cmd_validate(
     if private_repo:
         sol_dir = private_repo / "solutions" / slug
         if not sol_dir.exists():
-            errors.append(f"Private: missing solution directory")
+            errors.append("Private: missing solution directory")
         grader_file = private_repo / "grader" / slug / "pipeline.py"
         if not grader_file.exists():
-            errors.append(f"Private: missing grader/pipeline.py")
+            errors.append("Private: missing grader/pipeline.py")
 
     if errors:
         console.print(f"[red]Validation failed for '{slug}':[/red]")
@@ -201,4 +200,4 @@ def cmd_validate_all(
         if code != 0:
             failed.append(slug)
     if failed:
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None

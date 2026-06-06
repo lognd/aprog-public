@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
-from jinja2 import Environment, FileSystemLoader, StrictUndefined
-from pydantic import ValidationError
+from jinja2 import StrictUndefined
 from rich.console import Console
 
 from aprog.utils.repo import find_public_root, load_template_config, resolve_staging_dir
@@ -42,7 +41,7 @@ def cmd_new(
         tpl_cfg = load_template_config(root, template)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(2)
+        raise typer.Exit(2) from e
 
     assignment_root = root / "assignments" / slug
     if assignment_root.exists() and not force:
@@ -50,7 +49,7 @@ def cmd_new(
             f"[red]Error:[/red] Assignment already exists: {assignment_root}\n"
             "Pass --force to overwrite."
         )
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     staging = resolve_staging_dir(staging_dir) or (root.parent / "aprog-staging")
     staging_slug_dir = staging / slug

@@ -4,13 +4,22 @@ Hidden tests for {{ assignment_name }}.
 More thorough than visible-tests/; hidden until after the due date.
 """
 
-import sys
+import importlib.util
+import os
 from pathlib import Path
 
-sys.path.insert(0, "/autograder/submission")
+# GOTCHA: artifact names with hyphens (e.g. binary-search.py) cannot be imported
+# with a plain `import` statement. Use importlib.util to load them by file path.
+# GOTCHA: use SUBMISSION_DIR env var (set by make_pipeline) instead of hardcoding
+# /autograder/submission so that `aprog verify` works against the local solution dir.
+_src = Path(os.environ.get("SUBMISSION_DIR", "/autograder/submission")) / "{{ artifact_name }}.py"
+_spec = importlib.util.spec_from_file_location("{{ artifact_name | replace('-', '_') }}_module", _src)
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
 
-# FILL IN: import the function(s) under test.
-from {{ artifact_name }} import my_function  # noqa: E402
+# FILL IN: import the function(s) under test from _mod.
+# Example: my_function = _mod.my_function
+my_function = _mod.my_function
 
 
 # FILL IN: hidden test cases.

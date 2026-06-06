@@ -20,9 +20,13 @@ FetchContent_MakeAvailable(Catch2)
 # this CMakeLists.txt. All targets include the grader directory.
 # ---------------------------------------------------------------------------
 
+# GOTCHA: use ${CMAKE_SOURCE_DIR}/ (not ../) for visible-tests and hidden-tests.
+# CMAKE_SOURCE_DIR is the grader/<slug>/ dir; both test dirs must live inside it.
+# See: examples/template-demos/cpp-bst-staging/ for the expected layout.
+
 # Catch2 visible test suite (students use this locally too)
 add_executable({{ artifact_name }}_tests
-    "${CMAKE_SOURCE_DIR}/../visible-tests/test_catch.cpp"
+    "${CMAKE_SOURCE_DIR}/visible-tests/test_catch.cpp"
 )
 target_include_directories({{ artifact_name }}_tests PRIVATE "${CMAKE_SOURCE_DIR}")
 target_link_libraries({{ artifact_name }}_tests PRIVATE Catch2::Catch2WithMain)
@@ -30,7 +34,7 @@ target_compile_options({{ artifact_name }}_tests PRIVATE -Wall -Wextra -g)
 
 # Catch2 hidden test suite (staff only)
 add_executable({{ artifact_name }}_hidden_tests
-    "${CMAKE_SOURCE_DIR}/../hidden-tests/test_hidden.cpp"
+    "${CMAKE_SOURCE_DIR}/hidden-tests/test_hidden.cpp"
 )
 target_include_directories({{ artifact_name }}_hidden_tests PRIVATE "${CMAKE_SOURCE_DIR}")
 target_link_libraries({{ artifact_name }}_hidden_tests PRIVATE Catch2::Catch2WithMain)
@@ -47,5 +51,5 @@ target_compile_options({{ artifact_name }} PRIVATE -Wall -Wextra -g)
 add_executable(reference
     "${CMAKE_SOURCE_DIR}/main.cpp"
 )
-target_include_directories(reference PRIVATE "${CMAKE_SOURCE_DIR}/../hidden-tests")
+target_include_directories(reference PRIVATE "${CMAKE_SOURCE_DIR}/hidden-tests")
 target_compile_options(reference PRIVATE -O2)

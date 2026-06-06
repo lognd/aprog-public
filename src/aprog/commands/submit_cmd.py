@@ -87,7 +87,7 @@ def _upload(bundle: Path, slug: str, url: str) -> None:
             )
         except httpx.HTTPStatusError as e:
             console.print(f"[red]Upload failed:[/red] HTTP {e.response.status_code}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
         except Exception as e:
             console.print(f"[red]Upload error:[/red] {e}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e

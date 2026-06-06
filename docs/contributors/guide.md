@@ -1,31 +1,36 @@
 # Contributor Guide
 
-## Quick start
+Workflow reference for contributors. For a step-by-step walkthrough of creating your first assignment, see [quickstart.md](quickstart.md).
 
-```bash
-aprog templates list
-aprog new linked-list-insertion --template python-function
-aprog validate linked-list-insertion
-```
+For grader pipeline authoring (`pipeline.py`), see the [lograder documentation](https://github.com/lognd/lograder).
+
+---
 
 ## Contributor workflow
 
-1. Pick a template.
-2. Generate an assignment scaffold.
-3. Fill in `assignment.toml`.
-4. Fill in `README.md`.
-5. Add visible tests.
-6. Run validation.
-7. Open a public PR.
-8. Fill in `grader/pipeline.py` from the private template skeleton.
-9. Submit the private bundle.
+1. Browse templates and pick one that matches your assignment type.
+2. Scaffold the assignment with `aprog new`.
+3. Fill in `assignment.toml`, `README.md`, and visible tests.
+4. Validate with `aprog validate`.
+5. Open a public PR.
+6. Write the reference solution, hidden tests, and `grader/pipeline.py`.
+7. Submit the private bundle with `aprog submit`.
 
-## Pick a template
+---
+
+## Browse templates
 
 ```bash
+aprog templates list
 aprog templates list --language python
 aprog templates info python-function
 ```
+
+See [docs/templates/template-catalog.md](../templates/template-catalog.md) for descriptions of all templates.
+
+Look at `examples/template-demos/` for a complete working example for each template type. Reading a demo `pipeline.py` before writing your own will save significant time.
+
+---
 
 ## Create an assignment
 
@@ -33,7 +38,31 @@ aprog templates info python-function
 aprog new linked-list-insertion --template python-function
 ```
 
-## Edit classification
+This creates the public scaffold in `assignments/linked-list-insertion/` and the private scaffold in `$APROG_STAGING_DIR/linked-list-insertion/`.
+
+---
+
+## Fill in the grader pipeline
+
+Open `$APROG_STAGING_DIR/<slug>/grader/pipeline.py`. This file defines the lograder `Pipeline` for your assignment.
+
+The template scaffold provides a working skeleton with inline gotcha comments explaining the most common mistakes. Read them.
+
+You must:
+
+- Replace placeholder test cases with real inputs and expected outputs.
+- Set point values in the scorer.
+- Add a build step if the assignment requires compilation.
+
+**Resources:**
+
+- [lograder documentation](https://github.com/lognd/lograder) -- the primary reference for all step types, scorers, and configuration
+- `examples/template-demos/` -- a complete working `pipeline.py` for each template
+- [docs/grader/overview.md](../grader/overview.md) -- how the pipeline integrates with AProg
+
+---
+
+## Classification fields
 
 ```toml
 [classification]
@@ -44,41 +73,46 @@ concepts = ["mutation"]
 labels = ["unit-tests"]
 ```
 
-## Do not commit private files
+Valid values for `language`, `difficulty`, and `topics` are defined in `aprog.toml` at the repo root. Run `aprog list` to see what is registered. If you need a new topic or language, coordinate with the maintainer.
 
-Never commit:
+---
+
+## What not to commit
+
+Never commit to `aprog-public`:
 
 - solutions
 - hidden tests
 - answer keys
 - private notes
-- generated private configs
 - `grader/pipeline.py`
+- anything from `$APROG_STAGING_DIR`
 
-## Fill in the grader pipeline
+The CI workflow runs `aprog scan-public --all` on every PR to catch accidental private file leaks.
 
-The private template skeleton includes `grader/pipeline.py`. This file defines the lograder `Pipeline` for your assignment. You must:
+---
 
-- replace the placeholder test cases with real inputs and expected outputs
-- set point values in the scorer
-- add a build step if the assignment requires compilation
+## Submit private bundle
 
-The pipeline file stays private. It is submitted in the private bundle.
+Package and submit the private bundle:
 
-## Submit private solution
+```bash
+aprog submit linked-list-insertion
+```
 
-Package the private bundle:
+With `APROG_STAGING_DIR` set, `aprog submit` finds the staging files automatically.
+
+If you need to package manually:
 
 ```bash
 aprog package-private linked-list-insertion \
-  --solution path/to/your/solution \
-  --hidden-tests path/to/hidden-tests \
-  --grader path/to/grader
+  --solution ~/aprog-staging/linked-list-insertion/solution \
+  --hidden-tests ~/aprog-staging/linked-list-insertion/hidden-tests \
+  --grader ~/aprog-staging/linked-list-insertion/grader
+# Output: dist/linked-list-insertion-private.tar.gz
 ```
 
-Then follow the private submission workflow documented by maintainers.
-
-Expected private bundle shape:
+Expected bundle shape:
 
 ```text
 <slug>/

@@ -1,57 +1,31 @@
-# AProg Tooling Design Overview
+# Command Reference
 
-The `aprog` CLI is the main interface for contributors and maintainers.
+All commands: `aprog --help` or `aprog <command> --help`.
 
-## Command reference
+## Contributor commands
 
-| Group | Commands | Doc |
-|---|---|---|
-| Assignment creation | `new` | `tools/aprog-new.md` |
-| Template discovery | `templates list`, `templates info` | `tools/aprog-list.md` |
-| Validation | `validate` | `tools/aprog-validate.md` |
-| Public boundary scan | `scan-public` | `tools/aprog-scan-public.md` |
-| Generated file check | `check-generated` | `tools/aprog-scan-public.md` |
-| Discovery | `list`, `info` | `tools/aprog-list.md` |
-| Public packaging | `package-public` | `tools/aprog-package.md` |
-| Private packaging | `package-private` | `tools/aprog-package.md` |
-| Submission | `submit` | `tools/aprog-submit.md` |
-| Maintainer intake | `intake` | `tools/aprog-intake.md` |
-| Verification | `verify` | `tools/aprog-verify.md` |
-| Config generation | `generate-config` | `tools/aprog-generate-config.md` |
-| Gradescope packaging | `package-gradescope` | `tools/aprog-package-gradescope.md` |
-
-## Command naming principles
-
-- Use verbs.
-- Prefer explicit names over clever aliases.
-- Keep contributor commands safe by default.
-- Require explicit flags for private operations.
-
-## Contributor-safe commands
-
-These commands never write private files into `aprog-public`:
-
-```text
-aprog new
-aprog validate
-aprog scan-public
-aprog check-generated
-aprog list
-aprog info
-aprog package-public
-aprog submit
-aprog templates list
-aprog templates info
-```
+| Command | What it does |
+|---|---|
+| `aprog new <slug> --template <t>` | Scaffold a new assignment (public + private staging) |
+| `aprog templates list` | List available templates |
+| `aprog templates info <slug>` | Show template details and expected file layout |
+| `aprog validate <slug>` | Validate public files (schema, classification, generated files) |
+| `aprog validate --all` | Validate all assignments |
+| `aprog list` | List all assignments |
+| `aprog info <slug>` | Show assignment metadata |
+| `aprog submit <slug>` | Package and send the private bundle to the maintainer |
 
 ## Maintainer commands
 
-These read or write private files:
+| Command | What it does |
+|---|---|
+| `aprog intake <bundle.tar.gz>` | Import a private bundle into `aprog-private` |
+| `aprog verify <slug>` | Run the grader against the reference solution |
+| `aprog verify --all` | Verify all assignments |
+| `aprog generate-config <slug>` | Regenerate `run_autograder.py` and manifests |
+| `aprog generate-config --all` | Regenerate for all assignments |
+| `aprog check-generated <slug>` | Check whether generated files are current |
+| `aprog package-gradescope <slug>` | Build the Gradescope zip |
+| `aprog scan-public <slug>` | Check for private file leaks in the public repo |
 
-```text
-aprog package-private
-aprog intake
-aprog verify
-aprog generate-config --private <path>
-aprog package-gradescope
-```
+Most maintainer commands accept `--public <path>` and `--private <path>` to override the auto-detected repo roots.
