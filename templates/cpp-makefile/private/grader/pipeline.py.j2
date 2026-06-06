@@ -36,7 +36,6 @@ from lograder.pipeline.score import (
     TestCaseScorer,
 )
 from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
-from lograder.pipeline.types.artifacts import FileArtifact
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -87,10 +86,13 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
     build.scorer = AllOrNothingScorer(10.0, label="Build")
     build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
 
-    # MakefileBuild returns Ok({}) -- inject binary path manually.
-    # FILL IN: adjust path if Makefile writes to a subdirectory.
+    # GOTCHA: MakefileBuild returns Ok({}) -- an empty artifact dict, not a Manifest.
+    # PrebuiltArtifacts must use an absolute Path (not a relative string) here because
+    # there is no manifest root to resolve against after MakefileBuild.
+    # FILL IN: adjust path if your Makefile writes the binary to a subdirectory.
+    # See: examples/template-demos/word-count-staging/ for a complete example.
     pipeline.add(PrebuiltArtifacts({
-        "{{ artifact_name }}": FileArtifact(submission_dir / "{{ artifact_name }}"),
+        "{{ artifact_name }}": submission_dir / "{{ artifact_name }}",
     }))
 
     pipeline.add(visible := OutputCompareTest("{{ artifact_name }}", _VISIBLE_CASES))

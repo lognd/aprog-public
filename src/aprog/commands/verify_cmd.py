@@ -65,8 +65,11 @@ def cmd_verify(
 
     try:
         import inspect
+
         sig = inspect.signature(make_pipeline)
-        kwargs = {"submission_dir": sol_dir} if "submission_dir" in sig.parameters else {}
+        kwargs = (
+            {"submission_dir": sol_dir} if "submission_dir" in sig.parameters else {}
+        )
         with config(root_directory=private_repo):
             pipeline = make_pipeline(**kwargs)
             score = pipeline()
@@ -202,7 +205,9 @@ def cmd_package_gradescope(
         # visible-tests from the public repo (needed by CMakeLists.txt at build time)
         visible_dir = public_root / "assignments" / slug / "visible-tests"
         if not visible_dir.exists():
-            visible_dir = public_root / "examples" / "assignments" / slug / "visible-tests"
+            visible_dir = (
+                public_root / "examples" / "assignments" / slug / "visible-tests"
+            )
         if visible_dir.exists():
             for path in sorted(visible_dir.rglob("*")):
                 if path.is_file():

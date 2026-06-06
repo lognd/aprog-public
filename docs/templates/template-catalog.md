@@ -1,30 +1,46 @@
 # Template Catalog
 
-This document lists planned templates.
+Available templates for `aprog new`. Each template generates both the public scaffold (`assignments/<slug>/`) and the private scaffold (`$APROG_STAGING_DIR/<slug>/grader/pipeline.py`).
+
+**Before picking a template,** look at the corresponding demo in `examples/template-demos/`. Every template has a working demo with a complete `pipeline.py`, solution, and hidden tests. Reading it first is the fastest way to understand what you need to fill in.
+
+For `pipeline.py` authoring, see the [lograder documentation](https://github.com/lognd/lograder).
+
+```bash
+aprog templates list
+aprog templates list --language python
+aprog templates info <template-slug>
+```
+
+---
 
 ## Python templates
 
 ### `python-function`
 
-For assignments where students implement one or more functions.
+Students implement one or more functions in a `.py` file.
 
-Expected public files:
+**Demo:** `examples/template-demos/binary-search-staging/`
 
+Public files:
 ```text
 assignment.toml
 README.md
 visible-tests/test_visible.py
-assets/starter.py
+assets/<slug>.py          starter file
 ```
 
-Private grader pattern: `OutputCompareTest` or pytest-style `FileOutputTest`.
+Private grader pattern: `PytestTest` with hidden tests that import the student module via `importlib.util`.
+
+---
 
 ### `python-stdin-stdout`
 
-For classic programming contest style assignments.
+Classic stdin/stdout assignments. Students submit a `.py` script that reads from stdin and writes to stdout.
 
-Expected public files:
+**Demo:** `examples/template-demos/add-two-numbers-staging/`
 
+Public files:
 ```text
 assignment.toml
 README.md
@@ -33,99 +49,88 @@ expected/sample-input.txt
 expected/sample-output.txt
 ```
 
-Private grader pattern: `OutputCompareTest` with stdin/stdout comparison.
+Private grader pattern: `PrebuiltArtifacts` + `OutputCompareTest`.
+
+Note: the submitted `.py` file must have `#!/usr/bin/env python3` as its first line so the OS can execute it directly.
+
+---
 
 ### `python-pytest`
 
-For assignments where students submit a module tested by pytest.
+Students submit a module tested by pytest (typically a class or set of functions).
 
-Expected public files:
+**Demo:** `examples/template-demos/stack-adt-staging/`
 
+Public files:
 ```text
 assignment.toml
 README.md
 visible-tests/test_visible.py
-assets/
+assets/<slug>.py          starter file
 ```
 
-Private grader pattern: `BashScriptBuild` to run pytest, `FileOutputTest` to compare pytest output.
+Private grader pattern: `PytestTest` with hidden tests that import the student class via `importlib.util`.
 
-### `python-package`
-
-For larger multi-file Python projects.
-
-Expected public files:
-
-```text
-assignment.toml
-README.md
-visible-tests/
-assets/pyproject.toml
-assets/src/
-```
-
-Private grader pattern: `BashScriptBuild` (pip install + test runner).
+---
 
 ## C/C++ templates
 
 ### `cpp-stdin-stdout`
 
-For single-file C++ stdin/stdout assignments.
+Single-file C++ stdin/stdout assignments. Students submit a `.cpp` file.
+
+**Demo:** `examples/template-demos/reverse-string-staging/`
 
 Private grader pattern: `CMakeBuild` + `OutputCompareTest`.
 
+---
+
 ### `cpp-cmake`
 
-For C++ assignments built with CMake.
+C++ assignments built with CMake. Students submit source files and a `CMakeLists.txt`.
 
-Private grader pattern: `CMakeManifestCheck` + `CMakeBuild` + `OutputCompareTest` or `ValgrindTest`.
+**Demo:** `examples/template-demos/graph-search-staging/`
+
+Private grader pattern: `CMakeBuild` + `OutputCompareTest` or `CTestTest`.
+
+---
+
+### `cpp-makefile`
+
+C++ assignments built with a Makefile. Students submit source files and a `Makefile`.
+
+**Demo:** `examples/template-demos/word-count-staging/`
+
+Private grader pattern: `MakefileBuild` + `PrebuiltArtifacts` + `OutputCompareTest`.
+
+Note: `MakefileBuild` returns an empty artifact dict. Use `PrebuiltArtifacts` with an absolute `Path` to register the produced binary.
+
+---
+
+### `cpp-header-impl`
+
+C++ header-only or header+impl assignments. Students submit a `.hpp` (and optionally `.cpp`) file; the grader provides `main.cpp` and `CMakeLists.txt`.
+
+**Demo:** `examples/template-demos/cpp-bst-staging/`
+
+Private grader pattern: `InjectStudentIntoStaff` + `CMakeBuild` + `CatchTest`.
+
+---
+
+### `cpp-class`
+
+C++ class implementation assignments. Students submit a `.hpp` + `.cpp` pair.
+
+**Demo:** `examples/template-demos/matrix-class-staging/`
+
+Private grader pattern: `InjectStudentIntoStaff` + `CMakeBuild` + `CatchTest`.
+
+---
 
 ### `c-stdin-stdout`
 
-For single-file C stdin/stdout assignments.
+Single-file C stdin/stdout assignments.
+
+**Demo:** `examples/template-demos/caesar-cipher-staging/`
 
 Private grader pattern: `CMakeBuild` or `MakefileBuild` + `OutputCompareTest`.
-
-## Java templates
-
-### `java-stdin-stdout`
-
-For single-class Java stdin/stdout assignments.
-
-### `java-gradle`
-
-For larger Java project assignments.
-
-## Generic templates
-
-### `data-files`
-
-For assignments centered around parsing supplied files.
-
-Private grader pattern: `OutputCompareTest` or `FileOutputTest` with file inputs passed as arguments.
-
-### `multi-file-project`
-
-For projects with starter code spread across multiple files.
-
-### `performance-benchmark`
-
-For assignments with performance expectations.
-
-Private grader pattern: `PerformanceTest` with `PerformanceCase(name, args, stdin, time_limit: float)`.
-
-Each case specifies a `time_limit` in seconds. lograder measures wall time using `perf_counter` and kills the process at `time_limit + 30s` if it does not exit. Scoring uses `TestCaseScorer` keyed on case names.
-
-Example grader scaffold:
-
-```python
-from lograder.pipeline.test.performance import PerformanceTest, PerformanceCase
-from lograder.pipeline.score import TestCaseScorer
-
-_CASES = [
-    PerformanceCase(name="small", args=["10"], stdin="", time_limit=1.0),
-    PerformanceCase(name="large", args=["100000"], stdin="", time_limit=5.0),
-]
-
-_SCORER = TestCaseScorer({"small": 5.0, "large": 10.0}, label="Performance")
-```

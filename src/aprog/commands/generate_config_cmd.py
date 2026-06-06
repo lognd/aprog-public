@@ -36,6 +36,7 @@ _SOURCE = Path("/autograder/source")
 sys.path.insert(0, str(_SOURCE))
 
 from lograder.pipeline.config import config
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
 from lograder.pipeline.score import GradescopeConfig
 
 from grader.pipeline import make_pipeline
@@ -44,12 +45,17 @@ _RESULTS = Path("/autograder/results/results.json")
 
 if __name__ == "__main__":
     try:
+        metadata = GraderMetadata.from_gradescope(
+            grader_name={assignment_name!r},
+            authors=[StaffAuthor(name={assignment_author!r}, role="Instructor")],
+            notes="Contact course staff within 3 days if you believe there is a grading error.",
+        )
         import inspect as _inspect
         _sig = _inspect.signature(make_pipeline)
         _kwargs = {{"submission_dir": Path("/autograder/submission")}} if "submission_dir" in _sig.parameters else {{}}
         with config(root_directory=Path("/autograder")):
             pipeline = make_pipeline(**_kwargs)
-            score = pipeline()
+            score = pipeline(metadata=metadata)
             score.write_results_json(
                 config=GradescopeConfig(
                     visibility={visibility!r},
@@ -149,6 +155,8 @@ def cmd_generate_config(
 
     autograder_py.write_text(
         _RUN_AUTOGRADER_PY_TEMPLATE.format(
+            assignment_name=cfg.assignment.name,
+            assignment_author=cfg.assignment.author or "Course Staff",
             visibility=cfg.grader.visibility,
             stdout_visibility=cfg.grader.stdout_visibility,
         )
