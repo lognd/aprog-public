@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "ai-vector-i",
+    "name": "VectorI: Dynamic Integer Array",
+    "author": "lognd",
+    "description": "Debug and complete a dynamic array class for integers."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "easy",
+    "topics": [
+      "data-structures",
+      "memory-management"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-class",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/ai-vector-i",
+    "readme": "assignments/ai-vector-i/README.md",
+    "visible_tests": "assignments/ai-vector-i/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:8a24da22fe079bc88cb4582184cc352b1a22404fd843953b8a6f20be51b769fb"
+}
