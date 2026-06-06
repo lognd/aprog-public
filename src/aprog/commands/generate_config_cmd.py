@@ -200,7 +200,7 @@ def _generate_private(
         if d.exists():
             for p in sorted(d.rglob("*")):
                 if p.is_file():
-                    h.update(str(p).encode())
+                    h.update(str(p.relative_to(private_repo)).encode())
                     h.update(p.read_bytes())
     private_hash = f"sha256:{h.hexdigest()}"
 

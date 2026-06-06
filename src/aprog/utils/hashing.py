@@ -37,7 +37,7 @@ def hash_assignment_public(
             paths.append(tpl_toml)
     h = hashlib.sha256()
     for p in sorted(paths):
-        h.update(str(p).encode())
+        h.update(str(p.relative_to(public_root)).encode())
         if p.is_file():
             h.update(p.read_bytes())
     h.update(generator_version.encode())
