@@ -21,9 +21,15 @@ endif
 
 LOGRADER ?= ../lograder
 
+PRIVATE ?= ../aprog-private
+
+SLUGS          := $(notdir $(wildcard assignments/*))
+ZIPS           := $(patsubst %,dist/%-gradescope.zip,$(SLUGS))
+VERIFY_TARGETS := $(patsubst %,verify-%,$(SLUGS))
+
 .PHONY: all venv install dev uninstall check lint format typecheck test \
         test-verbose test-fast test-verbose-fast test-unit test-integration test-system \
-        version self-esteem clean
+        version self-esteem clean zips verify $(VERIFY_TARGETS)
 
 all: uninstall dev check test
 
@@ -94,3 +100,30 @@ self-esteem:
 clean:
 	rm -rf .venv dist/ build/ *.egg-info src/*.egg-info \
 	       __pycache__ .mypy_cache .ruff_cache .pytest_cache
+
+# -- zip packaging and verification -------------------------------------------
+
+zips: $(ZIPS)
+
+verify:
+ifdef SLUG
+	$(VENV)/aprog generate-config $(SLUG) --force
+	@scripts/verify-in-tmp.sh $(SLUG) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(VENV))/aprog
+else
+	$(MAKE) $(VERIFY_TARGETS)
+endif
+
+define SLUG_RULES
+dist/$(1)-gradescope.zip: \
+    $$(shell find assignments/$(1) -type f 2>/dev/null) \
+    $$(shell find $(PRIVATE)/grader/$(1) -type f 2>/dev/null)
+	@mkdir -p dist
+	$(VENV)/aprog generate-config $(1) --force
+	$(VENV)/aprog package-gradescope $(1) --private $(PRIVATE)
+
+verify-$(1):
+	@scripts/verify-in-tmp.sh $(1) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(VENV))/aprog
+
+endef
+
+$(foreach slug,$(SLUGS),$(eval $(call SLUG_RULES,$(slug))))
