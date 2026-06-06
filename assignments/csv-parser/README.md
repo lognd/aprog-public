@@ -68,10 +68,10 @@ Carol,,75
 
 Expected output of `parse_csv(text)`:
 ```
-rows[0] = {"Name", "City", "Score"}
-rows[1] = {"Alice", "Portland, OR", "92"}
-rows[2] = {"Bob",   "Said \"hi\"",  "88"}
-rows[3] = {"Carol", "",             "75"}
+rows[0] = {"Name",  "City",         "Score"}
+rows[1] = {"Alice", "Portland, OR", "92"   }
+rows[2] = {"Bob",   "Said \"hi\"",  "88"   }
+rows[3] = {"Carol", "",             "75"   }
 ```
 
 ---
