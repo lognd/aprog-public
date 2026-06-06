@@ -24,7 +24,7 @@ Fill in the body of `parse_csv` in `csv_parser.hpp`.  Do not change the
 signature.
 
 ```cpp
-std::vector<std::vector<std::string>> parse_csv(const std::string& text);
+std::vector<std::vector<std::string>> parse_csv(std::string text);
 ```
 
 Each element of the outer vector is one row.  Each element of the inner

@@ -29,7 +29,7 @@ VERIFY_TARGETS := $(patsubst %,verify-%,$(SLUGS))
 
 .PHONY: all venv install dev uninstall check lint format typecheck test \
         test-verbose test-fast test-verbose-fast test-unit test-integration test-system \
-        version self-esteem clean zips verify $(VERIFY_TARGETS)
+        version self-esteem clean zips verify hashes $(VERIFY_TARGETS)
 
 all: uninstall dev check test
 
@@ -105,9 +105,12 @@ clean:
 
 zips: $(ZIPS)
 
+hashes:
+	find . -type d \( -name ".claude" -o -name ".git" -o -name ".idea" -o -name ".mypy_cache" -o -name ".pytest_cache" -o -name ".ruff_cache" -o -name ".venv" \) -prune -o -type f -exec dos2unix {} +
+	$(VENV)/aprog generate-config --all --force
+
 verify:
 ifdef SLUG
-	$(VENV)/aprog generate-config $(SLUG) --force
 	@scripts/verify-in-tmp.sh $(SLUG) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(VENV))/aprog
 else
 	$(MAKE) $(VERIFY_TARGETS)
