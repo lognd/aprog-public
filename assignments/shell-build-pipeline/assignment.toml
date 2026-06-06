@@ -1,0 +1,27 @@
+[assignment]
+slug = "shell-build-pipeline"
+name = "Shell Build Pipeline"
+author = "lognd"
+description = "Write a shell script that replicates g++ compilation in stages with incremental rebuilds."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "medium"
+topics = ["systems", "io"]
+concepts = ["iteration"]
+labels = ["starter-code", "requires-filesystem"]
+course = "systems"
+module = "build-systems"
+
+[template]
+slug = "shell-script"
+version = "0.1"
+
+[grader]
+visibility = "visible"
+stdout_visibility = "visible"
+
+[grader.dependencies]
+system = ["g++"]
