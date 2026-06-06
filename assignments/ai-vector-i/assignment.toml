@@ -1,5 +1,5 @@
 [assignment]
-slug = "vector-i"
+slug = "ai-vector-i"
 name = "VectorI: Dynamic Integer Array"
 author = "lognd"
 description = "Debug and complete a dynamic array class for integers."

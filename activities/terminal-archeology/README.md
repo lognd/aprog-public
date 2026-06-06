@@ -3,12 +3,16 @@
 You have been dropped into an unfamiliar directory tree containing a broken C++ project.
 Your job is to explore it using only terminal commands -- no GUI file browser, no IDE, no code reading.
 
+## Getting started
+
+    sudo python3 launch.py
+
 ## Your objectives
 
 1. Find every `.cpp` file in the tree.
 2. Determine which one contains `main`.
 3. Figure out which headers that file is trying to include and which ones are actually missing.
-4. Construct a single `g++` command that would compile the project (assuming the missing headers existed).
+4. Construct a single `g++` command that would compile the project. (You need to also find the correct headers!)
 5. Run the compiled binary to obtain the passphrase.
 
 ## Rules

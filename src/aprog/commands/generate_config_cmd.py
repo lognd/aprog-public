@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Optional
 
@@ -87,6 +88,18 @@ exec python3 /autograder/source/run_autograder.py "$@"
 _GENERATOR_VERSION = "0.1"
 
 
+def _git_mark_executable(path: Path) -> None:
+    """Force git to track the file as executable (works even with core.fileMode=false)."""
+    try:
+        subprocess.run(
+            ["git", "update-index", "--chmod=+x", str(path)],
+            check=True,
+            capture_output=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pass  # not a git repo or git unavailable -- chmod already set above
+
+
 def cmd_generate_config(
     slug: str,
     private_repo: Optional[Path] = None,
@@ -164,6 +177,7 @@ def cmd_generate_config(
 
     autograder_sh.write_text(_RUN_AUTOGRADER_SH)
     autograder_sh.chmod(0o755)
+    _git_mark_executable(autograder_sh)
 
     console.print(f"[green][OK][/green] Generated configs for '{slug}':")
     console.print(f"  {manifest_path.relative_to(root)}")

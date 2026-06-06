@@ -1,7 +1,7 @@
 {
   "schema_version": "0.1",
   "assignment": {
-    "slug": "vector-i",
+    "slug": "ai-vector-i",
     "name": "VectorI: Dynamic Integer Array",
     "author": "lognd",
     "description": "Debug and complete a dynamic array class for integers."
@@ -20,10 +20,10 @@
     "version": "0.1"
   },
   "paths": {
-    "assignment_root": "assignments/vector-i",
-    "readme": "assignments/vector-i/README.md",
-    "visible_tests": "assignments/vector-i/visible-tests"
+    "assignment_root": "assignments/ai-vector-i",
+    "readme": "assignments/ai-vector-i/README.md",
+    "visible_tests": "assignments/ai-vector-i/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:f85027b9a44fcdda85c9bd735ebce3d1c8001683134b9413fd811eee04a75284"
+  "source_hash": "sha256:80f46b47d0e851fb25904d9cad96bf3449a8b50bd3f49e5f70f6bbc57c8af901"
 }
