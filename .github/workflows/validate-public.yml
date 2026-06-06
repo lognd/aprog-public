@@ -24,11 +24,19 @@ jobs:
       - name: Install AProg
         run: pip install -e .
 
+      - name: Regenerate configs
+        run: aprog generate-config --all --force
+
+      - name: Fail if generated files were stale
+        run: |
+          if ! git diff --exit-code generated/; then
+            echo ""
+            echo "Generated files are out of date. Run 'aprog generate-config --all --force' locally and commit the result."
+            exit 1
+          fi
+
       - name: Validate all assignments
         run: aprog validate --all
-
-      - name: Check generated files
-        run: aprog check-generated --all
 
       - name: Scan for private file leaks
         run: aprog scan-public --all
