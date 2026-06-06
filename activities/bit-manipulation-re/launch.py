@@ -9,11 +9,20 @@ five are correct.
 """
 import json, sys
 
-# -- Crypto --
-import hashlib as _hl, hmac as _hm
+# -- Crypto / obfuscation --
+_KEY_A = "704b3a7405232fb74aa43d9c7ecd4f6effe66147e37463a751beb015c07f306a"
+_KEY_B = "695f76d5766b1fc42c55e32b660e99492ee7141fc6aeb31a5a4ee35c2c527c0d"
+import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
 _KDF_ITERS = 100000
+
+# Split runtime key. This is obfuscation only; do not treat it as a secret.
+def _xor_bytes(a, b):
+    return bytes(x ^ y for x, y in zip(a, b))
+
+def _runtime_key():
+    return _xor_bytes(bytes.fromhex(_KEY_A), bytes.fromhex(_KEY_B))
 
 def _derive_key(answers):
     return _hl.pbkdf2_hmac("sha256", "|".join(answers).encode(), _SALT, _KDF_ITERS)
@@ -33,90 +42,65 @@ def _decrypt(blob_hex, answers):
         return None
     return bytes(a ^ b for a, b in zip(ct, _stream(key, len(ct)))).decode()
 
+def _item_key(label):
+    return _hm.new(_runtime_key(), label.encode(), _hl.sha256).digest()
+
+def _open_secret(blob_text, label):
+    try:
+        blob = _b64.b85decode(blob_text.encode())
+        key = _item_key(label)
+        ct, mac = blob[:-32], blob[-32:]
+        if not _hm.compare_digest(mac, _hm.new(key, ct, _hl.sha256).digest()):
+            return None
+        pt = _xor_bytes(ct, _stream(key, len(ct)))
+        data = _js.loads(_zl.decompress(pt).decode())
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
 _BLOB = "daa16a7c638cd67e486c7c84dd9d1f734d768e1e4d1c3b5b669fe3a1bd7d81d32944069ffbfe9f162154c2543253be6d2f5af05f189e161deea172f334d6"
 
-# -- Questions --
+# -- Public questions and encrypted answer/explanation material --
 QUESTIONS = json.loads(r"""
 [
   {
     "fn": "f1",
     "prompt": "What does f1(24) return?",
-    "hint": "24 = 0b00011000. Start by computing -24 in two's-complement.",
-    "answer": "8",
-    "wrong": {
-      "24": "f1 does not return its input. x & -x isolates the LOWEST set bit. -24 in two's complement: flip 0b00011000 -> 0b11100111, add 1 -> 0b11101000. AND: 0b00011000 & 0b11101000 = 0b00001000 = 8.",
-      "0": "x & -x is 0 only when x = 0. For x = 24, the lowest set bit is at bit position 3, value 8.",
-      "4": "Check your two's-complement. -24: flip 0b00011000 -> 0b11100111, add 1 -> 0b11101000. 0b00011000 & 0b11101000 = 0b00001000 = 8, not 4.",
-      "16": "16 = 0b10000 is the UPPER set bit of 24 (0b11000), not the lowest. x & -x gives the LOWEST set bit.",
-      "12": "12 is the input 24 with a bit flipped. -x in two's complement does not flip a single bit. Trace carefully: flip all bits of 24, then add 1.",
-      "3": "3 = 0b11 -- this is not one of 24's set bits. 24 = 0b00011000; its set bits have values 8 and 16."
-    },
-    "explanation": "x & -x isolates the lowest-order set bit. -x in two's complement flips all bits then adds 1, which carries through all trailing zeros and the lowest set bit, zeroing everything above it."
+    "hint": "24 = 0b00011000. Start by computing -24 in two's-complement."
   },
   {
     "fn": "f2",
     "prompt": "What does f2(24) return?",
-    "hint": "24 = 0b00011000. Compute 24 - 1 = 23 in binary, then AND.",
-    "answer": "16",
-    "wrong": {
-      "8": "x & (x-1) CLEARS the lowest set bit; it doesn't isolate it. 24 & 23 = 0b00011000 & 0b00010111 = 0b00010000 = 16.",
-      "24": "x & (x-1) always gives a strictly smaller result than x (for x > 0). 23 = 0b00010111. 0b00011000 & 0b00010111 = 0b00010000 = 16.",
-      "0": "0 would mean 24 is a power of two (it is not -- 24 = 16 + 8). 24 & 23 = 0b00010000 = 16.",
-      "4": "Recompute 23 in binary: 0b00010111. 0b00011000 & 0b00010111: bit4 = 1&1 = 1, all lower bits = 0. Result = 0b00010000 = 16.",
-      "23": "23 = 24 - 1 is one of the operands, not the result. The AND gives 0b00011000 & 0b00010111 = 0b00010000 = 16."
-    },
-    "explanation": "x & (x-1) clears the lowest-order set bit. Subtracting 1 flips the lowest set bit and all bits below it. ANDing with the original preserves everything above and zeros those positions."
+    "hint": "24 = 0b00011000. Compute 24 - 1 = 23 in binary, then AND."
   },
   {
     "fn": "f3",
     "prompt": "What does f3(0b10110101) return?",
-    "hint": "0b10110101 = 181. Trace the loop: each iteration clears one set bit. How many iterations until x = 0?",
-    "answer": "5",
-    "wrong": {
-      "8": "8 is the total number of bits in a byte, not the number of SET bits. Write out 0b10110101 and count the 1s.",
-      "4": "Recount: bit0=1, bit1=0, bit2=1, bit3=0, bit4=1, bit5=1, bit6=0, bit7=1. That is five 1-bits, not four.",
-      "3": "Recount from LSB: bit0=1, bit1=0, bit2=1, bit3=0, bit4=1, bit5=1, bit6=0, bit7=1. Ones at positions 0,2,4,5,7 = 5 total.",
-      "6": "Recount: 0b10110101. Bit pattern from MSB: 1,0,1,1,0,1,0,1. Count the 1s: positions 7,5,4,2,0 = 5, not 6.",
-      "7": "Trace the loop manually. Each iteration clears one 1-bit via x &= (x-1). 0b10110101 has 5 set bits, so the loop runs 5 times.",
-      "181": "181 is the input value, not the bit count. The loop counts set bits; 181 = 0b10110101 has 5 set bits."
-    },
-    "explanation": "Brian Kernighan's popcount algorithm. Each x &= (x-1) clears the lowest set bit. The loop runs exactly once per set bit. 0b10110101 has bits set at positions 0,2,4,5,7 -> count = 5."
+    "hint": "0b10110101 = 181. Trace the loop: each iteration clears one set bit. How many iterations until x = 0?"
   },
   {
     "fn": "f4",
     "prompt": "What does f4(0x0506) return? (give the decimal value)",
-    "hint": "0x0506 = 1286. Trace each mask+shift: what does (x & 0x00FF) << 8 produce? What does (x & 0xFF00) >> 8 produce?",
-    "answer": "1541",
-    "wrong": {
-      "1286": "1286 is the input (0x0506). Trace f4: (0x0506 & 0x00FF) = 0x0006, shift left 8 -> 0x0600. (0x0506 & 0xFF00) = 0x0500, shift right 8 -> 0x0005. OR: 0x0600 | 0x0005 = 0x0605 = 1541.",
-      "0x0605": "0x0605 is correct hex -- convert to decimal: 6 * 256 + 5 = 1536 + 5 = 1541.",
-      "1536": "1536 = 0x0600. You have the high byte right but missed adding the low byte (5). 0x0605 = 1536 + 5 = 1541.",
-      "771": "771 = 0x0303. That is not the result. (0x06 << 8) | 0x05 = 0x0600 | 0x0005 = 0x0605 = 1541.",
-      "1540": "Close -- off by one. 0x0605 = 6*256 + 5 = 1536 + 5 = 1541, not 1540.",
-      "0506": "0x0506 = 1286 is the input unchanged. f4 swaps the two lowest bytes: result is 0x0605 = 1541."
-    },
-    "explanation": "f4 swaps the two lowest bytes. 0x0506: low byte 0x06 shifts left 8 -> 0x0600; next byte 0x05 shifts right 8 -> 0x0005. OR = 0x0605 = 1541."
+    "hint": "0x0506 = 1286. Trace each mask+shift: what does (x & 0x00FF) << 8 produce? What does (x & 0xFF00) >> 8 produce?"
   },
   {
     "fn": "f5",
     "prompt": "What does f5(6) return?",
-    "hint": "6 = 0b110. Compute 6 >> 1 first, then XOR that with the original 6.",
-    "answer": "5",
-    "wrong": {
-      "3": "6 >> 1 = 3, but f5 XORs the shifted value with the ORIGINAL, not just returns the shift. 6 ^ 3 = 0b110 ^ 0b011 = 0b101 = 5.",
-      "7": "6 | 1 = 7 uses OR. This function uses XOR: 6 ^ (6 >> 1) = 0b110 ^ 0b011 = 0b101 = 5.",
-      "12": "12 = 6 << 1. This function shifts RIGHT, not left: 6 ^ (6 >> 1) = 0b110 ^ 0b011 = 0b101 = 5.",
-      "0": "XOR of 6 and 3 is not zero. 0b110 ^ 0b011: bit2=1^0=1, bit1=1^1=0, bit0=0^1=1 -> 0b101 = 5.",
-      "2": "2 = 0b010. Check bit by bit: 0b110 ^ 0b011 -> bit2=1, bit1=0, bit0=1 = 0b101 = 5.",
-      "9": "9 = 0b1001. 6 is only 3 bits wide (0b110) and 6>>1 = 3 = 0b011. XOR gives 0b101 = 5."
-    },
-    "explanation": "f5 computes the binary-reflected Gray code of x. Adjacent Gray codes differ in exactly one bit. f5(6) = 0b110 ^ 0b011 = 0b101 = 5."
+    "hint": "6 = 0b110. Compute 6 >> 1 first, then XOR that with the original 6."
   }
 ]
 """)
+QUESTION_SECRETS = json.loads(r"""
+[
+  "bJR-+FEV$(oQDfK0dNTUrB$AO;H!=;UwuCWm=bVf9HwTWjr^UVt3tKaCgmhw$j!k7Yuvi^r&hQP8nn3lm70vUO5wV>1_70#M_CsAT_LI2HjZ`0k`jR)QcPI651$J>(*8m8Tk1At#c*(6;M;-TP+w!~&TgN^Q=VOgD)c|g9(Tb`ADLRahv5X!zSRtTG68&2sP<M`I4(E|$b!i4QP|E`(RCX1HeTw3ipJl1t}Q~>OQ4rFo{OFuj$Mv->{5z^I?9!8Q><k%dG_O7xDGt7ji?i%1DNOq!dn0BOmAbjKuY0+-=8<k?2_QOlxb!kA>;$5yOt2{%2QggNV8yVYW#8n?JR{%05=SFkiHW=s_}?NmPwhiC$}Iz-)Fct7bKLedO9I9WVik!F2Iz7IB<y08q|U&@Y@GyC#ry<X_`K6L6l1PJL)_R#7)<~h5adKWglm3{Q$B79wh8hnF#3H4x%mXM%us2e2<yF-Ar(W322xQX6$|TRxy}`3s7E~2D(Hiaw~KsQTcI0zeL!-t6hbfC8E&|@=c0}cNsQYG%6^aw>#cO7iW78c8P8v8DSPI8aQ-Ll#PXSkcx32d|TJyqiB!^-TIPwi*>w0(u3zxXaZ~;<!^35-_x(SQ}%<^KEmg@BZj8W@R<=w76",
+  "Ci`>wMTFr&cG>=xF1q!AN)Hb(m5gH3it-abT2Pfy6HHL|CD3Jym{DoLY}eMd7~!TBsySMFtP4ID+XC%Mpv>l7$__(5(A7$CC>%Sg1(J`ebPrZU7Al4Kg5yqbUXxV0!7{xNDIWzo#p3df2&OMdQq^M`Xs?Jvz8u4~Fe#I0ad;z?G@GS}BcGTrsIzA(ZN9Y(>1%`8H2h?I9)8KzQDc0If5<8%-kYeU4Mr0oZt95)tp{g%^gTi@&#R6tRqlqwkZDE_@BkXD!x&hYT)mT(!cy6ruB`iaS{jtr$cq$*`rSg0C_tz1x+-hsQ)6YTctR>T{24y6!7+{frRk5rYani*0Aa*(<9MJZEG)7^?9OPHC5k<SQFFu%4qjnA#C-DZj!7|BoGBiz)XJPAF`Gp%rBix`VCRP})599LatMTA@rdRct%>kFFtI7wnwqa^^g1Ii0j>is$M65kC9O8HmYdxR#WC33s$F8jxccwKfs$gsT{fkmtoSJ6t0seij_O=i89+-_@2-Kb`%fqB1I|b=k|%H1Qa0<5SO&?mltN~AeW!1kNFibf#ch9`",
+  "Amvp6rZbRcK3movg33G;I}mc+@)|&A47CBy#0LA1dMj(RN8ypp${SP|yvJ=CXUYoM#pz>EWzq8e{-h0&yHBdYl_y-*4Rh(_Rf36hKqZ2AmKh%9+oDKxrWOjwD7RoH^DYoLmzjbM-ID>cLv$ZfYgwkKXh@_gm&S+fdu{pJc@ZY6AD_#8Yty}D3Tl}BJg$br6tE0SZ<0C)(I@adDM0cP{rboTf%Q$%y!Tz>Sfa()2X?K(-yeZ#w)$v%V|pPRT3lt<b&v9_vE?eg^kh?cIgSwgDM*qVn5j7N-tcMXkD$Pa4nl=TyByIlTn{YHK2Ikq4`4jMZf23ln^L&^A(4w*5jz7%{{Ry!m-4;@7w56&ZSq`Ltj<U2$3c0B8Oa#k1Iq!!yM)uJVOsH@22h?(l-@k4HB(+U6xTbP3ckZZ>Zw#Q=&4ZBVoy~S0|89XR+q;sutl+A!=>NaXG9HkTV>--wt~z`wkJ1QamP>$_6qo}u4PI>uX+HDNhp@SNU2nqQCM}Hsm$JvXV;^oeKF~>{>Gq54UAT51vZA07;V^ueKj8AqjPDS+1=3zfZa1B1Um->#F(?qL}Q(%>N^u$by1&vRU)%Qb747@d?5we?F@(P7!m",
+  "Ndj9)YN$GQkZm@nFk5*!N<N2AXK(jY1gyx<%QlUEYw?u1Ppg9a2wD;2F;_4cl2I>!(j#c2lbi=8r6cy*8IVfyNs_Dmk4NC|lG>vu)6sUyHReK>p6wBU6X8cEE(@&d&WJ&HAay7p^8<ob8UoIuVahv+BifATU``Nu1?GXa%B2i0-#PTHu2qdRipO_7(?3J>+=fyUGh;I$ZvNBNkHk~_aL+oHyatRty%d=;s!WTQb90r?_2ymz*#}gfv}gQ;^x%}<cM3yTwQ*u!9`7mJZUYY(GxeerBtTiQ+Xfbk*Y;dqF0fmZ{Z$*n1~&>9V8BT67k5Ue9uf^M0rxk%tViV&La}a7(4ql8YH^`_uz&s`E*SDx%S?T<^$&0dtWkw2sI~R170HQsK^b5-;BZ@4cpbbN!S%}Ww+D{6;2>;9Py)x-Ip=)k?q?rE|Ihcp6<>sBYMzUY-x6aGBUrPmxBGC~tR^a_yN*F3Ru?8#MK%RQ%p(kV8@i41+Sa8Uk^mkXL2xJjAK<1b6aR+T2v1-SOE6gGc7JVwT`<eTlYH+",
+  "GVkjDCzQYfgJ3j~KCeOgV?_sesoGDTCHS0#i2CR-7Sw%qjJ1(G5^j+?=zlLJGjr})a<G2=Z&7{Y_?bVK?(zkFM4Pn~rd+HW2x)<AH+#0D**Swy8g>YWM4jfa3(|-4AnQA^vlG)NuNK1*Wl%mKTd+UrYAUa41ro|d#UN#eoZe;E0^(-S0xibNG$ST(<;-|pbynBkHUHR<4P<VD-hoD0v7?^$tAyEF-9TnW`n<-ik~VVW<{ztois8|1<j=|j6b{jD;6A%Ppt=srt0}KfVZ6*|KS->U-U#A*fTCNaokGN~h%G#%yBe{1aF<gMUMkTwu(pe7Qlu=gY(}44Q+mfRrJ)!ANKNqe@+ktFs+a5&=T0Ra8PVG>>mJY<F;ekSCMcc$Bn4pBi<KWfPB;l*0^RDQ32FAYAleMi)k<kmi*;sHqUWn%f!>Um^SRp?4ZxyE_1BEH>~hU1{X(O`@KLUB+Z?0ES^pP$I-+2%z(#RBglIk@5w7qEjQj*;LzK;^7sLq=U5HvTSF1Mx@`WAgcFUs8hK%6}pU<drenb"
+]
+""")
 
-FUNCTIONS_TEXT = """\
-
+FUNCTIONS_TEXT = """
     int f1(int x) { return x & -x; }
 
     int f2(int x) { return x & (x - 1); }
@@ -169,7 +153,15 @@ def _show_passphrase(passphrase):
     print()
 
 
+def _secret_for_question(index):
+    secret = _open_secret(QUESTION_SECRETS[index - 1], "bit-manipulation-re:question:" + str(index))
+    if secret is None:
+        print("  [error] Could not open question data -- contact your instructor.")
+        sys.exit(1)
+    return secret
+
 def _ask(q, index, total):
+    secret = _secret_for_question(index)
     print(f"\n  Q{index}/{total}  [{q['fn']}]  {q['prompt']}")
     print(f"           Hint: {q['hint']}")
     attempts = 0
@@ -177,15 +169,15 @@ def _ask(q, index, total):
         raw = input("  Your answer: ").strip()
         if not raw:
             continue
-        if raw == q["answer"]:
+        if raw == secret["answer"]:
             if attempts > 0:
-                for ln in _wrap(q["explanation"]):
+                for ln in _wrap(secret.get("explanation", "")):
                     print(ln)
             else:
-                print(f"  Correct.  {q['explanation']}")
+                print(f"  Correct.  {secret.get('explanation', '')}")
             return raw
         attempts += 1
-        _show_wrong(raw, q.get("wrong") or {})
+        _show_wrong(raw, secret.get("wrong") or {})
         print("           Trace through the function step by step and try again.")
 
 
@@ -204,7 +196,7 @@ def main():
     input("  Write your one-line descriptions for each function, then press Enter...")
 
     answers = []
-    total   = len(QUESTIONS)
+    total = len(QUESTIONS)
     for i, q in enumerate(QUESTIONS, 1):
         answers.append(_ask(q, i, total))
 

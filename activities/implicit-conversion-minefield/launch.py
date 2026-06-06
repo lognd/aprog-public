@@ -7,11 +7,20 @@
 """
 import json, os, subprocess, sys, tempfile
 
-# -- Crypto --
-import hashlib as _hl, hmac as _hm
+# -- Crypto / obfuscation --
+_KEY_A = "2f8da41d3a113946b2afdf2369ea042687cd1b1216f3b775d03e4697b0897930"
+_KEY_B = "58975deb27e264e07bb7341c36fb24f01190652535ced5665e2f51ef92cb62e9"
+import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
 _KDF_ITERS = 100000
+
+# Split runtime key. This is obfuscation only; do not treat it as a secret.
+def _xor_bytes(a, b):
+    return bytes(x ^ y for x, y in zip(a, b))
+
+def _runtime_key():
+    return _xor_bytes(bytes.fromhex(_KEY_A), bytes.fromhex(_KEY_B))
 
 def _derive_key(answers):
     return _hl.pbkdf2_hmac("sha256", "|".join(answers).encode(), _SALT, _KDF_ITERS)
@@ -31,9 +40,25 @@ def _decrypt(blob_hex, answers):
         return None
     return bytes(a ^ b for a, b in zip(ct, _stream(key, len(ct)))).decode()
 
+def _item_key(label):
+    return _hm.new(_runtime_key(), label.encode(), _hl.sha256).digest()
+
+def _open_secret(blob_text, label):
+    try:
+        blob = _b64.b85decode(blob_text.encode())
+        key = _item_key(label)
+        ct, mac = blob[:-32], blob[-32:]
+        if not _hm.compare_digest(mac, _hm.new(key, ct, _hl.sha256).digest()):
+            return None
+        pt = _xor_bytes(ct, _stream(key, len(ct)))
+        data = _js.loads(_zl.decompress(pt).decode())
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
 _BLOB = "39bdb8b4135596b5fa9c3e87e7c9f71f4171616d6545425fa1d91b7699fe3a41fb977ef716099e22f365a27853cc629f7c620fd052a8e468f64f17e6b620"
 
-# -- Snippets --
+# -- Public snippets and encrypted feedback/explanation material --
 SNIPPETS = json.loads(r"""
 [
   {
@@ -41,188 +66,101 @@ SNIPPETS = json.loads(r"""
     "title": "double-to-int truncation",
     "platform_note": "int = 32 bits, double = 64-bit IEEE 754 (any platform)",
     "code": "#include <iostream>\nint main() {\n    int x = 3.9;\n    std::cout << x << \"\\n\";\n}",
-    "answer": "3",
-    "prompt": "What value does x hold?",
-    "wrong": {
-      "3.9": "Assigning a double to an int truncates toward zero -- it does not round. 3.9 becomes 3, not 4.",
-      "4": "Truncation is NOT rounding. 3.9 truncated toward zero is 3, not 4.",
-      "3.0": "x is an int and cannot store a decimal. 3.9 is truncated to the integer 3.",
-      "error": "This compiles without error (only a warning). int x = 3.9 is a valid narrowing conversion.",
-      "0": "The value is not discarded entirely. The integer part (3) is kept; only the fractional part (.9) is dropped."
-    },
-    "explanation": "double -> int truncates toward zero. 3.9 -> 3. The fractional part is silently discarded."
+    "prompt": "What value does x hold?"
   },
   {
     "id": 2,
     "title": "assigning -1 to unsigned int",
     "platform_note": "unsigned int = 32 bits (any platform)",
     "code": "#include <iostream>\nint main() {\n    unsigned int u = -1;\n    std::cout << u << \"\\n\";\n}",
-    "answer": "4294967295",
-    "prompt": "What does u hold?",
-    "wrong": {
-      "-1": "An unsigned int cannot represent -1. Assigning -1 wraps modulo 2^32: 2^32 - 1 = 4294967295. This is well-defined in C++.",
-      "0": "u does not become 0. -1 wraps modulo 2^32 to 4294967295 (UINT_MAX on a 32-bit unsigned).",
-      "1": "Not 1. The two's-complement bit pattern for -1 (all ones: 0xFFFFFFFF) interpreted as unsigned is 4294967295.",
-      "4294967296": "2^32 is 4294967296, but that is one more than UINT_MAX. -1 wraps to 2^32 - 1 = 4294967295.",
-      "2147483647": "That is INT_MAX (2^31 - 1). -1 as unsigned 32-bit is 4294967295 = 2^32 - 1."
-    },
-    "explanation": "Assigning a negative value to unsigned int is well-defined: -1 wraps to 2^32 - 1 = 4294967295 (UINT_MAX)."
+    "prompt": "What does u hold?"
   },
   {
     "id": 3,
     "title": "signed/unsigned comparison trap",
     "platform_note": "int = 32 bits signed, unsigned int = 32 bits (any platform)",
     "code": "#include <iostream>\nint main() {\n    int i = -1;\n    unsigned int u = 1;\n    std::cout << (i < u ? 1 : 0) << \"\\n\";\n}",
-    "answer": "0",
-    "prompt": "Is -1 less than 1u? Enter 1 (yes) or 0 (no).",
-    "wrong": {
-      "1": "Surprisingly, -1 is NOT less than 1u. In a mixed signed/unsigned comparison, the signed value converts to unsigned. -1 becomes 4294967295, which is GREATER than 1. Result: false (0).",
-      "true": "Enter 0 or 1. Also, the result is 0 (false): -1 converts to 4294967295 as unsigned, which is not less than 1.",
-      "false": "Enter 0 or 1. And the direction is correct (the expression is false) -- but you need to enter 0."
-    },
-    "explanation": "Mixed signed/unsigned comparison: the signed operand converts to unsigned. -1 -> 4294967295 > 1, so the result is false (0). This is a notorious source of bugs."
+    "prompt": "Is -1 less than 1u? Enter 1 (yes) or 0 (no)."
   },
   {
     "id": 4,
     "title": "integer division before double assignment",
     "platform_note": "int = 32 bits, double = 64-bit IEEE 754 (any platform)",
     "code": "#include <iostream>\nint main() {\n    double d = 1 / 3;\n    std::cout << d << \"\\n\";\n}",
-    "answer": "0",
-    "prompt": "What does d print?",
-    "wrong": {
-      "0.333333": "The division 1/3 uses integer arithmetic because BOTH operands are int literals. 1/3 = 0 (integer division). That 0 is then stored as 0.0 in d.",
-      "0.333": "Same issue: both 1 and 3 are int literals, so 1/3 = 0 in integer arithmetic. Use 1.0/3 to force floating-point division.",
-      "0.5": "0.5 is not right. Integer division: 1/3 = 0, then 0.0 is stored in d.",
-      "0.3": "0.3 is not right. The division happens as int/int = 0 before any assignment.",
-      "0.0": "The output is '0', not '0.0'. cout's default format for 0.0 prints '0'.",
-      "1": "1 is not right. 1/3 in integer division is 0."
-    },
-    "explanation": "The '/' operator selects integer or floating-point division based on operand types at the point of division, not the assignment target. Both 1 and 3 are int -> integer division -> 0."
+    "prompt": "What does d print?"
   },
   {
     "id": 5,
     "title": "bool from a non-zero int",
     "platform_note": "bool stores only 0 or 1 (any platform)",
     "code": "#include <iostream>\nint main() {\n    bool b = 42;\n    std::cout << b << \"\\n\";\n}",
-    "answer": "1",
-    "prompt": "What does b print?",
-    "wrong": {
-      "42": "bool cannot store 42. Any non-zero value converts to true, which prints as 1.",
-      "0": "0 means false. 42 is non-zero, so it converts to true (1).",
-      "true": "cout prints bool as 0 or 1 by default. Use std::boolalpha to print 'true'/'false'.",
-      "false": "false would mean b is 0. 42 is non-zero -> true -> prints as 1.",
-      "2": "2 is not a valid bool value. bool stores only 0 (false) or 1 (true). 42 -> true -> 1."
-    },
-    "explanation": "Any non-zero integer converts to bool true (1). bool stores only 0 or 1; any other value is narrowed."
+    "prompt": "What does b print?"
   },
   {
     "id": 6,
     "title": "bool arithmetic promotion",
     "platform_note": "bool promotes to int in arithmetic (any platform)",
     "code": "#include <iostream>\nint main() {\n    std::cout << (true + true) << \"\\n\";\n}",
-    "answer": "2",
-    "prompt": "What does true + true equal?",
-    "wrong": {
-      "1": "true promotes to int (value 1) for arithmetic. 1 + 1 = 2, not 1.",
-      "true": "The result is an int, not a bool. true + true = 1 + 1 = 2.",
-      "0": "Both trues promote to 1. 1 + 1 = 2.",
-      "false": "false would be 0. true + true = 1 + 1 = 2."
-    },
-    "explanation": "In arithmetic expressions, bool is promoted to int (true -> 1, false -> 0). true + true = 1 + 1 = 2."
+    "prompt": "What does true + true equal?"
   },
   {
     "id": 7,
     "title": "char literal in arithmetic",
     "platform_note": "char = 8 bits, ASCII encoding, char promotes to int in arithmetic (any platform)",
     "code": "#include <iostream>\nint main() {\n    std::cout << ('A' + 0) << \"\\n\";\n}",
-    "answer": "65",
-    "prompt": "What prints?",
-    "wrong": {
-      "A": "Adding 0 promotes 'A' to int. cout sees an int and prints the numeric value (65), not the character 'A'.",
-      "B": "'A' + 0 doesn't advance the character. It promotes 'A' to its ASCII value (65) and adds 0, giving 65.",
-      "66": "'A' is ASCII 65, not 66. 65 + 0 = 65.",
-      "a": "'a' is ASCII 97, 'A' is 65. And adding 0 promotes to int anyway -- the output is '65', not a character.",
-      "64": "'A' is ASCII 65 (not 64). 65 + 0 = 65.",
-      "0": "0 + 0 would be 0. 'A' has a non-zero ASCII value: 65."
-    },
-    "explanation": "char undergoes integral promotion in arithmetic. 'A' -> int value 65. Adding 0 gives 65. cout prints the int '65', not the character."
+    "prompt": "What prints?"
   },
   {
     "id": 8,
     "title": "unsigned subtraction wraparound",
     "platform_note": "unsigned int = 32 bits (any platform)",
     "code": "#include <iostream>\nint main() {\n    unsigned int a = 5, b = 10;\n    std::cout << (a - b) << \"\\n\";\n}",
-    "answer": "4294967291",
-    "prompt": "What does 5u - 10u print?",
-    "wrong": {
-      "-5": "Unsigned arithmetic cannot be negative. 5 - 10 underflows and wraps: 2^32 + (-5) = 4294967291. This is well-defined.",
-      "5": "5 is the first operand. 5u - 10u wraps to 2^32 - 5 = 4294967291.",
-      "0": "The result does not clamp to 0. Unsigned subtraction wraps modulo 2^32: 4294967291.",
-      "18446744073709551611": "That would be UINT64_MAX - 4 (64-bit wrap). Here unsigned int is 32 bits: 2^32 - 5 = 4294967291."
-    },
-    "explanation": "Unsigned arithmetic wraps modulo 2^32. 5 - 10 = -5 in math -> 2^32 - 5 = 4294967291."
+    "prompt": "What does 5u - 10u print?"
   },
   {
     "id": 9,
     "title": "float precision loss on a large integer",
     "platform_note": "float = 32-bit IEEE 754 (24-bit significand, ~7 significant decimal digits) (any platform)",
     "code": "#include <iostream>\nint main() {\n    float f = 16777217.0f;\n    std::cout << (long long)f << \"\\n\";\n}",
-    "answer": "16777216",
-    "prompt": "Does float store 16777217 exactly? What does the cast print?",
-    "wrong": {
-      "16777217": "float has 24 bits of significand (~7 decimal digits). 16777217 = 2^24 + 1 requires 25 significant bits. The nearest representable float is 2^24 = 16777216.",
-      "16777218": "16777218 would be rounding up. The nearest float to 16777217 is 16777216 (2^24), which is below.",
-      "0": "The value is not 0. It rounds to the nearest representable float: 16777216.",
-      "17000000": "The rounding is much subtler than that. 16777217 rounds to the adjacent float 16777216."
-    },
-    "explanation": "float has 24 bits of significand. 16777217 = 2^24 + 1 requires 25 bits and rounds to 2^24 = 16777216."
+    "prompt": "Does float store 16777217 exactly? What does the cast print?"
   },
   {
     "id": 10,
     "title": "floating-point equality surprise",
     "platform_note": "double = 64-bit IEEE 754 binary (any platform)",
     "code": "#include <iostream>\nint main() {\n    std::cout << (0.1 + 0.2 == 0.3 ? 1 : 0) << \"\\n\";\n}",
-    "answer": "0",
-    "prompt": "Is 0.1 + 0.2 == 0.3? Enter 1 (yes) or 0 (no).",
-    "wrong": {
-      "1": "0.1, 0.2, and 0.3 cannot be represented exactly in binary floating point. The nearest double to 0.1 + nearest double to 0.2 is approximately 0.30000000000000004, which is NOT equal to the nearest double to 0.3.",
-      "true": "Enter 0 or 1. Also: the answer is 0 (false) -- 0.1 + 0.2 != 0.3 in binary floating point.",
-      "false": "Enter 0 or 1. And the direction is correct (false = 0) -- type 0."
-    },
-    "explanation": "Never compare floats with ==. 0.1 + 0.2 = 0.30000000000000004 in IEEE 754 double precision. Use fabs(a - b) < epsilon instead."
+    "prompt": "Is 0.1 + 0.2 == 0.3? Enter 1 (yes) or 0 (no)."
   },
   {
     "id": 11,
     "title": "integer division then floating-point add",
     "platform_note": "int = 32 bits, double = 64-bit IEEE 754, operator precedence: / before + (any platform)",
     "code": "#include <iostream>\nint main() {\n    int a = 5, b = 2;\n    std::cout << a / b + 0.1 << \"\\n\";\n}",
-    "answer": "2.1",
-    "prompt": "What does this print?",
-    "wrong": {
-      "2.6": "The division a/b is int/int and evaluates first. 5/2 = 2 (truncated), NOT 2.5. Then 2 + 0.1 = 2.1, not 2.5 + 0.1 = 2.6.",
-      "2.5": "2.5 would require floating-point division. Both a and b are int, so a/b = 5/2 = 2 (truncated). Then 2 + 0.1 = 2.1.",
-      "2.0": "0.1 is a double literal. The int result (2) promotes to double and 2 + 0.1 = 2.1, not 2.0.",
-      "2.600000": "Same error as 2.6 -- the division is integer: 5/2 = 2. Then 2 + 0.1 = 2.1.",
-      "0.1": "0.1 is added to the division result, not returned alone. 5/2 = 2, then 2 + 0.1 = 2.1."
-    },
-    "explanation": "Division evaluates first (int/int = 2, truncated). Then 2 (int) + 0.1 (double) promotes int to double -> 2.1."
+    "prompt": "What does this print?"
   },
   {
     "id": 12,
     "title": "arithmetic right shift of a negative signed int",
     "platform_note": "int = 32 bits signed, right shift on signed negative int is arithmetic on gcc/clang/x86 (implementation-defined by the standard)",
     "code": "#include <iostream>\nint main() {\n    int x = -8;\n    std::cout << (x >> 1) << \"\\n\";\n}",
-    "answer": "-4",
-    "prompt": "What is -8 >> 1 on this machine?",
-    "wrong": {
-      "4": "4 would be a logical (zero-filling) right shift. On gcc/clang targeting x86/ARM, >> on a signed negative int is arithmetic: it fills with the sign bit. -8 >> 1 = -4.",
-      "2147483644": "That is the logical right shift result (treating -8 as unsigned 0xFFFFFFF8, shifting, getting 0x7FFFFFFC). This platform uses arithmetic shift: -8 >> 1 = -4.",
-      "-8": "-8 is the input, not the result. Right-shifting by 1 divides by 2 (floor division for negatives): -8 / 2 = -4.",
-      "-2": "-2 would be -8 >> 2 (shift by 2). Shifting by 1 divides by 2: -8 >> 1 = -4.",
-      "0": "0 is not right. Arithmetic right shift fills with the sign bit (1 for negative), not zero. -8 >> 1 = -4."
-    },
-    "explanation": "For signed int on gcc/clang/x86, >> is arithmetic (sign-extending). -8 in two's complement >> 1 = -4 (equivalent to floor(-8 / 2))."
+    "prompt": "What is -8 >> 1 on this machine?"
   }
+]
+""")
+SNIPPET_SECRETS = json.loads(r"""
+[
+  "6?JLzLJZ*rBSf(&eTn!jp<?IFC0TnUSK!H=hd-4nZK6zQkFOYHGG4>UB8K9j$H8{GJjk?1X<q7pAinGL)VfGQMR92`#z{)0Q)-6E{nc9DIe8Gh8dZe6V|dCdx(JR|G7h&d);L&~OW;&%xa?#EY>M%Ec^3jphY6k$Jl?F56LqRh2@)wHhcU7Q%4p67YIcF=ZfEpm%_^<c@u4JrdRNfAdA0L%={w|~gQ^x)JCrBy^C1zXR|746!w@n?vc@YY5Qxv1$&xYS&oz@AivV{yzwGYy6xHs=9BMn6`q|xm$nz~N8TOcGJt49ljKMNd*yQqB4&wA%qZ)E(GM|h=N_V%YqSX%e+-9L}CvSOM)!iPV8Krt)PSZ6-pa?OO|3aq_htT#Dt(vJb#ebujz4v=FVsqs|&rzoS)F-3ajELRDX9sK&<u$Cc$Mb3pv}ktiS+#r&{+kQ<&AVMUlQgX&",
+  "Qj+2CU!UDo*#P~1mBY5|R3VkSjDv%mZpl67K}tU8l=@DKbVU@gh(RY&XWA6y4F1H66v%NJoXazltR;9IHw3?#Xe3!<sU^ZI!*HKYvKVgMn8V*EFJA2xf(AoTlO@-0+UhG{+<`vjEm&@r4wk1#`F%0!&!w272XfFBzCsFL7@Ph~>{uESc|-nz*P5!vpwMS7Vd@WpoT3s|$b3mRMzP6HBB>yn;g6mE(uq$DC<AY+D`it4BcB0&H97{GR@(Lxr0W}MjVqPiH-%%<q(bZ3@_441jB8`tl4biz)*T>i7twGkW_29?MAzY!Dxoz1@}5WkrkX?Nc?YyhAhN(L7%;O)yb>DFL?LYWZz6wi#iYeN6JR`=hq2yjOX<Zqj>1Vf17iN}mB0Z`E|zWte%l&CIJ;^gxl6f5sO(W&ECzorrF4&yjHEwB$!??L^riM@X#-dDQN#>7jda?kA=6la4_;yK-oz2zpPT{bbK8Yj4Y4Tqng",
+  "vrOhXm;T_WsL1LR@Qq(-?N`>Dpb}6dy<jYk(_2io=0(+jNLQ$5jKpd$=)-}~W2bKUVbGPWmlT<;pJElN2wFBe4VR02or^na4JwVWXfIx#@B}A=EA#X|FJF&mh<HVpT3AkxRBf~B39|Tu=W%>%6_2ROSS1rPJf$q-U~_c0)k!c>i%dyd$YysQML6dh2V_Yso(c!wf4k>*ar<5k)pn?lggyz<;2%HGxnzFsP!gsISpWw;vHVU6?r${$`S?bknIGIz994in*irSyUm|5EZTdgk<`|YhlzrxaRaRudatI#~T&zM>#S43b#um{ZLWnfH_jHoM$>Y1+h>ZG;Rl&U)mn{k5EA`8dO?MnhELKEy<H>*{?c_+OHl8=UYi!VYc1OV;jV~vf3>2&fUO-ob;7B7bLE{Q}MIqT1lftbbFtO9f;sXkD0x}jBAYY-pU!iGlsNvuj!Ie|Mbp2rK7exs",
+  "RXG`G1>(M1Vdh8{-vLanjILwKOvgV^{#1Vz#bfeLB9(G5Z}N3`Yr%38oEU0*g&GK0^u|zqf9FPG;?C&b@>j$6;dC&*o>s*E`uB(Ef>VP!oDE$I^AC+~uXTIG%R#zm?Bm4v9Mi_l30sI2s52Q?;Z}sj;djN$sY1XwWz1n7Xw~QUkPj*+fNOOl?d;1r_No)>0gl<A=<{PZyb>?0*R@J%!d)&XqVp9A$4-E~?!xp^KiHWg$*fPbtkQ6XtQVp6ar06xZ4&F2Ry7tiIN~?7w%_b|6skcn|5G^TFHke{=VbhO0`qK>$G_LpA;30mhO1}g`79B(K`yB<b60vdpm9s_DhNY!e5#7pgis+w#g#WIcTq9<T@Ligrc2H{Zckef+{X!+Vdd7E^a_90H(j$YxZ@COafVhkJ6!-X8~V#cIH?{!d5rn~gMRPYj=-a?7hKc#X!F@9Me`C?4z0`)8i0WtuzsJF!5!bb(|t6eMJ2%-mEZCKQ&?NtOnC;!DTPa_5r2s?VHZ*)vf}-mMXtww<v&4@_J&RoDnV4c",
+  "h9lv$B#axMal*J=QtwvEOGz`YO?W27tm^S#q9Bws1q;6xCws^9UXxn(tSc5G-23=Hc8TX~c;o~=Rxm@R=&6`~1CAI~OKQ_`c_r+!=u3pKRFA&Y&CL2`m4!NT6YK|`0M_|;mqmGa|H6^8dNRn`FYM$B+`EDq`Xg{^I*i8>N6z^r=K#k!ZNG>m+tRP8#TfF?IN_MI=8wOi{uD+l_o@uIjQK1N=U01t{idE%)UKXjj`Ndkdlvxf&)FSk@`J>UzZPy^<z16IN~XFwms=dUxGuVLCvH0&3=97Ro-i`i=nPO&9_LR!-CeV-;<ZzkmL%WGuB42;Tx|^uMv*z>AuSe-mqG1EgyLp!<M8(J1wbZ<c+upj5K%*<2sJk78p$`Gq_Uw1#|z9Z*lyE%qJN~?48%?91(J&6HU",
+  "Bj*U28%F|uN0<gWMrIo2<`UYg3F#<!`?~aJ;mWOe6+JPuN&!2@mu+s5OO|al>!hRo5RAoCv{WEG>nMAbia>NaBiW8IsdcudkTXRZSZ>RzDNIw41Q1h9v5A^uOZ;U>w$XDvWl{1~>bwebri+OD;}llaZN(&-0z;?}nNe`ZWsaMzvf)aop);$dA0!10mL3KRhhuBG2LT)n2lXqLNi;VFt(yp|nD*!&YpL6IDH_ekijx99Zj5nXIJpDl3OU;i;5}jg-T`}f1lP3nQ0Wd5t!ESCIo%km^Uf!01iun_&qNQZi2",
+  "`(s^Ap~b$KYpSs8j=7}7)(TCiLo@vKRpFs%j`JKHiMe=?l8|yhMo}7JN;_#NBOquvDm`wy<F$zmF*uIncc1OtnaNa38OET}Wu)usiX||&NhS{yZ%g_M;%F~HZhDC7Gtc|^2GM#`yOMY(ymQU^DVS!B_&_**91R^?SS+H{!+A^B^zv~txam@f!S2x|LDeP-WS-0`_SNI3n8&cs%_uAumI?|lc3pRRhf9Ocy?cRKMhUl9*lqmZIjQb(b;|D(`?8}XT%rOYp7JjoL7642vf&h54{jx8#d<Haaa6PXSievAIXiQX-^f{QJRHgKDT*GM17V5DDefcs(=74C3(WJS`ngH6?p0!RD$-Uy*+TL@m3Bb!o4g4Nf7dA-`aq8<lDC$YFk;?lIW1sCx*@`Ash0lE=<FC1X<qA$guxAzI3q<j?N%UgO5cH6lCh!jq>cm-Zn3cN%*tFVU2CI*JF7V",
+  "!)suc3FQ_LRk0wY2zP&3V&EDK+OWvW2P0GiLkH4mA=AO^u%cy`X5}!Udp=ysn^?HZk)2{n$~HKjz{AN$ON!vUthi&as1dJqpBynjQz9;EUjt#B<E>)}dZG5u^n=BSmob0ag0YZ8$nj@7R}-;}*|`=_w4CJk3s^-$GsMaDYGKD3>`r7C9L^8`{4alrCni~?&ZYW>VU&#Nr6|p6`y7@13u}t<-vdBsI~zDC!Vuc?Ua9QI5D<SYy^?Q5%tATpCF3%tg6_S;!~gG9HMOxk6%d2G1Pr&a1S<f;S=CB+?86gjVZiWS2x;Wt+>`A!Qt^B$xA!Qdq^VdbcgBU%qU|9onv}?x>0$Siuq7)>rRtdt|IZPHH<}&h<VIqIdgv^(R9$`8sQcV{@%~WVxJ@B_ko^S(iWa1|%Ge<8K-j~tBrepc{HzB)hHhLPSNm8",
+  "rOnxHGm#M;NTXfALKdUDVNFp75{|jM2STKybXGLv+({ZfQZ(cVAW&Lo)qEIW(A}Sne5qG|o)#j@O_yIMKo{>bM|qvUn`?pcCwb8zmHU41X+Sgh<X_ReI3yJk#AxtkV~8N>{60zhaqiGl3y)gDc^%76ROUcyOBu5qQ*g|^b)aEL8A&bDC~->Aq`aW7OqQkFNAG0$>GO%5vLCAtb^8NF^-jSPP@&fUE@fTcM5jlufr`<arZ-Y$&w|HkP68^vyG>>h97F61L!UCle=W(OglumW#q;tHeI+$OVE{o2m*ft-)nG;(w|QEj!PlFX=^OIso78ai`@}?2Ie&@V#b3znO*|g=Co#UQHJ}H0NJ|csUuoy;3kU@K=%$R*ZfCmv@jyK*i8Rb%BppV&)xkixMm$Z_ib?",
+  "mPR`$OW!{-N*r4mMeFT#uy7_P=A;%Zhm~CM%3-{(whP*;7?RqIwumK7HsLlN+=wA1C8NG(EhdVpJiZ~2_+maAo93T7J(G19s8fpakhp9HwG3uf?Jrj)GOWIlus8a+>LyMVZ5#oya~Q>e(>y!W&g()o(J-?wRENL=R^-E%(<Kalx6DR3c6(My1<3=0&~LOv=YCrtZ|>on|LAvTOZsJ}bwa+`NcEH&V@HPAYl*3T<#$?u2buXCaMwbvvP0n{VN<{L>>y$PL&-bL8tUTE5-u7HspJagw<qo;1mV@&9*`F%duEPMvC;S%aZNZwI>@qF&K^A-j_&T49+7N0`DV7r8~j|?)T|&n2TBLmbjrJ1|HR0nUc~?+t+_GsufIegws-fv48s5Gk1<Xb*W&x>g^EXd$wa@^TZ%_%e$9am+=?hUZG4V#9ixWb#WsO74F",
+  "CN(p=`~i)pGf*TRepy)&_1-ykfKvksu^<4Qd?+4O?otu2<&j-+SvnKeQZk=NWPgwbe>U^^-Wr~rb*KFDht4_|syRDPlt~cb7dc<37H;5{vQ0al|EmfyC3hRvt+{y?!8Iz$MODO_$D4%0@1pgWK<f~Ix4_ly7{gjU`9EUl#rmU}Dvtymi{SLe?cpEU_lR0aWW#bXIje^XtW7XBwgTRPd-=1H*vD=_o!&qGd0dlzitCgivKTZz58wR6{Iy+WL!!TejvyINz0BqKt<-@a;F~b~hJprp^QMM#XM!6%#DexojsgvANm<bV3WjBG62na%x;l{k=pe8fELtA8b*4t!)JG{pTmc*<(0_;E1Y&}u@>O!m=~>UTaX(+;G~6iiA@wdt;%yks=`&wPXV!!};|NtXFXmG=yD1GjO*E8&_#valE(g*7((G60_tDPPn!JQQBF>zJlR0F0a;L0_BYye",
+  "PP)6X8~GU27&N?OHlivr>DH`GeOO9nSY0_X=cb0m)}LGDgb3ulg$Kad7)7t+YRtN^Za#f8e|qImf;M@zhwbNf=4!eXaz~KDayl-NKIb+`N;&|mSeKX1R`ilb0u3SOKR|ZVd1uhE6Qo#`o>0P4zt_kRh?`Sf?oV5gopIaI^OIV3rBqAxZ2`H<lJ;!PI;}wOz!{F1$wIvxoRU7_L>pa1R3SeP$OQCU*<e;(87_`#mXKeQEG8g{1=M!n=GfdH{B-38l)KPW-jgD9O6{mYLcE6u1f}s}sDlfK1i)?*R!E1Vkf9lo#BQV|eDH+hg54U>{V;39oFgSaWEgwE(2rkAfS|h}9t{ZgYw@HHSdn1n3R~$o3Y8`(`bQ(n!jN4}!2KGj&G_v}4yV-_Yvo`O{4rbOFxZwKb^Dcc#@Ppii!4lvFvpU2pdt%RGNd*rHT+9)=`V$0&l6ZUar*B8Mrx$mX>(lX2<D)Bq*vnc{chD@rpie<;zEZX7yc@gtpha&^EbpFvqn~TQf5z1RQw^?2O|>VRt+LU_`{c5c4{Rq<@aP%@l)O$-25VqlCL(89X4_Lx=b#V&@ZRaR5_c#e*"
 ]
 """)
 
@@ -261,6 +199,13 @@ def _show_passphrase(passphrase):
     print()
 
 
+def _secret_for_snippet(index):
+    secret = _open_secret(SNIPPET_SECRETS[index - 1], "implicit-conversion-minefield:snippet:" + str(index))
+    if secret is None:
+        print("  [error] Could not open snippet data -- contact your instructor.")
+        sys.exit(1)
+    return secret
+
 def _find_compiler():
     for c in ("g++", "clang++"):
         if subprocess.run(["which", c], capture_output=True).returncode == 0:
@@ -282,6 +227,7 @@ def _compile_run(code, compiler, tmpdir, idx):
 
 
 def _ask(s, actual, index, total):
+    secret = _secret_for_snippet(index)
     print(f"\n{' ':=<70}")
     print(f"  Snippet {index:02}/{total:02}: {s['title']}")
     print(f"{' ':=<70}")
@@ -299,13 +245,13 @@ def _ask(s, actual, index, total):
             continue
         if raw == actual:
             if attempts > 0:
-                for ln in _wrap(s["explanation"]):
+                for ln in _wrap(secret.get("explanation", "")):
                     print(ln)
             else:
-                print(f"  Correct.  {s['explanation']}")
+                print(f"  Correct.  {secret.get('explanation', '')}")
             return raw
         attempts += 1
-        _show_wrong(raw, s.get("wrong") or {})
+        _show_wrong(raw, secret.get("wrong") or {})
         print(f"  Actual output: {actual!r}   Type it exactly to continue.")
 
 

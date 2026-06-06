@@ -7,11 +7,20 @@
 """
 import json, sys
 
-# -- Crypto --
-import hashlib as _hl, hmac as _hm
+# -- Crypto / obfuscation --
+_KEY_A = "2e97876869c737206448a1b6f5b824a6b00575e474991422de6929f9b6facd99"
+_KEY_B = "303b57c73981ddc600582704b087beca15c9cff2b584365c620539dd308a424e"
+import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
 _KDF_ITERS = 100000
+
+# Split runtime key. This is obfuscation only; do not treat it as a secret.
+def _xor_bytes(a, b):
+    return bytes(x ^ y for x, y in zip(a, b))
+
+def _runtime_key():
+    return _xor_bytes(bytes.fromhex(_KEY_A), bytes.fromhex(_KEY_B))
 
 def _derive_key(answers):
     return _hl.pbkdf2_hmac("sha256", "|".join(answers).encode(), _SALT, _KDF_ITERS)
@@ -31,207 +40,127 @@ def _decrypt(blob_hex, answers):
         return None
     return bytes(a ^ b for a, b in zip(ct, _stream(key, len(ct)))).decode()
 
+def _item_key(label):
+    return _hm.new(_runtime_key(), label.encode(), _hl.sha256).digest()
+
+def _open_secret(blob_text, label):
+    try:
+        blob = _b64.b85decode(blob_text.encode())
+        key = _item_key(label)
+        ct, mac = blob[:-32], blob[-32:]
+        if not _hm.compare_digest(mac, _hm.new(key, ct, _hl.sha256).digest()):
+            return None
+        pt = _xor_bytes(ct, _stream(key, len(ct)))
+        data = _js.loads(_zl.decompress(pt).decode())
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
 _BLOB = "86ff7de570b5708fc3355160b0da4a76133a11b4353708c8ed99aa80bc21166c82f4e1aaa82da9453607b0aa21f11ed22257d845d8f8daff89"
 
-# -- Questions --
+# -- Public questions and encrypted answer/explanation material --
 QUESTIONS = json.loads(r"""
 [
   {
     "expr": "sizeof(char)",
     "arch": "any conforming C++ platform",
-    "answer": "1",
-    "hint": "What unit does sizeof use? How does C++ define 'byte'?",
-    "wrong": {
-      "2": "sizeof(char) is always exactly 1 by the C++ standard -- it is defined as the fundamental unit of memory measurement. Even on platforms with 16-bit hardware bytes (CHAR_BIT=16), sizeof(char) is still 1.",
-      "4": "sizeof(char) is always 1. You may be thinking of sizeof(int) on a 32-bit platform.",
-      "8": "sizeof(char) is always 1. The standard guarantees it unconditionally.",
-      "0": "sizeof can never be 0; every type occupies at least 1 byte. sizeof(char) is exactly 1."
-    },
-    "explanation": "sizeof(char) == 1 is an axiom of C and C++. All other sizeof values are measured in multiples of sizeof(char)."
+    "hint": "What unit does sizeof use? How does C++ define 'byte'?"
   },
   {
     "expr": "sizeof(short)",
     "arch": "32-bit x86 Linux (ILP32)",
-    "answer": "2",
-    "hint": "What is the minimum width the standard requires for short? What do most platforms use?",
-    "wrong": {
-      "1": "1 byte is sizeof(char). short must hold at least 16 bits, so it is at least 2 bytes.",
-      "4": "4 bytes is sizeof(int) on 32-bit x86. short is 2 bytes -- the standard guarantees at least 16 bits.",
-      "8": "8 bytes is sizeof(long) on 64-bit Linux. short is 2 bytes on every mainstream platform."
-    },
-    "explanation": "short is 2 bytes on every mainstream platform (ILP16, ILP32, LP64, LLP64). The standard guarantees at least 16 bits."
+    "hint": "What is the minimum width the standard requires for short? What do most platforms use?"
   },
   {
     "expr": "sizeof(int)",
     "arch": "16-bit AVR microcontroller (avr-gcc)",
-    "answer": "2",
-    "hint": "AVR is a 16-bit architecture. int is typically sized to the natural register width.",
-    "wrong": {
-      "1": "1 byte is sizeof(char). int must hold at least 16 bits and cannot be 1 byte.",
-      "4": "4 bytes is sizeof(int) on 32-bit and 64-bit systems. On a 16-bit AVR, int follows the 16-bit word size.",
-      "8": "8 bytes is sizeof(long) on 64-bit Linux. On a 16-bit AVR, int is 2 bytes."
-    },
-    "explanation": "On AVR (ILP16 model), int is 2 bytes. The natural word size of the CPU drives the size of int."
+    "hint": "AVR is a 16-bit architecture. int is typically sized to the natural register width."
   },
   {
     "expr": "sizeof(int)",
     "arch": "32-bit x86 Linux (ILP32)",
-    "answer": "4",
-    "hint": "On ILP32, which fundamental types share the same 32-bit width?",
-    "wrong": {
-      "2": "2 bytes is sizeof(int) on 16-bit platforms like AVR. On 32-bit x86, int is 4 bytes.",
-      "8": "8 bytes is sizeof(long) on 64-bit Linux. int stays 4 bytes even on 64-bit systems under LP64.",
-      "1": "1 byte is sizeof(char). int is 4 bytes on 32-bit x86."
-    },
-    "explanation": "On ILP32 (32-bit x86), int is 4 bytes. Notably, int also stays 4 bytes on 64-bit Linux under LP64 -- only long and pointers are widened."
+    "hint": "On ILP32, which fundamental types share the same 32-bit width?"
   },
   {
     "expr": "sizeof(long)",
     "arch": "64-bit Linux (LP64 data model)",
-    "answer": "8",
-    "hint": "How does 64-bit Linux differ from 64-bit Windows in how it treats the 'long' type?",
-    "wrong": {
-      "4": "4 bytes is sizeof(long) on 64-bit Windows (LLP64) and 32-bit Linux. On 64-bit Linux, LP64 widens long to 8 bytes -- this is the key difference from Windows.",
-      "2": "2 bytes is sizeof(short). long is at least 32 bits by the standard, and 8 bytes on 64-bit Linux.",
-      "16": "16 bytes is not a standard width for long. On 64-bit Linux (LP64), long is 8 bytes."
-    },
-    "explanation": "LP64 (64-bit Linux/macOS): char=1, short=2, int=4, long=8, ptr=8. The 'L' in LP64 stands for long being 64-bit."
+    "hint": "How does 64-bit Linux differ from 64-bit Windows in how it treats the 'long' type?"
   },
   {
     "expr": "sizeof(long)",
     "arch": "64-bit Windows MSVC (LLP64 data model)",
-    "answer": "4",
-    "hint": "Microsoft prioritized Win32 API backward compatibility when moving to 64-bit. What does that imply for 'long'?",
-    "wrong": {
-      "8": "8 bytes is sizeof(long) on 64-bit Linux (LP64). Windows uses LLP64 where long stays 4 bytes -- Microsoft kept it 32-bit to avoid breaking existing Win32 API code.",
-      "2": "2 bytes is sizeof(short). Under LLP64 (Windows), long is 4 bytes.",
-      "16": "16 bytes is not a standard width. Under Windows LLP64, long is 4 bytes."
-    },
-    "explanation": "LLP64 (64-bit Windows): char=1, short=2, int=4, long=4, long long=8, ptr=8. Microsoft kept long at 32 bits to avoid breaking millions of Win32 API calls."
+    "hint": "Microsoft prioritized Win32 API backward compatibility when moving to 64-bit. What does that imply for 'long'?"
   },
   {
     "expr": "sizeof(long long)",
     "arch": "any C++11-conforming platform",
-    "answer": "8",
-    "hint": "C++11 introduced long long with a portable minimum-size guarantee. What is it?",
-    "wrong": {
-      "4": "4 bytes is sizeof(int) or sizeof(long) on some platforms. long long is guaranteed >= 64 bits (8 bytes) by C++11 everywhere.",
-      "16": "16 bytes is __int128 on some GCC targets. long long is exactly 8 bytes on every C++11 platform.",
-      "2": "2 bytes is sizeof(short). long long must hold at least 64 bits = 8 bytes."
-    },
-    "explanation": "long long is guaranteed to be at least 64 bits by C++11. In practice it is exactly 8 bytes on every conforming platform."
+    "hint": "C++11 introduced long long with a portable minimum-size guarantee. What is it?"
   },
   {
     "expr": "sizeof(void*)",
     "arch": "16-bit AVR microcontroller",
-    "answer": "2",
-    "hint": "How many bytes are needed to address every location in a 16-bit address space?",
-    "wrong": {
-      "4": "4 bytes is sizeof(void*) on 32-bit systems. On 16-bit AVR, the address bus is 16 bits wide, so all pointers are 2 bytes.",
-      "8": "8 bytes is sizeof(void*) on 64-bit. On 16-bit AVR, pointers are 2 bytes.",
-      "1": "A pointer stores a memory address, not a single byte. On 16-bit AVR, addresses are 16 bits = 2 bytes."
-    },
-    "explanation": "Pointer width equals the address bus width. 16-bit CPU -> 2-byte pointer. All pointer types are the same size on a given platform."
+    "hint": "How many bytes are needed to address every location in a 16-bit address space?"
   },
   {
     "expr": "sizeof(void*)",
     "arch": "32-bit x86 Linux (ILP32)",
-    "answer": "4",
-    "hint": "A 32-bit address space has 2^32 addressable bytes. How many bytes does an address require?",
-    "wrong": {
-      "8": "8 bytes is sizeof(void*) on 64-bit. On 32-bit x86, all addresses fit in 4 bytes (2^32 locations).",
-      "2": "2 bytes is sizeof(void*) on 16-bit. On 32-bit x86, pointers are 4 bytes.",
-      "1": "1 byte can only address 256 locations. On 32-bit x86, pointers are 4 bytes."
-    },
-    "explanation": "32-bit address space -> 4-byte pointer. Every pointer type is the same width; the pointed-to type does not affect pointer size."
+    "hint": "A 32-bit address space has 2^32 addressable bytes. How many bytes does an address require?"
   },
   {
     "expr": "sizeof(void*)",
     "arch": "64-bit Linux (LP64)",
-    "answer": "8",
-    "hint": "Does the type that a pointer points to affect the size of the pointer itself?",
-    "wrong": {
-      "4": "4 bytes is sizeof(void*) on 32-bit. On 64-bit Linux, addresses are 64 bits = 8 bytes. All pointer types are the same width.",
-      "16": "16 bytes is far too large. Pointers on 64-bit are 8 bytes, regardless of what they point to.",
-      "1": "1 byte cannot address a 64-bit address space. Pointers on 64-bit Linux are 8 bytes."
-    },
-    "explanation": "64-bit address space -> 8-byte pointers. char*, int*, void*, and function pointers all have the same size on a given platform."
+    "hint": "Does the type that a pointer points to affect the size of the pointer itself?"
   },
   {
     "expr": "sizeof(char[10])",
     "arch": "any platform",
-    "answer": "10",
-    "hint": "Does sizeof cause array-to-pointer decay? Name one other context where decay does NOT happen.",
-    "wrong": {
-      "8": "8 bytes would be sizeof(char*) on a 64-bit system. sizeof does NOT cause array decay -- the operand is still the full array. 10 chars x 1 byte = 10.",
-      "4": "4 bytes would be sizeof(char*) on 32-bit. sizeof on an array gives total storage: 10 x 1 = 10 bytes.",
-      "1": "1 byte is sizeof(char), one element. The full array is 10 x sizeof(char) = 10 bytes.",
-      "2": "2 bytes would be a pointer on 16-bit. sizeof on a named array gives the full array size: 10 bytes."
-    },
-    "explanation": "sizeof does not cause array-to-pointer decay. sizeof(char[10]) = 10 * sizeof(char) = 10 * 1 = 10. The few contexts where decay doesn't happen: sizeof, alignof, decltype, address-of (&arr)."
+    "hint": "Does sizeof cause array-to-pointer decay? Name one other context where decay does NOT happen."
   },
   {
     "expr": "sizeof(struct { char a; int b; })",
     "arch": "32-bit x86 Linux (ILP32)",
-    "answer": "8",
-    "hint": "Sketch the layout on paper. Where must int b start, given its alignment requirement?",
-    "wrong": {
-      "5": "5 is the raw sum (1+4), but the compiler inserts 3 bytes of padding after 'char a' so that 'int b' is 4-byte aligned. Layout: [char][pad][pad][pad][int] = 8 bytes.",
-      "6": "Not quite. Padding after char rounds up to the next 4-byte boundary: 1 byte char + 3 bytes pad + 4 bytes int = 8 bytes.",
-      "4": "4 bytes cannot hold both members with proper alignment. The struct is 8 bytes: char(1) + padding(3) + int(4).",
-      "9": "9 is too large. Exactly 3 bytes of padding are inserted: char(1) + pad(3) + int(4) = 8."
-    },
-    "explanation": "Alignment rule: each member starts at an offset that is a multiple of its own size. char at offset 0 is fine. int (size 4) must start at offset 4, requiring 3 padding bytes after char."
+    "hint": "Sketch the layout on paper. Where must int b start, given its alignment requirement?"
   },
   {
     "expr": "sizeof(struct { char a; char b; char c; })",
     "arch": "any platform",
-    "answer": "3",
-    "hint": "What is the strictest alignment requirement of any member in this struct?",
-    "wrong": {
-      "4": "4 would apply if the struct needed alignment padding to reach a 4-byte boundary, but all members are char (1-byte aligned). No padding is ever needed. Result: 3 bytes.",
-      "8": "8 bytes only happens with members requiring larger alignment. Three chars pack tightly: 3 bytes.",
-      "1": "1 byte is sizeof(char), one member. Three chars together are 3 bytes."
-    },
-    "explanation": "When all members have 1-byte alignment, no padding is inserted and no trailing padding is needed. sizeof = 3 * 1 = 3 bytes."
+    "hint": "What is the strictest alignment requirement of any member in this struct?"
   },
   {
     "expr": "sizeof(char&)",
     "arch": "any C++ platform",
-    "answer": "1",
-    "hint": "Is sizeof(T&) the same as sizeof(T), or sizeof(T*)? Think about what a reference IS semantically.",
-    "wrong": {
-      "8": "sizeof(char&) is NOT pointer-sized. The standard says sizeof on a reference type gives the size of the referenced type: sizeof(char&) == sizeof(char) == 1.",
-      "4": "4 is sizeof(int). sizeof(char&) == sizeof(char) == 1. The & does not make it pointer-sized.",
-      "2": "2 is sizeof(short). sizeof(char&) == sizeof(char) == 1. References have no size overhead in sizeof."
-    },
-    "explanation": "C++ standard [expr.sizeof]: sizeof applied to a reference type gives the size of the referenced type. sizeof(char&) == sizeof(char) == 1."
+    "hint": "Is sizeof(T&) the same as sizeof(T), or sizeof(T*)? Think about what a reference IS semantically."
   },
   {
     "expr": "sizeof(int&)",
     "arch": "64-bit Linux (LP64)",
-    "answer": "4",
-    "hint": "Apply the same reference rule from the previous question. Does the answer change for int?",
-    "wrong": {
-      "8": "8 is sizeof(int*) or sizeof(void*) on 64-bit -- but NOT sizeof(int&). sizeof(int&) == sizeof(int) == 4.",
-      "1": "1 is sizeof(char). sizeof(int&) == sizeof(int) == 4. References carry no pointer-sized overhead.",
-      "2": "2 is sizeof(short). sizeof(int&) == sizeof(int) == 4."
-    },
-    "explanation": "sizeof(int&) == sizeof(int) == 4. The same rule applies regardless of which type is referenced."
+    "hint": "Apply the same reference rule from the previous question. Does the answer change for int?"
   },
   {
     "expr": "sizeof(struct { double a; char b; int c; })",
     "arch": "64-bit Linux (LP64)",
-    "answer": "16",
-    "hint": "Lay out each member in order. double is 8 bytes at offset 0, char is 1 byte at offset 8. Where must int start?",
-    "wrong": {
-      "13": "13 is the raw sum (8+1+4), but int c requires 4-byte alignment. After double(0-7) and char(8), the next 4-byte boundary is offset 12. Three padding bytes are inserted: 8+1+3+4 = 16.",
-      "24": "24 overcounts the padding. Only 3 bytes are needed before int c: double(8) + char(1) + pad(3) + int(4) = 16.",
-      "12": "12 omits the trailing padding. After char at offset 8, int must start at offset 12 (4-byte aligned), giving total 12+4 = 16.",
-      "20": "20 is too large. Layout: double@0(8) + char@8(1) + pad@9-11(3) + int@12(4) = 16 bytes."
-    },
-    "explanation": "Layout: [double a @ 0-7][char b @ 8][padding @ 9-11][int c @ 12-15] = 16 bytes. The struct size is a multiple of the largest member alignment (8 for double)."
+    "hint": "Lay out each member in order. double is 8 bytes at offset 0, char is 1 byte at offset 8. Where must int start?"
   }
+]
+""")
+QUESTION_SECRETS = json.loads(r"""
+[
+  ")L0d-QV{W|#Q%n_xGPKY@*uxkCYkv3($M7-V;ijaJio82!;wk+_5KRn1fsNQm8O!?#;4pJ<N;9{qj-$?{u6bdPf7E5L%L<gB^uR%ZV3v3GxCK<1aQu)>|Q>yDN7ow*8^8@CeWYlUG)R2<X2Rvz;#Fg0Y^JT40qxpA0Ud*!hYr9>Tl<|G%Bb7DkSTK=$JF&`aY%3o56D;%dsB~bSwbZRzRB^)nLx?;vj5a4KJ7~qM4B40;H87TzFlocpx~hnO+fj(6v|P@CNJFYB!xn8IFdG3O*vK<6r!z^A>Rv;4>78%p?J}E76$`1>Ht0&8+3N6#=h#`n`hCf?&)=|271qh0(as`MVr+2$jM=EU(Z0bUTkosKS<#gKXt^-}!5(URVSG9x4`MguDlQZ?g|*p5>}=UV&YIC|{$yVTL)g9d*|<G0Vd@gv_%PY{#_0trA3@B|{Fx78~eh7}JfhrWIyPE_(fVPIe*}xn0!?3xB{?*2we",
+  "HDIUuCbAlD_2LvJE24zVSlMR$+usA%gdjC(9t%Ct)jFHRcIlDXig>g}hSG@ll9SaHZ?{(!-Zi77eN_tmAKHwi9S2k_{-zVMHOiV4*ufOZze3X<5ZTE`X#VM1iC)x~?bTh*W(TG6+8+`QX?-u{U*XKLF3kQ)lSG~m=-olS`1p>$WGBvPx(6gCr!)gc#_{D*m%0Zv1}NG-TFNc-_Y46Gm$nEyigOr*$w2(Rk}H}rpj=h})#s&z+yF@S&a?OXAVU%%#wY!ztX6{)b!z;4bjKUE6{XjP#{<?G#i#laWvhx*R%<gF@-IA^R%eqOu^GbPUg@UZM!P>D{#x2zMP^<MGa*Sz",
+  "Rv|JjE{gGZ@9oAOpF-23|AC-Z80DoVFY5JSuWOp6Rb>Dv)Auw`m~{7|jN~5Kah`+*nWXbY^>MDk>rx@GEpv71I^Z*Vvt0qTLUI!yR4hD@Ts<;y*7GAuxu*U^(p3eR{*ZaOfPk0Jy#Dp^u3~!YtNw6OeCLFNH~-S$7JeyNiT>T$?qDip@2CMYN1;vOF^gxmbsM$76#xVz+^>&Om@9_7-1VLHLN+YwkqSAG&)&BI#4S1g$NwN-j4U#na2rG1i=Wx8Xor&$PBXBd)$wlV0LX63YgdJT@C*>}l%I?_6+PO#M@w_?)NVdLW;L!00nKPWDGNyny#?axYITI&<QfjTc2yN$bO(D;%5uKj",
+  "C{=b#UWud0CEs^neQKz&(-&enz3MlpqEJL7SXZtb>M6c5$txcf7ZUX^^3N*9=$u$#>SMTZVu$=C{pDJ#Xu<L>38cNYIj;=2mar;J%4Q-_Vgp;mk%9!Yonj`+Fk{I}hPY?IX0F~QOTYe9<c3cK3xb*qiW0v3{)$l<Iv*?h^+`mj2Xa97yAs3JpqIAsLzeow%W1yTkY3&s4Yf*)WFpshExhU*53{x2mzhuS6F{SOR;WQ<tripf#Sw97p`yt0ponp5{qiIZVQbhUxZ{&4MO?B=wXqj<G^!7PFh>3x%`(28iR8JPKC2Drw+yt!yZcylq=(r<P(6_i3k+L}%MXwM%Zotg6(;;q",
+  "WKlR=S2k<wan*I?=92xYiSG|WWs(=-3(V}zS->N*v=vKS0`mg`rKstB4d}yrG$*88!}%VPF8tf5XsV94)9bXRnrAdimTqcQhLjR`ClJn2iw#_NxgHM{3@{1?D8!}oX<Vk1x9ps5<;#LGVlzIB$tA$Cpu3&xC)%`xYqlavG^|+%|KQI?iay2pGq?r2KotfCNV;ow^NZx_{<lVr)6yx$Rm~7m250l-ZhDU^PEE~@SphCof2Hq+dj{SoIJMPeVQ14qnJf2%E*T_&3Y(t$v}wO3*aS1Nd0)&2JO&BdYRp2nUkYoY>z5;4LcKK+Fek=jGztHt-hrZNv!f$K@|r&LtY;Zo%c(hFVwdp>Q#mFFy|FB>E%Ni$i!XtQD1Z(Sd@gyw|5j+msHrGIK-{?fh_x*aB>",
+  "jazCltQTgw9w6uskQ9mS7hMlKYJCk8Fa`g>P2-a2U@L(bRPU^jB1#Q)2!-UtXXpqeCvd_jtX;RLpSbjfU%k|8Vmo8ocD||&ytll+7+Z>$t8EVc(aytkz=#P88p^q2z&<!&#F5$L>wF-gL+=njTvNRyz)6-!>Ha2zu6{%s_VfT9Vs02IG+Ls$eVYqa<x%)_5*|l53_`Cd=*X$CIp@TlrvDIh@F;1x#li(TwxyrV{t*XLRs~4m+tO0e)ve)+hs9oTvU*Y<a$&lJG$S2cxQ3rDj-lf8NKJh<)T<^xCoaz6zIk#jctt~q(6A+_YxI<#cAkBi?&!s9yc~0hUK?8V3HLjv%dToK4lhgr$#Djo7m7Dn724|reGNqyS>3|##J$i^->3KBIcupy+s%3iaoprHh*p_0",
+  "ndi;}0_+abd#aNd6);QF02A%Y8#jr=rQh6==L~C}ozhZ(b~5SM+B39(tG#&lcR#&Gty8VUZ*+}ZwNRjcxkgPryRq6fv30MM8z$H`&>(y+Z}nNuu4!O=J8txBFyr)O<#3}&`*4L;CfJ|1viA0gEdznCnm*KKOP-9OKGG_hNIPTK8RwbKEWfCalp?UQ5<GXSuMaJ*cov?ME!MqWf=)6K!O1f3S?Jc4tTAqdfGA6MKyK#T=-;)u&$nJU%3-k5(Kjnh4awO_d%$NrUKBpp-`LBxd|-G3jh1wkcwHq}*2`Roc-#4x62@>nr!)w7l7}F*Z%1}?H~a&#`4oMtkLwX<6GIc`(d?k{rfTz@M@$9x",
+  "XocSPUku@a<)GBbxJ{Aq58yV1AVNKC*Z7nd)y}n)P08vyLu6yGTlh^WKyCggw<L}&A3Jv_?Q&QKoT0h^LP>N+N8WVbxo~x%v*wF1wQp*){Em<Dy%wBg=fy~zX4TQxdHSBLqNTTaUwtOHPpGK_lc8XS{M=4&;`+rtHlW#Bvj?rM(_D&EP32?|^O0k<vT{u!r!g|^HUOv$l@GIS@t^xC06?fxT4wRhZX{JsfX*2q7RDsi?6aB2Wr2FOfs5He3y&&Eh4=9swY^u~LExdi<k&pkxJ8|`$G{t$cR~PUCxcHw2I8@VMFC^3fsibj@yAmUsPx-vr?)4;cUu@9*ZBZg>@O~XXoUQrgur}2qj9I0Zdc$G4muW&Rs",
+  "v>)PiGsmccqCMN3f6P(0?ncy@TeNvpA0yDB4iOFbx}qhWKaP>OTkP_-tzd53x?)t1zS$o=iuc$Qbd}VDS|<yWZL49x{9R<qPQitWP&XDzi~81pEx^DXUpde<y$jNW$s3+49O9JKzOL#QMB`4pRnpCYnT+u_-Yy~_`A*y6OM@nNMs*<J&Rd^BxZmaTt)44z)8U)_hU@nPNW?2~<+KqD9HmOirY=}4&$RxIIA}+A=fu*jRfK`(IR?~GIlKch<7}wJQiv`aGvV??tNN4R_rf}{yL~rro0&bC+PYoZbhi%tnGLcfv$phTYj@hZf`}1FK)zOXW&wZC`jhYnT<wW?",
+  "TKOawwqV(Fuzb{C1u>{frj;o;d}rXLo(=}r-aw}%CrbxF3E+c8-kg3!c)I~cfa|LoK{vv_fT8Y_2OH#}KM0q+b@y+(?YPQ>Y)F+$Hm)5l5d5KDgCJ=opjk>DlXI78&7ZM;0!e@*&r%Y%&jgxu-ntg$&8Dl%*8lwrb_4urUg!z`ZmtHibyui`pzx#cqg$UQ3M0uHI$+EG9ktzxC{ybYm={OsoMgT;QDPg4oUmKHqMl$i8D1YnIN;MKW%HX($9nFE)iMn_x0_G4Hy$N!Qx@rL6guXb7rrs1t92otooYsWN6PteylkDq{tB!+_hI`i*OAz|lIUGa4Z^%nW)p9PfcXdB{)8fn+)_(s`ve`}Pgdc<==i(AR72)15#Skx*EO+tZ3g=A",
+  "AWPpBy4+6MdZL{NY*kD=KuD7qC?QROBv%J{&ghlMrM))?&IRefKb5}XXdOCZ`r|y@{#$YUp2`SiaM*oKvs<|5bZxB?u7`;2ui%t&g&O!u?Ug?4F@n_3q$wtbJltP1h4ldA*bK~hP--wK8JpptZ|mKK^$9VvEwPe{JN!MH5`K%)ExkPGgGev&2ZLBnv#WB(e<_^u*g8?@n$b{itDqQar*<JSt64SXi&B@5`7aAX4)L-i&%98@JmI~x%@-n|Mg&eWng1B)r@ZQLaQOuc0m=6@D-qgQN)LO_C0mx)gDuvaxu}=UNoNn@Ey76V>aWRdH#*@)#d=lvi>LkzCXXZzqzrbJ5SmQ{HKtN_G45Z2#4F8M_e%HSaZa-ie+b~U{TnnbcmxSOPQAGQagp>U?yT*lQndBr)1ci|4@NyX%`UZirHBA!bRbJ5`zmXC-W=Br`#$Y8?`H0;ARmEfEMc^@uGAWJmsw!",
+  "J0Sk3HIzuc%<V}t?IQAJEGI|+T?;%N`EhZC(YA|bo5lPmT<*|TrAHR1)1jP=*ph0CfU%2VHNMfYpg=ui1YMDH&J(b4Tp15}knUR$-@Jb5&oftE_#Frs!Xz=-d^mQNfWS_8{Zv4q%5h<KiS9P4{e9tMhJV{-0-|Ps;Aud5Ss&0psl<MA4QM_hm4xyjs3>D+<PTlTci_ZGj|N8s-Z}i%DJ@38j8Vm|f)|T|qvUP6Dw8t(xZnAF(UWj1ytO4%4~f`SATAqf@f1M~QEi9PQUE8jk#Ic1x)Ot{nE>TTWZaS#C#^8UsmAR%-u$v^ap&P;&YA{5oROt|<Bg@Zy~TqUp{A&Z)(4$-oraGEq<X?%8Nqe<HH%-~xb@SZ-rSo$N}}PbR-H#6e1bw8Ke17nzv+S!S`>Wu_691Sn}gt#Xf90ZOAe;UB;f@B^S_h2djn;0j;OamZ*14^3}_F=vY9~XNfPryamI|KDSn<6dDm`iSzTT;{;;!1m}VlEZ(K3Ob2e5W9DW=Efm8oQF?-;}l?$LfE-j5Uj#Agvv>Y!*mnj)+9s",
+  "jM19{z&~<M|CAZR`xT0ZjVF*(@YJx^-l$W0?H|qa@ofx{u@l()PN)#7G2@q%VAeWP&ndj{jPgJiJ&If!<SFZsMo%r(<RJ&3>wF(n->oq$I-7@1hZMyhq+hA~TY2b%PKo}zKn{gJ)SZ58nd|9@u$yg|W(<5CvNC(y7;_@kyliIImWu+gP4M8JdWDWq=6I`0Ii}Nh(!*}`8DEC>-|qPp^Oa>Z92;?MeHE(Jf=Tr(S4<Us&Z1W<co9)<kZ@S+$?aw`z;&?)5$|wo)x!d!Q5Kxjeq+Ppo2FrU|NE9dmE-M&kM(M9gw()FO80pk!F#sX3fbd@Ot%EmtBqMNu(YE#N2qRgyaFm6FzeRR;iNFJ8bZMYAxbWuO`B|E=LGI+$XRsk^6#s|OkMmF1Hp|*qomgAcSUwO",
+  "cXS!GwLNB%^p0?Nr&M%D6URw3Lma0&&ci&Kt!PuY5)dLQ83dYJhJo&UMkJj1QFciLvqlD!i*U_sehWe3S{{$}gH}-`56UhNQ4QAO;kUx^Z=Y~hh1Mq;EC6&r>JAiIAvKjyY4~Pxu`tgSN_W8|OLivjSk_0C(PsI-r@s7LvhHb#Km)wXW_l+A2JG3dpv|Q@!dWH8#q=CGq@z#Nv0d?=hg{<M6U{gvFcFJ2VERtEyBL^1!Eq_T0PYU<KBh82c8dDGde|(8HgJOWr6`E-D9ow!^%=!NZ*?pV8B`-2-L&oI((|R47x!<Uf?9eJZw7}~^Gs2WZ_}MsS_elh6<wclg}yQx+W",
+  "t>FnRvI7O4&f<H<5+DasSm(2D8B<fZtU(fm$?x`T82^XBq@u$!qcy>6Cry#qV#{@D=2OI4Z!=<e*6naJsQJr%{o(AqDd?is6oc2Zrtw1Ww23QT+wL!QCU(OH$%^2yDb)>_|E_X6qMM4?jmQn!?HVgl<oYZU#Nv}ne94AlqCoGn>%Re*z2gO^V^PHYqM15BuIYxAEWoAFj1+9cMr!&VM2x58=@J?#mVGNDXr$|9a=~SjnF%ZPx9^WsXD|sgCi-$uic~bwGT%D<_l!5jG^-iVL$DLMsy!<F05-2hEK|+M<*4mPr4Xl-",
+  "w0v`B6x;6AYNQZi`tR!}KKILhEQ{0;G3hk!n4^*ZVc`7;Mn$jNLU^SrphZWYA?@I!i_%1z^rL#bf0=ETx<@RJRTQ{gsNr3lky+TM%ofU4O!O+u+>PR{9ku^peV2oT>67;lwGte<wdYz~)!Od)Te$~#@W{b?wb(~(@#<%AZen=a2ASWyO+4p5w<a)uW9QikQ4P3@-(mIx7a{a8HswRSS}$a%G)1=O_*_SsxGQBTtB<p>L^NlGq~&VsNDpoe2CsKFYk%Y|45xP5p5TtN&yvAv1Djp8%OavqpK?epa8-O80i^|cf)OU(5=9pjTwj4|5<QgC`QU@7S<QzjMvxzCqgkPPcIgi!<X|}??mnd2g&FeNpUj?4Ype|_L?JX2P`xbQ*lJNFxY>sl9frzUA;%qrGi`!Hy|x<G!xv;J=c~@>6HZ>+%bYwaE3t(F|B23(G0r7>_xpEckvrbgDLhscT?PvM>ycidti3cgZc=SH(;t$!?BDfUrPDktbu;ZO7GQch%s7~=%-xS4uG3vohyHx#d!rDFsFdRVN<IZaMMJUvAIU?CX-n&i#O5&Ah}{"
 ]
 """)
 
@@ -270,7 +199,15 @@ def _show_passphrase(passphrase):
     print()
 
 
+def _secret_for_question(index):
+    secret = _open_secret(QUESTION_SECRETS[index - 1], "sizeof-bingo:question:" + str(index))
+    if secret is None:
+        print("  [error] Could not open question data -- contact your instructor.")
+        sys.exit(1)
+    return secret
+
 def _ask(q, index, total):
+    secret = _secret_for_question(index)
     print(f"\n  Q{index:02}/{total:02}  {q['expr']}")
     print(f"           Architecture: {q['arch']}")
     print(f"           Hint: {q['hint']}")
@@ -279,15 +216,15 @@ def _ask(q, index, total):
         raw = input("  Your answer: ").strip()
         if not raw:
             continue
-        if raw == q["answer"]:
+        if raw == secret["answer"]:
             if attempts > 0:
-                for ln in _wrap(q["explanation"]):
+                for ln in _wrap(secret.get("explanation", "")):
                     print(ln)
             else:
-                print(f"  Correct.  {q['explanation']}")
+                print(f"  Correct.  {secret.get('explanation', '')}")
             return raw
         attempts += 1
-        _show_wrong(raw, q.get("wrong") or {})
+        _show_wrong(raw, secret.get("wrong") or {})
         print("           Enter a whole number and try again.")
 
 
@@ -297,7 +234,7 @@ def main():
     input("  Press Enter to begin...")
 
     answers = []
-    total   = len(QUESTIONS)
+    total = len(QUESTIONS)
     for i, q in enumerate(QUESTIONS, 1):
         answers.append(_ask(q, i, total))
 
