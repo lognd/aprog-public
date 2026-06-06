@@ -1,0 +1,26 @@
+[template]
+slug = "shell-script"
+name = "Shell Script"
+version = "0.1"
+description = "Assignment where students write a shell script, graded by running it in a controlled environment."
+
+[classification]
+language = "cpp"
+default_difficulty = "medium"
+recommended_topics = ["systems"]
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = true
+expected = false
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = false
+grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false
