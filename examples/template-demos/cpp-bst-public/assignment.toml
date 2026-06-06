@@ -1,0 +1,24 @@
+[assignment]
+slug = "cpp-bst"
+name = "Cpp Bst"
+author = "your-github-handle"
+description = "Implement a binary search tree with insert, search, and in-order traversal."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "medium"
+topics = ["data-structures", "bst", "trees"]
+labels = ["starter-code"]
+
+[template]
+slug = "cpp-header-impl"
+version = "0.1"
+
+[grader]
+visibility = "visible"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "valgrind"]

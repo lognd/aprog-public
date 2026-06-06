@@ -1,0 +1,20 @@
+[assignment]
+slug = "binary-search"
+name = "Binary Search"
+author = "your-github-handle"
+description = "Implement binary search on a sorted list of integers."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "python"
+difficulty = "easy"
+topics = ["searching", "algorithms"]
+
+[template]
+slug = "python-function"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"

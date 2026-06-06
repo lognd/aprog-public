@@ -1,0 +1,21 @@
+[assignment]
+slug = "stack-adt"
+name = "Stack Adt"
+author = "your-github-handle"
+description = "Implement a Stack ADT using a Python list as the underlying storage."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "python"
+difficulty = "easy"
+topics = ["data-structures", "stack"]
+labels = ["unit-tests"]
+
+[template]
+slug = "python-pytest"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"

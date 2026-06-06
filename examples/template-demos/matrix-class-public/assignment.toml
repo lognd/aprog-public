@@ -1,0 +1,24 @@
+[assignment]
+slug = "matrix-class"
+name = "Matrix Class"
+author = "your-github-handle"
+description = "Implement a 2D matrix class supporting addition, multiplication, and transposition."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "medium"
+topics = ["linear-algebra", "classes", "memory-management"]
+labels = ["starter-code"]
+
+[template]
+slug = "cpp-class"
+version = "0.1"
+
+[grader]
+visibility = "visible"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "valgrind"]

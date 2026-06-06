@@ -1,0 +1,23 @@
+[assignment]
+slug = "word-count"
+name = "Word Count"
+author = "your-github-handle"
+description = "Count the words on each line of input and print a per-line and total word count."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "easy"
+topics = ["strings", "stdin-stdout"]
+
+[template]
+slug = "cpp-makefile"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["make", "g++", "valgrind"]

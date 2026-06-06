@@ -1,0 +1,23 @@
+[assignment]
+slug = "reverse-string"
+name = "Reverse String"
+author = "your-github-handle"
+description = "Read a line from stdin and print it with its characters in reverse order."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "easy"
+topics = ["strings", "stdin-stdout"]
+
+[template]
+slug = "cpp-stdin-stdout"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++"]
