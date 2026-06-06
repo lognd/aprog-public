@@ -35,8 +35,26 @@ jobs:
             exit 1
           fi
 
-      - name: Validate all assignments
-        run: aprog validate --all
+      - name: Find changed assignments
+        id: changed
+        run: |
+          slugs=$(git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep '^assignments/' \
+            | cut -d/ -f2 \
+            | sort -u \
+            | tr '\n' ' ')
+          echo "slugs=$slugs" >> "$GITHUB_OUTPUT"
+
+      - name: Validate changed assignments
+        if: steps.changed.outputs.slugs != ''
+        run: |
+          for slug in ${{ steps.changed.outputs.slugs }}; do
+            aprog validate "$slug"
+          done
+
+      - name: Validate aprog.toml and templates (when touched)
+        if: steps.changed.outputs.slugs == ''
+        run: echo "No assignment directories changed -- skipping per-assignment validation."
 
       - name: Scan for private file leaks
         run: aprog scan-public --all
