@@ -1,13 +1,7 @@
 # mypy: ignore-errors
 from __future__ import annotations
 
-import pytest
-from pydantic import ValidationError
-
 from aprog.models.root_config import (
-    ClassificationConfig,
-    DifficultyEntry,
-    LanguageEntry,
     RootConfig,
 )
 

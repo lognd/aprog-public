@@ -11,7 +11,6 @@ grader actually executes. Marked slow because it spawns a subprocess.
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 import pytest
@@ -21,7 +20,6 @@ from aprog.commands.intake_cmd import cmd_intake
 from aprog.commands.new_cmd import cmd_new
 from aprog.commands.package_cmd import cmd_package_private
 from aprog.commands.validate_cmd import cmd_validate
-from aprog.commands.verify_cmd import cmd_verify
 
 SLUG = "echo-assignment"
 

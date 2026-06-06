@@ -47,7 +47,7 @@ def cmd_verify(
 
     ht_dir = private_repo / "hidden-tests" / slug
     if not ht_dir.exists():
-        console.print(f"[dim]Note:[/dim] No hidden-tests directory found (optional)")
+        console.print("[dim]Note:[/dim] No hidden-tests directory found (optional)")
 
     # Run grader against reference solution
     import sys
@@ -59,7 +59,7 @@ def cmd_verify(
         from pipeline import make_pipeline  # type: ignore[import-not-found]
     except ImportError as e:
         console.print(f"[red]Import error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     console.print(f"Running grader against reference solution for '{slug}'...")
 
@@ -75,7 +75,7 @@ def cmd_verify(
             score = pipeline()
     except Exception as e:
         console.print(f"[red]Pipeline error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
     finally:
         sys.path.pop(0)
 
@@ -92,9 +92,9 @@ def cmd_verify(
         _update_verification_state(private_repo, slug, "verified")
     else:
         console.print(
-            f"[red][FAIL][/red] Verification failed: reference solution did not earn full points"
+            "[red][FAIL][/red] Verification failed: reference solution did not earn full points"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
 
 def _update_verification_state(private_repo: Path, slug: str, state: str) -> None:
@@ -120,7 +120,7 @@ def cmd_package_gradescope(
     public_root = public_repo or find_public_root()
     if not private_repo:
         console.print("[red]Error:[/red] --private is required")
-        raise typer.Exit(2)
+        raise typer.Exit(2) from None
 
     from aprog.utils.repo import load_assignment_config
 
@@ -128,7 +128,7 @@ def cmd_package_gradescope(
         cfg = load_assignment_config(public_root, slug)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     import zipfile
 
@@ -147,13 +147,13 @@ def cmd_package_gradescope(
             + ", ".join(missing_generated)
         )
         console.print(f"  Run: aprog generate-config {slug} --force")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     if not (private_repo / "grader" / slug / "pipeline.py").exists():
         console.print(
             f"[red]Error:[/red] Grader pipeline missing: grader/{slug}/pipeline.py"
         )
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     dist = (output_dir or public_root / "dist").resolve()
     dist.mkdir(parents=True, exist_ok=True)

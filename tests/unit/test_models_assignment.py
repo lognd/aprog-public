@@ -6,10 +6,6 @@ from pydantic import ValidationError
 
 from aprog.models.assignment import (
     AssignmentConfig,
-    AssignmentSection,
-    ClassificationSection,
-    GraderSection,
-    TemplateSection,
 )
 
 

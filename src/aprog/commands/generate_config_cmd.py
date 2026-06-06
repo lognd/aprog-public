@@ -99,7 +99,7 @@ def cmd_generate_config(
         cfg = load_assignment_config(root, slug)
     except FileNotFoundError as e:
         console.print(f"[red]Error:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     gen_dir = root / "generated" / "assignments" / slug
     manifest_path = gen_dir / "assignment-manifest.json"
