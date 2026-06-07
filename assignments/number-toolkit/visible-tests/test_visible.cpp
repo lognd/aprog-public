@@ -27,6 +27,22 @@ int main() {
     assert(nth_fibonacci(1) == 1);
     assert(nth_fibonacci(7) == 13);
 
+    // is_power_of_two
+    assert(is_power_of_two(1)  == true);
+    assert(is_power_of_two(8)  == true);
+    assert(is_power_of_two(6)  == false);
+    assert(is_power_of_two(0)  == false);
+
+    // popcount
+    assert(popcount(0)  == 0);
+    assert(popcount(1)  == 1);
+    assert(popcount(13) == 3);   // 0b1101
+
+    // is_abundant
+    assert(is_abundant(12) == true);   // 1+2+3+4+6 = 16 > 12
+    assert(is_abundant(6)  == false);  // 1+2+3 = 6 (perfect, not abundant)
+    assert(is_abundant(1)  == false);
+
     std::cout << "All visible tests passed.\n";
     return 0;
 }

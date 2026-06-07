@@ -33,3 +33,27 @@ long long nth_fibonacci(long long n) {
     // TODO
     return 0;
 }
+
+// Returns true if n is a power of two (n > 0 and exactly one bit is set).
+// Must use bitwise operations; no loops or division.
+bool is_power_of_two(long long n) {
+    // TODO
+    return false;
+}
+
+// Returns the number of 1-bits in the binary representation of n.
+// Example: popcount(13) == 3  because 13 == 0b1101
+// Must use bit manipulation (shifts and masks); no library functions.
+int popcount(unsigned long long n) {
+    // TODO
+    return 0;
+}
+
+// Returns true if n is abundant: the sum of its proper divisors exceeds n.
+// A proper divisor of n is a positive divisor strictly less than n.
+// Example: is_abundant(12) == true  because 1+2+3+4+6 = 16 > 12
+// is_abundant(1) == false, is_abundant(6) == false (6 is perfect, not abundant)
+bool is_abundant(long long n) {
+    // TODO
+    return false;
+}
