@@ -62,11 +62,23 @@ name = "I/O"
 [classification.topics.systems]
 name = "Systems"
 
+[classification.topics.build-systems]
+name = "Build Systems"
+
 [classification.topics.memory-management]
 name = "Memory Management"
 
 [classification.topics.concurrency]
 name = "Concurrency"
+
+[classification.concepts.makefile]
+name = "Makefile"
+
+[classification.concepts.cmake]
+name = "CMake"
+
+[classification.concepts.static-libraries]
+name = "Static Libraries"
 
 [classification.concepts.recursion]
 name = "Recursion"
