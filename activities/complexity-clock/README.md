@@ -1,35 +1,62 @@
 # Complexity Clock
 
-Four programmers each wrote a function to compute the sum 1 + 2 + ... + n.
-Every function returns the correct answer.  But they are not equally fast.
-
-Your job is not to run the code -- it is to *count*.  For each function, trace
-through it by hand and determine exactly how many times the marked line
-executes when n = 10.
+Seven programmers each wrote a function to compute the same value. Every
+function returns the correct answer. They are not equally fast.
 
 ## Getting started
 
     python3 launch.py
 
-No shell drop, no compiling.  Four functions appear one at a time.  For each,
-type the number of times the marked line runs.  Wrong answers are explained
-and re-prompted.
+A shell opens with `clock.cpp` and a `Makefile`. Build the benchmark and
+run it. Study the timing output and the source code. When you are ready,
+type `exit` and answer two questions.
 
-## How to count
+## Your task
 
-Pick a small concrete value of n and trace manually:
+1. Build and run the benchmark.
+2. Read the timing output.
+3. Read every function in `clock.cpp`, including any helpers.
+4. Exit the shell and answer the questions.
 
-1. Find the marked line  `// <--`
-2. Identify which loop (or loops) contain it
-3. For each loop, determine how many times its body runs
-4. Multiply nested loop counts together; add them up when loops are sequential
+## You will know you are done when...
 
-A good strategy: build a table.  For a nested loop, list the outer variable
-down one side and count inner iterations across.
+Both questions are correct and the launcher reveals the passphrase.
 
-## Rules
+## Hints
 
-- Do NOT run the code or use a compiler.
-- Trace by hand.  The whole point is the process, not the answer.
-- Wrong answers are explained and re-prompted.
-- All four must be correct to receive the passphrase.
+<details>
+<summary>Hint 1 -- reading the output</summary>
+
+The `Time` column shows how long each function took in milliseconds. All
+seven produce the same answer. Look for the one that is dramatically slower
+than the others. Once you have identified it, read its source code
+carefully -- all of it, including any functions it calls.
+
+Do not be misled by code that looks complicated or has nested loops.
+Read what the code actually does, not just what it looks like at a glance.
+
+</details>
+
+<details>
+<summary>Hint 2 -- why the slow one is slow</summary>
+
+A function that calls another function is not necessarily O(1) per call.
+The cost of a function call depends on what that function does. If a
+function contains a loop, every call to it runs that loop.
+
+Ask yourself: if the outer loop in the slow function runs N times, and
+each iteration calls a helper, how many total loop iterations happen?
+What does the helper do for a call with argument k?
+
+</details>
+
+<details>
+<summary>Hint 3 -- the doubling question</summary>
+
+Work out the total number of operations for small N.
+For N=4: tally(1) + tally(2) + tally(3) + tally(4) = 1+2+3+4 = 10
+For N=8: tally(1)+...+tally(8) = 1+2+...+8 = 36
+When N doubles from 4 to 8, the work goes from 10 to 36 -- roughly a
+factor of 4, not 2. The general formula is N*(N+1)/2, which grows as N^2.
+
+</details>
