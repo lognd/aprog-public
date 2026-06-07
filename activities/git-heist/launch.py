@@ -53,7 +53,7 @@ def main():
         echo ""
     """))
     rcfile.close()
-    atexit.register(lambda: os.remove(rcfile.name))
+    atexit.register(lambda: os.path.exists(rcfile.name) and os.remove(rcfile.name))
 
     shell = os.environ.get("SHELL", "/bin/bash")
     subprocess.run([shell, "--rcfile", rcfile.name])
