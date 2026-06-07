@@ -15,10 +15,6 @@ trap 'rm -rf "$tmp"' EXIT
 
 mkdir -p "$tmp/grader" "$tmp/solutions"
 cp -r "$PRIVATE/grader/$SLUG"    "$tmp/grader/"
-cp -r "$PRIVATE/solutions/$SLUG" "$tmp/solutions/"
-if [ -d "$PRIVATE/hidden-tests/$SLUG" ]; then
-    mkdir -p "$tmp/hidden-tests"
-    cp -r "$PRIVATE/hidden-tests/$SLUG" "$tmp/hidden-tests/"
-fi
+cp -r "$PRIVATE/solutions/assignments/$SLUG" "$tmp/solutions/"
 
 "$APROG" verify "$SLUG" --private "$tmp" --public "$PUBLIC"
