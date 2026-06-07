@@ -3,7 +3,7 @@
 # To update: edit quiz-data/control-gauntlet.json and re-run the generator.
 """Control Gauntlet
 
-Short-circuit evaluation, De Morgan's law, break, and continue. Fix demorgan.cpp and break_continue.cpp; short_circuit.cpp is an exploration demo.
+Short-circuit evaluation, De Morgan's law, break, and continue. Fix search.cpp, filter.cpp, and leap.cpp; short_circuit.cpp is an exploration demo.
 """
 import os, shutil, subprocess, sys, tempfile, zipfile, textwrap
 import hashlib as _hl, hmac as _hm
@@ -13,7 +13,7 @@ REPO_ZIP   = os.path.join(SCRIPT_DIR, "repo.zip")
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
 _KDF_ITERS = 100000
-_BLOB      = "6148e3d52fc041d42fedec3cba81598fae5bd94cb9105f099865b0a4bc9c5daeab29e312834d60f3c50765da6258"
+_BLOB      = "c07f9744b9eb9c0e1e571f4c3cc53cd5136316712eccf5ed7d302d7e7606864cce813c80fe7b92e459fb2a6a7dfb"
 
 def _decrypt(key_str):
     key  = _hl.pbkdf2_hmac("sha256", key_str.encode(), _SALT, _KDF_ITERS)
@@ -64,18 +64,22 @@ def _compile_run(src, name, repo_dir):
     return run.stdout.strip(), None
 
 def _validate(repo_dir):
-    out_dm, err_dm = _compile_run("demorgan.cpp", "demorgan", repo_dir)
-    if out_dm is None:
-        return False, "compile-error", "demorgan.cpp", err_dm
-    out_bc, err_bc = _compile_run("break_continue.cpp", "break_continue", repo_dir)
-    if out_bc is None:
-        return False, "compile-error", "break_continue.cpp", err_bc
-    key_str = f"{out_dm}|{out_bc}"
+    out_s, err_s = _compile_run("search.cpp", "search", repo_dir)
+    if out_s is None:
+        return False, "compile-error", "search.cpp", err_s
+    out_f, err_f = _compile_run("filter.cpp", "filter", repo_dir)
+    if out_f is None:
+        return False, "compile-error", "filter.cpp", err_f
+    out_l, err_l = _compile_run("leap.cpp", "leap", repo_dir)
+    if out_l is None:
+        return False, "compile-error", "leap.cpp", err_l
+    key_str = f"{out_s}|{out_f}|{out_l}"
     return True, key_str, None, None
 
 def _all_binaries_exist(repo_dir):
-    return (os.path.isfile(os.path.join(repo_dir, "demorgan")) and
-            os.path.isfile(os.path.join(repo_dir, "break_continue")))
+    return (os.path.isfile(os.path.join(repo_dir, "search")) and
+            os.path.isfile(os.path.join(repo_dir, "filter")) and
+            os.path.isfile(os.path.join(repo_dir, "leap")))
 
 def main():
     if not os.path.isfile(REPO_ZIP):
@@ -95,25 +99,31 @@ def main():
        Control Gauntlet
       ============================================================
 
-       Three programs.  One to explore, two to fix.
+       Four programs.  One to explore, three to fix.
        
          Step 1 -- run the demo (nothing to fix):
            g++ -std=c++17 -o short_circuit short_circuit.cpp && ./short_circuit
            Watch which function calls get skipped.
        
-         Step 2 -- fix the bug in demorgan.cpp:
-           The function keep() uses the wrong logical operator.
-           Apply De Morgan's law and change one character.
-           Expected output:  Kept: 5
+         Step 2 -- fix the bug in search.cpp:
+           The loop never stops at the first prime it finds.
+           Add one statement so it exits as soon as first is set.
+           Expected output:  First prime in [100..200]: 101
        
-         Step 3 -- fix the two bugs in break_continue.cpp:
-           Loop 1 needs a break; to stop at the first match.
-           Loop 2 needs a continue; to skip even numbers.
-           Expected output:  First: 7 Sum: 25
+         Step 3 -- fix the bug in filter.cpp:
+           The if-body that should skip non-coprime numbers is empty.
+           Add the missing control-flow statement.
+           Expected output:  Sum coprime to 10 in [1..100]: 2000
        
-         Step 4 -- compile both fixed programs:
-           g++ -std=c++17 -o demorgan demorgan.cpp
-           g++ -std=c++17 -o break_continue break_continue.cpp
+         Step 4 -- fix the bug in leap.cpp:
+           The logical operators in is_leap() violate De Morgan's law.
+           Fix the operators so the rule matches the comment above the function.
+           Expected output:  Leap years in [1900..2000]: 25  (plus three spot checks)
+       
+         Step 5 -- compile all three fixed programs:
+           g++ -std=c++17 -o search search.cpp
+           g++ -std=c++17 -o filter filter.cpp
+           g++ -std=c++17 -o leap   leap.cpp
        
          Then type 'exit'.  The launcher checks your work.
       ============================================================
@@ -136,8 +146,9 @@ def main():
             if not _all_binaries_exist(repo_dir):
                 print()
                 print("  Please compile both programs before exiting:")
-                print("    g++ -std=c++17 -o demorgan demorgan.cpp")
-                print("    g++ -std=c++17 -o break_continue break_continue.cpp")
+                print("    g++ -std=c++17 -o search search.cpp")
+                print("    g++ -std=c++17 -o filter filter.cpp")
+                print("    g++ -std=c++17 -o leap   leap.cpp")
                 print()
                 try:
                     again = input("  Try again? [y/n] ").strip().lower()
