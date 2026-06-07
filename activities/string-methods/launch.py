@@ -54,8 +54,8 @@ def main():
          make run
 
        When the output looks correct, type 'exit'.
-       The LMS passcode is the first letter of each output line,
-       read in order.
+       The LMS passcode is the word (all lowercase) spelled by
+       the first letter of each output line, read top to bottom.
       ============================================================
 
     """)
@@ -73,8 +73,8 @@ def main():
         print()
         _banner("String Methods -- Done")
         print()
-        print("  The LMS passcode is the word spelled by the first letter")
-        print("  of each output line, read top to bottom.")
+        print("  The LMS passcode is the word (all lowercase) spelled by")
+        print("  the first letter of each output line, read top to bottom.")
         print()
     finally:
         try:
