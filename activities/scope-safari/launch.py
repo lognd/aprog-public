@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""
+Scope Safari activity launcher.
+Opens a shell for the student to work in, then validates by compiling
+and running their fixed main.cpp before cleaning up the temp directory.
+"""
+import os, sys, shutil, subprocess, tempfile, zipfile, textwrap
+import hashlib as _hl, hmac as _hm
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ZIP   = os.path.join(SCRIPT_DIR, "repo.zip")
+
+# -- Crypto -------------------------------------------------------------------
+# Blob is keyed on the exact stripped stdout of the correctly-fixed program.
+
+_SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
+_KDF_ITERS = 100000
+_BLOB      = "9efd370845e9374509eb27b86a38b8c983856631115e507ec2dc489af8cd5cc822d6d5a87f13e9fc1c710756025ec49cd39752ae0a24d9"
+
+def _decrypt(key_str):
+    key  = _hl.pbkdf2_hmac("sha256", key_str.encode(), _SALT, _KDF_ITERS)
+    blob = bytes.fromhex(_BLOB)
+    ct, mac = blob[:-32], blob[-32:]
+    if not _hm.compare_digest(mac, _hm.new(key, ct, _hl.sha256).digest()):
+        return None
+    ks, i, stream = b"", 0, b""
+    while len(stream) < len(ct):
+        stream += _hl.sha256(key + i.to_bytes(4, "little")).digest()
+        i += 1
+    return bytes(a ^ b for a, b in zip(ct, stream)).decode()
+
+# -- Validation ---------------------------------------------------------------
+
+def _validate(repo_dir):
+    binary = os.path.join(repo_dir, "safari")
+    r = subprocess.run(
+        ["g++", "-std=c++17", "-Wall", "-Wshadow", "-o", binary,
+         os.path.join(repo_dir, "main.cpp")],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return False, "compile-error", r.stderr
+    try:
+        run = subprocess.run([binary], capture_output=True, text=True, timeout=10)
+    except subprocess.TimeoutExpired:
+        return False, "timeout", ""
+    key_str = run.stdout.strip()
+    return True, key_str, run.stdout
+
+# -- Helpers ------------------------------------------------------------------
+
+_LINE_WIDTH = 70
+
+def _banner(title):
+    print("=" * _LINE_WIDTH)
+    pad = (_LINE_WIDTH - len(title) - 2) // 2
+    print(" " * pad + " " + title + " " * pad)
+    print("=" * _LINE_WIDTH)
+
+def _hr():
+    print("-" * _LINE_WIDTH)
+
+def _wrap(text):
+    for line in textwrap.wrap(text, width=_LINE_WIDTH - 4,
+                              initial_indent="  ",
+                              subsequent_indent="    "):
+        print(line)
+
+def _show_passphrase(passphrase):
+    print()
+    _hr()
+    print(f"  Passphrase: {passphrase}")
+    _hr()
+    print()
+
+def die(msg):
+    print(f"error: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+# -- Main ---------------------------------------------------------------------
+
+def main():
+    if not os.path.isfile(REPO_ZIP):
+        die("repo.zip not found.")
+
+    work_dir = tempfile.mkdtemp(prefix="scope-safari-")
+
+    with zipfile.ZipFile(REPO_ZIP, "r") as zf:
+        zf.extractall(work_dir)
+
+    entries = os.listdir(work_dir)
+    if len(entries) != 1:
+        shutil.rmtree(work_dir, ignore_errors=True)
+        die("unexpected zip structure")
+    repo_dir = os.path.join(work_dir, entries[0])
+
+    rcfile = tempfile.NamedTemporaryFile(mode="w", suffix=".rc", delete=False)
+    banner_text = textwrap.dedent(f"""\
+
+      ============================================================
+       Scope Safari
+      ============================================================
+
+       Files: main.cpp, explore.cpp, Makefile
+
+       main.cpp has bugs.  The program should print:
+         Multiples of 3 in [1..30]: 10
+         Above 7 in [1..10]: 3
+         Above 14 in [1..20]: 6
+
+       Fix main.cpp until the output is correct, then type 'exit'.
+      ============================================================
+
+    """)
+    rcfile.write(
+        f'PS1=\'\\u@scope-safari:\\W\\$ \'\n'
+        f'cd "{repo_dir}"\n'
+        "cat << 'BANNER'\n" + banner_text + "\nBANNER\n"
+    )
+    rcfile.close()
+
+    shell = os.environ.get("SHELL", "/bin/bash")
+
+    try:
+        while True:
+            subprocess.run([shell, "--rcfile", rcfile.name])
+            print()
+            _banner("Scope Safari -- Checking Your Work")
+            print()
+
+            ok, key_str, which = _validate(repo_dir)
+
+            if not ok:
+                if key_str == "compile-error":
+                    print("  main.cpp did not compile.  Error:\n")
+                    for line in which.strip().splitlines():
+                        print(f"    {line}")
+                elif key_str == "timeout":
+                    print("  Program did not finish in time.")
+            else:
+                passphrase = _decrypt(key_str)
+                if passphrase is not None:
+                    _show_passphrase(passphrase)
+                    break
+                print("  Program compiled and ran, but the output was not correct.")
+                print()
+                print(f"  Got:      {key_str!r}")
+                expected = "Multiples of 3 in [1..30]: 10\nAbove 7 in [1..10]: 3\nAbove 14 in [1..20]: 6"
+                print(f"  Expected: {expected!r}")
+
+            print()
+            try:
+                again = input("  Try again? [y/n] ").strip().lower()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                break
+            if again == "y":
+                print()
+                continue
+            break
+    finally:
+        try:
+            os.remove(rcfile.name)
+        except OSError:
+            pass
+        shutil.rmtree(work_dir, ignore_errors=True)
+
+
+if __name__ == "__main__":
+    main()

@@ -133,4 +133,48 @@ Single-file C stdin/stdout assignments.
 
 **Demo:** `examples/template-demos/caesar-cipher-staging/`
 
-Private grader pattern: `CMakeBuild` or `MakefileBuild` + `OutputCompareTest`.
+Private grader pattern: `InjectStudentIntoStaff` + `CMakeBuild` + `OutputCompareTest`.
+
+---
+
+## Systems templates
+
+### `shell-script`
+
+Shell scripting assignments. Students submit a `.sh` script.
+
+Private grader pattern: `SourceCheck` + `PrebuiltArtifacts` (sets execute bit automatically) + `OutputCompareTest`.
+
+Note: the submitted `.sh` file must have a valid shebang (e.g. `#!/bin/bash`) as its first line so the OS can execute it directly. No `chmod` needed in `setup.sh` -- `PrebuiltArtifacts` sets the execute bit.
+
+---
+
+## C++ no-CMake templates
+
+These templates compile student code directly with `g++` via `GXXBuild`, without requiring a `CMakeLists.txt`. Use them when the submission is a small number of files and you do not need the CMake artifact discovery system.
+
+### `cpp-single-file`
+
+Students submit one `.cpp` file. Grader compiles it directly with `g++` and tests I/O correctness plus Valgrind memory safety.
+
+Private grader pattern: `SourceCheck` + `GXXBuild` + `OutputCompareTest` + `ValgrindTest`.
+
+Use when: the assignment is a standalone program (sorting, string manipulation, basic data structures without a separate header).
+
+### `cpp-asan`
+
+Students submit one `.cpp` file. Grader compiles with `-fsanitize=address,undefined` and uses `ASanTest` to detect memory errors at runtime.
+
+Private grader pattern: `SourceCheck` + `GXXBuild(sanitizers=["address","undefined"])` + `OutputCompareTest` + `ASanTest`.
+
+Use when: the assignment emphasizes memory management (manual dynamic allocation, pointer arithmetic, resource ownership). ASan provides more actionable error messages than Valgrind for heap-based errors.
+
+Note: `ASanTest` requires the binary to be compiled with ASan. The grader's `setup.sh` only needs `g++` (ASan is built into GCC >= 4.8 on Linux).
+
+### `cpp-compile-check`
+
+Students submit a `.hpp` header. Grader tests both runtime correctness (via a grader-provided `main.cpp`) and compile-time rules using `CompileCheckTest`.
+
+Private grader pattern: `SourceCheck` + `GXXBuild` + `OutputCompareTest` + `CompileCheckTest`.
+
+Use when: the assignment has C++ language rules that must be enforced at compile time: const correctness, access specifiers, deleted constructors, template constraints, SFINAE, or C++20 concepts.

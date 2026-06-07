@@ -1,0 +1,27 @@
+# {{ assignment_name }}
+
+<!-- FILL IN: write the problem statement here. -->
+
+## Submission
+
+Submit a single header file named `{{ artifact_name }}.hpp`.
+
+Your header must:
+- Declare the full `{{ artifact_name | capitalize }}` class interface
+- Be self-contained (bring in your own `#include` directives)
+- Compile cleanly at `-std=c++17`
+
+## Grading
+
+| Component             | Points |
+|----------------------|--------|
+| Compilation           | 10     |
+| Correctness           | varies |
+| Compile-Time Rules    | varies |
+
+The grader checks not just whether your code runs correctly, but also that
+your class properly **rejects** illegal operations at compile time (e.g.
+mutating a `const` object, calling a deleted constructor, etc.).
+
+Code that compiles when it should not, or fails to compile when it should,
+will lose points.

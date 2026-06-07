@@ -5,9 +5,7 @@ Grader: {{ assignment_name }}
 Pipeline:
   LocalDirectory          -- reads student submission
   SourceCheck             -- validates {{ artifact_name }}.cpp submitted
-  InjectStudentIntoStaff  -- copies .cpp into grader dir for CMake
-  CMakeManifestCheck      -- verifies grader CMakeLists.txt
-  CMakeBuild              -- compiles student binary
+  GXXBuild                -- compiles {{ artifact_name }}.cpp with g++ directly (no CMake)
   OutputCompareTest       -- visible I/O correctness cases
   OutputCompareTest       -- hidden I/O correctness cases
   ValgrindTest            -- memory safety (extra credit)
@@ -19,24 +17,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import lograder.output.layout.check.source  # noqa: F401
-import lograder.output.layout.pipeline.build  # noqa: F401
-import lograder.output.layout.pipeline.mixin  # noqa: F401
-import lograder.output.layout.project.simple_project  # noqa: F401
-import lograder.output.layout.test.output_compare  # noqa: F401
-import lograder.output.layout.test.valgrind  # noqa: F401
-
-from lograder.pipeline.build.cmake import CMakeBuild
-from lograder.pipeline.check.project.simple_project import (
-    CMakeManifest,
-    CMakeManifestCheck,
-)
-from lograder.pipeline.check.source.source_check import (
-    SourceCheck,
-)
+from lograder.pipeline.build.gxx import GXXBuild
+from lograder.pipeline.check.source.source_check import SourceCheck
 from lograder.pipeline.input.local_directory import LocalDirectory
 from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
-from lograder.pipeline.mixin.mixin import InjectStudentIntoStaff
 from lograder.pipeline.pipeline import Pipeline
 from lograder.pipeline.score import (
     AllOrNothingScorer,
@@ -48,6 +32,7 @@ from lograder.pipeline.score import (
 )
 from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
 from lograder.pipeline.test.valgrind import ValgrindCase, ValgrindTest
+from lograder.process.registry.gcc import GNUXXStandard
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -116,7 +101,6 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
     pipeline.add(LocalDirectory(root=submission_dir))
 
     # -- 2. Source check -- validates file is submitted -----------------------
-    # Add constraints here if you want to forbid specific constructs.
     pipeline.add(source := SourceCheck(
         language="cpp",
         files=["{{ artifact_name }}.cpp"],
@@ -131,32 +115,25 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
     )
     source.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
 
-    # -- 3. Inject student source into grader dir for CMake -------------------
-    pipeline.add(InjectStudentIntoStaff(
-        _GRADER_DIR,
-        student_files=["{{ artifact_name }}.cpp"],
+    # -- 3. Compile with g++ --------------------------------------------------
+    pipeline.add(build := GXXBuild(
+        sources=["{{ artifact_name }}.cpp"],
+        output="{{ artifact_name }}",
+        standard=GNUXXStandard.CXX17,
     ))
-
-    # -- 4. CMake manifest check ----------------------------------------------
-    pipeline.add(cmake_check := CMakeManifestCheck())
-    cmake_check.scorer = AllOrNothingScorer(0.0, label="CMake Setup")
-    cmake_check.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
-
-    # -- 5. Build -------------------------------------------------------------
-    pipeline.add(build := CMakeBuild())
     build.scorer = AllOrNothingScorer(0.0, label="Compilation")
-    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
+    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
 
-    # -- 6. Visible correctness tests -----------------------------------------
+    # -- 4. Visible correctness tests -----------------------------------------
     pipeline.add(visible := OutputCompareTest("{{ artifact_name }}", _VISIBLE_CASES))
     visible.scorer = TestCaseScorer(
         _VISIBLE_POINTS,
         gimme=GimmeConfig(min_pass_fraction=0.25, points=5.0),
         label="Visible Correctness",
     )
-    visible.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="4")
+    visible.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
 
-    # -- 7. Hidden correctness tests ------------------------------------------
+    # -- 5. Hidden correctness tests ------------------------------------------
     pipeline.add(hidden := OutputCompareTest("{{ artifact_name }}", _HIDDEN_CASES))
     hidden.scorer = TestCaseScorer(
         _HIDDEN_POINTS,
@@ -164,14 +141,14 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
         label="Hidden Correctness",
     )
     hidden.scorer.gradescope = GradescopeTestConfig(
-        visibility="after_due_date", number="5"
+        visibility="after_due_date", number="4"
     )
 
-    # -- 8. Memory safety (extra credit) --------------------------------------
+    # -- 6. Memory safety (extra credit) --------------------------------------
     pipeline.add(vg := ValgrindTest("{{ artifact_name }}", _VALGRIND_CASES))
     vg.scorer = AllOrNothingScorer(0.0, extra_credit=5.0, label="Memory Safety")
     vg.scorer.gradescope = GradescopeTestConfig(
-        visibility="after_due_date", number="6"
+        visibility="after_due_date", number="5"
     )
 
     return pipeline

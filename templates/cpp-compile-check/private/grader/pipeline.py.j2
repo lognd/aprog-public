@@ -1,0 +1,189 @@
+"""
+Grader: {{ assignment_name }}
+{{ "=" * (8 + (assignment_name | length)) }}
+
+Pipeline:
+  SourceCheck               -- checks that {{ artifact_name }}.hpp is present; optional constraints
+  GXXBuild                  -- compiles with grader main.cpp to verify functional correctness
+  OutputCompareTest         -- I/O correctness of the runtime behavior
+  CompileCheckTest          -- compile-time correctness: asserts that certain code
+                               compiles OR fails to compile (const, access, deleted
+                               constructors, templates, SFINAE, concepts)
+
+Private layout:
+  grader/
+    main.cpp                  (driver that includes {{ artifact_name }}.hpp and exercises it)
+    pipeline.py               (this file)
+  solution/
+    solution.hpp              (staff reference implementation)
+
+setup.sh installs: g++
+
+Tip: use CompileCase(should_compile=False) to assert that illegal operations
+(e.g. mutating a const member) are rejected at compile time.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from lograder.pipeline.build.gxx import GXXBuild
+from lograder.pipeline.check.source.source_check import SourceCheck
+from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
+from lograder.pipeline.pipeline import Pipeline
+from lograder.pipeline.score import (
+    AllOrNothingScorer,
+    CleanRunScorer,
+    GimmeConfig,
+    GradescopeConfig,
+    GradescopeTestConfig,
+    TestCaseScorer,
+)
+from lograder.pipeline.test.compile_check import CompileCase, CompileCheckTest
+from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
+from lograder.process.registry.gcc import GNUXXStandard
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+
+_GRADER_DIR = Path(__file__).parent
+_SUBMISSION_DIR = Path("/autograder/submission")
+
+# ---------------------------------------------------------------------------
+# I/O correctness cases
+# FILL IN: test the runtime behavior of the student's implementation.
+# ---------------------------------------------------------------------------
+
+_IO_CASES: list[OutputCompareCase] = [
+    OutputCompareCase(
+        name="basic_usage",
+        args=[],           # FILL IN
+        stdin=b"",         # FILL IN
+        expected_stdout="TODO\n",
+        comparison=ComparisonMode.STRIP,
+    ),
+]
+
+_IO_POINTS: dict[str, float] = {
+    "basic_usage": 20.0,
+}
+
+# ---------------------------------------------------------------------------
+# Compile-time check cases
+# FILL IN: test that the student's type enforces the right compile-time rules.
+#
+# Each CompileCase either:
+#   should_compile=True  -- valid code that must compile
+#   should_compile=False -- illegal code that must NOT compile
+#
+# preamble: code before main().  Put #includes and type declarations here.
+# code:     snippet placed inside main() (or the full TU if "// NO_MAIN" in preamble).
+# ---------------------------------------------------------------------------
+
+_COMPILE_CASES: list[CompileCase] = [
+    # Example: enforce const-correctness on getter
+    CompileCase(
+        name="const_getter_compiles",
+        preamble='#include "{{ artifact_name }}.hpp"',
+        code="const {{ artifact_name | capitalize }} obj; (void)obj.get_value();",
+        should_compile=True,
+        standard=GNUXXStandard.CXX17,
+    ),
+    CompileCase(
+        name="const_setter_forbidden",
+        preamble='#include "{{ artifact_name }}.hpp"',
+        code="const {{ artifact_name | capitalize }} obj; obj.set_value(1);",
+        should_compile=False,
+        standard=GNUXXStandard.CXX17,
+    ),
+    # FILL IN: add more cases for your specific compile-time requirements.
+]
+
+_COMPILE_POINTS: dict[str, float] = {
+    "const_getter_compiles": 10.0,
+    "const_setter_forbidden": 10.0,
+    # FILL IN
+}
+
+
+# ---------------------------------------------------------------------------
+# Pipeline factory
+# ---------------------------------------------------------------------------
+
+
+def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    pipeline = Pipeline()
+
+    # -- 1. Read student submission -------------------------------------------
+    pipeline.add(LocalDirectory(root=submission_dir))
+
+    # -- 2. Source check ------------------------------------------------------
+    pipeline.add(source := SourceCheck(
+        language="cpp",
+        files=["{{ artifact_name }}.hpp"],
+        constraints=[],
+        label="{{ artifact_name }}.hpp submitted",
+    ))
+    source.scorer = CleanRunScorer(
+        0.0,
+        max_errors=0,
+        require_ok_return=True,
+        label="File Submitted",
+    )
+    source.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
+
+    # -- 3. Build with grader-provided main -----------------------------------
+    pipeline.add(build := GXXBuild(
+        sources=["{{ artifact_name }}.hpp"],  # header-only: include via main.cpp
+        output="{{ artifact_name }}_driver",
+        extra_sources=[_GRADER_DIR / "main.cpp"],
+        include_dirs=[_GRADER_DIR / "include"],  # FILL IN if grader headers are needed
+        standard=GNUXXStandard.CXX17,
+    ))
+    build.scorer = AllOrNothingScorer(10.0, label="Compilation")
+    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
+
+    # -- 4. Runtime correctness -----------------------------------------------
+    pipeline.add(io := OutputCompareTest("{{ artifact_name }}_driver", _IO_CASES))
+    io.scorer = TestCaseScorer(
+        _IO_POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=5.0),
+        label="Correctness",
+    )
+    io.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
+
+    # -- 5. Compile-time rules ------------------------------------------------
+    pipeline.add(cc := CompileCheckTest(
+        _COMPILE_CASES,
+        include_dirs=[submission_dir],  # so CompileCheckTest can find the student header
+    ))
+    cc.scorer = TestCaseScorer(_COMPILE_POINTS, label="Compile-Time Rules")
+    cc.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="4")
+
+    return pipeline
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from lograder.pipeline.config import config
+
+    metadata = GraderMetadata.from_gradescope(
+        grader_name="{{ assignment_name }}",
+        authors=[StaffAuthor(name="Course Staff", role="Instructor")],
+        notes="Contact course staff within 3 days if you believe there is a grading error.",
+    )
+
+    with config(root_directory=Path("/autograder"), executable_timeout=60.0):
+        score = make_pipeline()(metadata=metadata)
+
+    score.write_results_json(
+        config=GradescopeConfig(
+            visibility="visible",
+            stdout_visibility="after_due_date",
+        ),
+    )

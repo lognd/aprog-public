@@ -1,0 +1,22 @@
+[assignment]
+slug = "number-toolkit"
+name = "Number Toolkit"
+author = "lognd"
+description = "Implement five number-theory utility functions in C++."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "easy"
+topics = ["algorithms", "number-theory"]
+concepts = ["iteration", "conditionals"]
+labels = ["starter-code"]
+
+[template]
+slug = "cpp-header-impl"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"

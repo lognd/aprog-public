@@ -1,0 +1,171 @@
+"""
+Grader: {{ assignment_name }}
+{{ "=" * (8 + (assignment_name | length)) }}
+
+Pipeline:
+  SourceCheck               -- checks that {{ artifact_name }}.cpp is present; optional constraints
+  GXXBuild                  -- compiles with -fsanitize=address,undefined
+  OutputCompareTest         -- functional correctness (standard I/O)
+  ASanTest                  -- memory safety: heap overflow, use-after-free, leaks
+
+Private layout:
+  grader/
+    pipeline.py               (this file)
+  solution/
+    solution.cpp              (staff reference implementation)
+
+setup.sh installs: g++ (with ASan support -- requires GCC or Clang with ASan)
+Note: ASan is built into GCC >= 4.8 and Clang >= 3.1 on Linux.
+      Docker images based on Ubuntu 20.04+ include it by default.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from lograder.pipeline.build.gxx import GXXBuild
+from lograder.pipeline.check.source.source_check import SourceCheck
+from lograder.pipeline.input.local_directory import LocalDirectory
+from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
+from lograder.pipeline.pipeline import Pipeline
+from lograder.pipeline.score import (
+    AllOrNothingScorer,
+    CleanRunScorer,
+    GimmeConfig,
+    GradescopeConfig,
+    GradescopeTestConfig,
+    TestCaseScorer,
+)
+from lograder.pipeline.test.asan import ASanCase, ASanTest
+from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
+from lograder.process.registry.gcc import GNUXXStandard
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+
+_GRADER_DIR = Path(__file__).parent
+_SUBMISSION_DIR = Path("/autograder/submission")
+
+# ---------------------------------------------------------------------------
+# Output compare -- functional correctness
+# FILL IN: replace with actual test cases.
+# ---------------------------------------------------------------------------
+
+_IO_CASES: list[OutputCompareCase] = [
+    OutputCompareCase(
+        name="correct_output",
+        args=[],           # FILL IN
+        stdin=b"",         # FILL IN
+        expected_stdout="TODO\n",
+        comparison=ComparisonMode.STRIP,
+    ),
+]
+
+_IO_POINTS: dict[str, float] = {
+    "correct_output": 20.0,
+}
+
+# ---------------------------------------------------------------------------
+# ASan -- memory safety cases
+# FILL IN: pick inputs that exercise all memory-managed code paths.
+# Each case runs the instrumented binary; an ASan error causes a failure.
+# ---------------------------------------------------------------------------
+
+_ASAN_CASES: list[ASanCase] = [
+    ASanCase(
+        name="no_heap_errors",
+        args=[],           # FILL IN
+        stdin=b"",
+        # expected_exit_code=0,  # FILL IN if you care about exit code
+    ),
+    ASanCase(
+        name="no_leaks",
+        args=[],           # FILL IN: different input path that exercises cleanup
+        stdin=b"",
+    ),
+]
+
+_ASAN_POINTS: dict[str, float] = {
+    "no_heap_errors": 10.0,
+    "no_leaks": 10.0,
+}
+
+
+# ---------------------------------------------------------------------------
+# Pipeline factory
+# ---------------------------------------------------------------------------
+
+
+def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
+    pipeline = Pipeline()
+
+    # -- 1. Read student submission -------------------------------------------
+    pipeline.add(LocalDirectory(root=submission_dir))
+
+    # -- 2. Source check ------------------------------------------------------
+    pipeline.add(source := SourceCheck(
+        language="cpp",
+        files=["{{ artifact_name }}.cpp"],
+        constraints=[],
+        label="{{ artifact_name }}.cpp submitted",
+    ))
+    source.scorer = CleanRunScorer(
+        0.0,
+        max_errors=0,
+        require_ok_return=True,
+        label="File Submitted",
+    )
+    source.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
+
+    # -- 3. Compile with AddressSanitizer + UBSan -----------------------------
+    pipeline.add(build := GXXBuild(
+        sources=["{{ artifact_name }}.cpp"],
+        output="{{ artifact_name }}",
+        standard=GNUXXStandard.CXX17,
+        sanitizers=["address", "undefined"],
+        debug_symbols=True,
+        # extra_sources=[_GRADER_DIR / "main.cpp"],  # FILL IN if grader provides main
+    ))
+    build.scorer = AllOrNothingScorer(10.0, label="Compilation")
+    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
+
+    # -- 4. Functional correctness --------------------------------------------
+    pipeline.add(io := OutputCompareTest("{{ artifact_name }}", _IO_CASES))
+    io.scorer = TestCaseScorer(
+        _IO_POINTS,
+        gimme=GimmeConfig(min_pass_fraction=0.25, points=5.0),
+        label="Correctness",
+    )
+    io.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
+
+    # -- 5. Memory safety (ASan) ----------------------------------------------
+    pipeline.add(asan := ASanTest("{{ artifact_name }}", _ASAN_CASES))
+    asan.scorer = TestCaseScorer(_ASAN_POINTS, label="Memory Safety (ASan)")
+    asan.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="4")
+
+    return pipeline
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    from lograder.pipeline.config import config
+
+    metadata = GraderMetadata.from_gradescope(
+        grader_name="{{ assignment_name }}",
+        authors=[StaffAuthor(name="Course Staff", role="Instructor")],
+        notes="Contact course staff within 3 days if you believe there is a grading error.",
+    )
+
+    with config(root_directory=Path("/autograder"), executable_timeout=60.0):
+        score = make_pipeline()(metadata=metadata)
+
+    score.write_results_json(
+        config=GradescopeConfig(
+            visibility="visible",
+            stdout_visibility="after_due_date",
+        ),
+    )

@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "number-toolkit",
+    "name": "Number Toolkit",
+    "author": "lognd",
+    "description": "Implement five number-theory utility functions in C++."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "easy",
+    "topics": [
+      "algorithms",
+      "number-theory"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/number-toolkit",
+    "readme": "assignments/number-toolkit/README.md",
+    "visible_tests": "assignments/number-toolkit/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:37ac630532417daf3873a1e164416224312c16a7984fb0949af35531d404cfe0"
+}

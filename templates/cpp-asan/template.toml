@@ -1,0 +1,26 @@
+[template]
+slug = "cpp-asan"
+name = "C++ Memory Safety (ASan)"
+version = "0.1"
+description = "Student submits C++ source; grader compiles with AddressSanitizer and checks for memory errors. Use for assignments where memory management correctness is the primary learning objective."
+
+[classification]
+language = "cpp"
+default_difficulty = "medium"
+recommended_topics = []
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = false
+expected = false
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = false
+grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false
