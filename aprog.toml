@@ -44,6 +44,9 @@ name = "Sorting"
 [classification.topics.searching]
 name = "Searching"
 
+[classification.topics.number-theory]
+name = "Number Theory"
+
 [classification.topics.dynamic-programming]
 name = "Dynamic Programming"
 
@@ -82,6 +85,9 @@ name = "Object-Oriented Programming"
 
 [classification.concepts.functional]
 name = "Functional Programming"
+
+[classification.concepts.conditionals]
+name = "Conditionals"
 
 [labels.requires-filesystem]
 name = "Requires filesystem access"

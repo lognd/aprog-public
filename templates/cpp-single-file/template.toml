@@ -1,0 +1,26 @@
+[template]
+slug = "cpp-single-file"
+name = "C++ Single File (GXX)"
+version = "0.1"
+description = "Student submits one C++ source file. Grader compiles directly with g++ (no CMake required). Includes output comparison and Valgrind memory checks."
+
+[classification]
+language = "cpp"
+default_difficulty = "medium"
+recommended_topics = []
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = false
+expected = false
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = false
+grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false

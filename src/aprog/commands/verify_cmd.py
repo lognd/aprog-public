@@ -45,7 +45,7 @@ def cmd_verify(
         )
         raise typer.Exit(5)
 
-    ht_dir = private_repo / "hidden-tests" / slug
+    ht_dir = private_repo / "grader" / slug / "hidden-tests"
     if not ht_dir.exists():
         console.print("[dim]Note:[/dim] No hidden-tests directory found (optional)")
 

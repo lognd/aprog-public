@@ -3,21 +3,30 @@ Grader: {{ assignment_name }}
 {{ "=" * (8 + (assignment_name | length)) }}
 
 Pipeline:
-  LocalDirectory          -- reads student submission
-  SourceCheck             -- validates {{ artifact_name }}.cpp submitted
-  GXXBuild                -- compiles {{ artifact_name }}.cpp with g++ directly (no CMake)
-  OutputCompareTest       -- visible I/O correctness cases
-  OutputCompareTest       -- hidden I/O correctness cases
-  ValgrindTest            -- memory safety (extra credit)
+  LocalDirectory      -- reads student submission
+  SourceCheck         -- validates {{ artifact_name }}.sh was submitted
+  PrebuiltArtifacts   -- marks the script executable; registers it as the graded artifact
+  OutputCompareTest   -- visible correctness cases
+  OutputCompareTest   -- hidden correctness cases
 
-Student submits: {{ artifact_name }}.cpp
+Student submits: {{ artifact_name }}.sh
+
+GOTCHA: The student's script must begin with "#!/bin/bash" (or another valid shebang)
+        so the OS can execute it directly. PrebuiltArtifacts sets the execute bit
+        automatically -- no chmod step needed in setup.sh.
+GOTCHA: SourceCheck with language="bash" performs file-presence checking only;
+        no AST-level constraint analysis is available for shell scripts.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from lograder.pipeline.build.gxx import GXXBuild
+import lograder.output.layout.check.source  # noqa: F401
+import lograder.output.layout.pipeline.build  # noqa: F401
+import lograder.output.layout.test.output_compare  # noqa: F401
+
+from lograder.pipeline.build.prebuilt import PrebuiltArtifacts
 from lograder.pipeline.check.source.source_check import SourceCheck
 from lograder.pipeline.input.local_directory import LocalDirectory
 from lograder.pipeline.metadata import GraderMetadata, StaffAuthor
@@ -31,19 +40,15 @@ from lograder.pipeline.score import (
     TestCaseScorer,
 )
 from lograder.pipeline.test.output_compare import ComparisonMode, OutputCompareCase, OutputCompareTest
-from lograder.pipeline.test.valgrind import ValgrindCase, ValgrindTest
-from lograder.process.registry.gcc import GNUXXStandard
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 
-_GRADER_DIR = Path(__file__).parent
 _SUBMISSION_DIR = Path("/autograder/submission")
 
 # ---------------------------------------------------------------------------
-# Visible test cases
-# FILL IN: replace with real cases matching README.md sample examples.
+# Visible test cases -- FILL IN
 # ---------------------------------------------------------------------------
 
 _VISIBLE_CASES: list[OutputCompareCase] = [
@@ -54,6 +59,7 @@ _VISIBLE_CASES: list[OutputCompareCase] = [
         expected_stdout="TODO\n",
         comparison=ComparisonMode.STRIP,
     ),
+    # FILL IN: add more visible cases here.
 ]
 
 _VISIBLE_POINTS: dict[str, float] = {
@@ -61,8 +67,7 @@ _VISIBLE_POINTS: dict[str, float] = {
 }
 
 # ---------------------------------------------------------------------------
-# Hidden test cases
-# FILL IN: thorough cases not shown to students until after due date.
+# Hidden test cases -- FILL IN
 # ---------------------------------------------------------------------------
 
 _HIDDEN_CASES: list[OutputCompareCase] = [
@@ -73,20 +78,12 @@ _HIDDEN_CASES: list[OutputCompareCase] = [
         expected_stdout="TODO\n",
         comparison=ComparisonMode.STRIP,
     ),
+    # FILL IN: add more hidden cases here.
 ]
 
 _HIDDEN_POINTS: dict[str, float] = {
     "hidden_1": 80.0,
 }
-
-# ---------------------------------------------------------------------------
-# Valgrind cases (memory safety -- extra credit)
-# FILL IN: pick representative cases from above.
-# ---------------------------------------------------------------------------
-
-_VALGRIND_CASES: list[ValgrindCase] = [
-    ValgrindCase(name="vg_sample_1", args=[], stdin=b"TODO\n", check_leaks=True),
-]
 
 
 # ---------------------------------------------------------------------------
@@ -100,29 +97,25 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
     # -- 1. Read student submission -------------------------------------------
     pipeline.add(LocalDirectory(root=submission_dir))
 
-    # -- 2. Source check -- validates file is submitted -----------------------
+    # -- 2. Verify the script file was submitted ------------------------------
     pipeline.add(source := SourceCheck(
-        language="cpp",
-        files=["{{ artifact_name }}.cpp"],
+        language="bash",
+        files=["{{ artifact_name }}.sh"],
         constraints=[],
-        label="Source File Submitted",
+        label="Script Submitted",
     ))
     source.scorer = CleanRunScorer(
         0.0,
         max_errors=0,
         require_ok_return=True,
-        label="Source File Submitted",
+        label="Script Submitted",
     )
     source.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="1")
 
-    # -- 3. Compile with g++ --------------------------------------------------
-    pipeline.add(build := GXXBuild(
-        sources=["{{ artifact_name }}.cpp"],
-        output="{{ artifact_name }}",
-        standard=GNUXXStandard.CXX17,
-    ))
-    build.scorer = AllOrNothingScorer(0.0, label="Compilation")
-    build.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
+    # -- 3. Register the script as a runnable artifact ------------------------
+    # PrebuiltArtifacts resolves the relative string path against manifest.root
+    # and sets the execute bit automatically (make_executable=True by default).
+    pipeline.add(PrebuiltArtifacts({"{{ artifact_name }}": "{{ artifact_name }}.sh"}))
 
     # -- 4. Visible correctness tests -----------------------------------------
     pipeline.add(visible := OutputCompareTest("{{ artifact_name }}", _VISIBLE_CASES))
@@ -131,7 +124,7 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
         gimme=GimmeConfig(min_pass_fraction=0.25, points=5.0),
         label="Visible Correctness",
     )
-    visible.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="3")
+    visible.scorer.gradescope = GradescopeTestConfig(visibility="visible", number="2")
 
     # -- 5. Hidden correctness tests ------------------------------------------
     pipeline.add(hidden := OutputCompareTest("{{ artifact_name }}", _HIDDEN_CASES))
@@ -141,21 +134,14 @@ def make_pipeline(submission_dir: Path = _SUBMISSION_DIR) -> Pipeline:
         label="Hidden Correctness",
     )
     hidden.scorer.gradescope = GradescopeTestConfig(
-        visibility="after_due_date", number="4"
-    )
-
-    # -- 6. Memory safety (extra credit) --------------------------------------
-    pipeline.add(vg := ValgrindTest("{{ artifact_name }}", _VALGRIND_CASES))
-    vg.scorer = AllOrNothingScorer(0.0, extra_credit=5.0, label="Memory Safety")
-    vg.scorer.gradescope = GradescopeTestConfig(
-        visibility="after_due_date", number="5"
+        visibility="after_due_date", number="3"
     )
 
     return pipeline
 
 
 # ---------------------------------------------------------------------------
-# Entry point
+# Entry point -- called by run_autograder.py on Gradescope
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
@@ -167,7 +153,7 @@ if __name__ == "__main__":
         notes="Contact course staff within 3 days if you believe there is a grading error.",
     )
 
-    with config(root_directory=Path("/autograder"), executable_timeout=60.0):
+    with config(root_directory=_SUBMISSION_DIR, executable_timeout=30.0):
         score = make_pipeline()(metadata=metadata)
 
     score.write_results_json(

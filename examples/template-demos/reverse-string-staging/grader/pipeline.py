@@ -27,10 +27,7 @@ import lograder.output.layout.test.output_compare  # noqa: F401
 import lograder.output.layout.test.valgrind  # noqa: F401
 
 from lograder.pipeline.build.cmake import CMakeBuild
-from lograder.pipeline.check.project.simple_project import (
-    CMakeManifest,
-    CMakeManifestCheck,
-)
+from lograder.pipeline.check.project.simple_project import CMakeManifestCheck
 from lograder.pipeline.check.source.source_check import SourceCheck
 from lograder.pipeline.input.local_directory import LocalDirectory
 from lograder.pipeline.metadata import GraderMetadata, StaffAuthor

@@ -1,0 +1,26 @@
+[template]
+slug = "cpp-compile-check"
+name = "C++ Compile-Time Check"
+version = "0.1"
+description = "Tests that student's C++ class or template enforces compile-time rules (const correctness, access specifiers, deleted constructors, template constraints, SFINAE). Combines GXXBuild for functional tests with CompileCheckTest for compile-time assertions."
+
+[classification]
+language = "cpp"
+default_difficulty = "hard"
+recommended_topics = []
+
+[outputs.public]
+assignment_toml = true
+readme = true
+visible_tests = false
+expected = false
+assets = true
+
+[outputs.private]
+solution = true
+hidden_tests = false
+grader = true
+
+[variables]
+requires_problem_statement = true
+requires_examples = false

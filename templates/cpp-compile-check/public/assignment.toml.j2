@@ -1,0 +1,12 @@
+[assignment]
+name = "{{ assignment_name }}"
+slug = "{{ assignment_slug }}"
+language = "cpp"
+difficulty = "{{ difficulty }}"
+topics = {{ topics | tojson }}
+
+[submission]
+files = ["{{ artifact_name }}.hpp"]
+
+[grading]
+total_points = 100
