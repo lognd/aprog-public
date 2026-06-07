@@ -1,12 +1,9 @@
 # Scope Safari
 
-Every name in C++ has a *scope* -- the region of the program where it exists.
-Scope is governed by curly braces `{ }`.  A variable lives from the line where
-it is declared to the closing `}` of the block that contains it.  This rule has
-some consequences that are easy to miss the first time you see them.
-
-This activity walks you through five of those consequences, then asks you to
-fix a program that breaks three of them at once.
+Every name in C++ has a scope -- the region of the program where it is
+visible. Scope is determined by curly braces `{ }`. A variable lives from
+the line where it is declared to the `}` that closes the block containing it.
+This rule has some consequences that are easy to miss the first time.
 
 ## Getting started
 
@@ -14,88 +11,71 @@ fix a program that breaks three of them at once.
 
 A shell opens inside a fresh copy of the project.
 
-## Walk-through
+## Your task
 
-### Step 1 -- run the exploration program
+`main.cpp` has bugs. The program should print:
+
+    Multiples of 3 in [1..30]: 10
+    Above 7 in [1..10]: 3
+    Above 14 in [1..20]: 6
+
+Fix `main.cpp` until the output matches, then type `exit`. The launcher
+checks your work automatically.
+
+## Resources in the repo
+
+`explore.cpp` demonstrates several scope concepts in isolation. Build and
+run it any time:
 
     make explore && ./explore
 
-Read every section before moving on.  The exploration program demonstrates:
+You are not required to use it, but it may help you understand what is
+happening in `main.cpp`.
 
-1. **Blank scope** -- a bare `{ }` block creates a new scope; any variable
-   declared inside it is destroyed when the block ends.
-2. **For-loop variable scope** -- the variable in `for (int i = ...)` belongs
-   to the loop body and does not exist after the closing `}`.
-3. **Shadowing** -- declaring a variable with the same name as an outer one
-   creates a *separate* variable that hides the outer one inside that scope.
-   The outer variable is unchanged.
-4. **Switch-case scope** -- all `case` labels in a `switch` share one scope.
-   Declaring a variable with an initializer in one case makes it technically
-   visible in every other case, even ones that jump over the declaration.
-   Compilers reject this.
-5. **do-while** -- the body of a `do { } while (cond)` always runs at least
-   once because the condition is checked *after* the body, not before.
+## You will know you are done when...
 
-### Step 2 -- try to compile main.cpp
-
-    make
-
-It will not compile.  `main.cpp` has three scope bugs.  Read the error
-messages carefully -- the compiler will point you to each one.
-
-### Step 3 -- fix all three bugs
-
-Open `main.cpp` in an editor and fix each bug:
-
-- **Bug 1** produces a compiler warning about shadowing and causes the wrong
-  answer.
-- **Bug 2** produces a "not declared in this scope" error.
-- **Bug 3** produces a "jump to case label crosses initialization" error.
-
-After each fix, try `make` again.  Once it compiles:
-
-    make run
-
-### Step 4 -- exit
-
-    exit
-
-The launcher will check your output automatically and reveal the passphrase.
-
-## You'll know you're done when...
-
-`make run` prints three lines and all three values are correct.
+The launcher prints the passphrase.
 
 ## Hints
 
 <details>
-<summary>Bug 1 hint -- shadowing</summary>
+<summary>Hint 1 -- reading compiler output</summary>
 
-Look for a variable declared with `int` inside a loop body when a variable
-with the same name already exists in the outer scope.  The inner declaration
-creates a new variable that is discarded at the end of each iteration; the
-outer one is never modified.  Remove the `int` keyword from the inner
-declaration (or restructure the code so only one variable exists).
-
-</details>
-
-<details>
-<summary>Bug 2 hint -- out-of-scope variable</summary>
-
-The loop variable `i` is declared inside the `for (...)` header, so it only
-exists inside the loop.  If you need the final value of `i` after the loop
-ends, declare `int i = 0;` *before* the `for` and remove `int` from the
-header.
+Compile `main.cpp` with `make` and read every line of output, including
+warnings. Compilers flag certain scope problems as warnings even when the
+code is technically legal. A warning on a specific line is a signal worth
+investigating.
 
 </details>
 
 <details>
-<summary>Bug 3 hint -- switch-case scope</summary>
+<summary>Hint 2 -- the first wrong value</summary>
 
-When execution enters a `switch` at `case 7:` or `default:`, it jumps over
-the `int bonus = 10;` line in `case 8:`.  The compiler forbids this because
-`bonus` would be in scope but never initialized.  One clean fix: declare
-`int bonus = 0;` before the `switch`, then assign inside each case without
-the `int` keyword.
+The first line of output is wrong. There is a loop in `main` that is
+supposed to accumulate a counter, but the counter never changes. Ask
+yourself: how many variables named `count` exist inside the loop body, and
+which one does `count++` actually modify?
+
+</details>
+
+<details>
+<summary>Hint 3 -- the second wrong value</summary>
+
+The third line of output is wrong even though the program compiles cleanly
+and produces no warnings for that code path. `count_above` is called twice.
+The second call gives a different kind of wrong answer than the first call.
+Read `count_above` carefully. Consider the lifetime of `result` across
+multiple calls: does it behave the way you expect?
+
+</details>
+
+<details>
+<summary>Hint 4 -- static local variables</summary>
+
+A local variable declared with `static` has a lifetime that extends beyond
+the call that created it. It is initialized once (the first time the
+function runs) and keeps its value between subsequent calls. This can be
+intentional (see `next_id` in `explore.cpp`) or accidental. If `result`
+should start at zero for each call, `static` is wrong.
 
 </details>

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Scope Safari activity launcher.
-Opens a shell for the student to work in, then validates by compiling and
-running their fixed main.cpp before cleaning up.
+Opens a shell for the student to work in, then validates by compiling
+and running their fixed main.cpp before cleaning up the temp directory.
 """
 import os, sys, shutil, subprocess, tempfile, zipfile, textwrap
 import hashlib as _hl, hmac as _hm
@@ -11,12 +11,11 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ZIP   = os.path.join(SCRIPT_DIR, "repo.zip")
 
 # -- Crypto -------------------------------------------------------------------
-# The blob is keyed on the exact stdout of the correctly-fixed program.
-# _decrypt() cannot succeed without first running the binary.
+# Blob is keyed on the exact stripped stdout of the correctly-fixed program.
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
 _KDF_ITERS = 100000
-_BLOB      = "7297122ba68c0473fe439cb182a9f57f091e3cac32df3f4b33b3fd14ac898471a61b5a889b79c1c3659073528c02152946"
+_BLOB      = "9efd370845e9374509eb27b86a38b8c983856631115e507ec2dc489af8cd5cc822d6d5a87f13e9fc1c710756025ec49cd39752ae0a24d9"
 
 def _decrypt(key_str):
     key  = _hl.pbkdf2_hmac("sha256", key_str.encode(), _SALT, _KDF_ITERS)
@@ -35,7 +34,7 @@ def _decrypt(key_str):
 def _validate(repo_dir):
     binary = os.path.join(repo_dir, "safari")
     r = subprocess.run(
-        ["g++", "-std=c++17", "-o", binary,
+        ["g++", "-std=c++17", "-Wall", "-Wshadow", "-o", binary,
          os.path.join(repo_dir, "main.cpp")],
         capture_output=True, text=True,
     )
@@ -55,11 +54,17 @@ _LINE_WIDTH = 70
 def _banner(title):
     print("=" * _LINE_WIDTH)
     pad = (_LINE_WIDTH - len(title) - 2) // 2
-    print(" " * pad + " " + title + " " + " " * pad)
+    print(" " * pad + " " + title + " " * pad)
     print("=" * _LINE_WIDTH)
 
 def _hr():
     print("-" * _LINE_WIDTH)
+
+def _wrap(text):
+    for line in textwrap.wrap(text, width=_LINE_WIDTH - 4,
+                              initial_indent="  ",
+                              subsequent_indent="    "):
+        print(line)
 
 def _show_passphrase(passphrase):
     print()
@@ -96,30 +101,22 @@ def main():
        Scope Safari
       ============================================================
 
-       Files: explore.cpp, main.cpp, Makefile
+       Files: main.cpp, explore.cpp, Makefile
 
-       Step 1 -- run the exploration program and read the output:
-         make explore && ./explore
+       main.cpp has bugs.  The program should print:
+         Multiples of 3 in [1..30]: 10
+         Above 7 in [1..10]: 3
+         Above 14 in [1..20]: 6
 
-       Step 2 -- try to compile main.cpp:
-         make
-
-         It will not compile.  Read every error carefully.
-
-       Step 3 -- fix all three scope bugs in main.cpp, then:
-         make run
-
-       When the output looks correct, type 'exit'.
-       The launcher will check your work automatically.
+       Fix main.cpp until the output is correct, then type 'exit'.
       ============================================================
 
     """)
-    rcfile.write(textwrap.dedent(f"""\
-        PS1='\\u@scope-safari:\\W\\$ '
-        cd "{repo_dir}"
-        cat << 'BANNER'
-{banner_text}BANNER
-    """))
+    rcfile.write(
+        f'PS1=\'\\u@scope-safari:\\W\\$ \'\n'
+        f'cd "{repo_dir}"\n'
+        "cat << 'BANNER'\n" + banner_text + "\nBANNER\n"
+    )
     rcfile.close()
 
     shell = os.environ.get("SHELL", "/bin/bash")
@@ -127,27 +124,29 @@ def main():
     try:
         while True:
             subprocess.run([shell, "--rcfile", rcfile.name])
-
             print()
             _banner("Scope Safari -- Checking Your Work")
             print()
 
-            ok, key_str, detail = _validate(repo_dir)
+            ok, key_str, which = _validate(repo_dir)
 
-            if ok:
+            if not ok:
+                if key_str == "compile-error":
+                    print("  main.cpp did not compile.  Error:\n")
+                    for line in which.strip().splitlines():
+                        print(f"    {line}")
+                elif key_str == "timeout":
+                    print("  Program did not finish in time.")
+            else:
                 passphrase = _decrypt(key_str)
                 if passphrase is not None:
                     _show_passphrase(passphrase)
                     break
-                print("  The program compiled and ran, but the output was not correct.")
-                print("  Expected three lines: Passing, Top at, Bonus.")
-
-            elif key_str == "compile-error":
-                print("  main.cpp did not compile.  Errors:\n")
-                for line in detail.strip().splitlines():
-                    print(f"    {line}")
-            elif key_str == "timeout":
-                print("  The program did not finish in time.")
+                print("  Program compiled and ran, but the output was not correct.")
+                print()
+                print(f"  Got:      {key_str!r}")
+                expected = "Multiples of 3 in [1..30]: 10\nAbove 7 in [1..10]: 3\nAbove 14 in [1..20]: 6"
+                print(f"  Expected: {expected!r}")
 
             print()
             try:
@@ -159,7 +158,6 @@ def main():
                 print()
                 continue
             break
-
     finally:
         try:
             os.remove(rcfile.name)
