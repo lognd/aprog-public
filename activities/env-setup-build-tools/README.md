@@ -1,6 +1,6 @@
 # Activity: Install CMake and Make
 
-> **Activity 4 of 6**
+> **Activity 4 of 7**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)

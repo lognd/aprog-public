@@ -1,6 +1,6 @@
 # Activity: Install and Configure an IDE
 
-> **Activity 5 of 6**
+> **Activity 5 of 7**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
