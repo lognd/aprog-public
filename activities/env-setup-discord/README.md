@@ -1,6 +1,6 @@
 # Activity: Join the Class Discord
 
-> **Activity 6 of 6**
+> **Activity 6 of 7**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
@@ -8,6 +8,8 @@
 > - [3. Compiler](../env-setup-compiler/)
 > - [4. Build Tools](../env-setup-build-tools/)
 > - [5. IDE](../env-setup-ide/)
+>
+> Next: [7. Git and GitHub](../env-setup-git/)
 
 The class Discord server is where announcements are posted, questions
 are answered, and office hours are coordinated. Joining is required.
