@@ -6,6 +6,7 @@ on:
     paths:
       - "src/**"
       - "tests/**"
+      - "activities/**"
       - "pyproject.toml"
       - "setup.cfg"
       - "setup.py"
@@ -36,3 +37,6 @@ jobs:
 
       - name: Test
         run: pytest --no-testmon -m "not slow"
+
+      - name: Activity structural tests
+        run: pytest tests/unit/test_real_activities.py -v
