@@ -5,10 +5,20 @@
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
 > - [2. Python](../env-setup-python/)
+>
+> Next: you are done with environment setup.
 
-Git is the version control system you will use for every assignment.
-GitHub is the website that hosts your repositories and lets you submit
-work. This activity gets both fully configured.
+This activity installs and configures three tools:
+
+- **git** -- the version control program that runs on your computer.
+  It records every change you make as a "commit" and lets you browse,
+  share, and revert your project history.
+- **GitHub** -- the website that hosts your git repositories in the
+  cloud. You push commits here so they are backed up and can be
+  submitted for grading.
+- **gh** (GitHub CLI) -- an official command-line tool that
+  authenticates git with GitHub, lets you clone and create
+  repositories, and opens pull requests from the terminal.
 
 <details>
 <summary>What is the difference between git and GitHub?</summary>
@@ -158,7 +168,29 @@ fetches and installs the package from it.
 brew install gh
 ```
 
-Verify:
+### Windows (native -- PowerShell or Command Prompt)
+
+If your IDE runs natively on Windows (CLion, PyCharm without WSL
+gateway), you also need `gh` available in a Windows terminal.
+
+**Option 1 -- winget** (built into Windows 10/11):
+
+```
+winget install --id GitHub.cli
+```
+
+Open a new terminal after installation.
+
+**Option 2 -- installer**: Download the `.msi` from
+https://cli.github.com and run it.
+
+Verify in PowerShell or Command Prompt:
+
+```
+gh --version
+```
+
+Verify (WSL or macOS/Linux):
 
 ```bash
 gh --version
@@ -168,7 +200,9 @@ gh --version
 
 ## Step 5: Authenticate with GitHub
 
-Run the login wizard:
+### Browser login (recommended)
+
+Run the login wizard in your WSL terminal (or macOS/Linux terminal):
 
 ```bash
 gh auth login
@@ -183,6 +217,39 @@ When prompted:
 
 `gh` prints a one-time code and opens your browser. Paste the code
 when prompted, approve the authorization, and return to the terminal.
+
+### Token login (alternative)
+
+If the browser flow does not work (for example in a headless
+environment or a CI context), you can authenticate with a Personal
+Access Token instead:
+
+1. Go to https://github.com/settings/tokens
+2. Click **Generate new token > Generate new token (classic)**.
+3. Give it a name, set an expiration, and check the **repo** scope.
+4. Click **Generate token** and copy the value immediately.
+
+Then pipe the token to `gh`:
+
+```bash
+echo "YOUR_TOKEN_HERE" | gh auth login --with-token
+```
+
+Replace `YOUR_TOKEN_HERE` with the token you copied. Do not add
+quotes or extra spaces.
+
+### Windows users: authenticate twice
+
+If your IDE (CLion, PyCharm) runs natively on Windows -- not through
+the WSL gateway -- it uses the Windows `gh` credential helper, which
+is separate from the WSL one.
+
+You must run `gh auth login` (or the token method) in **two places**:
+
+1. Inside your WSL terminal (authenticates git in WSL)
+2. In a Windows PowerShell or Command Prompt (authenticates your IDE)
+
+Both sessions must be authenticated for everything to work.
 
 <details>
 <summary>HTTPS vs SSH -- which should I choose?</summary>
@@ -343,6 +410,15 @@ If neither exists, re-run the installation commands from Step 4.
 
 Copy the URL printed to the terminal and open it manually in your
 Windows browser. Paste the one-time code when prompted on the page.
+
+Alternatively, use the token method from Step 5 to avoid the browser
+flow entirely.
+
+### IDE cannot push or pull even though WSL works
+
+Your IDE may be running on Windows natively and using the Windows `gh`
+credential helper, which is separate from WSL's. Open PowerShell and
+run `gh auth login` (or the token method) there as well.
 
 ### "gh auth status" shows "not logged in"
 
