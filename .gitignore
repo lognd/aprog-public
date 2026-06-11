@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 .claude/*
+FROBLEMS.md
+LOGRADER-IDEA.md
 .idea/*
 */CLAUDE.md
 CLAUDE.md
