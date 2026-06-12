@@ -1,0 +1,21 @@
+[assignment]
+slug        = "stats-library"
+name        = "Stats Library"
+author      = "lognd"
+description = "Implement a statistics library as a properly organized CMake project."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["algorithms", "data-structures"]
+concepts   = ["iteration"]
+labels     = ["starter-code"]
+
+[template]
+slug = "cpp-cmake"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"

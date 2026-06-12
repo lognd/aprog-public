@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "stats-library",
+    "name": "Stats Library",
+    "author": "lognd",
+    "description": "Implement a statistics library as a properly organized CMake project."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "algorithms",
+      "data-structures"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-cmake",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/stats-library",
+    "readme": "assignments/stats-library/README.md",
+    "visible_tests": "assignments/stats-library/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:b4ae310a8f0a2426e96e2b871bea3cf76b9c2d08fb238dd3d13be00921d64789"
+}
