@@ -1,0 +1,21 @@
+[assignment]
+slug        = "cstring-utils"
+name        = "C-Style String Utils"
+author      = "lognd"
+description = "Implement classic string utility functions using C-style char arrays and const-correct pointer parameters."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["strings", "algorithms"]
+concepts   = ["pointers", "mutation"]
+labels     = ["starter-code"]
+
+[template]
+slug = "cpp-header-impl"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"

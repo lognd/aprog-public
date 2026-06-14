@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "pointer-toolkit",
+    "name": "Pointer Toolkit",
+    "author": "lognd",
+    "description": "Implement array and string utility functions using raw pointers and pointer arithmetic."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "algorithms",
+      "strings"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/pointer-toolkit",
+    "readme": "assignments/pointer-toolkit/README.md",
+    "visible_tests": "assignments/pointer-toolkit/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:b9c3df00e8dce5743384b85e0ea6e62477032a82b6e5623e306b3c8b71f9a52e"
+}

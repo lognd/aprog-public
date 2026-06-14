@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "cli-calculator",
+    "name": "CLI Calculator",
+    "author": "lognd",
+    "description": "Write a command-line calculator that validates its arguments and performs basic arithmetic."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "easy",
+    "topics": [
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-stdin-stdout",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/cli-calculator",
+    "readme": "assignments/cli-calculator/README.md",
+    "visible_tests": "assignments/cli-calculator/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:ad1ab9332c03f5eb8078598879e54f674aa24f9e6b65c60e8f49432f2565152f"
+}

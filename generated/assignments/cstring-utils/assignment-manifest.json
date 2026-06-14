@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "cstring-utils",
+    "name": "C-Style String Utils",
+    "author": "lognd",
+    "description": "Implement classic string utility functions using C-style char arrays and const-correct pointer parameters."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "strings",
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/cstring-utils",
+    "readme": "assignments/cstring-utils/README.md",
+    "visible_tests": "assignments/cstring-utils/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:d2055f6bcdc0661560199575a18b67894fca24cf8b7114b66104cedff82687a2"
+}

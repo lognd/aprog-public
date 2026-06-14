@@ -1,0 +1,21 @@
+[assignment]
+slug        = "cli-calculator"
+name        = "CLI Calculator"
+author      = "lognd"
+description = "Write a command-line calculator that validates its arguments and performs basic arithmetic."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "easy"
+topics     = ["algorithms"]
+concepts   = ["conditionals", "iteration"]
+labels     = ["starter-code"]
+
+[template]
+slug = "cpp-stdin-stdout"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"

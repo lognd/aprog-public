@@ -1,0 +1,21 @@
+[assignment]
+slug        = "recursive-algorithms"
+name        = "Recursive Algorithms"
+author      = "lognd"
+description = "Implement five classic recursive algorithms: binary search, merge sort, Fibonacci with memoization, digit sum, and palindrome check."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["algorithms"]
+concepts   = ["recursion", "iteration"]
+labels     = ["starter-code"]
+
+[template]
+slug = "cpp-header-impl"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
