@@ -9,6 +9,13 @@ provided lightweight testing harness.
 
 ---
 
+## Learning goals
+
+- Implement descriptive statistics (mean, median, mode, variance, stddev, range) from scratch
+- Organize a C++ project as a multi-target CMake build: one library, one test executable
+- Write your own test suite using a provided harness, including edge cases and error conditions
+- Throw `std::invalid_argument` at the correct boundary and distinguish population vs sample statistics
+
 ## Task
 
 Implement all eight functions declared in `include/stats.hpp` inside
@@ -131,3 +138,13 @@ g++ -std=c++17 -I include -I src \
 
 The project structure and compilation checks are gates: if either fails, no
 further tests run.
+
+## Going further
+
+- Add a `trimmed_mean(data, fraction)` function that removes the top and bottom
+  `fraction` of values before computing the mean. Write tests for it.
+- Look up the difference between population variance (divide by n) and sample
+  variance (divide by n-1). When would you use each, and which does this
+  assignment use?
+- Benchmark `median` on a 1,000,000-element vector. Is sorting the copy the
+  bottleneck? Look up `std::nth_element` as a faster O(n) alternative.

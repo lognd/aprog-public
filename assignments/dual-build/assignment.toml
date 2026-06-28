@@ -11,9 +11,7 @@ language = "cpp"
 difficulty = "medium"
 topics = ["systems", "build-systems"]
 concepts = ["makefile", "cmake", "static-libraries"]
-labels = ["starter-code"]
-course = "systems"
-module = "build-systems"
+labels = ["starter-code", "multi-file"]
 
 [template]
 slug = "cpp-cmake"

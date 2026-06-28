@@ -9,7 +9,7 @@ status = "draft"
 [classification]
 language = "cpp"
 difficulty = "medium"
-topics = ["algorithms"]
+topics = ["algorithms", "number-theory"]
 concepts = ["recursion"]
 labels = ["starter-code"]
 

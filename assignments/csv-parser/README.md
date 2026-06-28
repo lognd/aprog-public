@@ -5,6 +5,13 @@ Implement a single C++ function that parses CSV text into a
 
 ---
 
+## Learning goals
+
+- Parse a structured text format by iterating characters and tracking parser state
+- Handle quoting and escaping without regular expressions or external libraries
+- Build nested `std::vector<std::vector<std::string>>` from a streaming input
+- Write a function that correctly handles edge cases (empty fields, trailing commas, short rows)
+
 ## Background
 
 CSV (Comma-Separated Values) is deceptively simple to parse.  The naive
@@ -86,3 +93,12 @@ The parser does not pad short rows or truncate long ones.
 g++ -std=c++17 -o test visible-tests/test_csv_parser.cpp
 ./test
 ```
+
+## Going further
+
+- Extend `parse_csv` to support `\r\n` line endings if it does not already,
+  and write a test case with Windows-style line endings.
+- Implement a `serialize_csv` function that goes the other direction: takes
+  a `vector<vector<string>>` and produces valid RFC 4180 CSV text.
+- Look up what happens when a quoted field contains a newline. Does your
+  parser handle multi-line fields?

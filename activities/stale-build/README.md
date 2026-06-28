@@ -1,14 +1,22 @@
-# stale-build
+# Activity: Stale Build
 
-You have inherited a prime-counting utility.
-The CI pipeline always runs `make clean && make` before testing, and it
-always passes. Your colleague reports that when they edit `limits.h` and
-run `make` locally (without cleaning first), the binary still prints the
-old result. They have gone on vacation.
+You have inherited a prime-counting utility. The CI pipeline always runs
+`make clean && make` before testing, and it always passes. Your colleague
+reports that when they edit `limits.h` and run `make` locally (without
+cleaning first), the binary still prints the old result. They have gone on
+vacation.
 
-Your job: figure out why incremental builds produce stale output, and fix it.
+Your job: figure out why incremental builds produce stale output, and fix
+the Makefile.
 
-## The program
+## Concepts covered
+
+- How `make` uses file timestamps to decide what to rebuild
+- The prerequisite list in a Makefile rule and what happens when a file is omitted
+- Why a header file that defines a compile-time constant must be a listed dependency
+- The difference between a clean build (always correct) and an incremental build (correct only with complete prerequisites)
+
+## Background
 
 `sieve.cpp` implements a trial-division primality test. For each candidate
 `n` in `[2, SIEVE_LIMIT]`, it checks every integer `d` from 2 up to the
@@ -20,32 +28,65 @@ Because `SIEVE_LIMIT` is a compile-time constant, changing it in `limits.h`
 only takes effect if the files that include it are recompiled. That is the
 key to this problem.
 
-## Getting started
-
-    python3 launch.py
+## How it works
 
 A shell opens inside a fresh copy of the repository. Read the source files,
-build the program, and investigate. Type `exit` when you believe you have
-fixed the problem. The launcher will run two checks.
+build the program, and investigate. The fix must make incremental builds
+reliable -- do not delete object files by hand as a workaround. Fix the
+build system, not the source code: `limits.h`, `sieve.cpp`, and `main.cpp`
+are correct; the Makefile is the problem.
 
-## What counts as fixed
-
-The launcher considers the problem fixed when ALL of the following are true:
+The launcher considers the problem fixed when both of the following are
+true:
 
 1. `make clean && make && ./count_primes` prints the expected output.
 2. If you modify `limits.h` and run `make` again (without cleaning),
    the binary is rebuilt and reflects the change.
 
-Check 2 is the real test. A clean build has always worked. The question
-is whether `make` knows that changing `limits.h` means the compiled
-object files are out of date.
+Check 2 is the real test. A clean build has always worked. The question is
+whether `make` knows that changing `limits.h` means the compiled object
+files are out of date.
 
-## Rules
+## Getting started
 
-- Fix the build system, not the source code. `limits.h`, `sieve.cpp`, and
-  `main.cpp` are correct; the Makefile is the problem.
-- Do not delete the object files by hand as a workaround. The fix should
-  make incremental builds reliable, not just get past the validator once.
+```bash
+python3 launch.py
+```
+
+A shell opens inside a fresh copy of the repository. Type `exit` when you
+believe you have fixed the problem.
+
+### Step 1 -- build and run the program
+
+```bash
+make && ./count_primes
+```
+
+Note the output.
+
+### Step 2 -- reproduce the bug
+
+Edit `limits.h` and change `SIEVE_LIMIT` to a different value. Run `make`
+without cleaning. Does the output change? If not, you have reproduced the
+bug.
+
+### Step 3 -- fix the Makefile
+
+Open the Makefile. Find the rules for each `.o` file and add the missing
+header dependencies.
+
+### Step 4 -- verify the fix
+
+Edit `limits.h` again and run `make`. Confirm the binary is rebuilt and the
+output reflects your change.
+
+### Step 5 -- exit
+
+```
+exit
+```
+
+The launcher runs both checks automatically.
 
 ## You will know you are done when...
 
@@ -57,9 +98,10 @@ Both checks pass and the launcher reveals the passphrase.
 <summary>Hint 1 -- where to start</summary>
 
 Build the program and run it. Then edit `limits.h` and change `SIEVE_LIMIT`
-to a different value. Run `make` (without cleaning) and run the binary again.
-Did the output change? If not, `make` did not rebuild what it should have.
-Think about what has to happen for a change to a header file to take effect.
+to a different value. Run `make` (without cleaning) and run the binary
+again. Did the output change? If not, `make` did not rebuild what it should
+have. Think about what has to happen for a change to a header file to take
+effect.
 
 </details>
 
@@ -90,9 +132,21 @@ A prerequisite line lists all files that, if changed, should cause the
 target to be rebuilt. If `sieve.o` depends on both `sieve.cpp` and
 `limits.h`, the rule should read:
 
-    sieve.o: sieve.cpp limits.h
+```makefile
+sieve.o: sieve.cpp limits.h
+```
 
 Add the missing header to each object-file rule. Then verify by editing
 `limits.h`, running `make`, and confirming the binary reflects your change.
 
 </details>
+
+## Going further
+
+- Look up `gcc -MMD -MP`. These flags auto-generate dependency files (`.d`)
+  so the Makefile never needs manual header lists. Add them to the build and
+  see how the generated `.d` files look.
+- Try the same exercise with CMake: does `cmake --build` correctly detect
+  header changes without you listing them manually? Why?
+- Read about `ninja` as an alternative to `make`. How does it handle
+  dependency tracking differently?

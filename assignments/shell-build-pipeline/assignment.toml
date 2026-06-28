@@ -9,11 +9,9 @@ status = "draft"
 [classification]
 language = "cpp"
 difficulty = "medium"
-topics = ["systems", "io"]
-concepts = ["iteration"]
+topics = ["systems", "build-systems", "io"]
+concepts = ["iteration", "shell-scripting", "file-io"]
 labels = ["starter-code", "requires-filesystem"]
-course = "systems"
-module = "build-systems"
 
 [template]
 slug = "shell-script"

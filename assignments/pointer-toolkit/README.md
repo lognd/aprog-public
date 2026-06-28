@@ -7,6 +7,13 @@ memory by incrementing or decrementing the pointer itself rather than using an i
 In this assignment you implement eight array and string utility functions using only
 pointer arithmetic -- no subscript operators on the core traversals.
 
+## Learning goals
+
+- Navigate arrays and C strings using pointer arithmetic (`p++`, `*(p + i)`) without subscript operators
+- Use two-pointer technique for in-place reversal of arrays and strings
+- Implement C string utilities (`strlen`, `strcpy`, `strcmp`) from first principles
+- Return `nullptr` to signal "not found" and use it correctly at the call site
+
 ## Task
 
 Implement all functions in `pointer_toolkit.cpp`. Declarations are in
@@ -113,3 +120,13 @@ g++ -std=c++17 -Wall -I. -o tests pointer_toolkit.cpp visible-tests/test_visible
 | str_find_char (2 cases) | 10 |
 | Gimme (>= 50% correct) | 5 |
 | **Total** | **100** |
+
+## Going further
+
+- Rewrite `reverse` and `find` using array subscripts (`arr[i]`) and compare
+  the assembly output at `-O2`. Are the two versions identical?
+- Add a `str_contains(const char* haystack, const char* needle)` function
+  without using `strstr`. Implement it using only the pointer patterns from this
+  assignment.
+- Run your implementations under Valgrind and confirm no out-of-bounds reads.
+  Then deliberately break one function and see how Valgrind reports it.

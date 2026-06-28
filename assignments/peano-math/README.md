@@ -11,6 +11,13 @@ In this assignment you will implement exactly that chain using only recursion.
 No loops.  No built-in arithmetic operators except in one precisely designated
 place.
 
+## Learning goals
+
+- Build complex operations (multiply, exponentiate) from simpler primitives (successor, add)
+- Write mutually recursive functions that call each other through a defined interface
+- Understand how recursion replaces loops when iteration is forbidden
+- Reason about base cases and recursive cases for arithmetic functions
+
 ## Task
 
 Implement the four functions declared in `peano.hpp` inside `peano.cpp`.
@@ -82,3 +89,12 @@ g++ -std=c++17 -Wall -Wextra -o run peano.cpp main.cpp
 - 20 pts -- constraints satisfied (no loops, operator rules)
 - 10 pts extra credit -- all four functions correct and constraints satisfied on
   large inputs (stress tests)
+
+## Going further
+
+- Implement `subtract(a, b)` using only `successor` and recursion. What is the
+  base case, and how do you handle the case where `b > a`?
+- Read about Church numerals -- a representation of natural numbers as functions.
+  How does it relate to what you implemented here?
+- Add a `modulo(a, b)` function built from `subtract` and comparison. Can you
+  then implement `is_prime` using only your Peano primitives?

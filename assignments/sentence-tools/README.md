@@ -8,6 +8,13 @@ or `char*` parameters -- no `std::string` allowed.  The challenge is reasoning
 about word boundaries, in-place mutation, and the null terminator convention
 simultaneously.
 
+## Learning goals
+
+- Implement word-level string operations using only `const char*` and `char*` -- no `std::string`
+- Reason about word boundaries, whitespace runs, and null terminators simultaneously
+- Perform in-place mutation of C strings (capitalize, lowercase, trim) without heap allocation
+- Mark functions `inline` and understand why it is required for header-only definitions
+
 ## Task
 
 Implement every function declared in `sentence_tools.hpp` inside that same
@@ -96,4 +103,13 @@ The `SUBMISSION_DIR` variable tells CMake where to find your
 
 ## Submission
 
-Submit a single file named `sentence_tools.hpp`.  Do not rename the file.
+Submit a single file named `sentence_tools.hpp`. Do not rename the file.
+
+## Going further
+
+- Add a `word_wrap(const char* s, int width, char* dst, size_t dst_len)` function
+  that wraps `s` at `width` characters. No `std::string` allowed.
+- Look up `std::string_view` (C++17). Rewrite `word_count` to accept a
+  `std::string_view` instead of `const char*`. What changes?
+- Benchmark `contains_word` on a 10,000-word string. Profile with `gprof` and
+  see how much time is spent in character comparison.

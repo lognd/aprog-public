@@ -9,8 +9,8 @@ status      = "draft"
 [classification]
 language   = "cpp"
 difficulty = "medium"
-topics     = ["algorithms", "data-structures"]
-concepts   = ["iteration"]
+topics     = ["algorithms", "data-structures", "build-systems"]
+concepts   = ["iteration", "cmake"]
 labels     = ["starter-code"]
 
 [template]

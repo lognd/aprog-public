@@ -1,31 +1,45 @@
-# Recursion Unwind
+# Activity: Recursion Unwind
 
-## What you will practice
+Recursion is not magic -- every call has a cost in time (how many calls
+happen) and space (how many frames are alive at once). This activity builds
+intuition for both by comparing three implementations of the same function:
+naive recursive Fibonacci, memoized recursive Fibonacci, and iterative
+Fibonacci.
 
-Recursion is not magic -- every call has a cost in time (how many calls happen)
-and space (how many frames are alive at once).  This activity builds intuition
-for both by comparing three implementations of the same function: naive
-recursive Fibonacci, memoized recursive Fibonacci, and iterative Fibonacci.
+## Concepts covered
+
+- Counting recursive calls by tracing a call tree
+- Maximum stack depth: how many frames are alive simultaneously at the deepest point
+- Exponential call growth in naive recursion vs linear growth with memoization
+- How iterative Fibonacci avoids both the call-count explosion and the stack depth problem
 
 ## How it works
 
-You are shown code for three implementations of fib(n) and asked nine
+You are shown code for three implementations of `fib(n)` and asked nine
 questions grouped into three sets of three:
 
-- How many times is the function called when computing fib(5)?
+- How many times is the function called when computing `fib(5)`?
 - What is the maximum number of stack frames alive at once?
-- If the input doubles to fib(10), how does the call count change?
+- If the input doubles to `fib(10)`, how does the call count change?
 
-Each question asks you to reason from the code, not just recall a fact.  The
-passphrase is revealed when all nine answers are correct.
+Each question asks you to reason from the code, not just recall a fact.
+The passphrase is revealed when all nine answers are correct.
 
-## Requirements
+## Getting started
 
-- Python 3.8 or later
-- No external libraries required
-
-## Running the activity
-
-```
+```bash
 python3 launch.py
 ```
+
+## You will know you are done when...
+
+All nine answers are correct and the program prints the passphrase.
+
+## Going further
+
+- Implement memoized Fibonacci using a `std::unordered_map` and verify that
+  the call count matches your answer for `fib(5)`.
+- Use a debugger (`gdb` or `lldb`) to pause execution inside naive `fib` and
+  print the call stack with `bt`. Count the frames at the deepest call.
+- Look up tail-call optimization. Can the compiler optimize naive `fib` into
+  a loop? Try compiling with `-O2` and inspecting the assembly.

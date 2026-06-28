@@ -2,6 +2,15 @@
 
 Implement five number-theory utility functions in `number_toolkit.hpp`.
 
+## Learning goals
+
+- Implement number-theory algorithms efficiently within explicit complexity bounds
+- Use O(sqrt(n)) trial division for primality testing instead of the naive O(n) approach
+- Apply the Euclidean algorithm for GCD and understand why it is faster than looping from min(a, b)
+- Write iterative (not recursive) Fibonacci to avoid exponential call growth
+
+## Task
+
 ## Functions
 
 | Function | Signature | Notes |
@@ -55,7 +64,17 @@ An O(sqrt(n)) implementation finishes in microseconds; O(n) does not pass.
 
 Submit a single file named `number_toolkit.hpp`. Do not rename the file.
 
-## Local Testing
+## Going further
+
+- Implement the Sieve of Eratosthenes and benchmark it against your trial-division
+  `is_prime` for finding all primes up to 1,000,000. At what threshold does the
+  sieve become faster?
+- Look up Miller-Rabin primality testing. How does it differ from trial division,
+  and at what input size does it become relevant?
+- Add a `prime_factors` function that returns the prime factorization of n as a
+  sorted vector. Use your `is_prime` to guide it.
+
+## Compilation and Testing
 
 ```bash
 g++ -std=c++17 -o toolkit_test visible-tests/test_visible.cpp -I assets

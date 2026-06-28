@@ -9,8 +9,8 @@ status      = "draft"
 [classification]
 language   = "cpp"
 difficulty = "easy"
-topics     = ["algorithms"]
-concepts   = ["conditionals", "iteration"]
+topics     = ["algorithms", "io"]
+concepts   = ["conditionals", "iteration", "argument-parsing"]
 labels     = ["starter-code"]
 
 [template]

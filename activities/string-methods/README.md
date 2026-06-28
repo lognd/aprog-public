@@ -1,4 +1,4 @@
-# String Methods -- Fix the Word Wrapper
+# Activity: String Methods
 
 Word-wrapping means breaking a long string of text into lines that each fit
 within a maximum column width, always cutting at a space between words rather
@@ -12,17 +12,26 @@ When both bugs are fixed the output has exactly five lines.  Read the first
 letter of each line in order -- those five letters spell the LMS passcode for
 this activity.
 
+## Concepts covered
+
+- `std::string` operations: building lines word by word with space separators
+- Off-by-one errors in string length comparisons (`<` vs `<=`)
+- The "flush the last item" pattern: loops that build up a buffer often need a post-loop push
+- Reading a function carefully to find subtle logic errors vs. syntax errors
+
 ## Getting started
 
-    python3 launch.py
+```bash
+python3 launch.py
+```
 
 A shell opens inside a fresh copy of the project.
 
-## Walk-through
-
 ### Step 1 -- compile and run the broken program
 
-    make run
+```bash
+make run
+```
 
 The program prints however many lines the broken function produces, along
 with a count.  It also tells you whether that count is correct.  Read the
@@ -43,7 +52,9 @@ Find the two bugs:
 
 ### Step 3 -- fix both bugs and rerun
 
-    make run
+```bash
+make run
+```
 
 The program will tell you if the output has the right number of lines.  Both
 bugs must be fixed at the same time -- fixing only one will not produce
@@ -56,12 +67,14 @@ order, as a single word.
 
 ### Step 5 -- exit
 
-    exit
+```
+exit
+```
 
 Write down the first letter of each of the 5 output lines in order before
-you exit.  That word is the LMS passcode -- submit it directly.
+you exit. That word is the LMS passcode -- submit it directly.
 
-## You'll know you're done when...
+## You will know you are done when...
 
 The program prints exactly 5 lines and says "Correct!"
 
@@ -92,8 +105,17 @@ The function returns without ever saving it.  Add this before `return lines;`:
 <summary>Hint 3 -- checking your work</summary>
 
 After fixing both bugs, each line should be at most 36 characters long and
-there should be exactly 5 of them.  If you still see the wrong count, make
+there should be exactly 5 of them. If you still see the wrong count, make
 sure you fixed both bugs -- they interact, so one fix alone will not be
 enough.
 
 </details>
+
+## Going further
+
+- Extend `word_wrap` to also handle tab characters as whitespace. How does
+  that change the line-length accounting?
+- Write a unit test for `word_wrap` using a vector of `{input, width, expected}`
+  triples. What edge cases do you need to cover?
+- Look up `std::istringstream` as an alternative to the manual word-splitting
+  loop. Rewrite the function using it and compare readability.

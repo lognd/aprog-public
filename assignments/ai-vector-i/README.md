@@ -6,6 +6,12 @@ of a dynamic integer array -- and then fix it.
 You are given the following **intentionally broken** starter code. It has **several bugs**.
 Your job is to find and fix every one of them so that `VectorI` compiles and behaves correctly.
 
+## Learning goals
+
+- Learn how to vibe code.
+- Understand why relying on code-generation tools in a course designed to teach you how to program is a bad idea.
+- Understand that you will be shooting yourself in the foot in later courses and work if you rely on code-generation tools.
+
 ## Starter file
 
 **`vector_i.hpp`** (see `assets/`)
@@ -74,6 +80,6 @@ Fix every bug in `vector_i.hpp` so that `VectorI`:
 5. Correctly grows the backing array in `push_back` (doubles capacity from a non-zero base).
 6. Returns a reference to the element just inserted by `push_back`.
 
-## Submit
+## Submission
 
 Submit only `vector_i.hpp`. Do not add a `main` function.

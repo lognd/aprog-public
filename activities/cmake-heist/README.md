@@ -1,34 +1,39 @@
-# cmake-heist
+# Activity: CMake Heist
 
 A multi-module C++ project with no build system. Your job is to write
 `CMakeLists.txt` from scratch -- or rather, from an outline.
 
-## Getting started
+## Concepts covered
 
-    python3 launch.py
+- `cmake_minimum_required`, `project`, and `CMAKE_CXX_STANDARD` boilerplate
+- `add_library(STATIC ...)` and `add_executable` target definitions
+- `target_include_directories` with PUBLIC vs PRIVATE visibility
+- `target_link_libraries` and transitive dependency propagation
+- `enable_testing` and `add_test` for CTest integration
 
-A shell opens inside a fresh copy of the project. A `CMakeLists.txt`
-is already there with comments guiding each section. Fill it in.
+## How it works
 
-## The project
+A shell opens inside a fresh copy of the project. A `CMakeLists.txt` is
+already there with comments guiding each section. Fill it in so the
+project configures, builds, and passes its tests.
 
-    lib_math/    -- static library: gcd, is_prime, prime_count
-    lib_text/    -- static library: digit_count, print_row, print_rule
-                    (depends on lib_math internally)
-    app/         -- main executable, uses both libraries
-    lib_*/tests/ -- test harness for each library
+The project layout:
 
-## What you must write
+```
+lib_math/    -- static library: gcd, is_prime, prime_count
+lib_text/    -- static library: digit_count, print_row, print_rule
+                (depends on lib_math internally)
+app/         -- main executable, uses both libraries
+lib_*/tests/ -- test harness for each library
+```
 
-A single `CMakeLists.txt` at the root of the project that:
+You must write a single `CMakeLists.txt` at the root that:
 
 - Declares the project and sets the C++ standard
 - Defines a static library target `math` with public include paths
 - Defines a static library target `text` that links against `math`
 - Defines `app` as an executable linked against both libraries
 - Enables testing and registers two test executables (`test_math`, `test_text`)
-
-## Validation
 
 The launcher runs four checks when you type `exit`:
 
@@ -37,19 +42,56 @@ The launcher runs four checks when you type `exit`:
 3. `ctest --test-dir build` -- both test suites must pass
 4. `./build/app` -- output must match expected
 
-All four must pass.
+## Getting started
+
+```bash
+python3 launch.py
+```
+
+A shell opens inside a fresh copy of the project.
+
+### Step 1 -- read the outline
+
+Open `CMakeLists.txt` and read the comments. Each comment describes one
+thing you need to add. Do not delete the comments as you fill in the file.
+
+### Step 2 -- fill in CMakeLists.txt
+
+Work top to bottom through the outline. Build and test as you go:
+
+```bash
+cmake -B build && cmake --build build && ctest --test-dir build
+```
+
+### Step 3 -- exit
+
+```
+exit
+```
+
+The launcher runs all four checks automatically and prints the passphrase
+if everything passes.
 
 ## You will know you are done when...
 
 The launcher prints the passphrase.
+
+## Going further
+
+- Add a `INTERFACE` library target for shared compile flags and see how it
+  propagates differently from `PUBLIC`.
+- Add a `Release` and `Debug` build type toggle to the CMakeLists.txt and
+  verify that `-DCMAKE_BUILD_TYPE=Debug` enables debug symbols.
+- Read the CMake docs on `IMPORTED` targets -- used when consuming a
+  pre-built third-party library -- and write a toy example.
 
 ## Hints
 
 <details>
 <summary>Hint 1 -- where to start</summary>
 
-Every CMakeLists.txt begins the same way: declare the minimum CMake version,
-name the project, and set the C++ standard. Look up
+Every CMakeLists.txt begins the same way: declare the minimum CMake
+version, name the project, and set the C++ standard. Look up
 `cmake_minimum_required`, `project`, `CMAKE_CXX_STANDARD`.
 
 </details>
@@ -64,7 +106,9 @@ Windows. You name the target; the `lib` prefix is added for you.
 
 To make a library's headers available to targets that link against it:
 
-    target_include_directories(name PUBLIC path/to/include)
+```cmake
+target_include_directories(name PUBLIC path/to/include)
+```
 
 `PUBLIC` means: both the library itself AND anything that links against it
 will get this include path. `PRIVATE` means only the library itself.
@@ -79,10 +123,9 @@ will get this include path. `PRIVATE` means only the library itself.
 from `dep`. Because `text_utils.h` does not include anything from `math`,
 the dependency is private.
 
-When `app` links against `text`, it transitively gets `math` too
-(because `text` declared that dependency). You still need to link
-`math` explicitly for `app` if `app/main.cpp` calls math functions
-directly -- and it does.
+When `app` links against `text`, it transitively gets `math` too (because
+`text` declared that dependency). You still need to link `math` explicitly
+for `app` if `app/main.cpp` calls math functions directly -- and it does.
 
 </details>
 
@@ -94,13 +137,15 @@ You need to build two separate test executables -- one for each library.
 and their own `target_link_libraries`. Call `enable_testing()` first, then
 define both:
 
-    add_executable(test_math lib_math/tests/test_runner.cpp lib_math/tests/test_math.cpp)
-    target_link_libraries(test_math PRIVATE math)
-    add_test(NAME math_tests COMMAND test_math)
+```cmake
+add_executable(test_math lib_math/tests/test_runner.cpp lib_math/tests/test_math.cpp)
+target_link_libraries(test_math PRIVATE math)
+add_test(NAME math_tests COMMAND test_math)
 
-    add_executable(test_text lib_text/tests/test_runner.cpp lib_text/tests/test_text.cpp)
-    target_link_libraries(test_text PRIVATE text)
-    add_test(NAME text_tests COMMAND test_text)
+add_executable(test_text lib_text/tests/test_runner.cpp lib_text/tests/test_text.cpp)
+target_link_libraries(test_text PRIVATE text)
+add_test(NAME text_tests COMMAND test_text)
+```
 
 `add_test` does not build anything -- it only tells CTest "when tests are
 run, execute this command." The executable must already exist, which means
@@ -112,8 +157,8 @@ appears in `ctest` output; `COMMAND` is the binary to invoke.
 <details>
 <summary>Hint 5 -- include paths inside tests</summary>
 
-The test files include headers like `"lib_math/math_utils.h"`. These headers
-live in `lib_math/include`. Because `math` was declared with
+The test files include headers like `"lib_math/math_utils.h"`. These
+headers live in `lib_math/include`. Because `math` was declared with
 `target_include_directories(math PUBLIC lib_math/include)`, any target
 that calls `target_link_libraries(... math)` automatically inherits that
 include path. You do not need to repeat the `target_include_directories`

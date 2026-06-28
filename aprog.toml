@@ -101,6 +101,18 @@ name = "Functional Programming"
 [classification.concepts.conditionals]
 name = "Conditionals"
 
+[classification.concepts.bitwise]
+name = "Bitwise Operations"
+
+[classification.concepts.argument-parsing]
+name = "Argument Parsing"
+
+[classification.concepts.file-io]
+name = "File I/O"
+
+[classification.concepts.shell-scripting]
+name = "Shell Scripting"
+
 [labels.requires-filesystem]
 name = "Requires filesystem access"
 description = "Assignment expects student code to read or write files."

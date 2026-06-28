@@ -15,6 +15,13 @@ programmers for years if never addressed head-on.
 
 ---
 
+## Learning goals
+
+- Store a 2D matrix in a flat array and derive the row-major offset formula (`r * cols + c`)
+- Use pointer arithmetic (`*(ptr + offset)`) as the exclusive alternative to `[]`
+- Distinguish the four combinations of `const` and `*` in pointer declarations
+- Write functions that signal read-only intent with `const int*` vs mutable intent with `int*`
+
 ## Background: what you need to know before you start
 
 ### How a 2D matrix is stored in a flat array
@@ -277,5 +284,15 @@ g++ -std=c++17 -Wall -Wextra -o tests \
 
 ## Submission
 
-Submit a single file named `matrix.cpp`.  Do not rename it and do not submit
+Submit a single file named `matrix.cpp`. Do not rename it and do not submit
 `matrix.hpp`.
+
+## Going further
+
+- Add a `mat_multiply(const int* a, const int* b, int* dst, int n)` function
+  for square n x n matrices. Benchmark the naive O(n^3) version against a
+  cache-friendly loop-reordering (k-j-i instead of i-j-k).
+- Implement the same nine functions using `std::vector<int>` with `operator[]`.
+  Compare the code. Which version is clearer? Which is safer?
+- Compile with `-fsanitize=address` and deliberately pass wrong row/col counts
+  to `mat_transpose`. Read the ASan report to understand what it catches.

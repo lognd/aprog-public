@@ -4,6 +4,13 @@ A small C++ library ships with a header and implementation file. Your job is
 to write two build configurations for it -- one using Make, one using CMake --
 and understand why the two tools approach the problem differently.
 
+## Learning goals
+
+- Write a Makefile from scratch with correct prerequisite lists, automatic variables, and phony targets
+- Write a CMakeLists.txt that builds a static library and links an executable against it
+- Understand why Make uses timestamps and what happens when a header is missing from prerequisites
+- See how the same build intent is expressed declaratively (CMake) vs procedurally (Make)
+
 ## What you are building
 
 The library provides three number-theory functions declared in `stats.h`.
@@ -111,3 +118,13 @@ The script requires `make`, `cmake`, and `g++` to be available.
 | Makefile structure (automatic vars, CXXFLAGS, header dep, .PHONY, no spurious rebuilds) | 25 |
 | CMake builds and test passes | 35 |
 | **Total** | **100** |
+
+## Going further
+
+- Add a `compile_commands.json` target to your CMakeLists.txt (set
+  `CMAKE_EXPORT_COMPILE_COMMANDS=ON`) and open the project in an IDE that
+  uses it. What does the IDE gain from this file?
+- Extend the Makefile to support parallel builds (`make -j4`). Does it
+  already work? If not, what prerequisite is missing?
+- Look up `cmake --preset` (CMake 3.19+). Write a `CMakePresets.json` that
+  defines a debug and a release preset.

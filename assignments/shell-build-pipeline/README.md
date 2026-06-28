@@ -5,6 +5,13 @@ By the time you finish, you will understand the problem Makefiles were invented 
 
 ---
 
+## Learning goals
+
+- Understand the four compilation stages: preprocess, compile, assemble, link
+- Use `g++ -E`, `g++ -S`, `g++ -c`, and `g++` (link) as separate invocations
+- Write a shell script that implements incremental builds using file timestamp comparisons
+- Use pipes, stderr redirection, and `wc` as real tools in a build script
+
 ## Background
 
 `g++` can compile a C++ program in one shot:
@@ -198,3 +205,12 @@ Check with `ls -lt` to see modification times.
 | All four stages explicitly invoked | +5 EC | Visible |
 
 **Total: 100 pts + 5 extra credit**
+
+## Going further
+
+- Add a `clean` target to your script: delete all generated `.i`, `.s`, `.o`,
+  and `program` files.
+- Look up `make -n` (dry run). Implement a `--dry-run` flag in your shell
+  script that prints what would be rebuilt without actually running the commands.
+- Read about `ninja` and `cmake --build`. How do they solve the same incremental
+  build problem as your script, and what do they add?
