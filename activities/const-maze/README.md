@@ -111,7 +111,8 @@ All eleven questions are correct and the program prints the passphrase.
 - Look up the "east const" convention (`int const*` instead of `const int*`)
   and read the arguments for and against it.
 - Why can a `const` reference bind to a temporary (`const int& r = 5;`) but
-  a non-const reference cannot?
+  a non-const reference cannot? (This will be super important for something
+  called the "Big 5" later on!)
 - Write a `consteval` function and confirm that passing a runtime variable
   produces a compile error.
 - Add a `constinit` global to a program and verify you can modify it after
