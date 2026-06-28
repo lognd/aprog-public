@@ -1,8 +1,8 @@
 [assignment]
-slug        = "cstring-utils"
-name        = "C-Style String Utils"
+slug        = "sentence-tools"
+name        = "Sentence Tools"
 author      = "lognd"
-description = "Implement classic string utility functions using C-style char arrays and const-correct pointer parameters."
+description = "Implement a small C-style string library that operates at the word level: counting, extracting, searching, and transforming words in a sentence."
 version     = "0.1.0"
 status      = "draft"
 
@@ -10,7 +10,7 @@ status      = "draft"
 language   = "cpp"
 difficulty = "medium"
 topics     = ["strings", "algorithms"]
-concepts   = ["pointers", "mutation"]
+concepts   = ["pointers"]
 labels     = ["starter-code"]
 
 [template]
@@ -19,3 +19,6 @@ slug = "cpp-header-impl"
 [grader]
 visibility        = "after_due_date"
 stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "valgrind"]

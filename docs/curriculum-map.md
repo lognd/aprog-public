@@ -14,9 +14,9 @@ Status: `done` = committed, `planned` = designed but not built, `wip` = in progr
 | Standard Library Types | array-foray, vector-inspector-corrector, string-methods | csv-parser | done                 |
 | Makefile & CMake | stale-build, cmake-heist | dual-build | done                 |
 | C++ Standards, Project Organization, README | cpp-standards-hunt, project-docs, project-layout | stats-library | done                 |
-| Memory Model (heap vs. stack, call stack, recursion) | stack-heap-bingo, recursion-unwind, call-stack-autopsy, stack-heap-safari | peano-math, recursive-algorithms | untested             |
+| Memory Model (heap vs. stack, call stack, recursion) | stack-heap-bingo, recursion-unwind, call-stack-autopsy, stack-heap-safari | peano-math | untested             |
 | Pointers (pass modes, arrays as pointers, arithmetic) | pass-mode-minefield | pointer-matrix, pointer-toolkit | untested             |
-| C-Style Strings & Arrays | cstring-predictor | cstring-utils | untested             |
+| C-Style Strings & Arrays | cstring-predictor, char-by-char, cstring-whodunit, cstring-vs-stdstring | sentence-tools | planned              |
 | Const | const-maze | -- | untested             |
 | Command Line Arguments | argv-explorer | -- | untested             |
 | Basic OS Theory | -- | -- | planned              |
