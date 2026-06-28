@@ -152,7 +152,7 @@ def _secret_for_question(index):
 
 def _ask(q, index, total):
     secret = _secret_for_question(index)
-    print(f"\n  Q{index:02}/{total:02}  [{q['fn']}]  {q['prompt']}")
+    print(f"\n  Q{index:02}/{total:02}  {q['prompt']}")
     print(f"           Hint: {q['hint']}")
     attempts = 0
     while True:

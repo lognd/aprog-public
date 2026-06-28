@@ -8,8 +8,8 @@
 import json, os, subprocess, sys, tempfile
 
 # -- Crypto / obfuscation --
-_KEY_A = "ad530c19c43f6ec8a682447887a5e510b04209d321b6ffeb7912f4ea933ae965"
-_KEY_B = "8313a431a22602b8ffff2f339890b7784d0468657f92efd5c36446a3ebac868b"
+_KEY_A = "16448e778af3c6daeda3da8bee278bf729f2f08a379fbd23661a465151bb80f4"
+_KEY_B = "e67aa1e42bfc1355e2cf65510f232c5d5fe323919a1dfa3a543e2fd88609c141"
 import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
@@ -56,7 +56,7 @@ def _open_secret(blob_text, label):
     except Exception:
         return None
 
-_BLOB = "fcbbd5a57e7f3e3c4dc7e3591432ecc2114a604078cf6e9581264a7074a0b3d8144b7abdfeba2f4133b46af1655d772cfe"
+_BLOB = "7989252ba0285136a5857a54f311aab2705df2c1653ba099641aa116a1d0f908f6294446ec671d59f2666b6a8c0b24aafe"
 
 # -- Public snippets and encrypted feedback/explanation material --
 SNIPPETS = json.loads(r"""
@@ -107,12 +107,12 @@ SNIPPETS = json.loads(r"""
 """)
 SNIPPET_SECRETS = json.loads(r"""
 [
-  "-FcOLde05?$v@u~kwXxEu1N(%9Z^v<<=aQ;RngEs?2rqeXJN>EyoE*^VM;*@`oIJA)#o!}Fo{OaoC8&IbcBjOMS4g?8#8F5&taNy1h-UGxFOPMo~l%PBKImW-Y2PDPfENx_JarF_tMKw+;#-+*D2;7l9a4@D)JdPfefm1Wobp6MZi5Ki}i}g{oFJyh8P?}<J6oBDcOY(nE@Cpw^H;8Q7MT?z&6&IqT7W>Rz6ITNAGp7)C_6axX~uxgc%&sl#r8VbFWmd&?e{Y3wcVey2}f5BItk3a8zow{iFr&nccUB#PxMqlg_aIAQRK%3i30$FKCybFvOv426;-WkYi%*g~GA2qXQU=GqcI{r@f*~E$P$DrTiG{PT~|EpCAp+s``481>rM;<q{vP#<mFrH&Et^dIhm8Q8Su8u3!h)Yz(*@TbC6?yAW=ocPS3|2@kI0rYzO0Ztn1<v_;nYj#UuNv|(#U^8o",
-  "5Cjd5JQOvm^~*X{U3LW~Zw<f$vi5({oLaiC13l?iO~>h{G1NPKpOz8hb%B4#61HuP;Q$#lHjVu##)`4(hp-l~u**sQew8c%pdQ#zj3fYKR?--tI)UmDj?=~Yl;E_n7H8h40S`uOg$T{500*soA6WiTHNI*eMTBae;x0MpfpK3YqUAfr{1@<=l$fN=$fG`76`UK)*A|sL5S&y~UPAVTOg$O+VI2=N0$N4ZQJ2opiy>`nKe+zpj|@WnyLn(Zt=xl36>22d?K|Sso+c=B*7w~qeonb9q<MMF*qG^(=`uZ`U$2GoK*3sdZ4eF+qBq!J7^ZCYP5Z{fK>YfcV36ZJkMs)ccu*|+g*vA<bN5)g*}RWj_MhO0KwYT6zN<`u$1v=aLd%N4`@M?tAOgCgTVn^Tfpy-Ie|o=wf|X<KXFRzjr#J)AFa",
-  "bpD>`{uYf&qOS@2);bym=r2C#6CGZ2(>4r^Y`n_p><q_k=_cILns|aW*PTL(e?E!@#&BHV1hB4}=ATl4RFO!97n7CFRYPm@Ys`l(xAhCG^o>OHoQZKE;(RkCyPbxdk>ledcj_Fv1|pqTR23m8CEBG-6cp<ufV`xT#b)-YI&lF43R#fZ$bK@6@zuJ;3;6KMlQCZAjUP1>;BIT&F?s>?W1M5mnh>|fGbOOeUXbV(DaK@J9f~rvEZ!edAY!3QEZ#AnT$NsAbSW-I^2u5Flns}@kbCcwl_B`Gm_QkgmHS9#G3dJK*P3@-mR=YmF-!|ts)J5VPR4T5Y~?qIo-XUPTi2D6mNg#)*6^>LBhCvfJ*uJXf?aj=z!vuYV<v%E&vU(<LZCEZs)5C7<1n<g@zEEK=K",
-  "5hBI^V{q%PG4mLwIgZ@1(1t@53v~wZVCCf^qo=zo32t(gFs8bO(!`Y70oY+HZtq+xU#A3^Y4d-oYxMgBl#veQ!l~kPau4=aEjgy9ewnUk#m6k+8C|Y@)!ctpp`aMWFxx6ezLysI`TO<(%G!GY-Nu5J8uUa6N+8U4Zxp{};@w+nbe@P_A6R<)=}8=i^C@!NQ+<bw@+qt|M^U@(tK&neI_c~UyDTj(%`OkFS2>yVUHnFs57r?h1~h20A_w%54gwz?<vajLd3t`s|Btl`LTw5q;VhM7Kg&3@4T2kvT6)qt=`<rR?&z4LXf0PXeC6&(mbhSze@XS~Vq$0feyD-",
-  "kuZIPhH-|i@-GuY{#8oJl}lY(IViFA9QrSIOap<@Dv95FcL9W++aJ^i)mBh`)?MG{$~3%22jIKhsT#L81Ujhw=VA?l_X=$OF%sp@B(tJQKKD@6z3FgZFg>Hl?4k3yFzINXBpW!Fz1C?evhLlZ6w7UoLmob)xyfc9#+x~0)Mu_@DQR@!yV2$6k{U9^_A0orH?OeRe_Pia(RSE;vbmw*>Txzm3DNBO4A{W*izn43DS5^T=N=Ebb>Ch}irBwvuIX#Bdkt<#G937KL4A_;zCBAT{ynBmAXT!9@;4Xt&U&*y$iK9{t<?e`qB5JS7XU?28Q=ZEHAVZgYTK+`TJ@*ctdaOemw8Bq``t-_Am4H;t8XZk5nX6V;aq!1LFyr)t@$&E-f-gQYe;AC%QcB@c_M~!nJNatHC73&^SZRKrOu7cTqj&^t<ZGU",
-  "3pI?Y=P+9sPV?|7hG}B-l(vmh-834hiP)aB1&`+B`mjXio+5ZMFwZDz(013Q#tM_Ny6iJ)D+t3kXMu5_I&))qTOfc*QFcZSKEg~7|8wE~w%JdtXYvk1Hcrw8)10eyyce2}NDt6(PrRt4PKY??d+2sG-Qil#Zx-4F74K)?+!)nIZ<WV@J^YdSpYmkr27AdDg&;s(_Z~mMqB&1xN$jY<J1K+gPs(z~n(>N`3@OR4R}oQdz-!m*eYSusOwoopAI)3Ak-sP>mvEU8R6Ec8=Rj&$rCJ)XVNF2SWhFz<w#~lYdili(X-)`Cp3p7&;R)SHqG5J5mC+ividyIp-ukUE)LI&S33D;n1|Tr{Jz(XoU2~{?II<v}IKOoN?4VXIGON$?*WH?`3l?SqLopmDV8bYLaGsy+bAf4nnmx!Mq0h@{U{AYWRCyP%"
+  "dG6>p+|fmDOS<+jbs~s+_4_K8m*;|`QvVpZ89yePCf-qT3>cXAC!=H*jtq}AE*Y*8CHXj|<QqJy5J{H|G(^ZqZW-)>T<~isgj-{m;u}8b^iXL|^5VnZM_oc<B958g*m`7isX*j|eCk8vIof8L_Up1EOSc#(S%hgLDrl*uuroq*S~jG`rCw@h?-?x<m(!-AEKH6ZAOg^K9l7+C_5%zc+ZjyQsf48j0IGhn;A0kHt$_Uep-I-4ETQ90sb8&Vmfa^E?9tev(+N*|vj70qc^x36oN|i3$$97UmTcT6e97a2Ko=q_(9F{59*_Cbp$#U0W;rxn$QT|az{m28MaC{M@B)ZYgDQ3tZAY!om&zdu8Frxz$Z?jUku?DI@`*i`(18ezHi<4gh+vql8~TH2v2M>`4kW_AfJE*a+oy&jB&mlD3ywKbs+FUah_$3J1|d~7WE$!1_5K%Wa-voR(a)|qtQ6`4*t7",
+  "=DY*zcivpHBUDnR(jH^hAGA08VFUlNoL3~IDK(PDj56Axc`mnO*nEGtQ?s7j4ML7wHXU+Qplq*A&RTn{$15w3NNmS$7I!jDZDzGte&l%HwMdnxsrw%NM!3p$(%C~x3mu3Nk7F9Gm5Pe$eoOY^AUy2?O*4tA?2xM>V0j`a`@RK+glnR@M@fOKZyiS2L!^<~e9ZkM@o;G}0ElYhP|!6sNgz*dr`<n;n>iAA2Q3qe$&HYTyt_ZwB|`<v!9fh64b2+|uI|+7jxAV3`U`4RxBF3Dm2~r(Esvsy3)=wQCtRjN9|)@+sxqxBY-<>=tTyX4CH^B%2ie%Fu$^kGCumYP>fK=RC}vavd>Z3UMp(vzJDQi|%_B$Y7^jU!ilw6g-c*<dg&cv4v;n`iNx=gmV#s3348uZbmbo>S4W||FP~jRKq6ByqDg",
+  "HEletg3}G&-heh=oRgoRW_jf>?c{Qj-$wWOg_PA)Ab~tZFCY<bJ)OBzGW@zu*b=#Of>Zl#x^JpRb>2zmhKf&5q3z3$k3|w9aO<w9*e+%mU#U7<Mh7=?fTZz$9+XIruUookkPP2`#IRs2?ZbyRWu3rDoP~CJvbbrPHw2rs{Y<<k4O`Gxn6FfWe{s`2i=0z7N3OOj=HqgXm{0Ga7?|M^wf~uHzm+``bK?^8Kh8Jz&B*f+%LhZ&>C3}bGymv#?B6B-(>9EMtZp+U&z%_f1Gwir_~7aGbS#WP<w;;xb%42DM2{tqrH3X1|E%B#VQ@NP%uXK8+G!n~wE1#)a|k83whuMdkl3kHbncp>nHOvHC>C=d{pF^;q+@-5KN>Pb<dI%aqU;OlcZ@ap*&A=ybGti#u>",
+  "-Z#+6Z=L2n<_*Jb0JiO?V&<h=*DmQ$z;u257`yu%Cf5uG0=UC7-EOSH@mt-f-j&Tg*YUlRy|CDHAI!IP=`P9}W2!SYB!y~>D~p8%aF?)|Wf6w8qsKuPuR4I|0nKpY&voJVMCg7gToNHY_DbML7wd0YxFsEXq`cAEhHT#lD#oA!n4BQZJQR&ETlgX-(U9%r*qq)~@5M9lNc^T~UsU=3#~fbE47X$x6H+R>TV3(8H^v%c!e%z1Rwm!gA}M&V9nk1AqrfDUZ^3!~TaQxIP}&OjD{L<c6UY_stEGxR)a_*|R!?K?97(eM;bJ|NaB{y1tM4{c32MRqzT2qcX_Zp",
+  "^qmeN(LcxPH|oc`5h;e8FUb?$KlCuDo8R_XzC9>mSbfQ>+PqeDOHhO9cBJw(YYj<kBf+|Vf^qD)l_p3Y4@iYqub)=*Z0ZmHurfkVgze!%m(m^tW{lA4kpQhi=%nhi)K$c~z}7upA9U;i=L;a=WTG<fQbR*t3GkA+bIjIriIGzZBs2?bR86CAJF2@I<esPYURx){PF2JDfe*V3x$#fur*Ov0jghy-=AKrVBD{Dz`Whj=dfMzCxp3i-wMQf-R0y)-+g@QV#ul0SM5Qu6Avs`pbJ9Ky$(O9~BK}$k{q{+|e{w4-S=M+WXYd>G#(@Q}GwKhT_@dQh{bcGlQYrESK7L+vk(;1}Efw`2BC{*jGWrNI_TIjrnT}V4d%-=D;obwPsgY@k@ugT`h?l~xk_sC57NSl2kU)q8a#xbzEZS3<A0y;_C`&&u",
+  "Wk4_M*(y34+Or^3Z$J@XCKcNy;}vP-FGYF&rm!u)A|c!L;<=fax>3wR(gXCYP6qT7&BcmfP7}+7O0dD-3{cb)mBan_q4ZPZW_XA<sf2AoFkJ9O!o}G{$iJQLzx4N<pTv2QVx)`9BmT$XcjhP1dlzv^`h`J7ARC76w`iUKTC;bM!?YkB<{*^LoOLkJnm<$H;_8<&yZ1i0u6oy7O2RFyH)IKg>oYFO_F_P~u=}h)wJM_ML1h!qJts(c&Q+1t^t%&_ZRhUL*{mgUb$A2C!B=!tM}qH?F<gg+$T;BWk_xJ*hmvweNoS*h=d-nLBjNaV2?tPhJ)2N1Ab93D(o+`bv1-eO|M#^*ulDa$!60-A_HQeJ{enKQ(ha6!KBPK1#e_g65<gp=cRAV2biYl`D41|vaxG?qyVsKONu^DxcdxxsR}C9qw@u?^JyQ"
 ]
 """)
 
@@ -192,9 +192,17 @@ def _ask(s, actual, index, total):
     print(f"  {s['prompt']}")
     attempts = 0
     while True:
-        raw = input("  Your prediction: ").strip()
-        if not raw:
-            continue
+        n_lines = actual.count("\n") + 1
+        if n_lines > 1:
+            print(f"  (Output has {n_lines} lines -- enter each line, then press Enter.)")
+            parts = []
+            for ln_i in range(1, n_lines + 1):
+                parts.append(input(f"  Line {ln_i}: ").rstrip("\r"))
+            raw = "\n".join(parts)
+        else:
+            raw = input("  Your prediction: ").strip()
+            if not raw:
+                continue
         if raw == actual:
             if attempts > 0:
                 for ln in _wrap(secret.get("explanation", "")):

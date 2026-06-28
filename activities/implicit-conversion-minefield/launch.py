@@ -240,9 +240,17 @@ def _ask(s, actual, index, total):
     print(f"  {s['prompt']}")
     attempts = 0
     while True:
-        raw = input("  Your prediction: ").strip()
-        if not raw:
-            continue
+        n_lines = actual.count("\n") + 1
+        if n_lines > 1:
+            print(f"  (Output has {n_lines} lines -- enter each line, then press Enter.)")
+            parts = []
+            for ln_i in range(1, n_lines + 1):
+                parts.append(input(f"  Line {ln_i}: ").rstrip("\r"))
+            raw = "\n".join(parts)
+        else:
+            raw = input("  Your prediction: ").strip()
+            if not raw:
+                continue
         if raw == actual:
             if attempts > 0:
                 for ln in _wrap(secret.get("explanation", "")):
