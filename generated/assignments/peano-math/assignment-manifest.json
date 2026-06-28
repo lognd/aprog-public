@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "peano-math",
+    "name": "Peano Math",
+    "author": "lognd",
+    "description": "Build integer arithmetic from scratch using only the successor operation and recursion."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/peano-math",
+    "readme": "assignments/peano-math/README.md",
+    "visible_tests": "assignments/peano-math/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:55735120f60f9e26c9af8732d0ff70d0b0743878644629b6aeae8f3b25c6438e"
+}

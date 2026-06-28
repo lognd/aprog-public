@@ -1,0 +1,25 @@
+[assignment]
+slug = "pointer-matrix"
+name = "Pointer Matrix"
+author = "lognd"
+description = "Implement a 2D matrix library using only pointer arithmetic -- the [] operator is forbidden."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "medium"
+topics = ["algorithms", "memory-management"]
+concepts = ["pointers"]
+labels = ["starter-code"]
+
+[template]
+slug = "cpp-header-impl"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["g++"]

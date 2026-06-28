@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "pointer-matrix",
+    "name": "Pointer Matrix",
+    "author": "lognd",
+    "description": "Implement a 2D matrix library using only pointer arithmetic -- the [] operator is forbidden."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "algorithms",
+      "memory-management"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/pointer-matrix",
+    "readme": "assignments/pointer-matrix/README.md",
+    "visible_tests": "assignments/pointer-matrix/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:aa3d2534290feccfb974a4f293a0c367f46946f9adcd8fe54b614d71338fec0b"
+}

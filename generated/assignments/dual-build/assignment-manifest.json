@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "dual-build",
+    "name": "Dual Build",
+    "author": "lognd",
+    "description": "Write a Makefile and a CMakeLists.txt for the same C++ library project."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "systems",
+      "build-systems"
+    ],
+    "course": "systems"
+  },
+  "template": {
+    "slug": "cpp-cmake",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/dual-build",
+    "readme": "assignments/dual-build/README.md",
+    "visible_tests": "assignments/dual-build/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:84d1c50a02aff8e91900bb14669eff766f41ff95ccdd4e92b349ee4c85ec6008"
+}

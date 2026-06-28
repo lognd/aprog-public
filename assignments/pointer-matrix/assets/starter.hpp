@@ -1,0 +1,14 @@
+// Pointer Matrix -- starter header.
+// Implement all declared methods in this file.
+// Do not add #include directives for STL containers.
+#pragma once
+
+// FILL IN: replace with the real class/struct declaration.
+template <typename T>
+class MyStructure {
+public:
+    MyStructure();
+    ~MyStructure();
+
+    // TODO: declare required methods.
+};
