@@ -53,9 +53,5 @@ def test_launch_py_is_valid_python(slug: str) -> None:
 def test_launch_py_defines_main(slug: str) -> None:
     src = (_ACTIVITIES_DIR / slug / "launch.py").read_text(encoding="utf-8")
     tree = ast.parse(src)
-    names = {
-        node.name
-        for node in ast.walk(tree)
-        if isinstance(node, ast.FunctionDef)
-    }
+    names = {node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)}
     assert "main" in names, f"activities/{slug}/launch.py has no main() function"
