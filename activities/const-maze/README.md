@@ -33,6 +33,7 @@ All eight questions are correct and the program prints the passphrase.
 - Look up the "east const" convention (`int const*` instead of `const int*`)
   and read the arguments for and against it. Which style is used in this course?
 - Why can a `const` reference bind to a temporary (`const int& r = 5;`) but
-  a non-const reference cannot? Find the rule in the C++ standard.
+  a non-const reference cannot? Find the rule in the C++ standard. (This will
+  be **SUPER** important later when we cover Big 5!)
 - Write a class with both `const` and non-const overloads of `operator[]` and
   verify that each overload is called in the right context.
