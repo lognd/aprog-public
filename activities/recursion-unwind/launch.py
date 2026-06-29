@@ -75,9 +75,9 @@ QUESTIONS = json.loads(r"""
   },
   {
     "fn": "fib_naive",
-    "prompt": "If you call fib_naive(10) instead of fib_naive(5), roughly how many times is fib_naive called? Pick the best description.",
+    "prompt": "If you call fib_naive(10) instead of fib_naive(5), roughly how many times is fib_naive called? Type exactly one of these three strings: the same / about double / much more than double",
     "code": "int fib_naive(int n) {\n    if (n <= 1) return n;\n    return fib_naive(n - 1) + fib_naive(n - 2);\n}",
-    "hint": "fib_naive(5) made 15 calls. fib_naive(10) doubles the input. Does the number of calls double? Triple? Or grow much faster?"
+    "hint": "fib_naive(5) made 15 calls. fib_naive(10) doubles the input. Does the number of calls double? Triple? Or grow much faster? Your answer must match one of the three options word-for-word."
   },
   {
     "fn": "fib_memo",
@@ -93,9 +93,9 @@ QUESTIONS = json.loads(r"""
   },
   {
     "fn": "fib_memo",
-    "prompt": "If you call fib_memo(10) instead of fib_memo(5), roughly how many times is fib_memo called?",
+    "prompt": "If you call fib_memo(10) instead of fib_memo(5), roughly how many times is fib_memo called? Type exactly one of these three strings: the same / about double / much more than double",
     "code": "int fib_memo(int n, int cache[]) {\n    if (n <= 1) return n;\n    if (cache[n] != -1) return cache[n];\n    cache[n] = fib_memo(n-1, cache) + fib_memo(n-2, cache);\n    return cache[n];\n}",
-    "hint": "With memoization, how many unique values of n does the function actually compute from scratch?"
+    "hint": "With memoization, how many unique values of n does the function actually compute from scratch? Your answer must match one of the three options word-for-word."
   },
   {
     "fn": "fib_iter",
@@ -111,9 +111,9 @@ QUESTIONS = json.loads(r"""
   },
   {
     "fn": "fib_iter",
-    "prompt": "If you call fib_iter(10) instead of fib_iter(5), roughly how many times is fib_iter called?",
+    "prompt": "If you call fib_iter(10) instead of fib_iter(5), roughly how many times is fib_iter called? Type exactly one of these three strings: the same / about double / much more than double",
     "code": "int fib_iter(int n) {\n    if (n <= 1) return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int tmp = a + b;\n        a = b;\n        b = tmp;\n    }\n    return b;\n}",
-    "hint": "Does the number of calls to fib_iter change when n changes?"
+    "hint": "Does the number of calls to fib_iter change when n changes? Your answer must match one of the three options word-for-word."
   }
 ]
 """)
@@ -176,8 +176,7 @@ def _secret_for_question(index):
 def _ask(q, index, total):
     secret = _secret_for_question(index)
     _hr()
-    print(f"\n  Q{index:02}/{total:02}  [{q['fn']}]")
-    print(f"  {q['prompt']}")
+    print(f"\n  Q{index:02}/{total:02}  {q['prompt']}")
     print()
     for line in q.get("code", "").splitlines():
         print(f"    {line}")

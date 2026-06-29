@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "const-qualifier-toolkit",
+    "name": "Const Qualifier Toolkit",
+    "author": "lognd",
+    "description": "Implement a flat 2D character grid library with const-correct function signatures."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "memory-management",
+      "data-structures"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/const-qualifier-toolkit",
+    "readme": "assignments/const-qualifier-toolkit/README.md",
+    "visible_tests": "assignments/const-qualifier-toolkit/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:a90f21e4a5bc784b2cc57da2706ddc0aab895e4fbbc89f9e2af51fc7b5ca6f83"
+}

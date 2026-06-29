@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "connect-four",
+    "name": "Connect Four",
+    "author": "lognd",
+    "description": "Implement a command-line Connect Four game with two-player and vs-computer modes."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "hard",
+    "topics": [
+      "data-structures",
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-cmake",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/connect-four",
+    "readme": "assignments/connect-four/README.md",
+    "visible_tests": "assignments/connect-four/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:02255857eb83672797eee7033c4b03486e053b89480f313caa9ad93be62941f8"
+}

@@ -1,0 +1,21 @@
+[assignment]
+slug        = "connect-four"
+name        = "Connect Four"
+author      = "lognd"
+description = "Implement a command-line Connect Four game with two-player and vs-computer modes."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "hard"
+topics     = ["data-structures", "algorithms"]
+concepts   = ["pointers", "argument-parsing"]
+labels     = ["multi-file", "interactive"]
+
+[template]
+slug = "cpp-cmake"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"

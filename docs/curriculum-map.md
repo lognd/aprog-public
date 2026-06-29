@@ -3,67 +3,67 @@
 Activities and assignments mapped to course topics.
 Status: `done` = committed, `planned` = designed but not built, `wip` = in progress, `untested` = built but not yet verified end-to-end.
 
-| Topic | Activities | Assignments | Status               |
-|---|---|---|----------------------|
-| Ethics | -- | -- | covered, no artifact |
-| Environment Setup | env-setup-shell, env-setup-compiler, env-setup-build-tools, env-setup-python, env-setup-ide, env-setup-discord, env-setup-git | -- | done                 |
-| What is a computer? | -- | -- | covered, no artifact |
-| Command-Line & Compilation | terminal-archeology, git-heist | shell-build-pipeline | done                 |
-| Variables & Type | bit-manipulation-re, implicit-conversion-minefield, sizeof-bingo | collatz-conjecture | done                 |
-| Control & Functions | complexity-clock, scope-safari, control-gauntlet | number-toolkit, cli-calculator | untested             |
-| Standard Library Types | array-foray, vector-inspector-corrector, string-methods | csv-parser | done                 |
-| Makefile & CMake | stale-build, cmake-heist | dual-build | done                 |
-| C++ Standards, Project Organization, README | cpp-standards-hunt, project-docs, project-layout | stats-library | done                 |
-| Memory Model (heap vs. stack, call stack, recursion) | stack-heap-bingo, recursion-unwind, call-stack-autopsy, stack-heap-safari | peano-math | untested             |
-| Pointers (pass modes, arrays as pointers, arithmetic) | pass-mode-minefield | pointer-matrix, pointer-toolkit | untested             |
-| C-Style Strings & Arrays | cstring-predictor, char-by-char, cstring-whodunit, cstring-vs-stdstring | sentence-tools | planned              |
-| Const | const-maze | -- | untested             |
-| Command Line Arguments | argv-explorer | -- | untested             |
-| Basic OS Theory | -- | -- | planned              |
-| Streams & Files | -- | -- | planned              |
-| Testing Tools (Catch2, gtest, gdb) | -- | -- | planned              |
-| Programming Paradigms | -- | -- | planned              |
-| Structs (DOD & OOP intro) | -- | -- | planned              |
-| OOP Vocab & Theory (5 Pillars) | -- | -- | planned              |
-| OOP Implementation in C++ | -- | -- | planned              |
-| Inheritance (ABC, drawbacks, composition) | -- | -- | planned              |
-| Polymorphism (Interfaces, Templating) | -- | -- | planned              |
-| Design Patterns | -- | -- | planned              |
-| Dynamic Memory (Big 5, move semantics) | -- | -- | planned              |
-| Memory & Profiling Tools (valgrind, asan, perf, gprof) | -- | -- | planned              |
-| Smart Pointers (std + build your own) | -- | -- | planned              |
-| Complexity Theory | -- | -- | planned              |
-| List ADT & Supporting DS | -- | -- | planned              |
-| Linked List (operations, build your own) | -- | -- | planned              |
-| Stack, Queue, Deque (ADT) | -- | -- | planned              |
-| Standard Containers p1 | -- | -- | planned              |
-| Map & Set ADT | -- | -- | planned              |
-| Standard Containers p2 | -- | -- | planned              |
-| Iterators (traversals) | -- | -- | planned              |
-| Proofs & Invariance | -- | -- | planned              |
-| Searching | -- | -- | planned              |
-| Sorting | -- | -- | planned              |
-| Function Pointers, Functors, Lambdas | -- | -- | planned              |
-| Libraries (static vs. dynamic) | -- | -- | planned              |
-| SFML | -- | -- | planned              |
-| auto & Type Deduction | -- | -- | planned              |
-| Modern C++ (C++11-C++17 features) | -- | -- | planned              |
-| Exception Handling | -- | -- | planned              |
-| Intro to Python | -- | -- | planned              |
-| Python Syntax (including OOP) | -- | -- | planned              |
-| Python Data Types | -- | -- | planned              |
-| Python Data Structures | -- | -- | planned              |
-| Python Decorators | -- | -- | planned              |
-| Python Classes (instance, class, static) | -- | -- | planned              |
-| Python Inner-Workings (__dict__, __mro__, etc.) | -- | -- | planned              |
-| Python Types & Comprehensions | -- | -- | planned              |
-| Python Generics & Typing | -- | -- | planned              |
-| Python Generators | -- | -- | planned              |
-| Python Async, Threads, Multiprocessing | -- | -- | planned              |
-| Python Contexts & Error Handling | -- | -- | planned              |
-| Python Scientific Computing | -- | -- | planned              |
-| Python Web Servers | -- | -- | planned              |
-| APIs | -- | -- | planned              |
-| Concepts from Other Languages | -- | -- | planned              |
-| Large Projects | -- | -- | planned              |
-| What's Next | -- | -- | planned              |
+| Topic | Activities                                                                                                                    | Assignments                    | Status               |
+|---|-------------------------------------------------------------------------------------------------------------------------------|--------------------------------|----------------------|
+| Ethics | --                                                                                                                            | --                             | covered, no artifact |
+| Environment Setup | env-setup-shell, env-setup-compiler, env-setup-build-tools, env-setup-python, env-setup-ide, env-setup-discord, env-setup-git | --                             | done                 |
+| What is a computer? | --                                                                                                                            | --                             | covered, no artifact |
+| Command-Line & Compilation | terminal-archeology, git-heist                                                                                                | shell-build-pipeline           | done                 |
+| Variables & Type | bit-manipulation-re, implicit-conversion-minefield, sizeof-bingo                                                              | collatz-conjecture             | done                 |
+| Control & Functions | complexity-clock, scope-safari, control-gauntlet                                                                              | number-toolkit  | untested             |
+| Standard Library Types | array-foray, vector-inspector-corrector, string-methods                                                                       | csv-parser                     | done                 |
+| Makefile & CMake | stale-build, cmake-heist                                                                                                      | dual-build                     | done                 |
+| C++ Standards, Project Organization, README | cpp-standards-hunt, project-docs, project-layout                                                                              | stats-library                  | done                 |
+| Memory Model (heap vs. stack, call stack, recursion) | stack-heap-bingo, recursion-unwind, call-stack-autopsy, stack-heap-safari                                                     | peano-math                     | untested             |
+| Pointers (pass modes, arrays as pointers, arithmetic) | pass-mode-minefield                                                                                                           | pointer-matrix, pointer-toolkit | untested             |
+| C-Style Strings & Arrays | cstring-predictor, char-by-char, cstring-whodunit, cstring-vs-stdstring                                                       | sentence-tools                 | untested             |
+| Const | const-maze, const-contract, const-refactor                                                                                    | const-qualifier-toolkit        | untested             |
+| Command Line Arguments | argv-explorer, cli-contract                                                                                                   | connect-four                   | planned              |
+| Basic OS Theory | --                                                                                                                            | --                             | planned              |
+| Streams & Files | --                                                                                                                            | --                             | planned              |
+| Testing Tools (Catch2, gtest, gdb) | --                                                                                                                            | --                             | planned              |
+| Programming Paradigms | --                                                                                                                            | --                             | planned              |
+| Structs (DOD & OOP intro) | --                                                                                                                            | --                             | planned              |
+| OOP Vocab & Theory (5 Pillars) | --                                                                                                                            | --                             | planned              |
+| OOP Implementation in C++ | --                                                                                                                            | --                             | planned              |
+| Inheritance (ABC, drawbacks, composition) | --                                                                                                                            | --                             | planned              |
+| Polymorphism (Interfaces, Templating) | --                                                                                                                            | --                             | planned              |
+| Design Patterns | --                                                                                                                            | --                             | planned              |
+| Dynamic Memory (Big 5, move semantics) | --                                                                                                                            | --                             | planned              |
+| Memory & Profiling Tools (valgrind, asan, perf, gprof) | --                                                                                                                            | --                             | planned              |
+| Smart Pointers (std + build your own) | --                                                                                                                            | --                             | planned              |
+| Complexity Theory | --                                                                                                                            | --                             | planned              |
+| List ADT & Supporting DS | --                                                                                                                            | --                             | planned              |
+| Linked List (operations, build your own) | --                                                                                                                            | --                             | planned              |
+| Stack, Queue, Deque (ADT) | --                                                                                                                            | --                             | planned              |
+| Standard Containers p1 | --                                                                                                                            | --                             | planned              |
+| Map & Set ADT | --                                                                                                                            | --                             | planned              |
+| Standard Containers p2 | --                                                                                                                            | --                             | planned              |
+| Iterators (traversals) | --                                                                                                                            | --                             | planned              |
+| Proofs & Invariance | --                                                                                                                            | --                             | planned              |
+| Searching | --                                                                                                                            | --                             | planned              |
+| Sorting | --                                                                                                                            | --                             | planned              |
+| Function Pointers, Functors, Lambdas | --                                                                                                                            | --                             | planned              |
+| Libraries (static vs. dynamic) | --                                                                                                                            | --                             | planned              |
+| SFML | --                                                                                                                            | --                             | planned              |
+| auto & Type Deduction | --                                                                                                                            | --                             | planned              |
+| Modern C++ (C++11-C++17 features) | --                                                                                                                            | --                             | planned              |
+| Exception Handling | --                                                                                                                            | --                             | planned              |
+| Intro to Python | --                                                                                                                            | --                             | planned              |
+| Python Syntax (including OOP) | --                                                                                                                            | --                             | planned              |
+| Python Data Types | --                                                                                                                            | --                             | planned              |
+| Python Data Structures | --                                                                                                                            | --                             | planned              |
+| Python Decorators | --                                                                                                                            | --                             | planned              |
+| Python Classes (instance, class, static) | --                                                                                                                            | --                             | planned              |
+| Python Inner-Workings (__dict__, __mro__, etc.) | --                                                                                                                            | --                             | planned              |
+| Python Types & Comprehensions | --                                                                                                                            | --                             | planned              |
+| Python Generics & Typing | --                                                                                                                            | --                             | planned              |
+| Python Generators | --                                                                                                                            | --                             | planned              |
+| Python Async, Threads, Multiprocessing | --                                                                                                                            | --                             | planned              |
+| Python Contexts & Error Handling | --                                                                                                                            | --                             | planned              |
+| Python Scientific Computing | --                                                                                                                            | --                             | planned              |
+| Python Web Servers | --                                                                                                                            | --                             | planned              |
+| APIs | --                                                                                                                            | --                             | planned              |
+| Concepts from Other Languages | --                                                                                                                            | --                             | planned              |
+| Large Projects | --                                                                                                                            | --                             | planned              |
+| What's Next | --                                                                                                                            | --                             | planned              |

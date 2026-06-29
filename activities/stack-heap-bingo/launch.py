@@ -554,7 +554,7 @@ COLS = list("12345")
 
 def _render_grid(correct):
     print()
-    print("         1      2      3      4      5")
+    print("        1    2    3    4    5")
     for ri, row_label in enumerate(ROWS):
         marks = ["[X]" if correct[ri][ci] else "[ ]" for ci in range(5)]
         print(f"  {row_label}    " + "  ".join(marks))
@@ -633,10 +633,7 @@ def main():
                 print("  Correct!")
             line_idx, bingo_line = _check_bingo(correct)
             if bingo_line is not None:
-                ans_list = []
-                for _r, _c in bingo_line:
-                    _secret = _open_cell(CELL_BLOBS[_r][_c], _r, _c)
-                    ans_list.append(_secret["answer"] if _secret else "")
+                ans_list = [_open_cell(CELL_BLOBS[r][c], r, c)["answer"] for r, c in bingo_line]
                 phrase = _decrypt_line(LINE_BLOBS[line_idx], ans_list)
                 labels = " ".join(ROWS[r] + COLS[c] for r, c in bingo_line)
                 print()
