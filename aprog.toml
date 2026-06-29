@@ -62,6 +62,9 @@ name = "I/O"
 [classification.topics.systems]
 name = "Systems"
 
+[classification.topics.basic-os-theory]
+name = "Basic OS Theory"
+
 [classification.topics.build-systems]
 name = "Build Systems"
 
@@ -109,6 +112,18 @@ name = "Argument Parsing"
 
 [classification.concepts.file-io]
 name = "File I/O"
+
+[classification.concepts.posix-file-io]
+name = "POSIX File I/O"
+
+[classification.concepts.binary-formatting]
+name = "Binary Formatting"
+
+[classification.concepts.buffers]
+name = "Buffers"
+
+[classification.concepts.cli-arguments]
+name = "CLI Arguments"
 
 [classification.concepts.shell-scripting]
 name = "Shell Scripting"

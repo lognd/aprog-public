@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "hex-dump",
+    "name": "Hex Dump",
+    "author": "lognd",
+    "description": "Implement a hex dump utility using only open(), read(), write(), and close()."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "basic-os-theory"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-cmake",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/hex-dump",
+    "readme": "assignments/hex-dump/README.md",
+    "visible_tests": "assignments/hex-dump/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:cf1fb45a317280cf780da499d1a81b97189ecaa8a438ea6d1be7716d355ccee0"
+}
