@@ -20,7 +20,7 @@ Status: `done` = committed, `planned` = designed but not built, `wip` = in progr
 | Const | const-maze, const-contract, const-refactor                                                                                    | const-qualifier-toolkit        | untested             |
 | Command Line Arguments | argv-explorer, cli-contract                                                                                                   | connect-four                   | untested             |
 | Basic OS Theory | posix-file-tour, file-io-contracts, write-your-first-syscalls                                                                 | hex-dump                       | planned              |
-| Streams & Files | --                                                                                                                            | --                             | planned              |
+| Streams & Files | iostream-interceptor, sstream-formatter, text-stream-surgery, binary-stream-explorer                                          | log-analyzer                   | done                 |
 | Testing Tools (Catch2, gtest, gdb) | --                                                                                                                            | --                             | planned              |
 | Programming Paradigms | --                                                                                                                            | --                             | planned              |
 | Structs (DOD & OOP intro) | --                                                                                                                            | --                             | planned              |
