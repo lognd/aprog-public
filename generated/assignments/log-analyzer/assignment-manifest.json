@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "log-analyzer",
+    "name": "Log Analyzer",
+    "author": "lognd",
+    "description": "Build a log-file analyzer that reads structured log entries with fstream, parses each line with istringstream, and reports per-level statistics formatted with iomanip."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "io",
+      "strings"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-stdin-stdout",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/log-analyzer",
+    "readme": "assignments/log-analyzer/README.md",
+    "visible_tests": "assignments/log-analyzer/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:72108386e0b3c28bb9dd9b49be3beabc8e7fd9caddfb1ec6222bcd00b739e903"
+}

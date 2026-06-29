@@ -1,0 +1,25 @@
+[assignment]
+slug = "log-analyzer"
+name = "Log Analyzer"
+author = "lognd"
+description = "Build a log-file analyzer that reads structured log entries with fstream, parses each line with istringstream, and reports per-level statistics formatted with iomanip."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "cpp"
+difficulty = "medium"
+topics = ["io", "strings"]
+concepts = ["file-io"]
+labels = []
+
+[template]
+slug = "cpp-stdin-stdout"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++"]
