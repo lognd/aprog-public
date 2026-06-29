@@ -67,7 +67,7 @@ def load_activity(slug: str) -> types.ModuleType:
     activity_dir = str(path.parent)
     sys.path.insert(0, activity_dir)
     try:
-        spec.loader.exec_module(mod)  # type: ignore[attr-defined]
+        spec.loader.exec_module(mod)
     finally:
         try:
             sys.path.remove(activity_dir)

@@ -17,7 +17,6 @@ import pytest
 
 from tests.helpers.activity_harness import (
     DEFAULT_MAX_WRONG,
-    FUZZ_TOKENS,
     PASSPHRASE_MARKERS,
     FuzzInput,
     load_activity,

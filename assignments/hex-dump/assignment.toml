@@ -1,0 +1,21 @@
+[assignment]
+slug        = "hex-dump"
+name        = "Hex Dump"
+author      = "lognd"
+description = "Implement a hex dump utility using only open(), read(), write(), and close()."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["basic-os-theory"]
+concepts   = ["posix-file-io", "binary-formatting", "buffers", "cli-arguments"]
+labels     = ["starter-code"]
+
+[template]
+slug = "cpp-cmake"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
