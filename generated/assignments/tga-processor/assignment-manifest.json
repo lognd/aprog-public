@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "tga-processor",
+    "name": "TGA Image Processor",
+    "author": "lognd",
+    "description": "Implement a command-line TGA image processing tool using structs and binary file I/O."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "hard",
+    "topics": [
+      "systems",
+      "io",
+      "memory-management"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-makefile",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/tga-processor",
+    "readme": "assignments/tga-processor/README.md",
+    "visible_tests": "assignments/tga-processor/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:c9d6e000a8580608d3c8b2f77048429515caa3b0f47bb023e659538e984744b4"
+}
