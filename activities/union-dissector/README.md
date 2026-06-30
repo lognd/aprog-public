@@ -5,31 +5,67 @@ how to interpret the bits stored at that variable's address.  An `int` and a
 `float` can occupy the same number of bytes, but the bits mean completely
 different things depending on which type you use to look at them.  Normally
 the compiler enforces this separation strictly -- you cannot just tell it "I
-know these bytes are really a float, please read them that way."  If you try
-using pointer casts to force a reinterpretation, you get undefined behavior.
-If you use `memcpy` into a different type, you get the correct answer but at
-the cost of a copy and a lot of boilerplate.
+know these bytes are really a float, please read them that way."
 
-A `union` is the language's built-in solution to this problem.  It declares a
-block of memory that can be legally read through any of its named members.
-All members share the same starting address and the same bytes.  Writing to
-one member and reading from another is the intended use -- no cast, no copy,
-no undefined behavior (with some caveats you will explore in Going Further).
+A `union` declares a block of memory that can be accessed through any of its
+named members.  All members share the same starting address and the same bytes.
+Writing to one member and reading through a different member -- called **type
+punning** -- is where C and C++ part ways in an important and surprising way.
 
-Why does this matter outside of academic exercises?  Here are three real
-situations where unions appear:
+**In C (C99 and later), type punning through a union is defined behavior.**
+The C standard explicitly permits it (C11 section 6.5.2.3, footnote 95).
+Writing to `bv.as_uint` and then reading `bv.as_float` is guaranteed to give
+you the float whose bit pattern matches what you stored.  This is why you see
+union type punning everywhere in C codebases that deal with binary formats and
+hardware.
 
-- **Binary file formats and network protocols** store multi-byte integers in a
-  specific byte order.  A union lets you write raw bytes into a buffer and
-  read them back as a typed value without any casting gymnastics.
-- **Hardware registers** are memory-mapped addresses where the same bytes must
-  be read as bit fields, as a single integer, and sometimes as individual
-  bytes -- all depending on which part of the driver is running.
-- **Discriminated unions** (also called tagged unions or sum types) are a
-  pattern for storing one of several possible types in the same space, with an
-  enum alongside telling you which one is currently valid.  Languages like
-  Rust and Swift build this in natively; in C and C++ you build it yourself
-  with a `union` and a tag.
+**In C++, the same code is technically undefined behavior.**  The C++ standard
+does not grant unions this special permission.  The optimizer is allowed to
+assume that two differently-typed expressions never alias the same memory (this
+is called the **strict aliasing rule**), and reading through the wrong union
+member violates that assumption.  In practice GCC and Clang both support union
+type punning as a documented extension and will not miscompile it at `-O2`, but
+the standard does not require them to.
+
+The **standard-safe way to type-pun in C++** is `std::memcpy`:
+
+```cpp
+float f = 1.0f;
+uint32_t bits;
+std::memcpy(&bits, &f, sizeof(bits));  // defined, no UB
+```
+
+Modern compilers recognize this pattern and optimize it to a single register
+move -- no actual copy happens in the generated code.  In C++20 there is an
+even cleaner solution: `std::bit_cast<uint32_t>(f)`, which does the same thing
+with no boilerplate and is explicitly defined by the standard.
+
+This activity uses the union approach because it makes the shared memory model
+**visible** -- you can see all three member names pointing at the same four
+bytes.  That is its pedagogical value.  Just know that in production C++ code
+you should use `memcpy` or `bit_cast` for type punning.
+
+**What unions ARE the right tool for in C++:**
+
+- **Discriminated unions (tagged unions)** -- storing one of several possible
+  types in the same space, with an `enum` tag alongside telling you which
+  member is currently active.  Reading only the active member is always defined.
+  Example: `struct Value { enum Kind { INT, FLOAT } kind; union { int i; float f; } data; }`.
+  This is the primary legitimate union use-case in C++.
+- **Saving space among mutually exclusive fields** -- a union of two large
+  structs where only one is ever active at a time.  Again: read only what you
+  wrote.
+- **C++17 `std::variant`** -- the modern, type-safe version of a discriminated
+  union.  Prefer it over raw unions in new code.
+
+**What unions are NOT the right tool for in C++** (despite being common in C):
+
+- Type punning for binary file formats or network protocols -- use `memcpy` or
+  `reinterpret_cast` on a `char*` (the strict aliasing rule grants `char*` an
+  exemption).
+- Hardware register access -- use `volatile` with `memcpy` or compiler
+  intrinsics.  Union type punning on `volatile` memory has additional
+  complications.
 
 This activity connects directly to something surprising: **a floating-point
 number is not a number you can see directly.**  It is a specific arrangement
@@ -45,9 +81,11 @@ same memory through a `uint32_t` instead.
 
 - `union` memory layout -- all members occupy the same bytes simultaneously
 - `sizeof(union)` equals the size of its largest member, not the sum
-- Type punning: reinterpreting bits without conversion
-- Why reading through a non-active union member is defined in C but
-  technically undefined in C++ (and why `memcpy` is the standard-safe route)
+- Type punning through a union is **defined behavior in C** (C11 6.5.2.3)
+  but **undefined behavior in C++** due to the strict aliasing rule
+- The safe C++ alternatives: `std::memcpy` (C++11) and `std::bit_cast` (C++20)
+- The right C++ use-case for unions: discriminated (tagged) unions where you
+  only ever read the member that was most recently written
 - Byte-level hex inspection with `printf` and `%02x`
 - IEEE 754 floating-point representation: how `1.0f` and `-0.0f` look in bits
 
@@ -215,9 +253,13 @@ the top bit (bit 31) is the sign bit, and it is 1.
   can you figure out the rule?
 - Try a union with `int32_t i` and `uint32_t u`.  Set `i = -1` and read `u`.
   What does that tell you about how negative integers are stored?
-- Look up `std::bit_cast<uint32_t>(1.0f)` introduced in C++20.  It does the
-  same thing as the union trick but in a way that is explicitly defined by the
-  standard.  Does it produce the same result on your machine?
+- Try the `std::memcpy` equivalent: `uint32_t bits; float f = 1.0f; std::memcpy(&bits, &f, sizeof(bits));`.
+  Print `bits` in hex.  Do you get `3f800000`?  This is defined behavior in
+  C++ unlike the union approach.  Check the assembly with `g++ -O2 -S` -- does
+  the compiler actually emit a copy instruction, or does it optimize it away?
+- In C++20, `std::bit_cast<uint32_t>(1.0f)` does the same thing as `memcpy`
+  but as a single expression and is explicitly defined by the standard.  Try
+  it with `-std=c++20` and confirm the result matches the union version.
 - The byte loop prints bytes in little-endian order.  Write a second loop that
   prints them in big-endian order (most-significant byte first) and verify
   that you get `3f 80 00 00`.

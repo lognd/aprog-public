@@ -3,7 +3,7 @@
 # To update: edit quiz-data/union-dissector.json and re-run the generator.
 """Activity: Union Dissector
 
-Complete a C++ program that uses a union to reinterpret the same bytes as different types, then inspect the raw bit patterns.
+Complete a C++ program that uses a union to inspect raw bit patterns. Learn why union type-punning is defined in C but undefined behavior in C++, and what the safe C++ alternatives are.
 """
 import os, shutil, subprocess, sys, tempfile, zipfile
 import hashlib as _hl, hmac as _hm
@@ -83,7 +83,7 @@ def main():
         "       Activity: Union Dissector\n"
         "      ============================================================\n"
         "\n"
-        "       A C++ program with four TODOs.  Your job: fill them in, build, and run.\n       \n       Step 1 -- read the starter file to understand the union definition\n         cat union_lab.cpp\n       \n       Step 2 -- fill in TODO 1 (store 0x3F800000, read back as float)\n         Open union_lab.cpp in your editor and complete the first TODO block.\n         Expected output line: as_float: 1\n       \n       Step 3 -- fill in TODO 2 (print all 4 bytes as hex)\n         Loop over bv.bytes[0..3] and print each as a 2-digit hex number.\n         Expected output line: bytes: 00 00 80 3f\n       \n       Step 4 -- fill in TODO 3 (store -0.0f, read back as uint hex)\n         Expected output line: neg_zero_bits: 80000000\n       \n       Step 5 -- fill in TODO 4 (print sizeof the union)\n         Expected output line: sizeof(ByteView): 4\n       \n       Step 6 -- build and run\n         make\n         ./union_lab\n       \n       When the output matches all four expected lines, type 'exit'.\n"
+        "       A C++ program with four TODOs.  Your job: fill them in, build, and run.\n       \n       NOTE: In C, union type-punning (reading a member you did not write) is\n       defined behavior (C11 6.5.2.3).  In C++, it is technically undefined\n       behavior.  GCC and Clang support it as an extension.  The safe C++\n       alternatives are std::memcpy (C++11) and std::bit_cast<T> (C++20).\n       The README explains when to use each approach.\n       \n       Step 1 -- read the starter file to understand the union definition\n         cat union_lab.cpp\n       \n       Step 2 -- fill in TODO 1 (store 0x3F800000, read back as float)\n         Open union_lab.cpp in your editor and complete the first TODO block.\n         Expected output line: as_float: 1\n       \n       Step 3 -- fill in TODO 2 (print all 4 bytes as hex)\n         Loop over bv.bytes[0..3] and print each as a 2-digit hex number.\n         Expected output line: bytes: 00 00 80 3f\n       \n       Step 4 -- fill in TODO 3 (store -0.0f, read back as uint hex)\n         Expected output line: neg_zero_bits: 80000000\n       \n       Step 5 -- fill in TODO 4 (print sizeof the union)\n         Expected output line: sizeof(ByteView): 4\n       \n       Step 6 -- build and run\n         make\n         ./union_lab\n       \n       When the output matches all four expected lines, type 'exit'.\n"
         "      ============================================================\n"
         "\n"
     )
