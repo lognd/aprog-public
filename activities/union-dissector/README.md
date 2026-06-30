@@ -9,71 +9,207 @@ know these bytes are really a float, please read them that way."
 
 A `union` declares a block of memory that can be accessed through any of its
 named members.  All members share the same starting address and the same bytes.
-Writing to one member and reading through a different member -- called **type
-punning** -- is where C and C++ part ways in an important and surprising way.
+This activity explores what that means concretely, when it is useful, and where
+C and C++ draw very different lines.
 
-**In C (C99 and later), type punning through a union is defined behavior.**
-The C standard explicitly permits it (C11 section 6.5.2.3, footnote 95).
-Writing to `bv.as_uint` and then reading `bv.as_float` is guaranteed to give
-you the float whose bit pattern matches what you stored.  This is why you see
-union type punning everywhere in C codebases that deal with binary formats and
-hardware.
+---
 
-**In C++, the same code is technically undefined behavior.**  The C++ standard
-does not grant unions this special permission.  The optimizer is allowed to
-assume that two differently-typed expressions never alias the same memory (this
-is called the **strict aliasing rule**), and reading through the wrong union
-member violates that assumption.  In practice GCC and Clang both support union
-type punning as a documented extension and will not miscompile it at `-O2`, but
-the standard does not require them to.
+## Background
 
-The **standard-safe way to type-pun in C++** is `std::memcpy`:
+### Use case 1 -- saving space among mutually exclusive fields
+
+Sometimes a data structure holds fields where only one can be meaningful at a
+time.  Consider a simplified network packet:
+
+```cpp
+struct Packet {
+    uint8_t protocol;   // 6 = TCP, 17 = UDP
+    union {
+        struct { uint32_t seq; uint32_t ack; } tcp;
+        struct { uint16_t length;            } udp;
+    } payload;
+};
+```
+
+A packet is either TCP or UDP -- never both.  Storing both structs separately
+would waste memory on whichever one is not active.  The union makes them share
+the same bytes, so the packet is as small as possible.
+
+The programmer is responsible for tracking which member is active.  In the
+example above, `protocol` serves as the tag.  If you write `payload.tcp` and
+then read `payload.udp`, the bytes you get are whatever `tcp` left behind --
+which is almost certainly wrong.  The union does not stop you; it just shares
+the memory.
+
+---
+
+### Use case 2 -- type punning (inspecting the raw bytes of a value)
+
+Type punning means reading the raw bytes of one type as if they were a
+different type.  The classic reason to do this is to inspect the bit pattern
+of a `float` -- something the compiler normally hides from you entirely.
+
+```cpp
+union ByteView {
+    uint32_t      as_uint;
+    float         as_float;
+    unsigned char bytes[4];
+};
+
+ByteView bv;
+bv.as_float = 1.0f;
+printf("%08x\n", bv.as_uint);  // prints 3f800000 -- the IEEE 754 bits of 1.0f
+```
+
+This is exactly what the activity asks you to do.  Before you write that code,
+read this warning:
+
+```
+WARNING -- C vs C++
+-------------------
+In C (C11 section 6.5.2.3, footnote 95), reading a union member
+you did not write is explicitly defined behavior.  C was designed
+for systems programming where inspecting raw bytes is routine, and
+the standard grants unions this special permission.
+
+In C++, the same pattern is undefined behavior.  The C++ standard's
+"strict aliasing rule" says the compiler may assume that two
+pointers of different types never point to the same memory.  The
+optimizer uses this assumption to eliminate or reorder reads --
+which means reading through the wrong union member can silently
+produce the wrong value, or no value at all, even if the bytes are
+physically there.
+
+GCC and Clang both support union type-punning as a documented
+extension and will not miscompile it at -O2.  But the standard
+does not require them to, and other compilers may not.
+
+The safe alternatives in C++ are:
+
+  std::memcpy(&result, &source, sizeof(result))   // C++11+
+  std::bit_cast<TargetType>(source)               // C++20+
+
+For memcpy, modern compilers recognize this pattern and optimize it
+to a single register move -- no actual memory copy occurs.
+```
+
+The `memcpy` approach:
 
 ```cpp
 float f = 1.0f;
 uint32_t bits;
-std::memcpy(&bits, &f, sizeof(bits));  // defined, no UB
+std::memcpy(&bits, &f, sizeof(bits));  // defined behavior in C++
+printf("%08x\n", bits);               // prints 3f800000
 ```
 
-Modern compilers recognize this pattern and optimize it to a single register
-move -- no actual copy happens in the generated code.  In C++20 there is an
-even cleaner solution: `std::bit_cast<uint32_t>(f)`, which does the same thing
-with no boilerplate and is explicitly defined by the standard.
+The `bit_cast` approach (C++20):
 
-This activity uses the union approach because it makes the shared memory model
+```cpp
+#include <bit>
+uint32_t bits = std::bit_cast<uint32_t>(1.0f);  // clean, defined, C++20
+printf("%08x\n", bits);
+```
+
+This activity uses the union approach because it makes the shared-memory model
 **visible** -- you can see all three member names pointing at the same four
-bytes.  That is its pedagogical value.  Just know that in production C++ code
-you should use `memcpy` or `bit_cast` for type punning.
+bytes.  That is its pedagogical value.  In production C++ code, use `memcpy`
+or `bit_cast`.
 
-**What unions ARE the right tool for in C++:**
+---
 
-- **Discriminated unions (tagged unions)** -- storing one of several possible
-  types in the same space, with an `enum` tag alongside telling you which
-  member is currently active.  Reading only the active member is always defined.
-  Example: `struct Value { enum Kind { INT, FLOAT } kind; union { int i; float f; } data; }`.
-  This is the primary legitimate union use-case in C++.
-- **Saving space among mutually exclusive fields** -- a union of two large
-  structs where only one is ever active at a time.  Again: read only what you
-  wrote.
-- **C++17 `std::variant`** -- the modern, type-safe version of a discriminated
-  union.  Prefer it over raw unions in new code.
+### Use case 3 -- discriminated unions (the main C++ use case)
 
-**What unions are NOT the right tool for in C++** (despite being common in C):
+The primary legitimate use of a raw union in C++ is to build a **discriminated
+union**, also called a **tagged union**.  The idea: pair a union with an enum
+that records which member is currently active.  As long as you only ever read
+the member that was last written, the behavior is well-defined in both C and
+C++.
 
-- Type punning for binary file formats or network protocols -- use `memcpy` or
-  `reinterpret_cast` on a `char*` (the strict aliasing rule grants `char*` an
-  exemption).
-- Hardware register access -- use `volatile` with `memcpy` or compiler
-  intrinsics.  Union type punning on `volatile` memory has additional
-  complications.
+```cpp
+enum class Kind { Int, Float, Bool };
 
-This activity connects directly to something surprising: **a floating-point
-number is not a number you can see directly.**  It is a specific arrangement
-of 32 bits defined by the IEEE 754 standard.  There is a sign bit, 8 exponent
-bits, and 23 mantissa bits.  The value `1.0f` happens to have the bit pattern
-`0x3F800000`.  You cannot normally see that pattern -- the compiler always
-shows you the float value.  A union lets you see the raw bits by reading the
-same memory through a `uint32_t` instead.
+struct Value {
+    Kind kind;
+    union {
+        int   as_int;
+        float as_float;
+        bool  as_bool;
+    };
+};
+
+Value v;
+v.kind     = Kind::Float;
+v.as_float = 3.14f;
+
+// Later, to read safely:
+if (v.kind == Kind::Float) {
+    printf("%f\n", v.as_float);  // only read what we wrote -- defined
+}
+```
+
+This pattern appears everywhere: interpreters store numbers and strings in the
+same slot, compilers represent AST node values, configuration systems store
+settings of mixed type.  The enum tag is what makes it safe -- without it, a
+union is just a shared block of bytes with no memory of what was written.
+
+---
+
+### What is a sum type?
+
+At this point it is worth stepping back and naming what you are looking at,
+because it is a fundamental idea that appears in almost every programming
+language.
+
+Types can be combined in two basic ways.
+
+A **product type** holds ALL of its parts simultaneously.  A `struct` with
+fields `int x` and `float y` always holds both an `int` AND a `float` at the
+same time.  The name comes from counting: if `int` has N possible values and
+`float` has M, then the struct has N times M possible states.  Every struct and
+class you have written so far is a product type.
+
+A **sum type** holds EXACTLY ONE of its variants at a time.  A type that is
+either an `int` OR a `float` OR a `bool` -- never more than one -- has N plus M
+plus 2 possible states (the sum of the variant sizes).  The discriminated union
+above is a sum type: at any given moment, a `Value` is one thing, not all three.
+
+Raw unions in C++ are an unsafe, low-level version of a sum type.  They share
+the memory correctly, but nothing in the language stops you from forgetting the
+tag, reading the wrong member, and getting garbage.  That responsibility falls
+entirely on you.
+
+C++17 introduced `std::variant` as the safe, type-checked version:
+
+```cpp
+#include <variant>
+#include <iostream>
+
+std::variant<int, float, bool> v = 3.14f;
+
+// std::get<int>(v);        // throws std::bad_variant_access -- v holds a float
+std::cout << std::get<float>(v) << "\n";  // ok: prints 3.14
+
+// Check before reading:
+if (std::holds_alternative<float>(v)) {
+    printf("it's a float: %f\n", std::get<float>(v));
+}
+```
+
+`std::variant` carries the tag automatically and throws an exception if you
+try to read the wrong variant.  Prefer it over raw unions in new C++ code.
+
+Sum types appear across almost every modern language under different names.
+In Rust, `Option<T>` (either a value or nothing) and `Result<T, E>` (either a
+success or an error) are sum types enforced by the compiler.  In Haskell they
+are called `Maybe` and `Either`.  In Swift, `enum` cases with associated values
+are sum types, and `Optional` is one too.  Once you understand the idea at the
+level of "one of these, not all of these," all of those constructs become
+immediately recognizable.
+
+An enum itself is actually a degenerate sum type where every variant carries no
+data -- just a label.  A discriminated union adds data to each variant.
+`std::variant` makes the whole thing safe and automatic.  The underlying idea
+is the same all the way through.
 
 ---
 
@@ -84,8 +220,8 @@ same memory through a `uint32_t` instead.
 - Type punning through a union is **defined behavior in C** (C11 6.5.2.3)
   but **undefined behavior in C++** due to the strict aliasing rule
 - The safe C++ alternatives: `std::memcpy` (C++11) and `std::bit_cast` (C++20)
-- The right C++ use-case for unions: discriminated (tagged) unions where you
-  only ever read the member that was most recently written
+- Discriminated (tagged) unions -- the primary safe C++ use case for raw unions
+- Product types vs sum types, and `std::variant` as the modern C++ sum type
 - Byte-level hex inspection with `printf` and `%02x`
 - IEEE 754 floating-point representation: how `1.0f` and `-0.0f` look in bits
 
@@ -260,6 +396,9 @@ the top bit (bit 31) is the sign bit, and it is 1.
 - In C++20, `std::bit_cast<uint32_t>(1.0f)` does the same thing as `memcpy`
   but as a single expression and is explicitly defined by the standard.  Try
   it with `-std=c++20` and confirm the result matches the union version.
+- Write the discriminated union `Value` example from the Background section.
+  Then write the same thing using `std::variant<int, float, bool>` and compare
+  how much less code the variant version requires.
 - The byte loop prints bytes in little-endian order.  Write a second loop that
   prints them in big-endian order (most-significant byte first) and verify
   that you get `3f 80 00 00`.
