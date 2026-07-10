@@ -3,8 +3,9 @@
 Not every CMakeLists.txt you encounter will work.  This activity gives you a
 GoogleTest project with three deliberate bugs -- the kind that appear when
 someone copies a template and fills in the wrong values.  Your job is to find
-all three bugs, fix them, and then extend the existing test suite with two new
-`TEST` cases of your own.
+all three bugs, fix them, and then extend the existing test suite (a
+collection of `TEST` blocks, each a labeled, automated check on your code)
+with two new `TEST` cases of your own.
 
 ## Concepts covered
 

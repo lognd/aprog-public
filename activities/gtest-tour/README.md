@@ -1,10 +1,16 @@
 # Activity: GoogleTest Tour
 
-GoogleTest (GTest) is the test framework you will use in your Operating Systems
-and Systems Programming assignments.  It is the dominant C++ testing framework
-in industry and powers most of Google's own test suites.  This tour covers the
-essentials: linking GTest with CMake, writing TEST() and TEST_F() cases, choosing
-between ASSERT_ and EXPECT_ macros, and filtering tests on the command line.
+GoogleTest (GTest) is a **test framework**: a library that lets you write
+small, automated checks (called tests) for your code and run all of them with
+one command, instead of manually re-running your program and eyeballing the
+output each time.  GTest is the test framework you will use in your Operating
+Systems and Systems Programming assignments.  It is the dominant C++ testing
+framework in industry and powers most of Google's own test suites.  This tour
+covers the essentials: linking GTest with CMake, writing `TEST()` (a labeled
+block of test code) and `TEST_F()` (the same, but with shared setup code
+defined in a **test fixture** class) cases, choosing between `ASSERT_` and
+`EXPECT_` macros (both check a condition and fail the test if it is false; the
+difference is what happens next), and filtering tests on the command line.
 
 ## Concepts covered
 

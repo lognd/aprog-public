@@ -1,9 +1,13 @@
 # Activity: Catch2 First Contact
 
-Reading about a test framework is different from wiring one up yourself.  In
+Reading about a test framework (a library for writing and running small,
+automated checks on your code) is different from wiring one up yourself.  In
 this activity you complete a real CMake project: fill in four blanks in a
-`CMakeLists.txt` that pulls in Catch2 via FetchContent, then write a test suite
-for a small statistics library and get every test to pass.
+`CMakeLists.txt` that pulls in Catch2 via `FetchContent` (a CMake mechanism
+that downloads a third-party library's source and makes it part of your build,
+so you do not have to install anything by hand), then write a test suite --
+a collection of `TEST_CASE` blocks, each a labeled test -- for a small
+statistics library and get every test to pass.
 
 ## Concepts covered
 

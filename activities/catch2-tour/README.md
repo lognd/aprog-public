@@ -1,10 +1,16 @@
 # Activity: Catch2 Tour
 
-Catch2 is the test framework you will use in every Data Structures assignment.
-This tour walks you through the concepts you need before your first graded
-submission: how to wire Catch2 into a CMake project, how TEST_CASE and SECTION
-work, when to use REQUIRE vs CHECK, and how to filter or inspect your tests from
-the command line.
+Catch2 is a **test framework**: a library that lets you write small, automated
+checks (called tests) for your code and run all of them with one command,
+instead of manually re-running your program and eyeballing the output each
+time.  Catch2 is the test framework you will use in every Data Structures
+assignment.  This tour walks you through the concepts you need before your
+first graded submission: how to wire Catch2 into a CMake project, how
+`TEST_CASE` (a labeled block of test code) and `SECTION` (a sub-block inside a
+`TEST_CASE` for one specific scenario) work, when to use `REQUIRE` vs `CHECK`
+(both check a condition and fail the test if it is false; the difference is
+what happens next), and how to filter or inspect your tests from the command
+line.
 
 ## Concepts covered
 

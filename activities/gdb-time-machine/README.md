@@ -1,15 +1,23 @@
 # Activity: GDB Time Machine
 
-Every crash leaves evidence.  When a program segfaults, gdb lets you freeze
-time at the moment of impact and inspect the exact state that caused it.  In
-this activity you will debug two programs that demonstrate two of the most
-common bugs in C and C++: a null pointer dereference and a missing null
-terminator.  Neither bug is obvious from reading the code; you have to step
-through execution and examine memory to understand what went wrong.
+Every crash leaves evidence.  gdb is a **debugger**: a tool that runs your
+program under its control so you can pause execution, inspect variables, and
+see exactly which line of code was running when something went wrong.  When a
+program segfaults, gdb lets you freeze time at the moment of impact and
+inspect the exact state that caused it.  In this activity you will debug two
+programs that demonstrate two of the most common bugs in C and C++: a **null
+pointer dereference** (using a pointer whose value is `0x0`, meaning "points
+to nothing," as if it pointed to real data) and a missing null terminator.
+Neither bug is obvious from reading the code; you have to step through
+execution and examine memory to understand what went wrong.
 
 ## Concepts covered
 
-- Using `run`, `bt`, `frame`, `print`, and `x/Ncb` in gdb
+- Using gdb commands: `run` (start the program), `bt` (print a **backtrace**,
+  the chain of function calls active when the program stopped, innermost
+  first), `frame` (jump to one entry in that chain to inspect its
+  variables), `print` (show a variable's value), and `x/Ncb` (examine raw
+  memory)
 - Identifying the crash site from a backtrace
 - Reading a null pointer value in gdb (`0x0`)
 - How `strncpy` behaves when the source exactly fills the destination buffer
