@@ -3,15 +3,21 @@
 Python gives you three different tools for doing more than one thing at
 once -- `asyncio`, `threading`, and `multiprocessing` -- and picking the
 wrong one does not just cost performance, it can silently fail to help
-at all. This activity is ten scenarios and definitions, no code: for
-each one you argue for the right tool (or for using none of them), and
-the launcher walks you through exactly why the other choices fall
+at all. This activity opens by defining **io-bound** and **cpu-bound**
+from scratch, then walks fifteen scenarios and definitions, no code:
+for each one you argue for the right tool (or for using none of them),
+and the launcher walks you through exactly why the other choices fall
 short. Along the way you will define the GIL (Global Interpreter Lock,
 the mechanism at the center of all of this) from scratch, and pin down
 what a race condition actually is.
 
 ## Concepts covered
 
+- **io-bound**: a workload whose runtime is dominated by WAITING on
+  something outside the CPU -- disk, network, user input -- where a
+  faster CPU does not help at all
+- **cpu-bound**: a workload whose runtime IS the computation itself,
+  where only more or faster CPU cores help
 - Choosing `asyncio` for many concurrent, I/O-bound waits (thousands of
   slow network requests)
 - Choosing `threading` for a blocking, non-async-aware library called
@@ -37,7 +43,7 @@ what a race condition actually is.
 
 ## How it works
 
-The launcher shows you thirteen questions, one at a time -- workload
+The launcher shows you fifteen questions, one at a time -- workload
 descriptions, or a request to define a term precisely. Type your
 answer. A correct answer shows a short explanation and moves you on; a
 wrong answer shows an explanation of the specific misconception behind
@@ -56,7 +62,7 @@ python3 launch.py
 
 ## You will know you are done when...
 
-You have correctly answered all thirteen questions and the launcher
+You have correctly answered all fifteen questions and the launcher
 shows you a passphrase.
 
 ## Hints

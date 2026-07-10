@@ -16,6 +16,11 @@ scheduling behavior by tracing deterministic interleaved print output.
 ## Taught here
 
 Concept: choosing a concurrency tool
+- Know **io-bound**: a workload whose runtime is dominated by WAITING on
+  something outside the CPU -- disk, network, user input -- where a
+  faster CPU does not help at all.
+- Know **cpu-bound**: a workload whose runtime IS the computation
+  itself, where only more or faster CPU cores help.
 - Know `asyncio` fits many concurrent, I/O-bound waits (e.g. thousands of
   slow network requests) when everything involved is async-aware.
 - Know `threading` fits a blocking, non-async-aware library called
