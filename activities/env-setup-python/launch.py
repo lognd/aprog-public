@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Activity: Install Python and Course Tools
 
-Verifies Python 3.10+, pip, and all required course tools, then
+Verifies Python 3.10+, uv, and all required course tools, then
 reveals the passphrase.
 """
 import sys, subprocess, platform, textwrap as _tw
@@ -15,7 +15,7 @@ _BLOB = "da6fcb954b5aa6ad76741dfa0271eda01d068ad565070716b119283cb37a2ada8dc7cb1
 
 _LINE_WIDTH = 70
 _MIN_PYTHON = (3, 10)
-_TOOLS = ["black", "ruff", "mypy", "pytest", "isort"]
+_TOOLS = ["uv", "ruff", "ty", "pytest"]
 
 def _banner(title):
     print("=" * _LINE_WIDTH)
@@ -85,14 +85,6 @@ def main():
         print(f"  {'python3':20s} TOO OLD   Python {ver_str}  (need >= 3.10)")
         all_ok = False
 
-    # pip
-    ok_pip, ver_pip = _run([sys.executable, "-m", "pip", "--version"])
-    if ok_pip:
-        print(f"  {'pip':20s} FOUND     {ver_pip.split()[0]} {ver_pip.split()[1]}")
-    else:
-        print(f"  {'pip':20s} NOT FOUND")
-        all_ok = False
-
     # Course tools
     missing = []
     for tool in _TOOLS:
@@ -111,14 +103,19 @@ def main():
         if missing:
             _wrap("Missing tools: " + ", ".join(missing))
             print()
-            _wrap("Install them with:")
-            print(f"    python3 -m pip install {' '.join(missing)}")
-            print()
-            _wrap("If pip reports an 'externally-managed-environment' error, "
-                  "see README.md for the virtual environment solution.")
-            print()
+            if "uv" in missing:
+                _wrap("Install uv first (see README.md Step 2):")
+                print("    curl -LsSf https://astral.sh/uv/install.sh | sh")
+                print()
+            others = [t for t in missing if t != "uv"]
+            if others:
+                _wrap("Install the remaining tools with uv:")
+                for tool in others:
+                    print(f"    uv tool install {tool}")
+                print()
             _wrap("After installing, open a new terminal and run this script "
-                  "again if the commands are still not found.")
+                  "again if the commands are still not found. If they are "
+                  "still missing, see Troubleshooting in README.md (PATH).")
         elif (v.major, v.minor) < _MIN_PYTHON:
             _wrap(f"Python {ver_str} is too old. Install Python 3.10 or later "
                   "and re-run this script with the newer version.")

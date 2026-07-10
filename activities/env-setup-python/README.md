@@ -8,9 +8,9 @@
 > Next: [3. Compiler](../env-setup-compiler/)
 
 Several course utilities and activity launchers are written in Python.
-You also need a set of standard development tools -- a formatter,
-linter, type checker, and test runner -- that you will use throughout
-the course.
+You also need a set of standard development tools -- a package manager,
+a formatter/linter, a type checker, and a test runner -- that you will
+use throughout the course.
 
 <details>
 <summary>What is Python and why does this course use it?</summary>
@@ -26,9 +26,9 @@ This course uses Python for:
 - Build and grading scripts
 - Assignments that involve scripting or automation
 
-The tools you install below (black, ruff, mypy, pytest, isort) are
-the current industry standard for Python development quality. You will
-see them in professional codebases.
+The tools you install below (uv, ruff, ty, pytest) are the modern
+standard for Python development quality. You will see them in
+professional codebases.
 
 </details>
 
@@ -50,41 +50,19 @@ If it is missing or too old:
 
 ```bash
 sudo apt update
-sudo apt install -y python3 python3-pip python3-venv
+sudo apt install -y python3
 ```
-
-<details>
-<summary>What are python3-pip and python3-venv?</summary>
-
-**pip** (the `pip3` executable) is Python's package installer. It
-downloads packages from PyPI (the Python Package Index at pypi.org)
-and installs them. When you run `pip install black`, pip fetches the
-`black` package and its dependencies from PyPI and places them where
-Python can find them.
-
-**venv** is the standard module for creating virtual environments.
-A virtual environment is an isolated Python installation with its own
-set of installed packages. This lets different projects have different
-package versions without conflicts. For example, one project might
-need `requests==2.28` and another `requests==2.31` -- venv keeps
-them separate.
-
-`python3-pip` and `python3-venv` are Debian/Ubuntu packages that
-provide these modules for the system Python. On other distributions
-they are often bundled with the main Python package.
-
-</details>
 
 ### Linux (Fedora / RHEL / Rocky)
 
 ```bash
-sudo dnf install python3 python3-pip
+sudo dnf install python3
 ```
 
 ### Linux (Arch / Manjaro)
 
 ```bash
-sudo pacman -S python python-pip
+sudo pacman -S python
 ```
 
 ### macOS
@@ -96,7 +74,7 @@ Homebrew:
 brew install python
 ```
 
-This installs `python3` and `pip3`. Verify:
+Verify:
 
 ```bash
 python3 --version
@@ -126,8 +104,7 @@ The Python installer on Windows writes two directories into the
    which contains `python.exe`.
 2. The `Scripts\` subdirectory (e.g.,
    `C:\...\Python314\Scripts\`), which contains executables for
-   packages you install with pip, such as `black.exe`, `ruff.exe`,
-   etc.
+   installed packages.
 
 The registry PATH is read by every new terminal you open. Without
 this checkbox, you would have to type the full path to `python.exe`
@@ -143,47 +120,54 @@ environment variables" in Control Panel.
 
 ---
 
-## Step 2: Install pip tools
+## Step 2: Install uv
 
-`pip` (or `pip3`) is the Python package manager. You will use it to
-install packages from PyPI.
+`uv` is a fast Python package and tool manager written in Rust. It
+replaces the older `pip` workflow for this course: it installs tools
+into isolated environments automatically, so nothing you install can
+break your system Python.
 
-<details>
-<summary>How does pip work internally?</summary>
-
-When you run `pip install black`, pip:
-
-1. Queries PyPI (https://pypi.org) for the `black` package.
-2. Downloads the wheel (`.whl`) or source distribution for your
-   platform.
-3. Unpacks it into Python's `site-packages` directory, which is the
-   folder Python searches when you `import` something.
-4. Installs any packages that `black` depends on, recursively.
-
-A wheel (`.whl`) is a pre-built binary package -- a zip file with a
-specific naming convention. It installs faster than a source
-distribution because no compilation step is needed.
-
-Installed package executables (like the `black` command) land in
-Python's `bin/` directory (`Scripts\` on Windows). That directory
-must be on your PATH for those commands to be usable.
-
-</details>
-
-Upgrade pip itself first (the bundled version is often old):
+### Linux / macOS / WSL
 
 ```bash
-python3 -m pip install --upgrade pip
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Windows (native, PowerShell)
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+`uv` installs to `~/.local/bin/` and offers to add that directory to
+your PATH. **Open a new terminal after installing**, then verify:
+
+```bash
+uv --version
 ```
 
 <details>
-<summary>Why python3 -m pip instead of just pip3?</summary>
+<summary>What is uv and how is it different from pip?</summary>
 
-`python3 -m pip` explicitly runs pip as a module of the Python
-interpreter you just typed (`python3`). This avoids a common pitfall
-where `pip3` on your PATH belongs to a different Python installation
-than `python3`. Using `-m pip` guarantees you are installing into the
-correct Python.
+`pip` is Python's traditional package installer: it downloads packages
+from PyPI (the Python Package Index at pypi.org) and installs them
+into whichever Python environment it belongs to. That "whichever" is
+the classic source of pain -- packages end up in the wrong Python,
+conflict with system packages, or require a virtual environment you
+have to create and activate by hand.
+
+`uv` solves the same problem with less ceremony and far more speed
+(it is 10-100x faster than pip):
+
+- `uv tool install <name>` installs a command-line tool into its own
+  private, isolated environment and puts just the command (e.g.
+  `ruff`) on your PATH. Tools can never conflict with each other or
+  with your system Python.
+- `uv venv` / `uv pip` manage per-project virtual environments when
+  you need libraries for a project.
+- On newer Linux distributions, `pip install` outside a virtual
+  environment fails with an `externally-managed-environment` error.
+  `uv tool install` sidesteps that whole problem by design.
 
 </details>
 
@@ -191,66 +175,56 @@ correct Python.
 
 ## Step 3: Install the course tools
 
-Install all five tools with a single command:
+Install the three course tools with `uv tool install`:
 
 ```bash
-python3 -m pip install black ruff mypy pytest isort
+uv tool install ruff
+uv tool install ty
+uv tool install pytest
 ```
 
 <details>
 <summary>What does each tool do?</summary>
 
-**black** -- an opinionated, uncompromising code formatter. It
-reformats your Python code to a single consistent style with no
-configuration choices. The point is that everyone's code looks the
-same, so diffs are about logic changes not style changes. Run it with
-`black myfile.py` or `black .` to format the entire current directory.
+**ruff** -- an extremely fast Python formatter and linter in one
+tool. `ruff format myfile.py` reformats your code to a consistent
+style (so diffs are about logic, not whitespace). `ruff check .`
+lints it: it reads your code without running it and reports likely
+bugs, unused imports, undefined variables, and hundreds of other
+issues.
 
-**ruff** -- an extremely fast Python linter written in Rust. A linter
-reads your code without running it and reports potential bugs, unused
-imports, undefined variables, style violations, and hundreds of other
-issues. Ruff replaces flake8, pyflakes, pep8, and many other older
-linters, running 10-100x faster. Run it with `ruff check .`.
-
-**mypy** -- a static type checker for Python. Python is dynamically
-typed (types are checked at runtime), but you can add optional type
-annotations to your code. Mypy reads those annotations and reports
-type errors before you run the program -- similar to what a C++
-compiler does. Run it with `mypy myfile.py`.
+**ty** -- a fast static type checker for Python. Python is
+dynamically typed (types are checked at runtime), but you can add
+optional type annotations to your code. `ty check myfile.py` reads
+those annotations and reports type errors before you run the
+program -- similar to what a C++ compiler does at compile time.
 
 **pytest** -- the standard Python testing framework. It discovers and
 runs test functions (functions whose names start with `test_`) and
 reports which pass and which fail. The course uses pytest for visible
-tests you can run locally. Run it with `pytest` in a project directory.
-
-**isort** -- sorts your import statements alphabetically and groups
-them by category (standard library, third-party, local). This is a
-style convention that makes it easy to see at a glance what a module
-depends on. Run it with `isort myfile.py` or `isort .`.
+tests you can run locally. Run it with `pytest` in a project
+directory.
 
 </details>
 
 Verify each tool is installed and on your PATH:
 
 ```bash
-black --version
+uv --version
 ruff --version
-mypy --version
+ty --version
 pytest --version
-isort --version
 ```
 
 If any command is not found, see Troubleshooting below.
 
 ---
 
----
-
 ## Verify completion
 
-Once all five tools respond to `--version`, run the activity script.
-Open your WSL terminal (or any terminal on macOS/Linux), navigate to
-this activity's folder, and run:
+Once all four commands respond to `--version`, run the activity
+script. Open your WSL terminal (or any terminal on macOS/Linux),
+navigate to this activity's folder, and run:
 
 ```bash
 python3 launch.py
@@ -261,9 +235,9 @@ python3 launch.py
 
 `launch.py` is a verification script included with this activity.
 `python3` is the Python interpreter -- the program that reads and runs
-Python source files. The script checks that your Python and all five
-tools are installed correctly, then prints a passphrase when everything
-passes.
+Python source files. The script checks that your Python and all the
+course tools are installed correctly, then prints a passphrase when
+everything passes.
 
 To get to the right folder, use `cd` (change directory). For example:
 
@@ -280,26 +254,6 @@ folder into the terminal window to paste its path automatically.
 
 Follow the prompts. When the script succeeds it prints a passphrase --
 submit that to record completion.
-
----
-
-## uv (optional, but faster)
-
-`uv` is a modern Rust-based replacement for pip that is 10-100x
-faster. It is not required for this course but is worth knowing about.
-
-```bash
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh   # Linux/macOS
-# or on Windows PowerShell:
-# powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# Use uv instead of pip
-uv pip install black ruff mypy pytest isort
-```
-
-`uv` installs to `~/.local/bin/` and modifies your shell config to
-add that to PATH. Open a new terminal after installation.
 
 ---
 
@@ -320,59 +274,34 @@ Either use `python3` explicitly, or:
 sudo apt install python-is-python3    # Ubuntu 20.04+
 ```
 
-### "black: command not found" after pip install
+### "uv: command not found" after installing
 
-pip installs executables to `~/.local/bin/` (Linux/macOS) or
-`%APPDATA%\Python\PythonXY\Scripts\` (Windows). If that directory is
-not on PATH, the commands install successfully but are not found.
+The installer puts `uv` in `~/.local/bin/`. New terminals pick that
+up automatically if the installer updated your shell config; the
+terminal you installed from does not. Open a new terminal, or run:
 
-On Linux/macOS, add `~/.local/bin` to PATH permanently:
+```bash
+source ~/.local/bin/env
+```
+
+If it is still not found, add the directory to PATH permanently:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Then verify: `which black`.
+### "ruff: command not found" after uv tool install
 
-On Windows, the Scripts directory should have been added by the
-Python installer if you checked "Add to PATH". If not, add it
-manually via "Edit the system environment variables".
-
-### "pip: externally-managed-environment" (Ubuntu 23.04+)
-
-Newer Ubuntu versions prevent pip from installing into the system
-Python to protect OS tools. The clean solution is a virtual
-environment:
+`uv tool install` places tool executables in `~/.local/bin/` too --
+the same PATH fix as above applies. You can also ask uv to repair the
+PATH for you:
 
 ```bash
-python3 -m venv ~/.venv
-source ~/.venv/bin/activate
-pip install black ruff mypy pytest isort
+uv tool update-shell
 ```
 
-Add the activation to your `~/.bashrc` to make it permanent:
-
-```bash
-echo 'source ~/.venv/bin/activate' >> ~/.bashrc
-```
-
-Or use the `--break-system-packages` flag (not recommended, but
-works for personal machines):
-
-```bash
-pip install --break-system-packages black ruff mypy pytest isort
-```
-
-### "SSL: CERTIFICATE_VERIFY_FAILED" on macOS
-
-Run the certificate installer that ships with Python:
-
-```bash
-/Applications/Python\ 3.14/Install\ Certificates.command
-```
-
-(Adjust the version number to match your install.)
+Then open a new terminal and verify with `which ruff`.
 
 ### Windows: multiple Pythons installed, wrong one runs
 
