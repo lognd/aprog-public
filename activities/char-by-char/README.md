@@ -38,4 +38,8 @@ All six answers are correct and the program prints the passphrase.
 - Compile a simple pointer loop and an equivalent index loop with `g++ -S -O2`
   and compare the assembly output. Are they identical?
 - What happens if you pass a `char*` that is not null-terminated to `strlen`?
-  Demonstrate the undefined behavior with AddressSanitizer (`-fsanitize=address`).
+  Demonstrate the undefined behavior (a category of bug where the C++
+  standard places no limit on what happens -- crash, garbage output, or
+  something that looks fine until it isn't) with AddressSanitizer
+  (`-fsanitize=address`, a compiler tool that detects memory errors like
+  out-of-bounds reads at runtime).

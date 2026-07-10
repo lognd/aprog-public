@@ -9,7 +9,9 @@ omission.
 
 - Buffer overflow: writing past the end of a fixed-size `char` array
 - Pointer comparison vs `strcmp`: `==` on two `char*` compares addresses, not content
-- Writing to string literals: undefined behavior because literals are read-only
+- Writing to string literals: undefined behavior (the C++ standard places
+  no limit on what happens -- crash, corruption, or silent "success") because
+  literals are read-only
 - `sizeof` vs `strlen`: `sizeof` gives the array size, `strlen` gives the string length
 - `strncpy` and the silent null-terminator omission when the source fills the buffer
 

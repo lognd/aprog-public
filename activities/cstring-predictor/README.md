@@ -71,7 +71,10 @@ Finally, remember that a `char[]` decays to a `const char*` the moment you
 pass it to a function or assign it to a pointer variable -- the array and a
 pointer to a string literal look the same once you only have the pointer,
 but only the array's own storage is writable. `const char* s = "dog";`
-points at read-only memory; `s[0] = 'x';` would be undefined behavior, while
+points at read-only memory; `s[0] = 'x';` would be undefined behavior (a
+category of bug where the C++ standard places no limit on what happens --
+the program might crash, silently corrupt memory, or appear to work fine
+on your machine and fail elsewhere), while
 `char s[] = "dog"; s[0] = 'x';` is perfectly fine because the array is your
 own local storage.
 
