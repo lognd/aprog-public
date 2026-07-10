@@ -172,9 +172,13 @@ Activities:
 Assignments:
 - `html-parser` -- implement a minimal HTML tag-stripping/counting parser and write your own Catch2 test suite for it
 
-## 18. Programming Paradigms (planned)
+## 18. Programming Paradigms (done)
 
-Nothing built yet.
+Activities:
+- `paradigm-lineup` -- identify which programming paradigm each of nine code snippets exemplifies
+- `paradigm-refactor-detector` -- compare the same problem solved two ways and answer what each paradigm choice costs or buys
+
+Assignments: none.
 
 ## 19. Structs (DOD & OOP intro) (untested)
 
@@ -187,9 +191,13 @@ Activities:
 Assignments:
 - `tga-processor` -- build a CLI TGA image processor (blending, color ops, geometric transforms) over a packed binary struct
 
-## 20. OOP Vocab & Theory (5 Pillars) (planned)
+## 20. OOP Vocab & Theory (5 Pillars) (done)
 
-Nothing built yet.
+Activities:
+- `pillar-identification` -- name the OOP pillar each of eleven concrete software scenarios illustrates
+- `is-a-has-a` -- decide is-a vs has-a vs neither for classic class-relationship scenarios, including the Square/Rectangle trap
+
+Assignments: none.
 
 ## 21. OOP Implementation in C++ (wip)
 
