@@ -1,0 +1,11 @@
+# Everything the graders and launchers touch runs on Linux; keep LF in the
+# working tree so shebangs and diffed output are never CRLF-corrupted.
+* text=auto eol=lf
+
+# Binary assets -- never normalize.
+*.zip binary
+*.img binary
+*.bin binary
+*.tga binary
+*.png binary
+*.jpg binary
