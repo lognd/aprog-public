@@ -285,7 +285,7 @@ wheels = [
 
 [[package]]
 name = "lograder"
-version = "0.3.7"
+version = "0.3.8"
 source = { editable = "../lograder" }
 dependencies = [
     { name = "ansi2html" },

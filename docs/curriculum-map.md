@@ -517,13 +517,20 @@ Activities:
 Assignments:
 - `tiny-ledger-api` -- build a Flask CRUD API with an app factory, exact status codes and error bodies, graded via the test client
 
-## 59. APIs (planned)
+## 59. APIs (untested)
 
-Nothing built yet.
+Activities:
+- `client-court` -- status-code handling, key placement, rate limits, pagination, and why you always set a timeout
 
-## 60. Concepts from Other Languages (planned)
+Assignments:
+- `api-harvester` -- write API-client logic against an injected fetch callable; instrumented fakes grade exact retry counts and pagination
 
-Nothing built yet.
+## 60. Concepts from Other Languages (untested)
+
+Activities:
+- `language-safari` -- map Rust ownership, Java GC, JS promises, Go channels, and TypeScript typing back onto course concepts
+
+Assignments: none.
 
 ## 61. Large Projects (planned)
 
