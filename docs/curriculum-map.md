@@ -255,16 +255,22 @@ Activities:
 
 Assignments: none.
 
-## 27. Smart Pointers (std + build your own) (wip)
+## 27. Smart Pointers (std + build your own) (untested)
 
-Activities: none yet.
+Activities:
+- `ownership-court` -- rule on ten ownership scenarios: unique_ptr, shared_ptr, weak_ptr, or plain raw pointer/reference
+- `shared-ptr-tracer` -- predict use_count and destruction output of seven programs, including the reference-cycle leak weak_ptr fixes
 
 Assignments:
-- `unique-ptr-from-scratch` -- (wip) implement a unique_ptr-like RAII owning-pointer class covering move semantics, release, and reset
+- `unique-ptr-from-scratch` -- implement a unique_ptr-like RAII owning-pointer class covering move semantics, release, and reset
 
-## 28. Complexity Theory (planned)
+## 28. Complexity Theory (untested)
 
-Nothing built yet.
+Activities:
+- `big-o-lineup` -- classify ten functions into O(1) through O(n^2), including triangular loops, binary search, and amortized push_back
+- `growth-witness` -- estimate runtimes and growth crossovers numerically from a measured data point and a complexity class
+
+Assignments: none.
 
 ## 29. List ADT & Supporting DS (planned)
 
