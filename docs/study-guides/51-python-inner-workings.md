@@ -92,6 +92,23 @@ Concept: CPython object internals
   address), not a language-level guarantee, and that `sys.getrefcount()`
   should never be asserted against an exact number, since the call itself
   takes a temporary reference to its argument.
+- Know `is` compares raw struct addresses (exactly `id()`'s value) and
+  cannot be intercepted by any class's code, while `==` dispatches to the
+  operand's own `__eq__` method, which can be written to say anything --
+  the mechanical reason `x is None` cannot be fooled but `x == None` can.
+- Know string interning is a CPython implementation detail, not a
+  guarantee: identical literal/identifier-shaped strings may share one
+  struct (`is` can appear to work), but a runtime-built equal string
+  usually does not -- `==` is the only correct content comparison.
+- Know `PyLongObject` stores a variable-length `ob_digit` array (with
+  `ob_size` recording how many digits are in use), the same
+  `PyVarObject`-plus-array shape as `PyListObject` -- the literal C-level
+  reason Python's `int` has no fixed width and never overflows.
+- Know `None`, `True`, and `False` are each exactly one struct for the
+  whole process (guaranteed singletons), unlike the small-int cache or
+  string interning (implementation-detail optimizations, not guarantees)
+  -- which is why `is` is the correct, preferred check against `None` but
+  never against numbers.
 
 ## Study checklist
 
