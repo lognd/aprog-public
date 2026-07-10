@@ -347,9 +347,14 @@ Activities:
 Assignments:
 - `binary-bounds` -- implement binary search plus first/last-occurrence bounds and an O(log n) count_of enforced by a performance test
 
-## 38. Sorting (planned)
+## 38. Sorting (untested)
 
-Nothing built yet.
+Activities:
+- `sort-pass-tracer` -- trace single passes and swap/comparison counts of bubble, selection, insertion, and merge steps on concrete arrays
+- `sorting-court` -- stability, algorithm choice, quadratic-vs-nlogn scale, and what std::sort actually is (introsort)
+
+Assignments:
+- `sort-suite` -- implement selection, insertion, and merge sorts plus a stability-required pair sort, oracle-checked and performance-gated
 
 ## 39. Function Pointers, Functors, Lambdas (planned)
 
