@@ -4,19 +4,23 @@ Implement five number-theory utility functions in `number_toolkit.hpp`.
 
 ## Learning goals
 
-- Implement number-theory algorithms efficiently within explicit complexity bounds
-- Use O(sqrt(n)) trial division for primality testing instead of the naive O(n) approach
-  (the `O(...)` notation, called Big-O notation, describes roughly how many steps an
-  algorithm takes as its input `n` grows -- `O(n)` means the step count grows
-  proportionally to `n`, while `O(sqrt(n))` means it grows proportionally to the
-  square root of `n`, which is far fewer steps for large `n`)
+- Implement number-theory algorithms that stay fast as their input grows
+- Test primality by trial division only up to the square root of `n`,
+  instead of checking every number up to `n` -- for a large `n` this is
+  the difference between finishing instantly and not finishing at all
 - Apply the Euclidean algorithm (a fast, ancient method for computing the
   greatest common divisor by repeated division instead of counting down) and
   understand why it is faster than looping from min(a, b)
 - Write iterative Fibonacci -- using a loop instead of a function that calls
-  itself (a technique called recursion, covered in a later topic) -- to avoid
-  exponential call growth (where the number of function calls roughly doubles
-  at every step, quickly becoming far too slow to run)
+  itself (a technique called recursion, covered in a later topic) -- so the
+  work grows one step at a time instead of ballooning: a naive recursive
+  version redoes so much repeated work that it quickly becomes far too slow
+  to run
+
+(The formal tool for talking about "how many steps as input grows"
+precisely -- Big-O notation -- arrives later in the course, in the
+Complexity Theory topic. For now, the goal is just to feel the difference
+between an approach that stays fast and one that does not.)
 
 ## Task
 
@@ -24,7 +28,7 @@ Implement the following five functions in `number_toolkit.hpp`:
 
 | Function | Signature | Notes |
 |----------|-----------|-------|
-| `is_prime` | `bool is_prime(long long n)` | Must be O(sqrt(n)); a naive O(n) loop fails the performance test on a large prime. |
+| `is_prime` | `bool is_prime(long long n)` | Must not test every number up to `n` -- testing divisors up to the square root of `n` is enough and required; a loop that checks every number up to `n` fails the performance test on a large prime. |
 | `gcd` | `long long gcd(long long a, long long b)` | Loop down from `min(a, b)` for full points. Euclidean algorithm earns bonus credit. |
 | `digit_sum` | `long long digit_sum(long long n)` | Sum of decimal digits. Handles negatives and zero. |
 | `count_divisors` | `long long count_divisors(long long n)` | Count all positive divisors of `n`. |
@@ -81,7 +85,8 @@ g++ -std=c++17 -o toolkit_test visible-tests/test_visible.cpp -Iassets
 | Euclidean GCD bonus   | +5     |
 
 The performance test calls `is_prime(999999937)` with a 0.1-second time limit.
-An O(sqrt(n)) implementation finishes in microseconds; O(n) does not pass.
+Trial division up to the square root of `n` finishes in microseconds; a loop
+that checks every number up to `n` does not pass.
 
 ## Submission
 
