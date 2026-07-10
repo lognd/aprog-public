@@ -251,6 +251,7 @@ Activities:
 - `big5-tracer` -- predict which special member functions run in nine instrumented programs (copies, moves, elision, std::move)
 - `rule-of-five-whodunit` -- diagnose what goes wrong in seven resource-managing classes with missing or broken special members
 - `value-category-taxonomy` -- classify lvalue/xvalue/prvalue expressions and learn how value category drives which special member overload resolution picks
+- `who-frees-this` -- ownership as a concept in the raw-pointer world: leak/double-free/dangling-use, transfer vs. borrow, real API ownership contracts, and the fix ladder that ends at smart pointers
 
 Assignments: none yet.
 

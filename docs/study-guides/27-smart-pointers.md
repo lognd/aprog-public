@@ -8,6 +8,10 @@ class from scratch with correct move semantics, `release`, and `reset`.
 
 ## Know before you start
 
+- Ownership as a concept: the responsibility to release a resource exactly
+  once, the leak/double-free/dangling-use failure modes, transfer vs.
+  borrow, and why nothing in C's type system enforces any of it -- only a
+  comment does [assumed: row 25 -- Dynamic Memory, `who-frees-this`]
 - The Big Five, move semantics, and `std::move` as a cast [assumed: row 25
   -- Dynamic Memory]
 - RAII and why an owning type deletes its copy operations [assumed: row 21

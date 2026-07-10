@@ -73,6 +73,40 @@ Concept: the Big Five and when each runs
   tracking every construction, copy, move, assignment, and destruction in
   order.
 
+Concept: ownership
+- Know that ownership is the responsibility to release a resource exactly
+  once -- not "holding a pointer to it" (many pieces of code can read
+  through a pointer without owning it), and not "having created it"
+  (ownership starts at creation but can be transferred away immediately
+  afterward).
+- Know the three failure modes: a leak (zero releases -- the responsibility
+  is dropped and nothing ever discharges it), a double-free (two pieces of
+  code each believe they are the owner and both release the same resource),
+  and a dangling use (a borrower uses a resource after the owner already
+  released it).
+- Know transfer vs. borrow, and the trap underneath both: nothing in C's
+  type system distinguishes a function that takes ownership of a pointer
+  from one that only reads through it -- `void f(T*)` looks identical
+  either way, and only a doc comment (e.g. `strdup`'s "caller must free"
+  vs. `getenv`'s "must not be freed") carries that information, which the
+  compiler cannot see or enforce.
+- Know the lifetime contract: an owner's lifetime must contain every
+  borrower's use of the resource; returning a pointer to a local variable
+  violates this the instant the function returns, regardless of
+  optimization flags.
+- Know that shared ownership is sometimes legitimate (two or more owners
+  that genuinely overlap in time, with no single one identifiable in
+  advance as "the last one standing"), that it releases only when the LAST
+  owner lets go, and that its own dedicated failure mode is a reference
+  cycle -- two objects that each keep the other alive forever, a silent
+  leak that ordinary "did anyone forget to free this" review will not
+  catch.
+- Know the fix ladder this concept sits at the bottom of: comments (this
+  row) -> conventions and RAII (row 21's raii-file-guard) -> types that
+  enforce ownership (row 27's `unique_ptr`/`shared_ptr`) -> a language that
+  refuses to compile the violation (row 60, Rust) -- each rung removes more
+  of the responsibility from a human remembering correctly.
+
 Concept: the Rule of Three / Rule of Five
 - Know the rule: if a class needs a user-defined destructor, copy
   constructor, or copy-assignment operator (the Rule of Three), it very
@@ -122,4 +156,5 @@ Concept: the classic resource-management bugs
 
 ## Practiced in
 
-`big5-tracer`, `rule-of-five-whodunit`, `value-category-taxonomy`
+`big5-tracer`, `rule-of-five-whodunit`, `value-category-taxonomy`,
+`who-frees-this`
