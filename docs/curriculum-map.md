@@ -419,13 +419,22 @@ Activities:
 Assignments:
 - `cpp-to-python-phrasebook` -- port six course-familiar string functions to stdlib-only Python, graded by pytest with a ty cleanliness bonus
 
-## 47. Python Data Types (planned)
+## 47. Python Data Types (untested)
 
-Nothing built yet.
+Activities:
+- `mutability-tribunal` -- predict output of nine snippets on str/tuple immutability, += rebind vs mutate, and unhashable keys
+- `numeric-nuances` -- floats vs exact ints: banker's rounding, floor division on negatives, and why 0.1 + 0.2 != 0.3
 
-## 48. Python Data Structures (planned)
+Assignments: none.
 
-Nothing built yet.
+## 48. Python Data Structures (untested)
+
+Activities:
+- `slice-sorcery` -- predict output of eight slicing snippets: copies vs aliases, slice assignment, sort() returning None, shared-row traps
+- `structure-selector` -- choose list, tuple, dict, or set per scenario, including hashability and duplicate/order behavior
+
+Assignments:
+- `roster-wrangler` -- implement six typed roster-analysis functions over list[dict] records, pytest-graded with a ty cleanliness bonus
 
 ## 49. Python Decorators (planned)
 
