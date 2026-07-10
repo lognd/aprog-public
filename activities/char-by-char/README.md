@@ -1,14 +1,18 @@
 # Activity: Char by Char
 
 The fundamental loop pattern for walking C-style strings character by
-character. Every C string function you will ever write -- `strlen`,
-`strcpy`, `reverse`, `contains` -- reduces to this one loop. You will also
-see how pointer arithmetic and the two-pointer technique emerge naturally
-from this pattern.
+character. A C-style string is just an array of `char` with no stored
+length -- code finds the end by scanning for a sentinel (a special marker
+value meaning "stop here"), the byte `'\0'`. Every C string function you
+will ever write -- `strlen`, `strcpy`, `reverse`, `contains` -- reduces to
+this one loop. You will also see how pointer arithmetic and the two-pointer
+technique (walking two positions through the same array at once, e.g. one
+from each end) emerge naturally from this pattern.
 
 ## Concepts covered
 
-- The null-terminated C string sentinel pattern (`'\0'` as the loop exit)
+- The null-terminated C string sentinel pattern (`'\0'` marking where the
+  real data ends and the loop should stop)
 - Pointer increment (`p++`) as character-by-character string traversal
 - How `strlen`, `strcpy`, and `reverse` all reduce to the same loop skeleton
 - The two-pointer technique for in-place string operations

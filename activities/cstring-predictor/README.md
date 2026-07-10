@@ -54,7 +54,8 @@ ever see them.
   `'\0'`. `strcat` never touches `dst`'s existing characters -- it only
   finds where they end.
 
-A buffer's declared *size* (how many bytes it can hold) and a string's
+A buffer (a fixed block of memory set aside to hold data) has a declared
+*size* (how many bytes it can hold), and a string's
 *length* (how many bytes are meaningful right now) are independent numbers.
 `char buf[20];` can hold a string of up to 19 real characters plus the
 terminator, but at any moment it might hold a much shorter string, or none

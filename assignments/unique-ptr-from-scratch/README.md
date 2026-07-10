@@ -24,8 +24,10 @@ use the real `std::unique_ptr` to see the same idea from the caller's side.
   you own now, then take ownership of something else)
 - Recognize and prevent a double-delete: the disaster that happens when two
   objects both believe they own the same pointer
-- Use `std::unique_ptr` and `std::make_unique` as a caller: write a factory
-  function that returns one, and functions that take one by reference
+- Use `std::unique_ptr` and `std::make_unique` as a caller: write a
+  **factory function** (a function whose only job is to construct and
+  return an object, so callers never write `new` themselves) that returns
+  one, and functions that take one by reference
   (inspect only) versus by value (which forces the caller to `std::move` it)
 
 ## Background
@@ -56,10 +58,11 @@ MyUniquePtr<int> b = a;   // if this compiled...
 
 Now `a` and `b` both store the same address. Both of their destructors will
 eventually run, and both will call `delete` on that same address. The
-second `delete` is a **double-delete** -- undefined behavior that, in
-practice, corrupts the heap allocator's internal bookkeeping and can crash
-the program at some unrelated later point, far from the line that actually
-caused it. There is no correct body you could write for a copy constructor
+second `delete` is a **double-delete** -- an instance of **undefined
+behavior**, meaning the C++ standard places no requirement on what happens
+next. In practice it corrupts the heap allocator's internal bookkeeping and
+can crash the program at some unrelated later point, far from the line that
+actually caused it. There is no correct body you could write for a copy constructor
 here: either both copies think they own the pointer (double-delete waiting
 to happen), or the "copy" would have to steal ownership from the original
 (which is not a copy at all -- that is a move).
@@ -83,7 +86,9 @@ copying. A move constructor steals the source's pointer and **must** leave
 the source owning nothing (its internal pointer set to `nullptr`):
 
 ```cpp
-MyUniquePtr(MyUniquePtr&& other) noexcept {
+MyUniquePtr(MyUniquePtr&& other) noexcept {   // noexcept: promises this function never throws
+                                              // an exception, which lets containers like
+                                              // std::vector move objects instead of copying them
     ptr_ = other.ptr_;
     other.ptr_ = nullptr;   // critical: without this line, ~other() double-deletes
 }
@@ -124,7 +129,9 @@ one you already own before deleting anything.
 ### Leak-checking
 
 Because this whole assignment is about getting deletion right, the grader
-runs your test binary under both **Valgrind** and **AddressSanitizer
+runs your test binary under both **Valgrind** (a program that runs your
+compiled binary inside a simulator and reports every leaked allocation,
+double-free, and invalid memory access it observes) and **AddressSanitizer
 (ASan)** in addition to the normal Catch2 checks. A test can report "all
 assertions passed" and still leak memory or narrowly avoid a crash --
 Valgrind and ASan catch what the assertions alone cannot: leaked
@@ -253,8 +260,10 @@ either file.
   either a function pointer or a lambda -- both are topics for later in the
   course. Once you've seen those, come back and add an optional deleter
   template parameter to `MyUniquePtr`.
-- Add a `MyUniquePtr<T[]>` partial specialization that calls `delete[]`
-  instead of `delete`, the way `std::unique_ptr` does for array types.
+- Add a `MyUniquePtr<T[]>` partial specialization (a separate version of the
+  template that the compiler picks instead of the general one whenever `T`
+  is an array type) that calls `delete[]` instead of `delete`, the way
+  `std::unique_ptr` does for array types.
 - Implement a non-member `swap(MyUniquePtr<T>&, MyUniquePtr<T>&)` free
   function that calls the member `swap` -- this is the pattern the standard
   library itself uses (`std::swap` has an overload that calls a type's

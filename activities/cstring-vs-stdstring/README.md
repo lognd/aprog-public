@@ -11,7 +11,8 @@ mutation, bounds checking, and the `c_str()` bridge back to C functions.
 ## Concepts covered
 
 - Length: `strlen` vs `.size()` and why C strings have no stored length
-- Concatenation: manual buffer management vs `operator+`
+- Concatenation: manual buffer management (tracking a fixed block of
+  memory yourself) vs `operator+`
 - Equality: pointer comparison vs `strcmp` vs `operator==`
 - In-place mutation: legal for `char[]`, undefined behavior for string
   literals (the C++ standard places no limit on what happens if you try)
