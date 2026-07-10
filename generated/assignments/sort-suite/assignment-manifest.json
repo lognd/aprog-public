@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "sort-suite",
+    "name": "Sort Suite",
+    "author": "lognd",
+    "description": "Implement selection sort, insertion sort, and merge sort over a std::vector<int>, plus a stable merge sort over std::vector<std::pair<int,std::string>> keyed on .first, and an is_sorted_asc helper -- all header-only, hand-written from scratch, with merge_sort required to actually run in O(n log n) time rather than just produce the right answer."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "sorting",
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/sort-suite",
+    "readme": "assignments/sort-suite/README.md",
+    "visible_tests": "assignments/sort-suite/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:b8612a72da541837096679b4053ed61c1ba44cf4529052d022becb24186b2a31"
+}
