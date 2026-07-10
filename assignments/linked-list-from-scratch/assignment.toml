@@ -1,0 +1,24 @@
+[assignment]
+slug        = "linked-list-from-scratch"
+name        = "Linked List From Scratch"
+author      = "lognd"
+description = "Build a singly linked list class template from scratch, including a full Big-5 (copy/move construct/assign, destructor), to learn the node/next-pointer mental model and how ownership of a chain of heap nodes is copied, moved, and released."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["data-structures", "linked-lists", "memory-management"]
+concepts   = ["pointers", "templates", "raii", "move-semantics"]
+labels     = ["starter-code", "unit-tests", "multi-file"]
+
+[template]
+slug = "cpp-header-impl"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "valgrind"]
