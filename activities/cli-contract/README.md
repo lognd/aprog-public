@@ -15,7 +15,8 @@ cannot guess them -- you have to find them.
 - Distinguishing flags (`--flag`) from positional arguments (`CHARACTER MESSAGE`)
 - The `-h`/`--help` and `--list` conventions as a tool's self-documentation
 - `usage:` as the standard no-argument error convention
-- Reading a binary's behavior as a black box before writing any code
+- Reading a binary's behavior as a black box (a program you can only run and
+  observe, with no source code to read) before writing any code
 
 ## How it works
 
@@ -96,5 +97,7 @@ line of output. Include any punctuation attached to it.
   `./cowfarm --help` and compare. What did you miss or get wrong?
 - Pick any CLI tool you use regularly (`ls`, `git`, `g++`) and write its
   usage string from memory before checking with `--help`. How close were you?
-- Look up the POSIX utility argument syntax conventions and compare them to
-  what `cowfarm` does. Which conventions does it follow? Which does it skip?
+- Look up the POSIX (Portable Operating System Interface, the standard that
+  defines common conventions across Unix-like systems) utility argument
+  syntax conventions and compare them to what `cowfarm` does. Which
+  conventions does it follow? Which does it skip?
