@@ -84,6 +84,33 @@ Concept: the four compilation stages
   (overwrite) or `2>>` (append), and chain commands with a pipe (`|`), for
   example piping `g++ -E` output into `wc -l` to count preprocessed lines.
 
+Concept: the git mental model
+- A commit is a full SNAPSHOT of the entire tracked tree at that moment,
+  chained to its parent commit -- not a diff. `git diff`/`git show` compute
+  a diff on demand for display; that is never what gets stored.
+- A branch is a named, MOVABLE POINTER to a single commit. `git branch
+  NAME` copies no files and no commits -- it just writes down which commit
+  the new name points at, which is why branching is nearly instant.
+- HEAD tracks "where you are": normally it points at a branch name, and
+  that branch name points at a commit; committing drags the branch pointer
+  (and therefore HEAD) forward by one commit.
+- A merge commit has TWO parents and preserves both histories completely;
+  a fast-forward merge (only possible when the target branch has not
+  diverged) just slides a pointer forward with no new commit at all.
+- Rebase REPLAYS commits onto a new base one at a time, producing new
+  commit hashes for the same changes and a linear history -- "rebase
+  re-records your work as if you had started from the new base." Never
+  rebase a branch someone else has already pulled and built on, since
+  their commits still point at the now-abandoned originals.
+- The staging area (index) is the holding area between the working tree
+  and history: `git add` stages a snapshot for the next commit; only
+  `git commit` seals it into history.
+- `git fetch` downloads new remote commits without touching your current
+  branch; `git pull` is fetch immediately followed by a merge (or rebase)
+  into your current branch.
+- The whole system exists to solve two problems: parallel work without
+  constant coordination, and a complete, permanent, restorable history.
+
 Concept: git history surgery
 - Be able to read the full history of a repository across all branches
   with `git log --all --oneline --graph`, and inspect one commit's diff
@@ -112,4 +139,4 @@ Concept: git history surgery
 
 ## Practiced in
 
-`cpp-syntax-boot-camp`, `terminal-archeology`, `git-heist`, `shell-build-pipeline`
+`cpp-syntax-boot-camp`, `terminal-archeology`, `git-mental-models`, `git-heist`, `shell-build-pipeline`

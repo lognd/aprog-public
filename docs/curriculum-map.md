@@ -39,6 +39,7 @@ No artifact.
 
 Activities:
 - `terminal-archeology` -- explore an unfamiliar broken C++ project tree using only shell commands, then fix it
+- `git-mental-models` -- conceptual model of git: commits as snapshots, branches as pointers, merge vs. rebase, and what problem the system solves
 - `git-heist` -- clean credentials and a large binary out of git history and reconcile a diverged branch
 - `cpp-syntax-boot-camp` -- predict-then-compile twelve first-contact C++ programs: variables, if/else, loops, functions, strings
 
