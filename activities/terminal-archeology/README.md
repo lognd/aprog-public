@@ -26,8 +26,9 @@ contents or its type without printing everything.
 
 **Identifying files by content, not just name** -- a file's extension is a
 hint, not a guarantee. The `file <path>` command inspects the actual bytes
-and reports what kind of content it holds (ASCII text, an ELF binary,
-a compressed archive, and so on). `strings <path>` extracts every
+and reports what kind of content it holds (ASCII text, an ELF binary --
+the executable file format Linux uses for compiled programs -- a
+compressed archive, and so on). `strings <path>` extracts every
 printable run of characters from a file, including binaries -- useful for
 finding readable text buried inside something that is not a plain text
 file.
@@ -82,7 +83,8 @@ your time if you include them without checking first -- read before you
 commit.
 
 This activity requires root access to mount the sandbox filesystem as a
-loopback device.
+loopback device -- a way of treating a plain disk-image file as if it were
+a real, mountable drive, without any physical hardware involved.
 
 ```bash
 sudo python3 launch.py
@@ -137,7 +139,9 @@ an explicit `-I` flag pointing at the header directory:
 g++ -I <header-dir> -o program <path-to-main.cpp>
 ```
 
-If the compiler complains about a missing symbol or a triggered `#error`,
+If the compiler complains about a missing symbol (a function or variable
+it cannot find a definition for) or a triggered `#error` (a preprocessor
+directive that deliberately halts compilation with a custom message),
 that is signal, not failure -- go back to Step 4 and reconsider which
 headers you included.
 

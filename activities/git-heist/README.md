@@ -51,18 +51,25 @@ Look at both branches, every commit, and where they diverged. Use
 
 ### Step 2 -- remove the bad commits
 
-Find the credentials commit and the binary commit. Use interactive rebase
+Find the credentials commit and the binary commit. Use interactive
+rebase -- a rebase that pauses to let you edit, reorder, or delete
+individual commits one by one, instead of just replaying all of them --
 to drop both from history:
 
 ```bash
 git rebase -i <parent-hash>
 ```
 
-In the editor, change `pick` to `drop` on the commits you want gone.
+This opens a text editor with a list of commits, one per line, each
+prefixed with a command word like `pick`. Change `pick` to `drop` on the
+commits you want gone, then save and close the editor.
 
 ### Step 3 -- reconcile the feature branch
 
-Check out the feature branch and rebase it on top of the cleaned main:
+The feature branch diverged from main some time ago -- it and main each
+have commits the other does not, because they were built up separately
+after that point. Check out the feature branch and rebase it on top of
+the cleaned main:
 
 ```bash
 git rebase main
