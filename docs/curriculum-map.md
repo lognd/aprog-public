@@ -239,13 +239,21 @@ Activities:
 Assignments:
 - `pattern-toolkit` -- implement Strategy, Observer, and Template Method patterns using non-owning base pointers, no dynamic memory
 
-## 25. Dynamic Memory (Big 5, move semantics) (planned)
+## 25. Dynamic Memory (Big 5, move semantics) (untested)
 
-Nothing built yet.
+Activities:
+- `big5-tracer` -- predict which special member functions run in nine instrumented programs (copies, moves, elision, std::move)
+- `rule-of-five-whodunit` -- diagnose what goes wrong in seven resource-managing classes with missing or broken special members
 
-## 26. Memory & Profiling Tools (valgrind, asan, perf, gprof) (planned)
+Assignments: none yet.
 
-Nothing built yet.
+## 26. Memory & Profiling Tools (valgrind, asan, perf, gprof) (untested)
+
+Activities:
+- `asan-autopsy` -- read six real AddressSanitizer reports and name the heap/stack error class each one describes
+- `valgrind-leak-lab` -- fix three distinct leaks in a real program; the launcher re-runs valgrind and demands zero definitely-lost bytes
+
+Assignments: none.
 
 ## 27. Smart Pointers (std + build your own) (wip)
 
