@@ -45,6 +45,11 @@ protected:
 };
 ```
 
+`protected` works like `private` (only the class's own code can touch these
+fields directly) except that derived classes are also let in -- `Book`,
+`Film`, and `Album` can read `title_` and `year_` because they inherit from
+`MediaItem`, but outside code still cannot.
+
 Two of its member functions end in `= 0`. That is a **pure virtual
 function**: it has no body in `MediaItem` at all, and every non-abstract
 class derived from `MediaItem` must supply one. A class with at least one
@@ -121,7 +126,10 @@ lib.add(b);          // lib now refers to b -- it does not copy or own it
   pointer**. This only works because `summary()` is virtual: even though the
   pointer's static type is `const MediaItem*`, calling `summary()` on it
   dispatches to `Book::summary()`, `Film::summary()`, or `Album::summary()`
-  depending on what the pointer actually points at.
+  depending on what the pointer actually points at. ("Static type" here just
+  means the type written in the pointer's declaration -- `const MediaItem*`
+  -- as opposed to the type of the actual object it happens to point at,
+  which can be any derived class.)
 
 ### The hiding pitfall
 
