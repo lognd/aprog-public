@@ -1,25 +1,27 @@
 # Pattern Toolkit
 
-A design pattern is a named, reusable solution to a recurring design problem.
-This assignment asks you to implement three of the most common ones -- Strategy,
-Observer, and Template Method -- each as a small, self-contained piece of C++.
-All three are applications of the runtime polymorphism you learned in the
-Polymorphism topic: an abstract base class with pure-virtual methods, concrete
-subclasses that override them, and code that talks to the subclasses through a
+A design pattern is not a rule imposed from outside -- it is the shape code
+takes when someone finally refactors away from a mess that grew out of
+perfectly reasonable choices. This assignment shows you three such messes
+first, lets you feel why the next feature request makes them worse, and only
+then asks you to implement the pattern that fixes it. All three are
+applications of the runtime polymorphism you learned in the Polymorphism
+topic: an abstract base class with pure-virtual methods, concrete subclasses
+that override them, and code that talks to the subclasses through a
 non-owning base pointer or reference and lets the vtable pick the right
 override at runtime.
 
-None of the three parts uses dynamic memory. Every object lives on the stack or
-inside a `std::vector`, and every polymorphic relationship is expressed with a
-plain non-owning `Base*` or `const Base&`, exactly as in the previous topic. You
-will not write `new`, `delete`, or `throw` anywhere.
+None of the three parts uses dynamic memory. Every object lives on the stack
+or inside a `std::vector`, and every polymorphic relationship is expressed
+with a plain non-owning `Base*` or `const Base&`, exactly as in the previous
+topic. You will not write `new`, `delete`, or `throw` anywhere.
 
 ---
 
 ## Learning goals
 
-- Recognize Strategy, Observer, and Template Method as concrete uses of
-  abstract base classes and virtual dispatch
+- Recognize the code smells (shotgun surgery, copy-paste divergence,
+  rigidity) that motivate Strategy, Observer, and Template Method
 - Pass behavior as an object (Strategy) so one algorithm can be reconfigured
   without being rewritten
 - Register and notify a changing set of listeners through non-owning base
@@ -31,18 +33,49 @@ will not write `new`, `delete`, or `throw` anywhere.
 
 ## Background
 
-All three patterns rest on the same machinery. An abstract base class declares
-one or more pure-virtual methods. Concrete subclasses override them. Client code
-holds a `Base*` or `Base&` and calls the virtual method; the compiler emits a
-vtable lookup, so the override that runs depends on the object's real type at
-runtime. The patterns differ only in how they arrange that machinery.
+All three patterns rest on the same machinery: an abstract base class
+declares one or more pure-virtual methods, concrete subclasses override them,
+and client code holds a `Base*` or `Base&` and calls the virtual method so
+the override that runs depends on the object's real type at runtime. Rather
+than presenting that machinery cold, each part below starts from working
+code that grew organically -- one reasonable decision at a time -- until it
+became painful to extend. Read the corresponding file in `assets/legacy/`
+before you start each part; the pattern you implement is the refactor that
+removes the pain.
 
-### Strategy
+### Strategy -- from `legacy/sort_modes.cpp`
 
-Strategy turns an algorithm's variable step into a separate object. Instead of
-baking a comparison rule into a sort function, you pass in a comparison object
-and the sort delegates to it. Swapping the object swaps the behavior, with no
-change to the sort itself.
+`sort_numbers` began in 2022 as a single ascending sort. In 2023 the finance
+team asked for a descending mode, so the fastest fix was to copy the loop
+and flip one comparison. In 2024 the physics module needed sorting by
+magnitude, so the ascending loop got copied again with `std::abs` sprinkled
+in. The function still compiles and still works -- that is exactly the
+problem. It is one `switch` over three near-identical copies of the same
+insertion sort, with a `// TODO: add another mode??` comment marking where
+the next copy would go.
+
+Now suppose the next request arrives: add a fourth mode that sorts by least
+significant digit. Doing it the way the file has always been extended means:
+
+1. Add a new enumerator to `SortMode`.
+2. Add a new `case` to the `switch`.
+3. Copy the entire loop body a fourth time and change the comparison.
+4. Update every call site that might want to expose the new mode.
+
+Four places to touch for one new rule, and nothing stops a fifth mode from
+being pasted in slightly wrong -- for example, comparing `std::abs(v[j - 1])
+>= std::abs(key)` instead of `>` would silently break the stability
+guarantee, and nothing in the function's shape would catch it.
+
+**The smell:** shotgun surgery. One conceptual change (add an ordering rule)
+requires editing one giant function in multiple places, and the loop body is
+duplicated verbatim except for a single comparison.
+
+**The fix:** Strategy turns an algorithm's variable step into a separate
+object. Instead of baking a comparison rule into the sort function, you pass
+in a comparison object and the sort delegates to it. Swapping the object
+swaps the behavior, with no change to the sort itself -- and a new mode is a
+new class, not a new copy of the loop.
 
 ```
         +------------------+          +-------------------+
@@ -58,12 +91,41 @@ change to the sort itself.
 Use Strategy when you have one algorithm with a step that should vary
 independently -- sorting orders, pricing rules, routing policies.
 
-### Observer
+### Observer -- from `legacy/thermometer_v1.cpp`
 
-Observer lets a subject broadcast changes to a set of listeners that register
-themselves at runtime. The subject holds non-owning pointers to its observers
-and calls a virtual hook on each one whenever its state changes. Observers can
-attach and detach at any time.
+`ThermometerV1::set_temperature` began as one line: print the reading. Ops
+then asked for a log of every reading, so a `std::vector<double>` got added
+and appended to inline. Safety then asked for a high-temperature alarm, so a
+counter and an `if` got added inline too. The function still works, and the
+comment left in the file says it plainly: `// TODO: marketing wants SMS
+alerts too, add param?? another bool??`
+
+Now suppose that SMS request actually lands, plus a "quiet hours" flag that
+suppresses the console print but keeps logging and alarms. Doing it the way
+the file has always been extended means:
+
+1. Add an SMS client member and a call to it inside `set_temperature`.
+2. Add a `bool` parameter (or another member flag) for quiet hours.
+3. Wrap the existing console `std::cout` line in a conditional on that flag.
+4. Update every constructor call site to pass the new parameter or configure
+   the new member.
+5. Write a test for the alarm that now has to route through SMS-sending
+   and log-appending code just to check a threshold comparison.
+
+Four or five places to touch, a growing constructor signature, and every
+reaction is now entangled with every other reaction inside one function --
+you cannot test the alarm logic without also exercising the console print
+and the log append.
+
+**The smell:** rigidity. `set_temperature` cannot gain or lose a reaction
+without being edited and recompiled, and every reaction depends on being
+listed inside the same function body as every other reaction.
+
+**The fix:** Observer lets a subject broadcast changes to a set of listeners
+that register themselves at runtime. The subject holds non-owning pointers
+to its observers and calls a virtual hook on each one whenever its state
+changes. Adding SMS alerts becomes writing one new `Observer` subclass and
+attaching an instance of it -- `Thermometer` itself never changes again.
 
 ```
         +---------------+  set_temperature(t)
@@ -78,16 +140,41 @@ attach and detach at any time.
                                    HighAlarm     TemperatureLog
 ```
 
-Use Observer when one object's changes must reach an open-ended, runtime-varying
-set of dependents -- event systems, model/view updates, alarms.
+Use Observer when one object's changes must reach an open-ended,
+runtime-varying set of dependents -- event systems, model/view updates,
+alarms.
 
-### Template Method
+### Template Method -- from `legacy/report_v1.cpp`
 
-Template Method fixes the outline of an algorithm in a base class and lets
-subclasses fill in specific steps. The base class defines a non-virtual method
-that calls virtual hooks in a fixed order. Subclasses override the hooks but
-never the outline. This is the "Hollywood principle": don't call us, we'll call
-you -- the base class calls the subclass's hooks, not the other way around.
+`make_sales_report()` and `make_inventory_report()` are two free functions,
+each building a report by concatenating strings. `make_inventory_report()`
+was copy-pasted from `make_sales_report()` to save time. Later, someone
+noticed the footer had a typo -- `"--- End of Reprot ---"` -- and fixed it in
+`make_sales_report()`. Nobody thought to check the copy: `make_inventory_
+report()` still emits the misspelled footer today. Go look; the bug is
+really there in `assets/legacy/report_v1.cpp`, sitting unnoticed because the
+two functions are never compared side by side.
+
+Now suppose the next request arrives: add a third report type, `SummaryReport`.
+Doing it the way the file has always been extended means:
+
+1. Copy one of the two existing functions wholesale.
+2. Change the header and body lines for the new report.
+3. Hope you copied the (correct) footer and not the misspelled one -- there
+   is no single place a reviewer can check the footer is right in all three.
+4. Repeat steps 1-3 for every report type added after that.
+
+**The smell:** copy-paste divergence. Shared logic (the footer, and the
+overall header-then-body-then-footer shape) exists in multiple physical
+copies that are free to drift apart, and already have.
+
+**The fix:** Template Method fixes the outline of an algorithm in a base
+class and lets subclasses fill in specific steps. The base class defines a
+non-virtual method that calls virtual hooks in a fixed order; the footer is
+written exactly once, in the base class, so it cannot desync between report
+types ever again. This is the "Hollywood principle": don't call us, we'll
+call you -- the base class calls the subclass's hooks, not the other way
+around.
 
 ```
         ReportGenerator::generate()   (fixed skeleton, not overridden)
@@ -97,15 +184,17 @@ you -- the base class calls the subclass's hooks, not the other way around.
               +--> footer()   (shared, defined once in the base)
 ```
 
-Use Template Method when several variants share an overall procedure but differ
-in a few steps -- report formats, parsers, game turn loops.
+Use Template Method when several variants share an overall procedure but
+differ in a few steps -- report formats, parsers, game turn loops.
 
 ---
 
 ## Task
 
-Each part lives in its own header. Implement every member function and free
-function declared in that header, inside the same header file.
+Read the corresponding `assets/legacy/` file for each part first, then
+implement the refactored target API below. Each part lives in its own
+header. Implement every member function and free function declared in that
+header, inside the same header file.
 
 ### Part 1 -- Strategy (`sort_strategy.hpp`)
 
@@ -192,6 +281,10 @@ Total Sales: $1000
 --- End of Report ---
 ```
 
+Note that this base-class footer is exactly the fix for the desync bug in
+`legacy/report_v1.cpp`: because it is written once, `SalesReport` and
+`InventoryReport` cannot disagree about how a report ends.
+
 The hidden tests compare `generate()` output byte for byte, so reproduce the
 strings, including the trailing newlines, precisely.
 
@@ -202,6 +295,9 @@ strings, including the trailing newlines, precisely.
 | `sort_strategy.hpp` | Part 1 -- Strategy; edit and implement here |
 | `thermometer.hpp` | Part 2 -- Observer; edit and implement here |
 | `report_generator.hpp` | Part 3 -- Template Method; edit and implement here |
+| `legacy/sort_modes.cpp` | Reference only -- read, do not modify or submit |
+| `legacy/thermometer_v1.cpp` | Reference only -- read, do not modify or submit |
+| `legacy/report_v1.cpp` | Reference only -- read, do not modify or submit |
 | `visible-tests/test_catch.cpp` | Visible Catch2 tests you can run locally |
 
 ## Compilation and Testing
@@ -246,12 +342,18 @@ Submit three files, all with their original names:
 
 ## Going further
 
+- Refactor `legacy/sort_modes.cpp`, `legacy/thermometer_v1.cpp`, and
+  `legacy/report_v1.cpp` yourself, end to end, into the Strategy/Observer/
+  Template Method shapes -- then diff your refactor against your
+  `pattern-toolkit` implementation. How close are they?
+- Find the desync bug in `legacy/report_v1.cpp` before reading the Template
+  Method section above, and explain in one sentence why the base-class
+  `footer()` in `report_generator.hpp` makes that bug structurally
+  impossible to reintroduce.
 - Add a `ByLastDigit` strategy that orders ints by their least-significant
   decimal digit and pass it to `sort_with`. Notice you changed no sort code.
 - Add a `RangeAlarm(double low, double high)` observer that counts
   temperatures falling inside a band, attach it alongside `HighAlarm`, and
   confirm both fire on the same `set_temperature` call.
-- Add a `SummaryReport` whose `body()` combines several lines. What did you have
-  to write, and what did you get for free from the base class?
-- Detach an observer from inside another observer's `on_temperature` and reason
-  about what happens to the in-progress notification loop.
+- Read about the open-closed principle (open for extension, closed for
+  modification) and identify which part of each legacy file violated it.
