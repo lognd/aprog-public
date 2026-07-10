@@ -45,9 +45,10 @@ Guides are organized module-by-module: the knowledge inventory is the
 MODULE's, synthesized across all of its artifacts and merged by concept --
 never broken out artifact-by-artifact.
 
-Only modules with built artifacts get a guide. Incomplete rows (planned,
-nothing built, or covered-in-lecture-only) get no file until their
-artifacts exist.
+Every module gets a guide, including lecture-only rows: for those, the
+inventory covers what the lecture must teach (Practiced in: none --
+lecture only). Rows that are planned-but-unbuilt still get no file until
+either artifacts exist or the row is declared lecture-only.
 
 Rules: ASCII only; no answers or passphrases from any activity may appear
 in a guide; knowledge items must be derived from the artifacts' actual
