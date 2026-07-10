@@ -1,12 +1,13 @@
 # Activity: sizeof Bingo
 
 How large is an `int`? What about a `long` on 64-bit Windows versus 64-bit
-Linux? Does `sizeof(T&)` give you the size of a pointer or the size of `T`?
+Linux? Does `'a'` take up the same space in C++ as it does in C?
 
 This activity walks you through sixteen `sizeof` expressions across
-different types, architectures, and data models. For each one, predict the
-result before you see the answer. Wrong guesses are explained and
-re-prompted -- you must get every answer correct to receive the passphrase.
+different primitive types, literal suffixes, and data models. For each
+one, predict the result before you see the answer. Wrong guesses are
+explained and re-prompted -- you must get every answer correct to receive
+the passphrase.
 
 ## Background
 
@@ -14,19 +15,24 @@ You do not need to memorize a table. Think through each question using
 these rules:
 
 - `sizeof(char)` is always 1 -- it is the definition of "one byte" in C++.
-- `sizeof(T&)` equals `sizeof(T)` -- references have no overhead in sizeof.
-- Pointer width equals the address-bus width of the target platform.
+- A character literal like `'a'` has type `char` in C++ (unlike C, where it
+  is `int`), so `sizeof('a') == 1` in C++.
+- An unsuffixed floating-point literal like `3.14` is always type `double`;
+  the `f` suffix (`2.0f`) forces it to `float` instead.
+- Integer literal suffixes select a wider type: `LL` forces `long long`.
+- `signed`/`unsigned` variants of a type are always the same size as each
+  other -- only the interpretation of the bits changes, never the width.
 - `int` is 4 bytes on every common 32-bit and 64-bit platform (ILP32, LP64, LLP64).
 - `long` is 8 bytes on 64-bit Linux/macOS (LP64) but 4 bytes on 64-bit Windows (LLP64).
 - `long long` is guaranteed to be at least 8 bytes everywhere since C++11.
-- Struct members are padded so each member is aligned to a multiple of its own size.
 
 ## Concepts covered
 
 - `sizeof(char)` is always 1 by definition -- all other sizes are multiples of this
-- `sizeof(T&)` equals `sizeof(T)` -- references carry no overhead in sizeof
-- How data models (ILP32, LP64, LLP64) determine the width of `long` and pointers
-- Struct alignment padding: each member aligns to a multiple of its own size
+- The C vs. C++ difference in the type of a character literal (`'a'`)
+- Default types of floating-point literals, and how suffixes (`f`, `LL`) change them
+- `signed`/`unsigned` variants of a type share the same size
+- How data models (ILP32, LP64, LLP64) determine the width of `int` and `long`
 
 ## How it works
 

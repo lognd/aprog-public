@@ -8,8 +8,8 @@ A guided walkthrough of GoogleTest (GTest) -- FetchContent setup, TEST() vs TEST
 import json, sys
 
 # -- Crypto / obfuscation --
-_KEY_A = "3b1a87097f678d8381b8c1b044cb8794869f1e82d3656655056feb3c430f521e"
-_KEY_B = "0f44af13ce80524c99dd4ea31f62ddbfac9c3be358e1ec6569e0efb84689f723"
+_KEY_A = "63d0eaa0af0ad572469df6c1f58fc7319921ea97fd2c7c03b511adbf29617a84"
+_KEY_B = "c7968e776e11c8d0b0a7f4ab3bd0f8aec746e9abccad4285708e44ec6b4f20b1"
 import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
@@ -56,7 +56,7 @@ def _open_secret(blob_text, label):
     except Exception:
         return None
 
-_BLOB = "19efa36fb47efe927e3b105775c8ef72c9a096d222f8343454d99464bd4be9b8cdb99292baa72ca61ad41563c37ddf5b5d038b87e2a3f4b4bc5752d805"
+_BLOB = "f1f262839fb45064135f0ad641c12044039b0dd15fedfb89d870e04ab2d1f6ccceb6743c9f84a82b4478d5a6dad84997cbb3f25385eb4da7cc16def950"
 
 # -- Public questions and encrypted answer/explanation material --
 QUESTIONS = json.loads(r"""
@@ -77,7 +77,7 @@ QUESTIONS = json.loads(r"""
     "code": "TEST(DivisionTest, ByZero) {\n    int d = 0;\n    ASSERT_NE(d, 0);   // line A\n    int r = 10 / d;\n    EXPECT_EQ(r, 5);   // line B\n}"
   },
   {
-    "prompt": "What does the third argument 1e-9 represent in EXPECT_NEAR?",
+    "prompt": "What does the third argument 1e-9 represent in EXPECT_NEAR?\n\n  Type exactly one of: maximum allowed difference / decimal places / precision level",
     "hint": "The two values being compared are floating-point. Why not use EXPECT_EQ?",
     "code": "TEST(MathTest, SqrtApproximation) {\n    EXPECT_NEAR(sqrt(2.0), 1.41421356, 1e-9);\n}"
   },
@@ -92,20 +92,20 @@ QUESTIONS = json.loads(r"""
     "code": "$ ./my_tests --gtest_filter=???"
   },
   {
-    "prompt": "In which CS course will you use GoogleTest for systems programming assignments?",
-    "hint": "Think about the course where you write low-level code: processes, threads, file systems."
+    "prompt": "Which C++ testing framework in this tour provides EXPECT_DEATH, a macro that verifies a statement crashes or calls exit() as expected -- useful for testing low-level code that manipulates raw memory or processes?\n\n  Type exactly one of: GoogleTest / Catch2 / neither",
+    "hint": "Think about which framework is built to test C-style, systems-level code where a bug might legitimately crash the process."
   }
 ]
 """)
 ITEM_SECRETS = json.loads(r"""
 [
-  "wteszy?KGO7aA3(*dD0X+Z*IAu9SG$bO(~2e1Hd@e)Akt5v|v&P_suy*plbU=+Y_$7I5@P&badAC|$>B+88120aBR95wu*&E%d$HNSCRE@nh)QGz4on?=f7%v5K8>oxBbUP%sa9LtY$^J*eCpdZ=Nlj`0IQN}_(F=V(%K(7@BnTT%k0^74yAacpjRf6-^ZNNlPmDF37R1h$rr9P4D-50fFCEU5m{><b*84F9;{I#fBVX<tNtydGyfX*74^)hJ_}aq@ItC>I!=aVJ`}0+*`p1G?;;0ly`#=r~lWMWqk~#NS|IBZdXOB7`bTvwb_}c9707t<+|Yw#fv+M9uek@v_)N47+D&2=XT($9dIGP|swtYs^}Aq?LAa#-@p8RCo7Bf#wa39<TIuiL&p7`nd6)%yQM?RN`*dK8kqS_OOUFLA)Bu<Q?LYxMwGvKjj#h$n^<`sQp_sYGCY0zcr}Y@%DRB`9`0e&cm2NHbYG=B|5dtXPPwG0R",
-  "=EE7yK17<UO&SmRi{K*-npFP6nsc0@44*#IFMpUGHPleVkUcg69?ctMAMIzS1*Z{+Ln`%)*w=<*4_h;rV7A5a@J%C{m=7pp|9Er)2XfHtb7si3c^@@TX?4q46+v|E<g3@KAxCw=*8<o?{5H&zw0&8K7%Y3rFsg2q{b?>kVCe2A$fX!-x`=i)U85-4HnP(*`r?1T>dAK@UW+lB0EY|d536uC><1+7y+?;L5!SLijyfoHWSgSgZXeh>?IdfpCjD4W2woK|^AACwz4bNn#%<NDFjTOW#P>X7mSKj<31I-?h%~<0rpEo}tU?ME*2zNB=YZi7ti~%?E%3o*@XMMoG(RRozePGzR4`Jw3>j=4k8oKboMF*CqufGvfbugcXZ!PlK_V&Y8Q1wCezVT-8~c@sz}ea*",
-  "GAKN;NluOH4eeE^5O}VZb!NGS3=7}$X}T|w{U^yW9Oz9X_{H^^BK&6t3ay;9+(yBzel3zcLM9(1(c0x4#RMvmP%baR;;tQ*7J62RR4gK|GCv{$A-8uLda0#k^5RD?xm|!(PAF<40Fg$OF?ZL4G(-vNDEly0<#)s#GG)w^)8_|2Av=pRkzv<3me#IfdT)$z-)&U;F=-{|E??J6+0QefPOTeZBM6PNI18wD!NSyEPk?05`kHZDG~d`H_<cw_h>?!4t$LUg$5pw1ZnjUuY65rRFFCCv1Q=OvMD$@;=K9<ufGnUEucdiG|C2sp1b>gQv=yl$f9)7ZV78@#UGi($d}<Yei<qd$?q3!T$jhEnp)z}N-qo}^cAQ(=H`H@4;^%9KMjLEpe|AHL>{U~qg>q9dd~&L0mF3wQI~1&I5z*uc_x1lJ4=7GyRax2",
-  "MPLlEV_a1)2!Sj*g_cRfIJ3x*W%~{xARTp{{mC;virg?ZIdFM<eq6mqw4%Dg$A?T=EDjAyXYWXHj03Gn%hjj{%(uh>3v2)!#nZCY?g{-C<1`ZHnj)opQ}m{+dWz%XS4mjRdd-;fVk#0fu}cIO0SOn>g^A*hCg9DopeHS%$?-tsDscMxICQPUCaMZgn10i0T^!~l?@^MQWH=I^_6g8Os_srw$#D?)ex$hpJ9e!Ek6O0h>_-H2F<0U)Z-2520UBg<n(j0)d07U;Ub|hL_vK_1e^C>dkatras{o_s9T^=HVuxi~a!nD7YliMg&2tIJbbRBk{i9{och`!kD~QzInL(Qnld=Kcf&wRtj7w<-T$t*m;_!xZR<Ln{%dA5c?e<2*)ZG*Ex$Sc=Na~rFYptLA9msmcM!Ds~)&C0v1f8Anylz+D+U(CMtLyR2!1BF<YSx@3+kqv67Ux9`kj!ei8BkS^WfQJ<C=#!ahne%f7=Rcz?&p;MUUhUAX4pF%%5gr;sLI{ZweYxn@5p;@B)UGNp%e}",
-  "LcPn8Z8AOie#OsJ&^@7T;dx>p%^{+ujRk>}*VYd*juRNa$Zq2tXOh!!Sc*w0F2U0N4-fiM$)D^Sn_qKqEoi;UtE^ris@j1yF{q3ewHI3e>94s-PaM6uooL0fDC!!$CGI{~{l@f_bc&{#2TuS^E`a7{&@ni(1@w`(*%;gF1t+nl9M$F8?8<{#_5e#j<lrRhl7BkE;1X8{enabYk)h&3KPZD$_+(PMOjoEmw*9%KRC*uR$ZO!HghFC~YPFYgOWCm@oqCf(AwV1|S7IGKI6gH1NtQ62H`LlySkX6|6zq9Ss!H?(1~xDbV}Ppu7k=>2zXXBJ-=PP5m30i=Ude<UCS5_mI>O`UA3z~kE#A|H+u~(&IR}TN&8Tt;4B><C^_KZ+N;^3GRq1zPo@4^goh&G=nWoXf9+AMrU{T&Wt*W_nPHL9=x|t#jC@I8qo7$b<FgCXI)3i%{eze6&QU",
-  "Yampjj#mK9CU-Ht=)!SS+m6ZA9lmeTRV4?g)@q6VM6-WCO~Je_29ta$y?wD5{4}2IE+WxQglo58*nFFc`=QJe{MaB-@Te!HUDHQ~hwm-Bq29!5!;iKK&p`!yE<o$DU7yt1=5VM5rCT?p!Cs%cv%g|^-cMaUULYI|Z{>y2vXa4o^_&`&!GWe~r=CB{$PZkU-NR@Y3$J1?=I+<!dXNgzVvF!WPl>z_QILVw*4a`LxBabjH|m&p^An*VFT4h$8Sj)=Nz}b}4cDXxHu|J}04LtclDG*7Y|-(>Wf5m_1$gJsAHD^>7ob!ugXwioYqW@oqvI?9$Q+S6MR^G61RQLz!}R}lh0KnjDJ8!~+(jJ{%KSvUM_6A5mwe!2+`d@Yr<PZ9Xt^n_JGLOeUdj?m)+ra+E=j>5RJ$}*zDJJK%aTwkDyk5Z+9Wm4f$2<N1_}Ol#<IgvdyXGb<l2@s1VaM9f-lK(PE(f)dFLT{0u)aWZiD{rhA~s&2CZ;#T8>5Nlc}tEgl`Gm#=T)3Qr?=tLRvkvFEHpr`~",
-  "a+9H609zWl)G!!2Y@}$AQ&P*=BeX2x<cRgMz^tu+jR@;f9LwoV_zwudD!#e^YogyOz4Qsy{&aW4kfxi!0LeG~swljW<pnFYw9nA6#p*oOf38e2b3vE6XP27<us~!LSc)oHLW2(!GvbTUt!D%e!iE&@LNqR3_KIIPiqtPZjoa|f6`^Zlqn4dzw(8CsC$-H|=OjxMJSW-=cm{Xo=$2lSXBFgpnZcM7s?~TM5-Cz3Y2q~LICjT<2iU*K;b+Yw&Qh(cWFp}SJURE5y;~9JwkO1Y5|`@VZWzlJQ_oIU(Y}cI=TsOk?!DW7vf$7J3~gc=+qc$+!d95>oWDgD#N@{lG#gaYd|^*%b$QD8M1>yi`JQ;DkoDr@BJglBa-P2d2lNxKo|<icad{?u>ZB#zB|A3k{_`{wz0l&{C0AwLK8csn+Wp)g5#fV0C>*G`huLq?MQwI4yoADRD@5D238wG3gF33KS?Y(ADhNaw`VnCrGEr=9foD;QM3Mz>=~x1w-Qe=SAIM4k;2+e5Wd`FQ0B?6bcItx#$6$Y%5NWrka%}"
+  "_ziQt1y-3|9=Xl>3V{9NLIQkj^%1KXTzKdg2gJWF<h=FiviSsTn&LH+N|=)eQko;0cH0FJax<@5fMo8WTlg|mM?ubL4OYT8orq$6CxS(d=RGsCJhYpwRM*5X<d8?721gG?3eUat>Y>x@gXMfy9#X5wp1PIWSQAyu4LIvT@27s}XCEgK1NT@kb=c4CSa_ErlrnPoJ8XRErLhq-RwzQg^<5yBvT{vQy2uuYDTSws9N<9YY0w}1@;mmj?zk4RIdjJT<IM`+39&^#`r4DrTU>Z1bO}2VW~TYFD&kYE8IxJhXMy>;sm`LK7$F4y*t~+x+L}(P$Y=ES>j`JJ#+6}s8?N|mdgMcGJ(=MFypkkc4BT*r;Y&L}!ODw+_gA1kYR#UoJc7}Z`P5gRy@|}M9`nY-$lkZe^2FO*(^Vv|p-8K0B}`rM1Fgh95ysJM;|D&pb>F7IE8TK)E=Fa=2_Md$ijoUDZfLO7#*va3$X9|W2(Bi<zI#RZX#",
+  "E%|;-yBCr+<U8hn&V}TtsS4)bvoBdxq<I=2^h6OdI@0$KZ52p^h5LW%L65vtjlX{OanFa{qs0htuyE-SE3X6Aj1?IthCc&v5$Qh4B?Z|mUntSWWh}%97WD1j*z!46Zs0yQ3ZswZ2{Y+#M^A67AYqTvY3`#8p;TgqjPM>8R#f-1Hz?!xJzgJDkz)->UoKi+$*NeIbe8%=i*e$@yBbfRHUqzA(S@>OqTi^C(;nJL)~oheJ&}bL%ZITcSL_vDp6A53z^1A9EbyfmCQ00;@Jc{2C#E`5PE4-I&ZVS)0$f%Z!Ak0&ASUKK0`}e2Xtk8_y$dh6XX^r_t!avr$;-xO$-DUn|G_9P(uQNR3LLQYtR>PuqTDSnQHYKC&@T@WC=ff1RcLzVjt-KnypNuBzFvv#xct%r",
+  "ood@kS!;XtK*H>8%049}&|Y;yv0UG_m~mV%8m8=#_<!31&RM7!TTrw2LesL{y|KXjXTvmCLpCM{W$Edb?$Hn^v=cQ%LGRaj9Isx0^QK)FJvFDv{|yyLlI4CFZhLzseAjhIrgBLxy7YMtE6W7>NmtMp`!p{_S?pZ1e;;MUs@(dHe~KY4T+)15P=tx8(Z^;K7sX0KX=|ruc*=4fz$W=3FaX1pK;>)#4CL8?4ojiB9<*vvQ)k?enRR;VD(Y&X_xwA1TSdg{V!?{cSSsmfP>5I^#F-ggO%C}ZrL(=&@wHlA4rMBDHF5-vou+_cG~4xWg<#L?wLXfSs>RO2P_ymYI=Jn2Qu|kq+tGu-@g&FHmhv$7)I&A(bxqz~hnBll{zj+!?+J|n1IJO~iuV7U;Zp08<sPj{l77GCE(U*pzRtT9$5u<PXIh?w1~E<",
+  "Ly@3lEG3&bh%_Di3fNHr$|3I<204GeP?rN*ySdf@Jj734`X+X-tC17$-tyaw{@Li$QZ8BN7D_EmVN<?4M7&F>LMK@0Y9@|q9msH53z0?%rg=}7wM79U(k?wJA%1~V=AyIiZOg2C=)qZY5XA<<8YXPq`Ry4j*eZh_#`3$3R9HWMa(Nsmcu9BSHHbd>ogw0KSl!l(u@fHsQuln&>n5fw(@gu6@|G$n5K{?4+jC2KW6%PQk|Q#4j-109EnUb-V_DsdjSqB88Z#5tOYzI+ilvdd^FKi5LfoY;3#nN;Xi)hG+6DICFT)ZYbyB@DaM@G?lR&~;Ul}%kFELuAGTJAe1)bE*lLeRHr=`LO3M-z<h9eZTEgfcxXkyNIM@DCd8QtOl((OIoxexIn3hZZ$jvs|H(bvkaQ@$5#h;afN$93w@P8Buk2lY6Dt-_<2I5`EC<QV$XM^vIY&JNDS?_z+(kq*805h>3!5*t(^whs1VAmj(GiRgR;RR",
+  "@2Te=x8I1JI>Vyp6aOq$+AV02ixjos3bK_GD;NNdpX328oPGtX0#w<Amt9L~9dJ1kkUA{lfEc9s^q$s4_}yG*<fyyM8Yt|hpizT#UXDc>ag48o4dNj1TvWuC-f5y7+M_1!^McQv7P|&^Bpi`Wuc_Y4%0bf%GE4rHc}WWUqn8<&Sw-v=J#eijrU6XY(V;jVr66!@oM1(rLlEo9dRmk-K^ImSl$PLYj5h*zEYop}{>r7*tNECtZH$^IE-4o{Y(4_fGoyTgq7AY1(#5p@t?lHn!G`y@QNnyPwcIiiJ`z77o3$Oe#2WHQCVu*z<cA`dUIMqm9try8*X3crC|2^h(Tz;Q!awQ>KM3+p5Omg^G(;8;Ew^F$E#{u+-5(Wk?bV6;L#5pUtzl}E?Xfb7kfkbQM@5v<tk*k2dX?AKM2Ljv2-1f{7env<E)^=hbtPC~whIRk0YeyTaTqHeR{",
+  "nS}8&B@GTQ<JdQ%_!0$6p8e1k9E*+eHVViDCM6?gG>;w=G7IYRo(!T2(iwMDhC_E^cbGoKpNUUArqwp@!OL|4qyJ)GkJ)hMgA_dcY*dno9P-Y42x2&JV3_JwVuu^DV`jqN%w~d$ZH^|LiNG0p48#fPi^4^y!0U@l>#b?z-NnP1nf)<G>EwJ2b(XwhTGQ4hCI()V0%M@vagT;q1fX+|ES^dMNCDcG3$z25ch%AKKVq#l@T4B6;=tBoys-C5gnID6+KS`#lg~pR*`9NjoD%603`>-2sLI6J{y4R#$$U!Jt~8PgRFkzl=ch~S=?tPhnMJ-=aeaRh>d8~)_NLyiX~d*=E+km&{<h0DYZ8HLLJQ6<PAWG12%~E%yL8XHErYl_iPwV06@rU<gx@j$F#d?veSA*q2|fCzNI8g51J&!PqmFt)b#>qrRp-QwTm?d_eu%Zt#Fmw#q$mBspc#Q5F=WLw$$fGJ2__?}`qL)w;}CSLcVeh;0=%co8H&_yrFd<b@C?X3gl_5tdz=brgH59HWXyU<K>",
+  ">A#m#qN+?e+5?N|_(r=bG~@!^tKzvd?AJ~ZnBTvq%xWyT1@GGPmo<4&8U=-kuy3yRawb`!;&>0#k)puHVDc1E5pY{ubk;~F93nG?vU{%N!@y&Iulke|4|l<dYx>r~Gqd9MA-saWeCZl#a)1;HgsYlHTUMxHjS7L{)+r;$)@c^xI_1+ReLVDvNEuh$u(Y_=DHX{v|G8PB$zg|T{bdNxU6vCN5lassA$<*gJgX1>`|7z3u4uK*!SQR`6w!G!qpI&-%QXgs!zHiZ;OTXLK9ByD;wz<=BDKd{ZW0}Ce)mnWBg-kbFENxmOQPGC5Wb?wlKv0BSDG3{%$32NYKA9wS{qd!@y}njO<}y!e}NcF{Z11(lP8~u3&&oB{1FcRZ=fl$YLs@Pk*@;YR?wK3H+{k1d=@I)8g;o2LYrn&?6LbXLPTE+jdU@Q2elW}BSu{ZjQLJ1LRgJEJ{bCl6DVPC5CSfK&t?W|aEhEqFhayWo}{RI5_6O)m*T!XQIQUagxjcAI);{WDP-2ca0_MpCcbkxjDlyM<F!kZdF7Cr`Q&P0%CMHyn5e7EAer9bgsRZ(HU"
 ]
 """)
 

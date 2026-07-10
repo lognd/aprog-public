@@ -9,8 +9,8 @@ import json, sys
 
 
 # -- Crypto / obfuscation --
-_KEY_A = "d3374e39923abc512746dd8448194740c15ccf2c9be57e8f39d2517da3e5031c"
-_KEY_B = "55500766847ec9d2ee8d0061a141fd268534cb3194b9b78c2ab8b79186eb0409"
+_KEY_A = "f88a4da76605a3b18772548a8fa4b8ea7114cb53204737627cffae479d7f2bee"
+_KEY_B = "3266cfa4dd3662e137fd23e90720753932f3f82eee7e01be63cd0eeee33a8536"
 import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
@@ -56,7 +56,7 @@ def _open_secret(blob_text, label):
         return data if isinstance(data, dict) else None
     except Exception:
         return None
-_BLOB = "d5f52348bb6b98d03297b16e81fd23085397758c749e3dcbede3f18c799afba5fa26986a6dc0e1b982510865fbc6481cb05c0b6d758983"
+_BLOB = "faa1657f70aeef42a4da521b19d8f75d1c9438d772b4571adbf3c041822e81a25ac33497bd2ccbbe03b07dc7ba845fb32b91748cf167e6"
 
 # -- Public questions and encrypted answer/explanation material --
 QUESTIONS = json.loads(r"""
@@ -66,7 +66,7 @@ QUESTIONS = json.loads(r"""
     "hint": "argc counts ALL strings including the program name."
   },
   {
-    "prompt": "What is argv[0]?",
+    "prompt": "What is argv[0]?\n\n  Type exactly one of: program name / first user argument / undefined",
     "hint": "It is set by the shell before your program even starts."
   },
   {
@@ -82,24 +82,24 @@ QUESTIONS = json.loads(r"""
     "hint": "There are two common options: an older C one and a newer C++ one."
   },
   {
-    "prompt": "How do you check that the user provided at least one argument?",
+    "prompt": "How do you check that the user provided at least one argument?\n\n  Type exactly one of: argc < 2 / argc == 0 / argv[1] == nullptr",
     "hint": "Use argc and think about what the minimum argc value means."
   },
   {
-    "prompt": "What happens if you access argv[5] when argc is 3?",
+    "prompt": "What happens if you access argv[5] when argc is 3?\n\n  Type exactly one of: undefined behavior / nullptr returned / exception thrown",
     "hint": "You are reading past the end of the valid array."
   }
 ]
 """)
 ITEM_SECRETS = json.loads(r"""
 [
-  "^4Ah>x1b*qifh_&OQVgUO%D{<MwklR!Wl=a^QnwZZofmR&IY{6=>9CZ){7s7_5LopYUBW^T|?MQknNx(cLzw+l8#ZjP>Fg<BiNxvg<>02&*aPKhI>rl4=w}fsVE^;J#g6->$0Xw%Z2h>rilT8DMn*%h|>7qv41;)@}{3fvY%!hat_jK4b^no$(PlrXt&%wo^l3VH!&?vwKdp@cY3EOEYF>m^*^Zz<|DFV-i))Im@mgV#~AhSI<wl7-X?FEIuv{d?v!_>A-^JUnP5pFB^`{`LBI*Nk+InY5Yc}m",
-  "23^X9;8N(RD$0%4y=h+D=e43>!(Fec)Snk$FC02!P37Rja7f3o*FBu${iVx6G0|?!>M4)VzQQ*G>?v$16Bj50(3$nhAt+L@>6c^EBWW4AYS~Ruc<E!||B^?Dfwudl`&6GTp+Ba@&>eA)jC4TOx+IDH(*cROoxf8yM6qjVCc$?Zy0|Kc@XHaPM)B#xvG~UCL(1PYPS3lmVt_kMYI=-(*uJUc-xYOuQpmQ^ip2)byBNIhkfOSv$)rolqJn5r8Ff6_aZm@EXu72rKrbjBbTjdGm^coeb3KD2NLxxvpbDUWJX{YjL1hQnl>Y;4NMar",
-  "R~zE<(PiwuV$dMaoq)_#%{8*G%tOL^w82i5djE)BfgeD6vkM>QM%(z-<OBd0#C<MlbCAI{c7G89zgx%!3h97Def97DDVcJg>U<7C5p5{5q7_L&K&0FN(2N$_%*5$T2v8o=l;HhMWw)i-9I(Ho7LM0VJh9imyFL#+d|5?Oa;ljaP_uQCVf93#JX1`r;)GBLAIQ(Xp)TBj7M%e>(lIyK+<1;4A_yHef&OdVWNJt_W>OdA4_25Qb=EmL!EF3>K}n5o5}vF*<h<SxavR%;V{Q*<z%VBwd<Nz1^ed%&%~B6va-A0sW#n48Oaf1b^xj_|QY)S+&;",
-  "Ki<-wJX*MvkxJgYu6V#5$COr#fl?*K#}=#USNCAY0k#eGFVrfmWj}bMzC?a;uj$cYs$MG`5sk`#A~5R9L^MnSTiUcnMfr$85-fYcMNksPYW1vF+tQ`Fg0mpEc)P`*wA9coHKBhr1Wv?1wdb`RnKAW)nY@_VjP-)4<Yxy0DcK6*dYd=qeY5tDdrHIhydtzOairXnBJkdc+-<oL>h^w@2W5Mx8iX1To3R87e<~8DVpiUL$B2$=7=8hK-h%k#tgLhkfEmF!K8VghVWK8X`c9_eA^F2%15N",
-  "LQMig&<8BIW_;3l(MGbX48>8g)wsJ)qlqN%Dfu6<Au8R^(7hdeNR7xt_Wl^Wu~uUVa<Z}YSFF0$!B{8%L^BP!hlV?j--CK7x0>o1qFeDNLb&05yQmKK&Jcp{)4xB^!i9C;6DW%H^>HdFpVfg;Y12_w9e_AHGXvgVK$O|0i3as7>8>(m<6h9liLTvV&!}44FaMu=5&@?vR5FHEX1X`m>9aQ)tmP9*@r9OGc;M1jJ#dte((+Z8tW85<JX<q~&Fluy@KyI82x#WgubAeBysjrSRgt!6b=t?A?)NDHW<q~GGdiv{KB#WgloW=CSl*|dBlO%>b^",
-  "M&KtWhUDg<-?@8#SI&Jt&u8R0G#PWPH1?ESxfJ{T%MyjwX|}Jy$0^?4MlO*hy`Bx8Y$X_92VzMsjy8Pgztx{Q*=U7VjV254UgOmEC#z$Wpe9=+811WA*W^=|C$L#{_{TZjD|yE5K+yOO>__b!H%*$&)OYN>92_*^9gE2CA$#xL-moRg{&EMPIFXtnOGmeG-!q(cS}-T7Nf;o0$69#u2ZuSf(yR~7O=U&0T57^2mdZQJn%wV6LP(U6`uS;kEyUbo0{_<V+|4T4;Fpa73g{Z}elN7Nsboz#;U7Q&8ep_kZVKGA&`-7Z*IluZc`rnR2QFScN&_fnMs{BYGxNl*bU!n;2tRkeNLsCI`#GSS3^coxwJSWQ8U",
-  "67b?A&0@W+?|>{W=Ke}#fQVcLOY^)tqk*p80|@HE48teuNztEe<nWDV=h0#kkWjaktz;xnAI;s9rO~mRaO0$5<SX_VJ~5+LdijlW-PKj4VMp2m5AVp(o>B=bIoWk83i;!v3^1uHO*BN}M1%0hVw*Bnzd^<to}dq<AF1=laNI$ubA}pR6ud`(<~ODKQTFV>L)p@ZR}id^{_=FHL-P3Uyg!il)3SG`%?mIoKLA%%{@$$yLw*!=x#$6a0Nh^`PoT?ebp~#g2LIbP6ApXhHnTtve;m*?p$nc`O9VOWT=<&&ZGoR%9Jt;@$g+I=;lwHnISO#w6alj@hJ8LLA>;etU%5pw9r24??2#!BvYAuW`j&i(b8(qXP|Mmg"
+  "2-ng5RA3d$v)~dRs?}fG9j9w~@r0CP>&#k~e*7gtWo@=1p1Yq>*H=)G{;nGo_1g|FMLTrxVD4#t$tsWh#gi<$bt=Y6fVyc_d1q@5OEnqQSkcg>?f@tJR#{Fq@A33i4PNSrJNS2edUz&=NvF)7E?Phc4FFo<j(fMTMr(4hiG>DCdiod&+g_;;**2|{%^(iAq_D<c!ahSLM~iLC;YkyLZzjSM?AGBPfAT<#gP`S?ukFord%1vneKPpE;H7n@^*ayKVnf`hLg<!oxkx)X54(v#4R}%5??wtL2#jy2",
+  "!?9-p9lpI!v8EC!0=t=89Z1|62t_A|L~VzG*)U=r<5kepP@9(ca8oo0DR4@3fiV(I{UZi=g0QmDyJgGFoK(m!2<O8N!mk-E?Z3A%H~06FMLXmm<D@sYh}CL)ZCK+@c_F7XxpRty&#n1G^_#Aj=knj18S=bAHG#8~g6nJn&2|~NpuL5jQ6XI1);=2>D4yt^Si`$H0+eR9KOtZ$bAh`R7r<iA1$z|AW|(<@zJDHaU^APRq`+$cJ@sBS(&gv%m>Owy`X<+Z3A2px27l)NqPVf@USH5Fx)_Ofb=4|s^@S;tUnz9))7J",
+  "C8u;72i1$t)uB(RC)1qt#$_vy#)5s1wETz_IVy5ksm8L;@h{*MkdPoQQKm@5aNWl|`gQ>y^ys(#;ox&sECW@Hq`ppaCHs|Cf)=)=0GkqN53fFy$=Y75SFEB@(}4=LEIKr-c|Mm!$4+zx%f%C*J6CL`k(<U6ga#MTCY-atD$%4Y2OLUG5@_Aa?7#?L9j!6kcIQ=9a866EoI`}k<?W&{Z*oX(!3YQauqpNCL@+Xf9XNM;rH8CbM;Z<y_Gji_;=ru=jd5AutZm6RoKOa}od1|Yyql~6PchxEsH-an*TK(Tm?kTOio7iVX|AfO84{D~#a;5HQU",
+  "a+T9h4_kR#Z8+O@!0|FYbdcD*inUPw;h_0etB_8b%IJChIOxDQcUc{U&YG6*{;_h%7tU{S@A~sISiWSlCYV~Dt43bo;xlh*Zg)msI=X(r9Kd|PeFn!U{*Ak!YgQkU$b<mkwHn7!yY1n8uRuIFbEmOpRFvs4MfeB!$6<<+A|LzeX+$%tbkE{#U=rLTH`N{TZ5#b9`Lh9Bh5mjAavlUh+b;DqoPrh6A%fMsc9fhuDj%F()8x;^woOro@h;z@2udR_+}B-(S|M?>txx#<W5nw`)~HNkpY8",
+  "Mb*DDaj_*#w8XI&j20v|IdMEojM*@$Pxew(K5A`M3%hI37>JqCv#ykYd06CQ_coliG6-~O=3p<HkvpldaX1`H-;wz8<-j0s#tScXCFB}Z<Jb{nFCemPzn0LN>&lpp46l!ZIk?_WyVtX_-3=jpB#QTS7#lY)<30ktNYPOk-=7>Y-GfF~`17%cFVwlFh6_-eHvWdIk5maiQLm5m*#<a^l-T1Rkxe;^p)HM$$Q*XPY!%(v*Ybi=<E1g}B08Yb7c}A$ppL?-CE0nOwQPbu*(<3@dpKGKJT3;PEu}qjOz~jPuYBQLaXni#1+Tq6`+u6-0Tn%{zW",
+  "qXod^HazX?tX7uuE|QE>6a?<(S0uChOB*Gg6A_C#ae6Wi6|e_Gv8}A}-t9kS3u{&*X*6V!@b0a-J$w7~`=5mwbR<MGJ43h~jTJv}Zk`9wPW0gpIQtC??ugnPu(Fd|2uvRIf1h(o!Ryr}m)mwyFMb*T8AVj;Tduzx0b3jOr*L%s`8B;nz8a*Ls;lYbQYibSdoN}It&h1A)8xt@pSuH1O?8UQkDxtfI?!o>x}DjHNC%)@rx@8dD~|#)0AoTgbIlXo_WPLz3TDI7wj72;5W><lJIYyYvQxv@?QMBUR}RA;El4PAwxzxCTxL-?Oq3LRFQr{uSQfh3Rh9>EC>G#{e1nK}4rdHR>;r^p!MXm!",
+  "BP!i|*P+9htlbU3e+k?${a5E}yrq+I)Sdhxu|{6~mb_9CU`*}4yGG{b`faX|_Er*h>S1OTapa#|MNm1l4G2}5mDpz2l5Q~NiW2U=+(I~K16N}O<T&(|<m%6(g{2FjZUQj7=5u-=3U3pDeZ>5<9w!}%bk1iAD~oBQH{DAY>~G++RT8p9IQ)b44@x#}97mXtKZIY4FX>KzuUGyL)`AS}DVsQM<F6aeeCGd~S(NbU=+sq9g@lI%ETME$zsTIlc3>L^H^EoI{2W*{ud}2M?owj}zs|+70K`x=j1X<f#vHgY;$R28zK2VPe3Gk2#81dSE;s!N8|9&cpd79q8#uNKs3(sQf!_C9Qk8MksuccXP31IZP1Y#"
 ]
 """)
 

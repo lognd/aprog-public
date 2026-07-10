@@ -8,8 +8,8 @@ A program crashed with a real AddressSanitizer stack-overflow report. Read the c
 import json, sys
 
 # -- Crypto / obfuscation --
-_KEY_A = "6d95b188a2b4307903e00a3925f8d7b3d8dd0a4e3fc997184df7412a0f16f20c"
-_KEY_B = "a9fa7256f3ef69626f1a265ab2fccd2f848bae52e8a008621b0d45957dac5c3c"
+_KEY_A = "6704ae269c3a2f4ba7ef9783de8d9bf8760f8c2d73db0080361c730541ec92e9"
+_KEY_B = "929e4b95b17980862fcdb1cb65b089e6f65a5d1f80e111749718d2e8b407387b"
 import base64 as _b64, hashlib as _hl, hmac as _hm, json as _js, zlib as _zl
 
 _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
@@ -56,14 +56,14 @@ def _open_secret(blob_text, label):
     except Exception:
         return None
 
-_BLOB = "c317ccc33eb8a242809f33a614e574f16dc96ee5f8f0270e04bd0935f705491c8dc7bdf1921d18e187364dcaefe5645b0a7c06cb9520b24d19c03c3544cd5b52f3b26d"
+_BLOB = "2c8a37f2466b201bec29ff9b26f503e077e0cc9e34a94e7db3f9532da2fc57b1535d34952386bcdb92297eb1df2e2b6ba609bd30f0cc1d5b3be834e4dcf8184a9da2f3"
 
 # -- Public questions and encrypted answer/explanation material --
 QUESTIONS = json.loads(r"""
 [
   {
     "fn": "crash report",
-    "prompt": "The crash report shows the following stack trace (truncated to the first 8 frames):\n\n  #0  parse_number(expr, pos)  crash_demo.cpp:9\n  #1  eval(expr, pos)          crash_demo.cpp:23\n  #2  parse_number(expr, pos)  crash_demo.cpp:12\n  #3  eval(expr, pos)          crash_demo.cpp:23\n  #4  parse_number(expr, pos)  crash_demo.cpp:12\n  #5  eval(expr, pos)          crash_demo.cpp:23\n  #6  parse_number(expr, pos)  crash_demo.cpp:12\n  #7  eval(expr, pos)          crash_demo.cpp:23\n\nThe FULL crash report showed hundreds more frames with the same alternating pattern. What kind of bug does this stack trace indicate?",
+    "prompt": "The crash report shows the following stack trace (truncated to the first 8 frames):\n\n  #0  parse_number(expr, pos)  crash_demo.cpp:9\n  #1  eval(expr, pos)          crash_demo.cpp:23\n  #2  parse_number(expr, pos)  crash_demo.cpp:12\n  #3  eval(expr, pos)          crash_demo.cpp:23\n  #4  parse_number(expr, pos)  crash_demo.cpp:12\n  #5  eval(expr, pos)          crash_demo.cpp:23\n  #6  parse_number(expr, pos)  crash_demo.cpp:12\n  #7  eval(expr, pos)          crash_demo.cpp:23\n\nThe FULL crash report showed hundreds more frames with the same alternating pattern. What kind of bug does this stack trace indicate?\n\n  Type exactly one of: infinite recursion / stack overflow / null pointer / out of bounds / use after free / memory leak",
     "code": "// Source: crash_demo.cpp\n\nint eval(const std::string& expr, int pos);\n\nint parse_number(const std::string& expr, int pos) {\n    if (pos >= (int)expr.size()) {\n        return eval(expr, pos);      // line 12\n    }\n    int val = 0;\n    while (pos < (int)expr.size() && isdigit(expr[pos])) {\n        val = val * 10 + (expr[pos] - '0');\n        ++pos;\n    }\n    return val;\n}\n\nint eval(const std::string& expr, int pos) {\n    return parse_number(expr, pos);  // line 23\n}",
     "hint": "Two functions call each other forever. Each call pushes a new stack frame. What happens to the stack when this never stops?"
   },
@@ -75,7 +75,7 @@ QUESTIONS = json.loads(r"""
   },
   {
     "fn": "stack depth",
-    "prompt": "The real crash report (not the truncated 8-frame version above) showed the alternating frames repeating for hundreds of iterations before the OS killed the process. Why did the program not crash immediately on the very first call to parse_number with an empty string?",
+    "prompt": "The real crash report (not the truncated 8-frame version above) showed the alternating frames repeating for hundreds of iterations before the OS killed the process. Why did the program not crash immediately on the very first call to parse_number with an empty string?\n\n  Type exactly one of: thousands of frames / crashes immediately / compiler optimizes it / eval detects loop / os grows stack",
     "code": "// The sequence:\n//   main() calls eval(\"\", 0)\n//   eval calls parse_number(\"\", 0)\n//   parse_number: pos=0, expr.size()=0, so pos >= size is TRUE\n//   parse_number calls eval(\"\", 0)  <-- loops back\n//   eval calls parse_number(\"\", 0)\n//   ... hundreds of times ...\n//   STACK OVERFLOW",
     "hint": "The stack has a fixed size (often 1-8 MB). How many function calls does it take to fill a stack that can hold, say, a few thousand frames?"
   },
@@ -89,10 +89,10 @@ QUESTIONS = json.loads(r"""
 """)
 ITEM_SECRETS = json.loads(r"""
 [
-  "SN(TB#UQfJSJ<I~0K+Ld)=&UQ%PJ3LWZ(fWl{BgU^4}&jq-s7(_LCn2-LyRG&nR&78R{wRx(m5M^{D9z!K2pa^4(<X!Tp%DCy^u=E0D;lL&&i%H{gRPZHZT1YKaNNk<Zl2lH5c!ut<?HK2>n2jnhtKy|Nt0M{|omN%3y0PIB9;5PyrfWp!#xpH+(VC(G2KNU%+~%tuah(Wxy;e;DIOfRzgmC!906L>U%>_-k8Khv{M~)ZST}inZadXHc6Bk<*+#2e@N?>WY^_t@P4U4e>Ts`Bs=Z%X_z{22Npo(E*Pbg*BxQzen6HN)|=NcV9(^u}xao#Zba=JZJN0cidGd-pf8wwz>UVHOR=KP#ZhAJgXXeF2{G~`jn9ZJtRS=<<cs7RO!>-tkbmgxpdirON=XV5A+2dhFer?adOZ|)`KHH!zR4#J9{P*0zHV&&h8|DI3@OpsOZ(UA8ZAv-3F3m`BeYs19o31e%peCr!7G4J>r}bpTs^9G8t@padMYk+}T*?z?1<#AmEwEnfWu%^+ir-d`QzE{ZV33PhM~Sgl3Z->+no5BD?dR8kO(YVdY0*Fn45utQKis#)dieEmo|vah^?-5_WVimR5Pb+mV3){AhP5;{H`zjxOky6ZLjT63v|aF1WnpdG!c70p*5<l1>KxkuvPr4r2UGs8_BvP%AcQ&GsgPPIGp=Kwz5o*hRNl=ypI<kdp",
-  "iJi#nj~Yqbm!Y!kx6g4J<>;TQTz1t*e`?3GWwEN2hvXH$PXP)t&1z00yWvf&@DEOQBu;EJh<G)e{j0GW8Tl1h;44&O>vR9wCR_*_peW{vg@*#MuQi;-8jVq*)(j&Uz<;=h3dtmzID3y<)1|0TP`Pqhj0p2EB$Dv(l2TFQyFXqU+&-n()p9IcmO*Oy9E*TyHvWWFpDtFYE8l-t({1kkZt?zd=<Q!B`6Wz{tf=cv5!BHH5vuV5ZrTcGpBz``JYNk$(xp?(Sy`}pr1uW(M7*i1PI>L%x9N%RI6<D9#2kd>!#Z6jO5HO#a`@}1B$){okc?kYaWl0!MF-nh^IIZcU)H*baX7gWh$Y&iiQ49H2Y7AG5lgZyLGLky<u@L7l)aGqO6#{PhneA9Nf=LQ+_i+^A`x<P4)Orl2AHQs`i~izFYMR8l>La?)v?gIqO7qZXklK>@-3&e8^{YwMM{WWy<mXkN4}FVrWOEfk{1!By95ltsVH(AcWWP5CBVKmUWx>D&e><x@4d-*Ag2N|(56>Wpr-DWW-sMC5ZkDpxgnjgVfh*970rNH>pt%$fr}lPms2z{{}N?tKZ;>8(JR7%FUXgXaE<nU<7@wh{iB6qe>aGfVMDNDT&ky+H9VePz1D-2_lUE3d0}7*wErYmrOn}v^d6P<Th*GFsY58iSLq)_VAil^&0EQPgR9ig2=`8D{bPXpzYNKLhNmfQc@_42F#",
-  "P1pvFIIJoH%IQIuK5g(ThYP2*iXC-(%_*<`o=(!!C6oV;W_XpL3GB(;O3(4)9&;(B0Kw5m!J6TNkfD*cXfCbUMJroM3d$q2jymlB6IrXxtXadUK00P;-LxrFb`B$3>`3iFco_6_X~)l+?#accFNb)#kcA3n`&T<=bL5mn(B~8L62znn=3I7JdRG>V@Xo0xyPBT#X(qz9h;@V0>V~|(nDG_52ZBQ#S0j%p9`uHRu_si`@eqrJ+(FW`4kY`n%YwDTnLxcxz&2+Yr<sk#N&}yh<H0=8{uDV>(ez^V>0`5pdwkXV<_?X~&;rF4jpyKCs_43Ku>iZ8cmJXAenT515*ti}jcp|uMvJXDgJMa$K|XFlT)7ck1qXGddKTj-XjcqAkB^o$<vuY%0_L)>Hkyr^JF;rd7PRnn;z`b(Fmtb~pL->f-vj_nL}`)dG8x0<ZsRMRznXVuB-oCjF1Qk-V(Ay1$pa{%&MPRMQ6wFWvg%SF@JV;Sk_38`#N5lVlZT0jS`{-%bO(NxZ1G)=`;;&y3ANRE!a@2TJrF>ORx@T?-vc*qD-+GElg-B4B4hWv>JP;rk@6j+V7iSl&36jdGpBS~_d8Dc&S|{+WVH4K)GN5O;7t&#u$^|{$-F5UB=PvjVYHc~o(@)!*JWuLj&QukZ<7gxL*_rM9BI)q-TZuC!u`FEvtvyrcgsslfoz0O^$brN`-^}rO~Hv)",
-  "K@gPVs+})aKarVhQc(6IE#*<JB6(yMh57?gNJqgbQBo5eBQY))=e^d%rCa30r@H&kYkf3fKu7auR74O)rxFled1(viK?qIUv;7LaA(FqDU_a`#5UmQg9?X8-&7|#j5$z73pHbetqOKU9z1`O1vGb{BbMjTUE#}LahC}Brse-qEptr_Dvz4t+Yy{c$m;m1K{CL$@&wpk58%pKTIro0oTaO}Q{+DNX7__;`AxFq}<3zCk+xL{WWjVn_23(bl%t!Im_^aEufT#b334WjvY;nG@xUYD`CWa(_u-Q$a$GBcM47Q0vgE$gqB0=%O*R3Hc%1Ru#5_(OKVu&sW=?_4HyLatyIh3Wd0yfgx?D&T_a#0<SXDTPbp^fC%&#!Torl=^C!SGC^3Tq6(aKkw6Pfs{JZ5`Z0mSb<*HKy?kbn#01sqo_!wui{y(|(9OyR1T%OzS@M<uJ>+8g;igM&7iCDKEk-LUcwPpI#{CfAZ_8I7TZ-HlC!DRF64pQrirgoY!1!35?ByDUPSliN^dR1oApAqMXzG$BL$Br@?zMg0l"
+  "Dpasp<*uIZB4P5CoL&3OTOZX^0VJ=lD@D!9w7|R7v<-JkAifQw-O5gYVzxPyvCOhl?$Rrp*au6xVwv05GnLsSJv^RJ@`ghvdIE(=tMWj3#W&;4KVy6+HO9`|Zo)aOOrSt-A&t3&Uy-5^RR?TBcQ92T!uwdChP>@Ecu!%;))wQzCMFk;tlygEkODXj%NxBVD$=j430;!>1mIT6^`tP`J}p7xS$(_d2Xm5>AD%ud4V)2QLU=fKTg$q?mcqJlTHpwT7IBSsY*(8(Zp2uj@AQsOLOwrb%gq_=qT{8}M(UeEB@2wO+`48~Y5Iw(NW|#7SSNfp9}a`x=Wt{ENV841A@>L-<6iK4%=gHTu*9lZMOqN<uJwa$Xwuw3OTCQN(?xCtHwew4t{38}UJm>zI|yDWTkXbs#nBBWpqJNiR1Z}oShn@3{+Z~L$5Cw}Ep1276Q`c(k}Ebm{`0S)yOfY*=!~mFp>w&Nz85|CSDz8qJZ6PPCVT!4-WMpi$S<5z%G8ICdoaEDDrVQOo?q^TLj7*Z?SyqOafu(R0Vi)&heYFOLN3h-`%k=P!0=>y5^8T%q$6+!@H<eY)sllECoDfR=kFtuL3xt(sEBjmfha%27HV>tini^05wc8D9~cZJq%)_ZU;46Dv@n!BLnpDVq;?eXh}cL-1h|=%WaLz!;mUUFV&l?pb3q?ZoRf@UrnJ;*jm<+056%",
+  "AMeU*9=@*b;^S{F1n%Ziw=~vVKY!s2gi`px;;T_Led|?e@)96$V$L`Y*SZuyUn*t3#dc8M)({_$#o+&!5Kwng{OW}=e+%tIU)55V!6HMoyfsr@%rx5~hpw-+>dgnuqFojLGyjMEJ9k;k?pj>5@u{QWlF><UYZ%O>m&)7VfzUItVx{l<&$>mlMBnI&!7*hhq}PwyPWV(^b$FRv!TDeY2UD~SJ@J=48eGlRt`hEKjWc?b&bZ&BIct;M%06Bs9j}oyK;?g~oqwpzJ7`No-}OgaldWHKbEHoBK*N!6d9*=ZcS~6J+&P-B{e8~3nn4_Yr#PG5@OsdFoz-z?kX<5LK-6y|M<n9_79Dyam0Ef@lR+!G2(^W9Y_B4f<B~X-tPXE(fPgwHAv`1Jr&UZhph$`m@Sc2ETr)kTLIVP!pCGp+;C|JMxe<U&+oJ3Xi$1($8m2Y?#x4KcL=<D}7{E7nU%|W=W5Bv^<oDz3S3(U(8c_N+1~XA=9O4%gUJz~KfGMd{D~?zFjXW$i+>>EG%Qo4ZO7(f!<cxd=@I0?*l8(whIp@D2Y-$K~HZE0MoTxz#WFOu%hf}>#^^KgvZkgGVXvS$l>j4^VK5@MO_3mi|)T)LkS*s_VJmcg8QFfM$Dn`BdWQSWwNJBM3@I1XDkpnuZ9<6iFkB28{5^Mb%ZU1dj`w_r(Ry04O8MqqqnG~Y5JepE`;S>*p*WO$TVvYc)Qv",
+  "-?S<8??<AjVZT5mxccu7MvDw&8*n_sd+BuTUGfgx#ab5OzJ8xZqHL9%=P}1XM@NZ!#9b6QWsPALGKzOjISit@_j0)YNPIK(QDQ1V(YYDWgro5Ffn9gapRDYuV)JHJvr0AwZ=WhDR2c<5t4rWOp+Juwp+E>ho!_qbgWA}llY@Zct2htBm$516&oGpbR*KiSs(Yt&;W!A@Rc$31OIS{#?1;oI0vXoC=}C+Fv@~7`FraN<_=D+>I*2EfZ&&{3`Szjjk~XKo%hL#p@c|sA2cvcYPdHM@i^9a{1=jfm3RN;E5LxHyeCxNfYhr9HC?0=T8>N@JQ$F7kTTg2a^?QPfwh_B2m_|EZ(DBC!vu$g&tSBcPosK~IrUi?`$;ueA?US%xQS!;9ax<!1W!O*k+x6*uY{$1e*x0?~Cx)bi9h-?5i%-1wM}`^a-|_`O0Z<!>l0t(o=G<?e1i{z-GQ(XJMIi>rY=KoqjEo?;xJN1llkjUi4Hs?>5gFnbG0BQ#waN!GxRyByuQFT$k?ZOJo%QWqkE_fDRC=WLXyR!j%l!j21h7&>-~TC;)XyOATI>wZw>c=jPv|h{{9fP1k9Vum6ktUZ=y)TxZDzda`){@*T;leo)s0Uke^{FlN&krXH$LI>tm~(TYEo^%=d9riQ?7L38Q-NSRW)n3oC?!b_SLaqoCiO}HZHaH_2;5`)(r",
+  "ErozbY!$<j`!H8bz8{Hr&0e`2VIsYq_ypxI5XN1oov1H*Q1~Nh;CprWAW~F<zZ*pmbT1d!+)eu0@=2qFOGW;;_86_+wFE>Ve3mb@n1)n{Z(a*`+>MZcq7OH@R%j!sjjyPbL-8j6=?!gF?5(x}`k^1=e1zLJw3^}g(CP%Hq@H0Yu|H1{GE|)iF%4CJ60T1GU4=+=_!(aJ*6$Nyi-nD0!#^b+EMtaQ7mLhulnaLm_WWr3zKm+(VJAri{}KlP8iYX>c1iF4D{NZ(jfBwVl`{pB)d1`^cr84NWiM`h0^*dk>4~IPbOc6xSpQoRNfFqbP#9zRp4QO@+}i)a$nPF>Bj!>ukiVW81P5#KpA6C~SY3?<&P|i4q%^A{<?~o}C~XvJE<yW)6+Jl}r5(nbd^Hl(9>%<1r??>A&>|nz!)3*3kShGs-b*Z64^=zTTvWuVPS;aTd*zD}Oq5`2b;+jGV~tGv8pMPs^pR3utnZ<)4%Jn_J2EhR`u}H>frc&$VnzRb)Z#xgKVXY`B0NkZ%U>LOnJ#(d2G6D27HjnCbi4"
 ]
 """)
 
