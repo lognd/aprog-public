@@ -27,15 +27,26 @@ what a race condition actually is.
   variables by default
 - Why a blocking call inside `asyncio` code stalls the entire event
   loop, not just its own coroutine
+- Hardware interrupts: what they are, and why they require neither a
+  thread nor an event loop to exist at all
+- The layering underneath threading: preemptive scheduling is built on
+  hardware timer interrupts, not a separate mechanism
+- The layering underneath asyncio's I/O events: network readiness
+  originates as a hardware interrupt the OS absorbs and delivers to
+  your event loop as a queued item, never as a raw interrupt
 
 ## How it works
 
-The launcher shows you ten questions, one at a time -- workload
+The launcher shows you thirteen questions, one at a time -- workload
 descriptions, or a request to define a term precisely. Type your
 answer. A correct answer shows a short explanation and moves you on; a
 wrong answer shows an explanation of the specific misconception behind
 that guess. The explanations are the real content here -- read them
 even when you get a question right the first time.
+
+For the full four-way disambiguation of event loops, threading,
+interrupts, and concurrency vs. parallelism -- since these four ideas
+get confused with each other constantly -- see `who-handles-the-wait`.
 
 ## Getting started
 
@@ -45,8 +56,8 @@ python3 launch.py
 
 ## You will know you are done when...
 
-You have correctly answered all ten questions and the launcher shows
-you a passphrase.
+You have correctly answered all thirteen questions and the launcher
+shows you a passphrase.
 
 ## Hints
 

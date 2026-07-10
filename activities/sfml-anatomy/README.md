@@ -34,6 +34,22 @@ A few terms used throughout:
 - **Back buffer**: the off-screen image SFML draws into. Nothing you draw
   is visible until that finished image is swapped onto the screen.
 
+The `while (window.isOpen())` game loop is, precisely, a cooperative,
+single-threaded **event loop** -- the same kind of machine `asyncio`'s
+event loop is, just written by hand instead of provided by a library.
+One worker (your program's one thread) repeatedly asks "what happened
+since I last checked?" via `pollEvent()`, and nothing about that loop
+uses threading (there is no second worker the OS is switching to) or a
+hardware interrupt directly (your code never receives a raw interrupt;
+the operating system absorbs the real hardware signal -- a key going
+down, a mouse moving -- and hands your loop an already-packaged event
+to find in the queue whenever `pollEvent()` next checks). If the
+difference between an event loop, threading, and a hardware interrupt
+is fuzzy, `who-handles-the-wait` (row 55) is the dedicated activity that
+untangles all four -- event loops, threading, interrupts, and
+concurrency vs. parallelism -- side by side, with this exact loop as one
+of its comparison points.
+
 ## Concepts covered
 
 - The game loop skeleton: `isOpen` / `pollEvent` / `clear` / `draw` / `display`
