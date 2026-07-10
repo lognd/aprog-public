@@ -11,7 +11,7 @@ Implement five number-theory utility functions in `number_toolkit.hpp`.
 
 ## Task
 
-## Functions
+Implement the following five functions in `number_toolkit.hpp`:
 
 | Function | Signature | Notes |
 |----------|-----------|-------|
@@ -21,7 +21,7 @@ Implement five number-theory utility functions in `number_toolkit.hpp`.
 | `count_divisors` | `long long count_divisors(long long n)` | Count all positive divisors of `n`. |
 | `nth_fibonacci` | `long long nth_fibonacci(long long n)` | 1-indexed iterative Fibonacci. `nth_fibonacci(1) == 1`. |
 
-## Examples
+Examples:
 
 ```cpp
 is_prime(17)          // true
@@ -35,6 +35,20 @@ count_divisors(12)    // 6  (1,2,3,4,6,12)
 count_divisors(7)     // 2  (1,7)
 nth_fibonacci(1)      // 1
 nth_fibonacci(7)      // 13
+```
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `assets/number_toolkit.hpp` | Starter header -- implement all five functions here |
+| `visible-tests/test_visible.cpp` | Visible test driver; exercises all five functions |
+
+## Compilation and Testing
+
+```bash
+g++ -std=c++17 -o toolkit_test visible-tests/test_visible.cpp -Iassets
+./toolkit_test
 ```
 
 ## Constraints
@@ -73,10 +87,3 @@ Submit a single file named `number_toolkit.hpp`. Do not rename the file.
   and at what input size does it become relevant?
 - Add a `prime_factors` function that returns the prime factorization of n as a
   sorted vector. Use your `is_prime` to guide it.
-
-## Compilation and Testing
-
-```bash
-g++ -std=c++17 -o toolkit_test visible-tests/test_visible.cpp -I assets
-./toolkit_test
-```

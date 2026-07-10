@@ -49,7 +49,35 @@ int exponentiate(int base, int exp);
 
 You do not need to handle negative inputs.
 
-### Constraints
+## Files
+
+| File | Purpose |
+|------|---------|
+| `assets/peano.cpp` | Starter source -- submit this file with all four functions implemented |
+| `assets/peano.hpp` | Provided; do not modify. Contains the function declarations |
+| `visible-tests/test_catch.cpp` | Visible Catch2 test suite |
+| `visible-tests/CMakeLists.txt` | Builds the visible test suite against your submission |
+
+## Compilation and Testing
+
+Using the provided CMake setup (recommended -- this is what the grader uses):
+
+```bash
+cd visible-tests
+mkdir build && cd build
+cmake .. -DSUBMISSION_DIR=../../assets
+cmake --build .
+./peano-math_tests
+```
+
+Or compile directly with g++, linking Catch2 yourself:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -o peano_tests assets/peano.cpp visible-tests/test_catch.cpp -lCatch2Main -lCatch2
+./peano_tests
+```
+
+## Constraints
 
 - **No loops.** `for`, `while`, and `do` are forbidden in `peano.cpp`.
 - **No `+` operator in `add`, `multiply`, or `exponentiate`.**
@@ -61,34 +89,23 @@ You do not need to handle negative inputs.
 The grader enforces these constraints automatically.  Submissions that violate
 them will receive zero on the affected function.
 
-## Files
-
-- `peano.cpp` -- **submit this file.**  Implement all four functions here.
-- `peano.hpp` -- provided; do not modify.  Contains the function declarations.
-
-## Compilation and Testing
-
-```bash
-g++ -std=c++17 -Wall -Wextra -o peano_tests peano.cpp visible-tests/test_visible.cpp
-./peano_tests
-```
-
-Or compile your own driver:
-
-```bash
-g++ -std=c++17 -Wall -Wextra -o run peano.cpp main.cpp
-./run
-```
-
 ## Grading
 
-- 20 pts -- `successor`: correctness
-- 20 pts -- `add`: correctness
-- 20 pts -- `multiply`: correctness
-- 20 pts -- `exponentiate`: correctness
-- 20 pts -- constraints satisfied (no loops, operator rules)
-- 10 pts extra credit -- all four functions correct and constraints satisfied on
-  large inputs (stress tests)
+| Component                 | Points |
+|----------------------------|--------|
+| No loops check             | 10     |
+| Operator constraints check | 10     |
+| Compilation                | 0*     |
+| Visible tests               | 35     |
+| Hidden tests                 | 45     |
+| **Total**                   | **100** |
+
+\* Compilation must succeed before any test cases can be scored, but does not
+itself carry points.
+
+## Submission
+
+Submit a single file named `peano.cpp`. Do not rename it.
 
 ## Going further
 
