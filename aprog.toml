@@ -203,6 +203,9 @@ name = "HTTP Protocol"
 [classification.concepts.web-frameworks]
 name = "Web Frameworks"
 
+[classification.concepts.apis]
+name = "Consuming APIs"
+
 [labels.requires-filesystem]
 name = "Requires filesystem access"
 description = "Assignment expects student code to read or write files."
