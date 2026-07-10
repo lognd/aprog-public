@@ -3,6 +3,27 @@
 Reference for all activity and assignment READMEs in this repo.
 The env-setup activity series is the canonical example of the activity format.
 
+## Audience: absolute beginners
+
+Every README is written from the ground up for absolute beginners who do
+not yet know the vocabulary. This is the highest-priority rule in this
+guide and it overrides brevity.
+
+- Define every technical term at first use, in plain language, in the
+  sentence where it appears or in an inline `<details>` block. Never
+  assume the reader knows a word because "everyone in CS knows it."
+  Terms like invariant, sentinel, vtable, ADT, amortized, idempotent,
+  duck typing, heap, buffer, and descriptor all count.
+- Prefer plain language over the buzzword when the buzzword adds nothing.
+  When the term IS the thing being taught, introduce it explicitly:
+  name it, define it, then use it consistently.
+- Expand every acronym at first use (RAII, ABC, POSIX, LSP, AoS/SoA).
+- Concrete before abstract: show the two-line example before stating the
+  general rule.
+- Read the draft back as someone who has never programmed outside this
+  course. Any sentence that requires outside knowledge to parse gets
+  rewritten or gets an explanation next to it.
+
 ---
 
 ## Activities
