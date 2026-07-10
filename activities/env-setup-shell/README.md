@@ -1,6 +1,6 @@
 # Activity: Get a Linux/Unix Shell
 
-> **Activity 1 of 7 -- start here**
+> **Activity 1 of 8 -- start here**
 >
 > Next: [2. Python](../env-setup-python/)
 

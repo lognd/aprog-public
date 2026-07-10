@@ -1,12 +1,12 @@
 # Activity: Set Up Git and GitHub
 
-> **Activity 7 of 7**
+> **Activity 7 of 8**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
 > - [2. Python](../env-setup-python/)
 >
-> Next: you are done with environment setup.
+> Next: [8. Discord](../env-setup-discord/)
 
 This activity installs and configures three tools:
 

@@ -1,12 +1,12 @@
 # Activity: Install CMake and Make
 
-> **Activity 4 of 7**
+> **Activity 4 of 8**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
 > - [2. Python](../env-setup-python/)
 >
-> Next: [5. IDE](../env-setup-ide/)
+> Next: [5. SFML](../env-setup-sfml/)
 
 CMake and Make are the build system tools used throughout this course.
 CMake generates build files from a high-level description of your

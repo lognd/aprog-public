@@ -1,6 +1,6 @@
 # Activity: Install C/C++ Compilers
 
-> **Activity 3 of 7**
+> **Activity 3 of 8**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)

@@ -1,15 +1,18 @@
 # Activity: Join the Class Discord
 
-> **Activity 6 of 7**
+> **Activity 8 of 8 -- the finale**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
 > - [2. Python](../env-setup-python/)
 > - [3. Compiler](../env-setup-compiler/)
 > - [4. Build Tools](../env-setup-build-tools/)
-> - [5. IDE](../env-setup-ide/)
+> - [5. SFML](../env-setup-sfml/)
+> - [6. IDE](../env-setup-ide/)
+> - [7. Git and GitHub](../env-setup-git/)
 >
-> Next: [7. Git and GitHub](../env-setup-git/)
+> This is the last step. Once you have joined, you are fully set up
+> for the course.
 
 The class Discord server is where announcements are posted, questions
 are answered, and office hours are coordinated. Joining is required.

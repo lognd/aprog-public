@@ -1,6 +1,6 @@
 # Activity: Install Python and Course Tools
 
-> **Activity 2 of 7**
+> **Activity 2 of 8**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)

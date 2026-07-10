@@ -1,14 +1,15 @@
 # Activity: Install and Configure an IDE
 
-> **Activity 5 of 7**
+> **Activity 6 of 8**
 >
 > Prerequisites:
 > - [1. Shell](../env-setup-shell/)
 > - [2. Python](../env-setup-python/)
 > - [3. Compiler](../env-setup-compiler/)
 > - [4. Build Tools](../env-setup-build-tools/)
+> - [5. SFML](../env-setup-sfml/)
 >
-> Next: [6. Discord](../env-setup-discord/)
+> Next: [7. Git and GitHub](../env-setup-git/)
 
 An IDE (Integrated Development Environment) is the program you write
 code in. It combines a code editor, real-time error checking, and a
