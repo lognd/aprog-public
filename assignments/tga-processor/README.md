@@ -53,6 +53,38 @@ immediately followed by a 2-byte field), you must use `#pragma pack(1)` to tell 
 compiler not to insert alignment padding. Without it, `sizeof(TGAHeader)` would be
 larger than 18 and `fread` would overwrite the wrong bytes.
 
+### Background: endianness and why it matters here
+
+Fields like `width` and `height` are 2 bytes wide (`uint16_t`), but a byte can
+only hold one 8-bit value. To store a number bigger than 255 in memory or in
+a file, the computer splits it across two bytes and has to pick an order to
+put them in. **Endianness** is the name for that ordering choice: it is a
+rule for which byte of a multi-byte number is stored first.
+
+Take the number 258. In binary that is `0000_0001 0000_0010`, which splits
+into two bytes: `0x01` (the "most significant byte," worth 256) and `0x02`
+(the "least significant byte," worth 2 -- together `256 + 2 = 258`). A
+format has two ways to write those two bytes to disk:
+
+- **Little-endian**: least-significant byte first -- bytes on disk are
+  `02 01`.
+- **Big-endian**: most-significant byte first -- bytes on disk are
+  `01 02`.
+
+TGA is a **little-endian** format: every multi-byte header field (including
+`width` and `height`) is stored least-significant byte first. When you
+`fread` or `ifstream::read` raw bytes straight into a `uint16_t` field of
+`TGAHeader`, the CPU reassembles those bytes into a number using whatever
+byte order *that CPU* uses natively. Almost every machine you will run this
+assignment on (x86, x86-64, Apple Silicon in its default mode) is itself
+little-endian, so this "just works" by coincidence, not because your code
+checked anything. On a big-endian machine, the exact same bytes would be
+reassembled in the opposite order and `width`/`height` would silently come
+out wrong -- for example, a file whose `width` bytes are `02 01` (258,
+little-endian) would be misread as `0x0201` = 513 on a big-endian host. The
+Constraints section below requires you to detect this situation at startup
+instead of silently producing corrupt output.
+
 ---
 
 ## Task
@@ -257,6 +289,23 @@ cd visible-tests && make
 - Do not use mutable global variables.
 - `sizeof(TGAHeader)` must equal 18. The grader checks this at compile time.
 - `sizeof(Pixel)` must equal 3.
+- Before doing anything else, `main` must verify that the host machine is
+  little-endian (see Background above) and exit early if it is not. Store a
+  `uint16_t` holding the value `1`, take its address, reinterpret it as an
+  `unsigned char*` (the standard-permitted way to inspect the individual
+  bytes of an object -- unlike a `union`, this does not have the
+  type-punning caveats you saw in the union-dissector activity), and check
+  whether the first byte equals `1`:
+
+  ```cpp
+  uint16_t value = 1;
+  unsigned char* byte = reinterpret_cast<unsigned char*>(&value);
+  bool little_endian = (byte[0] == 1);
+  ```
+
+  If `little_endian` is `false`, print exactly `error: big-endian host unsupported`
+  to `std::cerr` and exit with status code `1` before parsing any command-line
+  arguments or touching any file.
 
 ---
 
@@ -285,6 +334,17 @@ cd visible-tests && make
 
 Parts 1-10 award partial credit based on pixel accuracy. A solution with minor
 rounding differences earns most points.
+
+The grading machine is itself little-endian, so the big-endian startup check
+described in Constraints cannot be exercised by running your binary on a
+big-endian host during grading, and the grader does not currently verify that
+the check is present in your source. It is still a required part of the
+assignment and good systems-programming practice -- write it anyway. What the
+grader does verify objectively is correct little-endian decoding of `width`
+and `height`: several grader input images have deliberately asymmetric,
+non-round dimensions (for example 691x305) chosen so that any accidental
+byte-swapping in your `read` implementation produces obviously wrong image
+dimensions and fails those test cases.
 
 ---
 

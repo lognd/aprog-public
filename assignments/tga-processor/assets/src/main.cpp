@@ -43,6 +43,13 @@ static bool is_number(const std::string& s) {
 }
 
 int main(int argc, char* argv[]) {
+    // TODO: verify the host is little-endian before doing anything else.
+    // Store a uint16_t holding 1, inspect its first byte through an
+    // unsigned char pointer, and compare it to 1. If the host is
+    // big-endian, print "error: big-endian host unsupported" to
+    // std::cerr and return 1 immediately. See the Background section of
+    // the README for why this matters and exactly how to write the check.
+
     if (argc < 2 || std::string(argv[1]) == "--help") {
         print_help();
         return 0;
