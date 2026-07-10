@@ -39,6 +39,7 @@ No artifact.
 Activities:
 - `terminal-archeology` -- explore an unfamiliar broken C++ project tree using only shell commands, then fix it
 - `git-heist` -- clean credentials and a large binary out of git history and reconcile a diverged branch
+- `cpp-syntax-boot-camp` -- predict-then-compile twelve first-contact C++ programs: variables, if/else, loops, functions, strings
 
 Assignments:
 - `shell-build-pipeline` -- write a shell script that replicates make's incremental preprocess/compile/assemble/link pipeline
@@ -409,6 +410,7 @@ Assignments:
 ## 45. Intro to Python (untested)
 
 Activities:
+- `python-syntax-boot-camp` -- predict output of twelve first-contact Python programs with a C++ to Python construct mapping table
 - `python-culture-shock` -- predict output of nine Python snippets that surprise C++ programmers: names not owners, no overflow, slice copies
 - `indentation-court` -- rule on indentation structure, no-block-scope visibility, truthiness, and is None conventions
 
