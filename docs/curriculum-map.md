@@ -288,9 +288,13 @@ Activities:
 Assignments:
 - `linked-list-from-scratch` -- implement a templated singly linked list with the full Big 5, O(1) push_back and size, graded under ASan and Valgrind
 
-## 31. Stack, Queue, Deque (ADT) (planned)
+## 31. Stack, Queue, Deque (ADT) (untested)
 
-Nothing built yet.
+Activities:
+- `ring-buffer-rehearsal` -- trace head/tail indices of a circular buffer through wrapped push/pop sequences with modulo arithmetic
+
+Assignments:
+- `deque-two-ways` -- implement a Deque twice (circular-buffer array with O(1) pop_front enforced by a performance test, and doubly linked list) plus Stack/Queue adapters
 
 ## 32. Standard Containers p1 (planned)
 
