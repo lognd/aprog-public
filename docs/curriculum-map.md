@@ -453,13 +453,21 @@ Activities:
 Assignments:
 - `temperature-lab` -- build a Temperature class with classmethod factories, a validated property, computed read-only properties, and tolerant equality
 
-## 51. Python Inner-Workings (__dict__, __mro__, etc.) (planned)
+## 51. Python Inner-Workings (__dict__, __mro__, etc.) (untested)
 
-Nothing built yet.
+Activities:
+- `dunder-dungeon` -- watch __dict__ grow, shadowing reverse under del, diamond __mro__, bound methods, and __slots__ refuse attributes
+- `lookup-court` -- rule where attributes resolve, what super() actually consults, and why monkey-patching hits existing instances
 
-## 52. Python Types & Comprehensions (planned)
+Assignments: none.
 
-Nothing built yet.
+## 52. Python Types & Comprehensions (untested)
+
+Activities:
+- `comprehension-decathlon` -- predict output of ten comprehension snippets: filter vs if/else position, nesting, laziness, scoping
+- `type-inspector` -- type()/isinstance semantics, bool as int, and why annotations are promises the runtime never checks
+
+Assignments: none.
 
 ## 53. Python Generics & Typing (planned)
 
