@@ -1,0 +1,24 @@
+[assignment]
+slug        = "deque-two-ways"
+name        = "Deque, Two Ways"
+author      = "lognd"
+description = "Build a double-ended queue (deque) ADT with two backends -- a circular-buffer array (ArrayDeque) and a doubly linked list (ListDeque) -- then implement Stack and Queue as thin container adapters over a deque backend, mirroring std::stack and std::queue."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "hard"
+topics     = ["data-structures", "linked-lists", "memory-management"]
+concepts   = ["pointers", "templates", "raii", "move-semantics", "dynamic-memory"]
+labels     = ["starter-code", "unit-tests", "multi-file"]
+
+[template]
+slug = "cpp-header-impl"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "valgrind"]

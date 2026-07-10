@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "deque-two-ways",
+    "name": "Deque, Two Ways",
+    "author": "lognd",
+    "description": "Build a double-ended queue (deque) ADT with two backends -- a circular-buffer array (ArrayDeque) and a doubly linked list (ListDeque) -- then implement Stack and Queue as thin container adapters over a deque backend, mirroring std::stack and std::queue."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "hard",
+    "topics": [
+      "data-structures",
+      "linked-lists",
+      "memory-management"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/deque-two-ways",
+    "readme": "assignments/deque-two-ways/README.md",
+    "visible_tests": "assignments/deque-two-ways/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:e5b7718f5983045d6a890a6ec0c58a7c4eaed79d3a92ef837a157fbd0ab8c783"
+}
