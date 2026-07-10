@@ -10,16 +10,28 @@ In this assignment you implement your own `hexdump` utility.  The twist:
 you may only use `open()`, `read()`, `write()`, `close()`, and `exit()`.
 No `printf`.  No `cout`.  No `sprintf`.  No `fopen`.  No `malloc`.  Every
 byte of output must be constructed from raw arithmetic and written to fd 1
-with `write()`.  This forces you to work at exactly the level of abstraction
-the POSIX File I/O Tour introduced.
+with `write()`.  ("fd" is short for **file descriptor** -- a small integer
+the operating system hands your program to refer to an open file or stream.
+fd 1 is always standard output, the same place `printf` and `cout` write
+to; here you write to it directly with `write()` instead.)  This forces you
+to work at exactly the level of abstraction the POSIX File I/O Tour
+introduced.  (**POSIX** is a standard that defines a common set of
+operating-system interfaces -- including `open`/`read`/`write`/`close` --
+so that programs written against it behave the same way on Linux, macOS,
+and other POSIX-compliant systems.)
 
 ## Learning goals
 
 - Use `open()`, `read()`, and `close()` correctly for binary file I/O
-- Implement a read loop that handles partial reads and detects EOF
+- Implement a read loop that handles partial reads (a single `read()` call
+  is not guaranteed to fill your whole buffer -- it may return fewer bytes
+  than you asked for) and detects **EOF** (end of file, the point where
+  `read()` returns 0 because there is no more data)
 - Convert binary byte values to hex digits using integer arithmetic alone
 - Produce fixed-width formatted output using `write()` without any formatting library
-- Handle error conditions with `perror()` and `exit()` at the right call sites
+- Handle error conditions with `perror()` (a standard function that prints
+  a human-readable message for the last system error, e.g. "No such file
+  or directory") and `exit()` at the right call sites
 
 ## Task
 

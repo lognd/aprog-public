@@ -156,6 +156,10 @@ The test script compiles nothing; run the compile command first.
 | Memory safety (Valgrind, extra credit) | +10 |
 | **Total** | **90** |
 
+Valgrind is a tool that runs your compiled program and reports memory errors
+(leaks, reads of uninitialized memory, etc.) that would otherwise go
+unnoticed since the program can still appear to run correctly.
+
 Hidden tests cover: multiple levels in alphabetical order, most-recent
 tracking across many entries, malformed-line counting, empty files, large
 entry counts, and messages containing spaces.

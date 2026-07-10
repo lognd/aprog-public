@@ -7,9 +7,13 @@ canonical form. You will implement that promise.
 
 ## Learning goals
 
-- Implement a class with private data and a small, deliberate public interface
-- Maintain invariants across every constructor and every mutating-looking
-  operation, even though `Fraction` itself never mutates after construction
+- Implement a class with private data and a small, deliberate public
+  interface (the set of methods and constructors code outside the class is
+  allowed to call)
+- Maintain invariants (facts about an object's data that must stay true no
+  matter which constructor or method last touched it) across every
+  constructor and every mutating-looking operation, even though `Fraction`
+  itself never mutates after construction
 - Use `const` member functions to express "this method reads but never
   changes the object"
 - Practice returning new objects from arithmetic operations instead of
@@ -91,10 +95,13 @@ and drops the denominator entirely for whole numbers -- `"5"`, not `"5/1"`
 
 ### Contract
 
-Passing `denominator == 0` to the two-argument constructor, or calling
-`dividedBy()` with a `Fraction` whose value is zero, is a precondition
-violation. You do not need to handle these cases -- behavior is unspecified
-and no test (visible or hidden) calls your code this way.
+A function's contract is the set of conditions its caller must satisfy for
+the function to behave as documented; a condition the caller must guarantee
+before calling is called a precondition. Passing `denominator == 0` to the
+two-argument constructor, or calling `dividedBy()` with a `Fraction` whose
+value is zero, violates this contract. You do not need to handle these
+cases -- behavior is unspecified and no test (visible or hidden) calls your
+code this way.
 
 ## Files
 

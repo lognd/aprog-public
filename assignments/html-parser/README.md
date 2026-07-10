@@ -61,7 +61,7 @@ counted.  Close tags (starting with `/`) are not counted.
 
 | File | Purpose |
 |---|---|
-| `html_parser.hpp` | Interface -- provided, do not modify |
+| `html_parser.hpp` | Interface (the header file declaring the two functions' signatures, with no implementation) -- provided, do not modify |
 | `html_parser.cpp` | Your implementation -- fill in the `TODO` sections |
 | `CMakeLists.txt` | Build configuration -- wire Catch2 with FetchContent |
 | `tests/test_html_parser.cpp` | Your test suite -- complete all required categories |
@@ -155,5 +155,7 @@ Do not modify `html_parser.hpp`.
   true when every `<b>`, `<i>`, and `<u>` open tag has a matching close tag.
 - Handle attributes: `<b class="bold">` should strip to an empty string for the
   tag and pass through the text.
-- Try running your test suite with `-fsanitize=address` to catch any reads past
-  the end of a string.
+- Try running your test suite with `-fsanitize=address` (AddressSanitizer, or
+  ASan -- a compiler flag that instruments your program to catch memory bugs
+  like out-of-bounds reads while it runs) to catch any reads past the end of
+  a string.
