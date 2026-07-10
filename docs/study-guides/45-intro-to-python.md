@@ -18,6 +18,22 @@ identity vs. equality, and Python's total lack of `{}`-based block scope.
 
 ## Taught here
 
+Concept: bare Python syntax, contrasted with the equivalent C++ construct
+- Know `print()` is Python's equivalent of `std::cout`, and that a Python
+  name (`x = 5`) has no fixed type the way a C++ variable declaration
+  does -- the same name can be rebound to a value of any type later.
+- Be able to read `def`/`return` for a function definition, `if`/`elif`/
+  `else`, `for x in range(n)`, `for x in a_list`, and `while`, and know
+  that Python marks each block with a trailing colon `:` plus indentation
+  instead of C++'s `{ }`.
+- Be able to read an f-string (`f"{name} is {age}"`) as Python's built-in
+  way of building text with values inside it, `len()` as the equivalent of
+  a length/size query, and a list literal with `.append()` as the
+  closest analog to a growable `std::vector`.
+- Know a dictionary literal (`{"key": value}`) and key-based lookup with
+  `[ ]` has no single-token C++ equivalent, though `std::map` plays a
+  similar role.
+
 Concept: numbers behave differently
 - Know Python splits what C++'s `int / int` does into two separate
   operators: `/` is true division (always returns a float, even for two
@@ -78,4 +94,4 @@ Concept: indentation as syntax, and no block scope
 
 ## Practiced in
 
-`python-culture-shock`, `indentation-court`
+`python-syntax-boot-camp`, `python-culture-shock`, `indentation-court`

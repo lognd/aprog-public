@@ -9,8 +9,7 @@ functions with hard performance requirements.
 ## Know before you start
 
 - Basic control-flow syntax (`if`, `for`, `while`) and function declarations
-  [assumed: GAP -- no earlier row formally introduces C++ control-flow
-  syntax before this row exercises it]
+  [assumed: row 4 -- Command-Line & Compilation]
 - A working `g++`/`make` build setup [assumed: row 2 -- Environment Setup]
 
 ## Taught here
@@ -84,9 +83,3 @@ Concept: number-theory algorithms under complexity constraints
 ## Practiced in
 
 `complexity-clock`, `scope-safari`, `control-gauntlet`, `number-toolkit`
-
-## Gaps detected
-
-- Basic C++ control-flow and function syntax is assumed by every artifact
-  in this module but is not formally taught by any earlier row.
-  [assumed: GAP]

@@ -16,6 +16,20 @@ runnable binary.
 
 ## Taught here
 
+Concept: bare C++ syntax (statements, variables, control flow, functions)
+- Know that a C++ program is a list of statements, each ending in a
+  semicolon (`;`), executed one after another from `main`.
+- Be able to declare a variable with a type (`int x = 5;`), reassign it
+  with `=`, and print it with `std::cout`.
+- Be able to read `if`/`else`, a `for` loop's three-part header
+  (initializer; condition; update), and a `while` loop.
+- Be able to read a function definition (`int square(int x) { return x *
+  x; }`) and a call to it, including a function with more than one
+  parameter.
+- Know that `std::string` values are declared like any other variable and
+  concatenated with `+`, that `bool` prints as `1`/`0` by default, and
+  that `//` starts a comment that has no effect on program behavior.
+
 Concept: navigating an unfamiliar directory tree from the shell
 - Know that `pwd` prints the current working directory and `ls` lists its
   contents; `ls -a` also shows hidden entries (names starting with `.`),
@@ -98,4 +112,4 @@ Concept: git history surgery
 
 ## Practiced in
 
-`terminal-archeology`, `git-heist`, `shell-build-pipeline`
+`cpp-syntax-boot-camp`, `terminal-archeology`, `git-heist`, `shell-build-pipeline`

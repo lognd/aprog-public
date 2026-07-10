@@ -11,9 +11,7 @@ platforms.
 - A working C++ compiler (`g++` and/or `clang++`) [assumed: row 2 --
   Environment Setup]
 - Basic C++ variable declarations and primitive types (`int`, `char`,
-  `double`, etc.) [assumed: GAP -- no earlier row formally introduces
-  declaring a typed variable; env-setup's `hello.cpp` example is the only
-  prior exposure]
+  `double`, etc.) [assumed: row 4 -- Command-Line & Compilation]
 
 ## Taught here
 
@@ -92,9 +90,3 @@ Concept: sizeof and data models
 ## Practiced in
 
 `bit-manipulation-re`, `implicit-conversion-minefield`, `sizeof-bingo`, `collatz-conjecture`
-
-## Gaps detected
-
-- Basic C++ variable declaration/type syntax is assumed by all four
-  artifacts in this module but not formally taught by any earlier row.
-  [assumed: GAP]
