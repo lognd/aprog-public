@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import json
 import tarfile
 from pathlib import Path
@@ -9,7 +10,12 @@ import typer
 from rich.console import Console
 
 from aprog.models.manifest import PackageManifest
-from aprog.utils.repo import find_public_root, load_assignment_config
+from aprog.paths import assignment_dir, generated_assignment_dir
+from aprog.utils.repo import (
+    find_public_root,
+    load_assignment_config,
+    resolve_staging_dir,
+)
 
 console = Console()
 
@@ -30,8 +36,8 @@ def cmd_package_public(
     dist.mkdir(parents=True, exist_ok=True)
     out = dist / f"{slug}-public.tar.gz"
 
-    assignment_root = root / "assignments" / slug
-    gen_dir = root / "generated" / "assignments" / slug
+    assignment_root = assignment_dir(root, slug)
+    gen_dir = generated_assignment_dir(root, slug)
     manifest_path = gen_dir / "assignment-manifest.json"
 
     with tarfile.open(out, "w:gz") as tar:
@@ -58,8 +64,6 @@ def cmd_package_private(
 
     # Resolve paths from staging dir if not provided
     if not solution or not hidden_tests or not grader:
-        from aprog.utils.repo import resolve_staging_dir
-
         staging = resolve_staging_dir(None)
         if staging:
             staging_slug = staging / slug
@@ -119,8 +123,6 @@ def _add_dir_to_tar(tar: tarfile.TarFile, src: Path, arcname_prefix: str) -> Non
 
 
 def _add_string_to_tar(tar: tarfile.TarFile, content: str, arcname: str) -> None:
-    import io
-
     data = content.encode()
     info = tarfile.TarInfo(name=arcname)
     info.size = len(data)

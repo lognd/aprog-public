@@ -5,6 +5,8 @@ from typing import Annotated, Optional
 
 import typer
 
+from aprog.errors import ExitCode, fail
+
 app = typer.Typer(
     name="aprog", help="Assignment programming orchestration CLI.", no_args_is_help=True
 )
@@ -65,8 +67,7 @@ def validate(
         code = cmd_validate(slug, private_repo=private, public_root=public)
         raise typer.Exit(code)
     else:
-        typer.echo("Provide a slug or --all", err=True)
-        raise typer.Exit(2)
+        fail("[red]Error:[/red] Provide a slug or --all", ExitCode.USAGE)
 
 
 # -- scan-public ---------------------------------------------------------------
@@ -186,8 +187,7 @@ def generate_config(
     elif slug:
         cmd_generate_config(slug, private_repo=private, force=force, public_root=public)
     else:
-        typer.echo("Provide a slug or --all", err=True)
-        raise typer.Exit(2)
+        fail("[red]Error:[/red] Provide a slug or --all", ExitCode.USAGE)
 
 
 # -- package-public ------------------------------------------------------------
@@ -298,8 +298,7 @@ def verify(
     elif slug:
         cmd_verify(slug, public_repo=public, private_repo=private)
     else:
-        typer.echo("Provide a slug or --all", err=True)
-        raise typer.Exit(2)
+        fail("[red]Error:[/red] Provide a slug or --all", ExitCode.USAGE)
 
 
 # -- package-gradescope --------------------------------------------------------

@@ -11,7 +11,10 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
+from aprog.commands.generate_config_cmd import cmd_generate_config
+from aprog.commands.validate_cmd import cmd_validate
 from aprog.models.manifest import PackageManifest
+from aprog.paths import assignment_dir, grader_dir, sibling_hidden_tests_dir
 from aprog.utils.repo import find_public_root
 
 console = Console()
@@ -72,7 +75,7 @@ def cmd_intake(
             console.print(f"[red]Invalid package manifest:[/red] {e}")
             raise typer.Exit(1) from e
 
-        public_assignment = public_root / "assignments" / slug
+        public_assignment = assignment_dir(public_root, slug)
         if not public_assignment.exists():
             console.print(
                 f"[red]Error:[/red] Assignment '{slug}' not found in public repo"
@@ -90,25 +93,28 @@ def cmd_intake(
             console.print("[red]Error:[/red] grader/pipeline.py missing from bundle")
             raise typer.Exit(1) from None
 
-        _copy_dir(slug_dir / "solution", private_repo / "solutions" / slug, force)
+        # Write to canonical solution storage: solutions/assignments/<slug>.
+        _copy_dir(
+            slug_dir / "solution",
+            private_repo / "solutions" / "assignments" / slug,
+            force,
+        )
         if pkg_manifest.contains_hidden_tests and (slug_dir / "hidden-tests").exists():
             _copy_dir(
-                slug_dir / "hidden-tests", private_repo / "hidden-tests" / slug, force
+                slug_dir / "hidden-tests",
+                sibling_hidden_tests_dir(private_repo, slug),
+                force,
             )
-        _copy_dir(slug_dir / "grader", private_repo / "grader" / slug, force)
+        _copy_dir(slug_dir / "grader", grader_dir(private_repo, slug), force)
 
         console.print(f"[green][OK][/green] Intake complete for '{slug}'")
 
     if validate:
-        from aprog.commands.validate_cmd import cmd_validate
-
         code = cmd_validate(slug, private_repo=private_repo, public_root=public_root)
         if code != 0:
             raise typer.Exit(code) from None
 
     if generate:
-        from aprog.commands.generate_config_cmd import cmd_generate_config
-
         cmd_generate_config(slug, private_repo=private_repo, public_root=public_root)
 
 

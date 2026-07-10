@@ -30,7 +30,9 @@ def test_intake_copies_solution(
     bundle = _make_bundle(public_root, private_root, tmp_path)
     dest_private = tmp_path / "private"
     cmd_intake(bundle, public_repo=public_root, private_repo=dest_private)
-    assert (dest_private / "solutions" / "linked-list-insertion").exists()
+    assert (
+        dest_private / "solutions" / "assignments" / "linked-list-insertion"
+    ).exists()
 
 
 def test_intake_copies_grader(

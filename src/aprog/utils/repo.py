@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from aprog.models.assignment import AssignmentConfig
 from aprog.models.root_config import RootConfig
 from aprog.models.template import TemplateConfig
+from aprog.paths import assignment_dir, template_dir
 from aprog.utils.toml import load_toml
 
 
@@ -25,7 +27,7 @@ def load_root_config(public_root: Path) -> RootConfig:
 
 
 def load_assignment_config(public_root: Path, slug: str) -> AssignmentConfig:
-    path = public_root / "assignments" / slug / "assignment.toml"
+    path = assignment_dir(public_root, slug) / "assignment.toml"
     if not path.exists():
         raise FileNotFoundError(
             f"Assignment not found: assignments/{slug}/assignment.toml"
@@ -35,7 +37,7 @@ def load_assignment_config(public_root: Path, slug: str) -> AssignmentConfig:
 
 
 def load_template_config(public_root: Path, template_slug: str) -> TemplateConfig:
-    path = public_root / "templates" / template_slug / "template.toml"
+    path = template_dir(public_root, template_slug) / "template.toml"
     if not path.exists():
         raise FileNotFoundError(
             f"Template not found: templates/{template_slug}/template.toml"
@@ -56,8 +58,6 @@ def all_assignment_slugs(public_root: Path) -> list[str]:
 
 
 def resolve_staging_dir(staging_flag: Path | None) -> Path | None:
-    import os
-
     if staging_flag:
         return staging_flag.resolve()
     env = os.environ.get("APROG_STAGING_DIR")
