@@ -87,6 +87,58 @@ rcfile.write(f'PS1=...\ncd "{repo_dir}"\necho "instructions"\n')
 subprocess.run([shell, "--rcfile", rcfile.name])
 ```
 
+## Engine abstraction
+
+Every generated `launch.py` stays a single self-contained, stdlib-only file, but
+separates its core logic from the terminal frontend so another frontend (e.g. a
+future web endpoint) can `import launch` and drive the activity without a TTY.
+Each file defines a module-level `ENGINE` (an instance of a local `ActivityEngine`
+class); `main()` is a thin terminal loop built on top of it. All `print`/`input`
+calls stay in `main()`/`_ask()`, never in `ActivityEngine`.
+
+Two shapes, depending on activity type:
+
+- **Q&A / snippet-prediction activities** (sizeof-bingo, implicit-conversion-minefield,
+  bit-manipulation-re, recursion-unwind, cli-contract, gdb-time-machine,
+  catch2-first-contact, gtest-cmake-lab, complexity-clock, stack-heap-bingo, ...):
+
+  ```python
+  class ActivityEngine:
+      slug = "..."
+      title = "..."
+      description = "..."
+
+      def items(self): ...                 # public (non-secret) question/snippet dicts
+      def check(self, index, raw): ...      # -> {"correct": bool, "feedback": str|None, "explanation": str|None}
+      def passphrase(self, answers): ...    # -> str|None once all answers are correct
+
+  ENGINE = ActivityEngine()
+  ```
+
+  `feedback` is the keyed wrong-answer explanation when the raw answer matches a
+  known wrong answer, else `None`. `main()` loops over `ENGINE.items()`, calling
+  `ENGINE.check(...)` for each raw input, and calls `ENGINE.passphrase(answers)`
+  once all items are correct.
+
+- **Program-output / shell-drop activities** (control-gauntlet, const-contract,
+  const-refactor, union-dissector, dod-hot-cold, struct-layout-bingo):
+
+  ```python
+  class ActivityEngine:
+      slug = "..."
+      title = "..."
+
+      def check(self, repo_dir): ...   # -> (passphrase_or_None, feedback_lines)
+
+  ENGINE = ActivityEngine()
+  ```
+
+  `check(repo_dir)` builds/runs the student's dropped-in repo and derives the
+  passphrase key from program output; `feedback_lines` are the messages shown
+  when validation fails (compile errors, wrong output, missing binaries). The
+  subshell drop and "Try again? [y/n]" retry loop are terminal-frontend-only,
+  built on the shared `run_shell_drop_validated(ENGINE.check)` driver.
+
 ## Style conventions
 
 - `_LINE_WIDTH = 70`
