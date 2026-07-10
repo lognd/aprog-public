@@ -7,9 +7,9 @@ Implement a single C++ function that parses CSV text into a
 
 ## Learning goals
 
-- Parse a structured text format by iterating characters and tracking parser state
+- Parse a structured text format by iterating characters and tracking parser state (remembering things like "am I currently inside a quoted field?" as you move character by character)
 - Handle quoting and escaping without regular expressions or external libraries
-- Build nested `std::vector<std::vector<std::string>>` from a streaming input
+- Build nested `std::vector<std::vector<std::string>>` from a streaming input (text handled a chunk at a time rather than all parsed at once)
 - Write a function that correctly handles edge cases (empty fields, trailing commas, short rows)
 
 ## Background

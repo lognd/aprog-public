@@ -1,7 +1,9 @@
 # Activity: CMake Heist
 
 A multi-module C++ project with no build system. Your job is to write
-`CMakeLists.txt` from scratch -- or rather, from an outline.
+`CMakeLists.txt` from scratch -- or rather, from an outline. `CMakeLists.txt`
+is the script CMake reads to know what to build: which source files form
+which programs and libraries, and how those pieces depend on each other.
 
 ## Concepts covered
 
@@ -31,14 +33,19 @@ lib_*/tests/ -- test harness for each library
 You must write a single `CMakeLists.txt` at the root that:
 
 - Declares the project and sets the C++ standard
-- Defines a static library target `math` with public include paths
+- Defines a static library target `math` with public include paths (a
+  static library is a precompiled bundle of `.o` files, packaged into a
+  single archive file that later gets linked into whatever program uses it)
 - Defines a static library target `text` that links against `math`
 - Defines `app` as an executable linked against both libraries
 - Enables testing and registers two test executables (`test_math`, `test_text`)
 
 The launcher runs four checks when you type `exit`:
 
-1. `cmake -B build` -- CMakeLists.txt must configure without errors
+1. `cmake -B build` -- configures the project: reads `CMakeLists.txt` and
+   generates the actual build files inside a build directory named
+   `build` (the `-B` flag names it); CMakeLists.txt must configure
+   without errors
 2. `cmake --build build` -- everything must compile and link
 3. `ctest --test-dir build` -- both test suites must pass
 4. `./build/app` -- output must match expected

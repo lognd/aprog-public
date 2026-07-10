@@ -2,7 +2,8 @@
 
 Real systems produce log files.  Reading them reliably means knowing which
 stream abstraction to reach for at each step: `std::ifstream` to open the
-file, `std::istringstream` to tokenize each line, and `std::cout` with
+file, `std::istringstream` to tokenize each line (split it into separate
+words/fields), and `std::cout` with
 `<iomanip>` manipulators to produce aligned output.  This assignment
 combines all three into one tool.
 
@@ -139,8 +140,10 @@ The test script compiles nothing; run the compile command first.
 - You must use `std::ifstream` to open the log file.
 - You must use `std::istringstream` to parse each line.
 - You must use `std::setw` from `<iomanip>` for column alignment.
-- Do not use `std::filesystem`, `<regex>`, or any POSIX file APIs (`open`,
-  `read`, `fopen`).
+- Do not use `std::filesystem`, `<regex>`, or any POSIX file APIs -- POSIX
+  (Portable Operating System Interface) is the standard that defines the
+  low-level, operating-system-provided file functions `open`, `read`, and
+  `fopen`; this assignment sticks to the C++ stream classes instead.
 - The program must exit with code 0 on success and code 1 if the file cannot
   be opened.
 

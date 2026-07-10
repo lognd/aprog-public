@@ -7,7 +7,11 @@ cleaning first), the binary still prints the old result. They have gone on
 vacation.
 
 Your job: figure out why incremental builds produce stale output, and fix
-the Makefile.
+the Makefile -- the plain-text file that tells the `make` tool which
+commands to run to build the project, organized into named rules. Each
+rule lists a target (the file to produce), its prerequisites (the files
+it depends on), and a recipe (the commands to run if the target is out of
+date).
 
 ## Concepts covered
 
