@@ -2,22 +2,28 @@
 
 Every C++ program that reads or writes a file eventually makes the same
 four calls: `open()`, `read()`, `write()`, and `close()`.  These are not
-C++ -- they are POSIX system calls, and they are the same four calls
-your shell, your text editor, and your compiler make.  Understanding
-them at this level of detail will pay off every time you work with files,
-processes, or sockets for the rest of your career.
+C++ -- they are POSIX (Portable Operating System Interface, the standard
+that defines how programs talk to Unix-like operating systems) system
+calls: requests your program sends to the kernel, the core operating
+system program that actually controls the disk, memory, and CPU.  They
+are the same four calls your shell, your text editor, and your compiler
+make.  Understanding them at this level of detail will pay off every
+time you work with files, processes, or sockets for the rest of your
+career.
 
 This activity walks through the complete file I/O stack one layer at a
-time, starting at the highest abstraction and working down to the kernel
-fd table.  Each section ends with a short checkpoint question.
+time, starting at the highest abstraction and working down to the
+kernel's fd table (a per-process list the kernel keeps, mapping small
+integer file descriptors -- fds -- to the files each one refers to).
+Each section ends with a short checkpoint question.
 
 ## Concepts covered
 
 - The layered structure of the file I/O stack (program -> POSIX -> kernel fd table -> VFS, the virtual file system layer that lets the kernel present many different filesystem types through one interface -> disk)
-- File descriptors as per-process integer handles
+- File descriptors (fds) as per-process integer handles
 - The contracts of `open()`, `read()`, `write()`, and `close()`
-- Partial reads and writes, and why callers must loop
-- `errno` semantics: check return value first; read errno only on failure
+- Partial reads and writes (calls that transfer fewer bytes than requested, which is not an error), and why callers must loop
+- `errno` (a variable the kernel sets to an error code when a call fails) semantics: check return value first; read errno only on failure
 - `perror()` and `strerror()` for human-readable error reporting
 
 ## How it works

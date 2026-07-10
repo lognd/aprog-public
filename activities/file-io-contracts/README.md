@@ -1,12 +1,16 @@
 # Activity: File I/O Contracts
 
 A contract is a precise statement of what a function requires from its
-caller, and what the caller can rely on in return.  The four POSIX I/O
-calls -- `open()`, `read()`, `write()`, and `close()` -- each have
-contracts that are simple to state but easy to violate.  A partial read
-is not an error.  `errno` is not reset on success.  An unclosed fd is a
-resource leak.  These details do not show up as compile errors; they show
-up as subtle bugs in production.
+caller, and what the caller can rely on in return.  The four POSIX
+(Portable Operating System Interface, the standard for how programs talk
+to Unix-like operating systems) I/O calls -- `open()`, `read()`,
+`write()`, and `close()` -- each have contracts that are simple to state
+but easy to violate.  A partial read (a call that returns fewer bytes
+than you asked for) is not an error.  `errno` (a variable the kernel sets
+to an error code when a call fails) is not reset on success.  An
+unclosed fd (file descriptor -- the small integer handle the kernel gives
+you back for an open file) is a resource leak.  These details do not show
+up as compile errors; they show up as subtle bugs in production.
 
 This activity tests whether you know the contracts precisely enough to
 apply them correctly.

@@ -1,10 +1,14 @@
 # Activity: iostream Interceptor
 
-C++ streams look simple on the surface -- you type `<<` and things appear on
-screen, you type `>>` and values come in. But the stream model has a set of
-precise rules about whitespace, state flags, and what happens when things go
-wrong. Getting these rules wrong is one of the most common sources of silent
-bugs in beginner C++ programs.
+A stream is an object that represents a flow of data in or out of a program,
+one character at a time, hiding the details of where those characters
+actually come from (the keyboard, a file, a string in memory). C++ streams
+look simple on the surface -- you type `<<` and things appear on screen, you
+type `>>` and values come in. But the stream model has a set of
+precise rules about whitespace, state flags (internal bits such as `fail()`
+and `good()` that record whether the last read or write succeeded), and what
+happens when things go wrong. Getting these rules wrong is one of the most
+common sources of silent bugs in beginner C++ programs.
 
 This activity gives you seven short programs to predict. Each one isolates one
 behavior of `std::istream` and `std::ostream`. You will be right about some and

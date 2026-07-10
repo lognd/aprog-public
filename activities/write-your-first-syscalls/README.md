@@ -2,12 +2,17 @@
 
 Reading about `open()`, `read()`, `write()`, and `close()` is one thing.
 Writing the calls yourself -- getting the flags right, handling the return
-values, looping on partial reads -- is another.  This activity gives you a
-partial C++ program with three clearly marked blanks.  You fill them in,
-compile, and verify that the program prints a file's contents to the
-terminal using only the four POSIX calls.
+values, looping on partial reads (calls that return fewer bytes than you
+asked for) -- is another.  This activity gives you a partial C++ program
+with three clearly marked blanks.  You fill them in, compile, and verify
+that the program prints a file's contents to the terminal using only the
+four POSIX (Portable Operating System Interface, the standard for how
+programs talk to Unix-like operating systems) calls.
 
-No `printf`.  No `cout`.  No `fopen`.  Just the kernel interface.
+No `printf`.  No `cout`.  No `fopen`.  Just the kernel interface -- these
+four calls talk directly to the operating system's kernel (the core
+program that controls the disk, memory, and CPU) instead of going
+through a buffered C library helper.
 
 ## Concepts covered
 

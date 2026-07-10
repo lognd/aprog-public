@@ -9,9 +9,10 @@ control the exact layout of bytes in memory.
 
 This activity gives you a small binary file with a known format and a C++
 reader program that has three blanks left in it.  Your job is to fill in the
-blanks using the hex dump shown at startup and `sizeof()` to compute the right
-byte counts and offsets.  When the program prints the correct output, the
-passphrase unlocks.
+blanks using the hex dump (a printout of a file's raw bytes, usually shown in
+hexadecimal, two hex digits per byte) shown at startup and `sizeof()` to
+compute the right byte counts and offsets.  When the program prints the
+correct output, the passphrase unlocks.
 
 ## Concepts covered
 
@@ -48,7 +49,9 @@ A shell opens with `reader.cpp` and `data.bin`.
 ### Step 1 -- read the hex dump and the format spec
 
 Study the hex dump printed in the banner.  Match each group of bytes to the
-format spec: magic, count, and then the three records back-to-back.
+format spec: a magic number (a fixed, recognizable sequence of bytes at the
+start of a file that identifies its format -- here, the ASCII text `APRO`),
+count, and then the three records back-to-back.
 
 Confirm in the hex dump that:
 - Bytes 0-3 contain `APRO` in ASCII.

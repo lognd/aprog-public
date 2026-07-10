@@ -1,9 +1,15 @@
 # Activity: Text Stream Surgery
 
-Three small C++ programs.  Each one has a single file-stream bug.  The bugs
-are the classic mistakes that appear in nearly every programmer's first week
-with `std::ifstream`: using `eof()` as a loop condition, forgetting to check
-`is_open()`, and mixing `operator>>` with `std::getline` without clearing the
+Three small C++ programs.  Each one has a single file-stream bug.
+`std::ifstream` is the class C++ uses to read a file through the same
+stream interface (`>>`, `std::getline`) you already use with `std::cin`.
+The bugs are the classic mistakes that appear in nearly every programmer's
+first week with `std::ifstream`: using `eof()` (a flag that only turns true
+AFTER a read has already failed at the end of the file -- checking it as a
+loop condition means acting one read too late) as a loop condition,
+forgetting to check `is_open()` (a function that reports whether the file
+was actually opened, since a missing file does not throw an error by
+default), and mixing `operator>>` with `std::getline` without clearing the
 leftover newline.
 
 The programs compile.  They even produce output.  The output is just wrong.
@@ -12,7 +18,9 @@ that the fixed program produces the expected output.
 
 ## Concepts covered
 
-- `while (stream >> val)` as the correct loop idiom vs. `while (!stream.eof())`
+- `while (stream >> val)` as the correct loop idiom (an idiom is a standard,
+  recognized pattern for writing something -- not a language feature, just
+  the way experienced programmers write it) vs. `while (!stream.eof())`
 - `is_open()` to detect a failed file open before reading
 - Why `operator>>` leaves the newline in the buffer and how it breaks `std::getline`
 - `std::ifstream` open, read, and close lifecycle
