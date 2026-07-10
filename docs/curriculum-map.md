@@ -498,6 +498,7 @@ Assignments:
 Activities:
 - `concurrency-court` -- choose asyncio, threads, multiprocessing, or plain sequential per workload; GIL and races taught from scratch
 - `await-tracer` -- predict deterministic asyncio output: unawaited coroutines, gather ordering, sleep(0) interleaving
+- `who-handles-the-wait` -- disambiguate event loop, threading, interrupts, and concurrency-vs-parallelism side by side
 
 Assignments: none.
 

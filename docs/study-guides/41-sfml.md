@@ -38,6 +38,10 @@ Concept: the game loop
 - Know that skipping `display()` means `clear()` and `draw()` still ran
   and did real work, but none of it ever reached the screen -- the window
   keeps showing whatever was already there.
+- Know the game loop itself is a cooperative, single-threaded EVENT LOOP
+  -- not threading, and not a hardware interrupt handler directly (the OS
+  absorbs the real interrupt and delivers it as a queued item `pollEvent`
+  reads); see row 55's `who-handles-the-wait` for the full disambiguation.
 
 Concept: the event queue
 - Know that an event is something that happened since the last check (a

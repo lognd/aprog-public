@@ -64,6 +64,29 @@ Concept: async/await mechanics
 - Know a coroutine with no internal `await` still runs when awaited, but
   never yields the event loop partway through its own body.
 
+Concept: four machines, unmistakably distinguished
+- Event loop, threading, interrupts, and concurrency-vs-parallelism are
+  four DIFFERENT machines that get confused with each other constantly
+  -- know them well enough to classify any scenario on sight.
+- Event loop: one worker, switches happen where the running task's own
+  code chose to pause (`await`) -- cooperative scheduling.
+- Threading: many workers, switches happen wherever the OS scheduler
+  decides, with no cooperation from the running thread -- preemptive
+  scheduling.
+- Hardware interrupt: the hardware forces the CPU to a handler
+  asynchronously, with no thread and no loop required at all.
+- Blast radius of a blocking call: freezes every task sharing an event
+  loop's one thread; stalls only its own thread inside threading.
+- Concurrency (structure: dealing with many things at once, needs no
+  particular core count) vs. parallelism (simultaneous execution: doing
+  many things at the same instant, requires multiple cores).
+- Layering 1: thread preemption is built on hardware timer interrupts
+  -- the timer's tick is what gives the OS scheduler its chance to act.
+- Layering 2: GUI/network "events" originate as hardware interrupts,
+  are absorbed by the OS, and are delivered to your event loop as
+  already-packaged queue items -- your code never sees the raw
+  interrupt itself.
+
 ## Study checklist
 
 - [ ] Given a workload, choose asyncio, threading, multiprocessing, or
@@ -79,4 +102,4 @@ Concept: async/await mechanics
 
 ## Practiced in
 
-`concurrency-court`, `await-tracer`
+`concurrency-court`, `await-tracer`, `who-handles-the-wait`
