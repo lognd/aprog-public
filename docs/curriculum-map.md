@@ -296,13 +296,22 @@ Activities:
 Assignments:
 - `deque-two-ways` -- implement a Deque twice (circular-buffer array with O(1) pop_front enforced by a performance test, and doubly linked list) plus Stack/Queue adapters
 
-## 32. Standard Containers p1 (planned)
+## 32. Standard Containers p1 (untested)
 
-Nothing built yet.
+Activities:
+- `container-casting-call` -- pick vector, deque, list, or array for nine workloads and learn why vector is the sane default
+- `capacity-chronicles` -- predict size/capacity output of seven vector programs with reserve-pinned, standard-guaranteed values
 
-## 33. Map & Set ADT (planned)
+Assignments: none.
 
-Nothing built yet.
+## 33. Map & Set ADT (untested)
+
+Activities:
+- `associative-adjudicator` -- choose map, unordered_map, set, or unordered_set per scenario; hash table vs balanced tree from scratch
+- `bracket-trap` -- predict output of six map/unordered_map programs centered on the operator[] insert-on-read trap
+
+Assignments:
+- `word-ledger` -- implement six word-analysis functions over tokenized text using map, unordered_map, and set operations
 
 ## 34. Standard Containers p2 (planned)
 
