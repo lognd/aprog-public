@@ -30,7 +30,8 @@ before typing your answer.
 - `enum class` (scoped enum): no implicit conversion, must use `static_cast<int>`
 - `sizeof` applied to both `enum` and `enum class` -- and why the sizes are the same
 - The C idiom `typedef enum { ... } Name;` and why C++ does not require it
-- `switch` on `enum class` with exhaustive case labels and qualified names
+- `switch` on `enum class` with exhaustive case labels (one case per possible
+  value, so no value falls through unhandled) and qualified names
 - Using `static_cast<int>` to extract underlying values from `enum class`
 
 ---
