@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "grade-matrix",
+    "name": "Grade Matrix",
+    "author": "lognd",
+    "description": "A small toolkit of numpy-only functions over a scores matrix (rows = students, columns = assignments): per-student and per-assignment means, curving a column to a target mean, dropping each student's lowest score, a passing-threshold boolean mask, and per-column standardization -- graded on exact vectorized behavior, with a hard constraint that forbids writing the logic as a Python loop."
+  },
+  "classification": {
+    "language": "python",
+    "difficulty": "medium",
+    "topics": [
+      "scientific-computing"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "python-pytest",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/grade-matrix",
+    "readme": "assignments/grade-matrix/README.md",
+    "visible_tests": "assignments/grade-matrix/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:c9704286313359f708c5014852df8987f8591fa9e85e9f817cfe0bda5c257eae"
+}

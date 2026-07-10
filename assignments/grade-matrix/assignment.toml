@@ -1,0 +1,25 @@
+[assignment]
+slug = "grade-matrix"
+name = "Grade Matrix"
+author = "lognd"
+description = "A small toolkit of numpy-only functions over a scores matrix (rows = students, columns = assignments): per-student and per-assignment means, curving a column to a target mean, dropping each student's lowest score, a passing-threshold boolean mask, and per-column standardization -- graded on exact vectorized behavior, with a hard constraint that forbids writing the logic as a Python loop."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "python"
+difficulty = "medium"
+topics = ["scientific-computing"]
+concepts = ["numpy"]
+labels = ["unit-tests"]
+
+[template]
+slug = "python-pytest"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+extra = ["numpy"]
