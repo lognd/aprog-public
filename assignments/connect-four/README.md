@@ -8,7 +8,8 @@ You have a flat character grid and a full set of grid operations. Now put them t
 
 - Practice using a flat row-major grid (`char*`) as a real data structure, not a tutorial toy
 - Write a four-direction run-detection algorithm (horizontal, vertical, both diagonals)
-- Implement a simple but correct decision procedure (win > block > heuristic)
+- Implement a simple but correct decision procedure (win > block > heuristic --
+  a rule-of-thumb move that is not guaranteed optimal but is cheap to compute)
 - Understand the difference between mutating functions (`char*`) and read-only functions (`const char*`)
 
 ---
@@ -43,7 +44,7 @@ Return the column the computer should play. Use this three-priority decision pro
 2. If the human can win next turn by playing some column, block that column (lowest index wins ties).
 3. Otherwise, play the non-full column closest to center (`cols / 2`). Among columns equally close to center, prefer the lower-indexed one.
 
-To check whether a column leads to a win, simulate: call `drop_piece` on a copy of the board, then call `check_win`. Do not use randomness -- the AI must be fully deterministic.
+To check whether a column leads to a win, simulate: call `drop_piece` on a copy of the board, then call `check_win`. Do not use randomness -- the AI must be fully deterministic (given the same board, it must always choose the same move).
 
 ---
 
@@ -117,7 +118,8 @@ Run vs. computer:
 ./build/connect_four --vs-computer
 ```
 
-Run visible tests (from the project root):
+Run visible tests (from the project root) with pytest, a Python test-running
+tool that discovers and executes test functions and reports pass/fail for each:
 
 ```bash
 python -m pytest visible-tests/test_visible.py -v
@@ -160,5 +162,5 @@ If you wrote your own `grid.cpp` in the const-qualifier-toolkit assignment, subm
 ## Going further
 
 - Add a fourth priority to `computer_move`: after the center heuristic, prefer columns adjacent to existing pieces of your own color to build toward future fours.
-- Implement a depth-2 lookahead: avoid columns that hand the opponent a winning move on their next turn.
+- Implement a depth-2 lookahead (checking two moves ahead instead of one): avoid columns that hand the opponent a winning move on their next turn.
 - Benchmark your `check_win` implementation with a full board and a piece that does not win. How many cell reads does it perform? Can you reduce that number?

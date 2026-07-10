@@ -18,7 +18,11 @@ simultaneously.
 ## Task
 
 Implement every function declared in `sentence_tools.hpp` inside that same
-file.  Mark each function `inline` so the header-only build works.
+file.  Mark each function `inline` so the header-only build works -- "header-only"
+means the full body of every function lives in the `.hpp` file itself instead
+of a separate `.cpp` file.  Without `inline`, defining a function body directly
+in a header causes a linker error ("multiple definition") as soon as that
+header is `#include`d from more than one `.cpp` file.
 
 ### Interface
 
@@ -32,7 +36,8 @@ int word_count(const char* s);
 // Copies the n-th word (0-indexed) into dst, writing at most dst_len-1
 // characters plus a null terminator.  Returns true if the n-th word
 // exists, false otherwise.  On failure, dst[0] is set to '\0'.
-// Precondition: dst_len >= 1.
+// Precondition (a condition the caller must guarantee is true before
+// calling): dst_len >= 1.
 bool word_at(const char* s, int n, char* dst, size_t dst_len);
 
 // Returns true if `word` appears as a complete word in `sentence`.
@@ -70,7 +75,8 @@ whitespace character you need to handle is the regular space `' '`.
 
 - `sentence_tools.hpp` -- the file you edit; contains both declarations and
   your `inline` implementations
-- `visible-tests/test_catch.cpp` -- visible Catch2 tests you can run locally
+- `visible-tests/test_catch.cpp` -- visible tests you can run locally, written
+  with Catch2 (a C++ library for writing and running automated test cases)
 
 ## Compilation and Testing
 
@@ -101,6 +107,12 @@ The `SUBMISSION_DIR` variable tells CMake where to find your
 | Memory safety (Valgrind) | 10 |
 | Extra credit (ASan) | +10 |
 
+Catch2 is the test-writing library used above. Valgrind is a tool that runs
+your compiled program and reports memory errors (like reading past the end of
+a buffer) that would otherwise pass silently. ASan (AddressSanitizer) is a
+compiler flag (`-fsanitize=address`) that instruments your program at compile
+time to catch those same kinds of memory errors as it runs.
+
 ## Submission
 
 Submit a single file named `sentence_tools.hpp`. Do not rename the file.
@@ -111,5 +123,6 @@ Submit a single file named `sentence_tools.hpp`. Do not rename the file.
   that wraps `s` at `width` characters. No `std::string` allowed.
 - Look up `std::string_view` (C++17). Rewrite `word_count` to accept a
   `std::string_view` instead of `const char*`. What changes?
-- Benchmark `contains_word` on a 10,000-word string. Profile with `gprof` and
-  see how much time is spent in character comparison.
+- Benchmark `contains_word` on a 10,000-word string. Profile with `gprof` (a
+  profiling tool that measures how much time your program spends in each
+  function) and see how much time is spent in character comparison.

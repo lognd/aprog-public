@@ -1,6 +1,7 @@
 # Const Qualifier Toolkit
 
-`const` is a contract between you and your caller. When a function takes
+`const` is a contract (a promise about behavior that both sides are expected to
+honor) between you and your caller. When a function takes
 `const char* grid`, it promises: "I will not touch your data." The compiler
 enforces this promise -- but the real audience is the next programmer who reads
 the signature and decides whether it is safe to pass in their read-only buffer.
@@ -27,8 +28,10 @@ the board is the same flat grid you build here.
 
 ## Task
 
-A 2D grid of `char` is stored as a flat array in row-major order. The element
-at row `r` and column `c` in a grid with `cols` columns is:
+A 2D grid of `char` is stored as a flat (one-dimensional) array in row-major
+order -- meaning each row's characters are laid out one after another in
+memory, row 0 in full, then row 1 in full, and so on. The element at row `r`
+and column `c` in a grid with `cols` columns is:
 
 ```
 grid[r * cols + c]
@@ -60,7 +63,7 @@ The return type must match the input's const-ness:
 |------|---------|
 | `grid.hpp` | Declarations and contracts -- do not modify |
 | `grid.cpp` | Write your implementation here |
-| `visible-tests/test_catch.cpp` | Visible Catch2 tests you can run locally |
+| `visible-tests/test_catch.cpp` | Visible tests you can run locally, written with Catch2 (a C++ library for writing and running automated test cases) |
 
 ## Compilation and Testing
 

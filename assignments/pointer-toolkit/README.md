@@ -3,9 +3,10 @@
 ## Overview
 
 A pointer stores the address of another object. Pointer arithmetic lets you navigate
-memory by incrementing or decrementing the pointer itself rather than using an index.
-In this assignment you implement eight array and string utility functions using only
-pointer arithmetic -- no subscript operators on the core traversals.
+memory by incrementing or decrementing the pointer itself (e.g. `p++` to move to the
+next element) rather than using an index and the subscript operator (the `[]` in
+`arr[i]`). In this assignment you implement eight array and string utility functions
+using only pointer arithmetic -- no subscript operators on the core traversals.
 
 ## Learning goals
 
@@ -51,8 +52,9 @@ Copy n ints from src to dst. Advance both pointers simultaneously.
 size_t str_len(const char* s);
 ```
 
-Return the number of characters before the null terminator. Advance the pointer
-until you reach `'\0'`.
+Return the number of characters before the null terminator -- the `'\0'` byte that
+C strings use to mark where the text ends, since a `char*` has no built-in length of
+its own. Advance the pointer until you reach `'\0'`.
 
 ### `str_copy`
 
@@ -68,8 +70,8 @@ Copy src into dst including the null terminator. Returns dst.
 int str_compare(const char* a, const char* b);
 ```
 
-Compare two C strings lexicographically, like `strcmp`. Return negative, zero, or
-positive.
+Compare two C strings lexicographically (character by character, the way words are
+ordered in a dictionary), like `strcmp`. Return negative, zero, or positive.
 
 ### `str_reverse`
 
@@ -128,5 +130,7 @@ g++ -std=c++17 -Wall -I. -o tests pointer_toolkit.cpp visible-tests/test_visible
 - Add a `str_contains(const char* haystack, const char* needle)` function
   without using `strstr`. Implement it using only the pointer patterns from this
   assignment.
-- Run your implementations under Valgrind and confirm no out-of-bounds reads.
-  Then deliberately break one function and see how Valgrind reports it.
+- Run your implementations under Valgrind (a tool that watches your program run and
+  reports memory errors like reading past the end of an array) and confirm no
+  out-of-bounds reads. Then deliberately break one function and see how Valgrind
+  reports it.
