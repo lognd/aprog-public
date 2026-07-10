@@ -16,7 +16,9 @@ The conjecture is that every positive integer eventually falls into the 4 -> 2 -
 - Implement a mathematical sequence using bitwise operators instead of multiplication and division
 - Understand why bitwise shifts are equivalent to multiplying and dividing by powers of two
 - Work within operator constraints while still producing correct output
-- Think about `unsigned long long` overflow boundaries when reasoning about input validity
+- Think about `unsigned long long` overflow boundaries (overflow happens
+  when a value grows past the largest number a type can hold and wraps back
+  around, producing an incorrect result) when reasoning about input validity
 
 ## Task
 

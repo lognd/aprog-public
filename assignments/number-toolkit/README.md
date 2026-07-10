@@ -6,7 +6,9 @@ Implement five number-theory utility functions in `number_toolkit.hpp`.
 
 - Implement number-theory algorithms efficiently within explicit complexity bounds
 - Use O(sqrt(n)) trial division for primality testing instead of the naive O(n) approach
-- Apply the Euclidean algorithm for GCD and understand why it is faster than looping from min(a, b)
+- Apply the Euclidean algorithm (a fast, ancient method for computing the
+  greatest common divisor by repeated division instead of counting down) and
+  understand why it is faster than looping from min(a, b)
 - Write iterative (not recursive) Fibonacci to avoid exponential call growth
 
 ## Task
@@ -27,7 +29,7 @@ Examples:
 is_prime(17)          // true
 is_prime(9)           // false
 gcd(12, 8)            // 4
-gcd(7, 3)             // 1  (coprime)
+gcd(7, 3)             // 1  (coprime -- the two numbers share no common factor besides 1)
 digit_sum(123)        // 6
 digit_sum(-456)       // 15
 digit_sum(0)          // 0

@@ -39,6 +39,10 @@ vector is one field.  Row 0 is the first line of the input.
 
 ### Parsing rules (RFC 4180 subset)
 
+RFC 4180 is the internet standard document that defines the CSV format
+precisely (how quoting, escaping, and line endings work). You are
+implementing a subset of it -- just the rules in the table below.
+
 | Situation | Rule |
 |-----------|------|
 | Plain field | Characters up to the next `,` or end-of-line |

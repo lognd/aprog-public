@@ -10,7 +10,9 @@ By the time you finish, you will understand the problem Makefiles were invented 
 - Understand the four compilation stages: preprocess, compile, assemble, link
 - Use `g++ -E`, `g++ -S`, `g++ -c`, and `g++` (link) as separate invocations
 - Write a shell script that implements incremental builds using file timestamp comparisons
-- Use pipes, stderr redirection, and `wc` as real tools in a build script
+- Use pipes (chaining one program's output into another's input with `|`),
+  stderr redirection (sending a program's error-message stream to a file
+  instead of the screen), and `wc` as real tools in a build script
 
 ## Background
 
@@ -59,7 +61,9 @@ Fill in `build.sh`. The script must:
 4. Use at least one pipe -- for example, count how many lines the preprocessor produces
    before you save the result to disk.
 
-The project has three translation units:
+The project has three translation units (a translation unit is one `.cpp`
+file plus everything it `#include`s -- the compiler runs the four stages
+above on each one separately, then the link step combines the results):
 
 ```
 main.cpp       greet.cpp       math_utils.cpp
