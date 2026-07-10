@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "text-filters",
+    "name": "Text Filters",
+    "author": "lognd",
+    "description": "Implement a set of text filters twice: once behind a pure-virtual interface using runtime polymorphism, and once as function templates using compile-time duck typing."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "algorithms",
+      "strings"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/text-filters",
+    "readme": "assignments/text-filters/README.md",
+    "visible_tests": "assignments/text-filters/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:4631559c10804fed60b7a3f34e45e4e4900f56c8ef1f826d62222edb2cd12e85"
+}
