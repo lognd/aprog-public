@@ -7,6 +7,7 @@ Shell-drop activities have no answer-checking loop and are skipped.
 See tests/helpers/activity_harness.py for the shared harness.
 See tests/fixtures/activity_answers.json to record correct answers.
 """
+
 from __future__ import annotations
 
 import io
@@ -51,6 +52,7 @@ def _run_with_input(slug: str, input_mock: object) -> str:
 # Fuzz scenario 1: random-token wrong answers
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize("slug", _SLUGS)
 def test_fuzz_wrong_token(slug: str) -> None:
     """Random fuzz tokens must never unlock a passphrase."""
@@ -61,6 +63,7 @@ def test_fuzz_wrong_token(slug: str) -> None:
 # ---------------------------------------------------------------------------
 # Fuzz scenario 2: all-empty answers
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.parametrize("slug", _SLUGS)
 def test_fuzz_empty_answers(slug: str) -> None:

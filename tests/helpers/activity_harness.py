@@ -17,6 +17,7 @@ Adding a new activity
 3. Run `make test` -- fuzz tests pick up automatically; correct-path tests
    activate as soon as the answers list is non-empty.
 """
+
 from __future__ import annotations
 
 import ast
@@ -52,6 +53,7 @@ FUZZ_TOKENS: list[str] = [
 # Module loading
 # ---------------------------------------------------------------------------
 
+
 def load_activity(slug: str) -> types.ModuleType:
     """Load activities/<slug>/launch.py as a fresh module.
 
@@ -80,6 +82,7 @@ def load_activity(slug: str) -> types.ModuleType:
 # Activity discovery
 # ---------------------------------------------------------------------------
 
+
 def _has_qa_loop(slug: str) -> bool:
     """Return True if the activity has a QUESTIONS or SNIPPETS top-level name."""
     src = (_ACTIVITIES_DIR / slug / "launch.py").read_text(encoding="utf-8")
@@ -101,15 +104,14 @@ def qa_activity_slugs() -> list[str]:
     return sorted(
         d.name
         for d in _ACTIVITIES_DIR.iterdir()
-        if d.is_dir()
-        and (d / "launch.py").exists()
-        and _has_qa_loop(d.name)
+        if d.is_dir() and (d / "launch.py").exists() and _has_qa_loop(d.name)
     )
 
 
 # ---------------------------------------------------------------------------
 # Answer fixture
 # ---------------------------------------------------------------------------
+
 
 def answers_for(slug: str) -> list[str]:
     """Return correct answers for slug, or empty list if not yet recorded.
@@ -126,6 +128,7 @@ def answers_for(slug: str) -> list[str]:
 # ---------------------------------------------------------------------------
 # Input mocks
 # ---------------------------------------------------------------------------
+
 
 class FuzzInput:
     """Callable mock for builtins.input that injects wrong answers then EOF.

@@ -9,6 +9,7 @@ To add coverage for a new activity:
     2. Record the correct answers in tests/fixtures/activity_answers.json
     3. Re-run tests -- the new case is picked up automatically.
 """
+
 from __future__ import annotations
 
 import io
@@ -34,13 +35,18 @@ def _slugs_with_answers() -> list[str]:
 def test_correct_answers_reveal_passphrase(slug: str) -> None:
     """Correct answers must produce passphrase output."""
     if slug == "_no_answers_recorded":
-        pytest.skip("No activities have recorded answers yet -- add tests/fixtures/<slug>.json")
+        pytest.skip(
+            "No activities have recorded answers yet -- add tests/fixtures/<slug>.json"
+        )
 
     answers = answers_for(slug)
     mod = load_activity(slug)
     buf = io.StringIO()
 
-    with patch("builtins.input", side_effect=CorrectInput(answers)), redirect_stdout(buf):
+    with (
+        patch("builtins.input", side_effect=CorrectInput(answers)),
+        redirect_stdout(buf),
+    ):
         mod.main()
 
     output = buf.getvalue()
