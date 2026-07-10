@@ -356,9 +356,14 @@ Activities:
 Assignments:
 - `sort-suite` -- implement selection, insertion, and merge sorts plus a stability-required pair sort, oracle-checked and performance-gated
 
-## 39. Function Pointers, Functors, Lambdas (planned)
+## 39. Function Pointers, Functors, Lambdas (untested)
 
-Nothing built yet.
+Activities:
+- `callable-lineup` -- predict output of eight programs using function pointers, stateful functors, and lambdas with each capture mode
+- `capture-court` -- rule on capture semantics: value vs reference divergence, capture defaults, init-capture, and the dangling-capture UB trap
+
+Assignments:
+- `sort-with-anything` -- generalize merge sort with a Compare template parameter and prove it works with all three callable species
 
 ## 40. Libraries (static vs. dynamic) (planned)
 
