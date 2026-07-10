@@ -20,9 +20,12 @@ polymorphism ("polymorphism" means one piece of calling code can work with
 several different concrete types), the same mechanism you used in the
 inheritance assignment.
 
-In Part 2 you write function templates that do the same kind of work --
-apply a filter, apply several filters, check a property of a filter -- but
-the functions never mention `TextFilter` at all. They just call `f.apply(s)`
+In Part 2 you write function templates -- functions written once against a
+placeholder type name (here called `F`) instead of a fixed type, where the
+compiler generates a separate real function for each concrete type the
+template is actually used with -- that do the same kind of work: apply a
+filter, apply several filters, check a property of a filter. The functions
+never mention `TextFilter` at all. They just call `f.apply(s)`
 on whatever type `F` happens to be. If that expression compiles, the
 template compiles. This is duck typing: "if it walks like a filter and
 quacks like a filter, it's a filter" -- resolved entirely at compile time,
@@ -35,9 +38,10 @@ with no shared base class required.
   through the vtable, and that this requires an inheritance relationship
 - Write function templates that operate on "any type with the right method,"
   with no common base class
-- Understand that template instantiation happens at compile time: the
-  compiler only checks that the expressions inside the template body compile
-  for the type it is instantiated with
+- Understand that template instantiation (the compiler generating one
+  concrete function from a template for a specific type) happens at compile
+  time: the compiler only checks that the expressions inside the template
+  body compile for the type it is instantiated with
 - Compare the two approaches on the same problem and recognize when each is
   the better tool
 
