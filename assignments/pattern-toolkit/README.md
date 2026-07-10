@@ -1,15 +1,17 @@
 # Pattern Toolkit
 
 A design pattern is not a rule imposed from outside -- it is the shape code
-takes when someone finally refactors away from a mess that grew out of
-perfectly reasonable choices. This assignment shows you three such messes
-first, lets you feel why the next feature request makes them worse, and only
-then asks you to implement the pattern that fixes it. All three are
-applications of the runtime polymorphism you learned in the Polymorphism
-topic: an abstract base class with pure-virtual methods, concrete subclasses
-that override them, and code that talks to the subclasses through a
-non-owning base pointer or reference and lets the vtable pick the right
-override at runtime.
+takes when someone finally refactors (restructures existing code without
+changing what it does) away from a mess that grew out of perfectly
+reasonable choices. This assignment shows you three such messes first, lets
+you feel why the next feature request makes them worse, and only then asks
+you to implement the pattern that fixes it. All three are applications of
+the runtime polymorphism you learned in the Polymorphism topic: an abstract
+base class with pure-virtual methods, concrete subclasses that override
+them, and code that talks to the subclasses through a non-owning base
+pointer or reference and lets the vtable (the hidden table of function
+pointers the compiler attaches to a class with virtual functions, used to
+find the correct override) pick the right override at runtime.
 
 None of the three parts uses dynamic memory. Every object lives on the stack
 or inside a `std::vector`, and every polymorphic relationship is expressed
@@ -20,8 +22,10 @@ topic. You will not write `new`, `delete`, or `throw` anywhere.
 
 ## Learning goals
 
-- Recognize the code smells (shotgun surgery, copy-paste divergence,
-  rigidity) that motivate Strategy, Observer, and Template Method
+- Recognize code smells (a code smell is a pattern in working code that is
+  not a bug but signals that a change will be painful to make safely) --
+  specifically shotgun surgery, copy-paste divergence, and rigidity -- that
+  motivate Strategy, Observer, and Template Method
 - Pass behavior as an object (Strategy) so one algorithm can be reconfigured
   without being rewritten
 - Register and notify a changing set of listeners through non-owning base

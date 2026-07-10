@@ -208,8 +208,10 @@ either file.
 ## Going further
 
 - Add a fourth kind, `Podcast` (host, episodeCount), without changing
-  `Library` at all. That is the point of programming to the `MediaItem*`
-  interface instead of a `std::vector<Book>`, `std::vector<Film>`, ...
+  `Library` at all. That is the point of programming against the
+  `MediaItem*` shape shared by every derived class (an "interface" in the
+  general sense: a fixed set of calls something guarantees to support)
+  instead of a `std::vector<Book>`, `std::vector<Film>`, ...
 - Try commenting out `override` on `Book::summary()` and comparing the
   compiler error to what happens when you also remove `const`. Which one
   refuses to compile, and which one silently compiles into a different bug?

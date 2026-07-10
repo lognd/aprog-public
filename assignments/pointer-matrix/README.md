@@ -62,9 +62,14 @@ This works, but it has real costs:
 1. **Two levels of indirection.**  To read `m[r][c]` the CPU must first chase
    the outer pointer to find the row pointer, then chase the row pointer to
    find the element.  Two memory fetches, not one.
-2. **Poor cache behavior.**  Each row is a separate heap allocation that can
-   live anywhere in memory.  Iterating across rows means jumping around in
-   the heap -- cache misses at every row boundary.
+2. **Poor cache behavior.**  The CPU cache is a small, very fast block of
+   memory that automatically keeps a copy of recently used data so the CPU
+   does not have to wait on slower main memory every time.  It works best
+   when the data you access next is physically close to the data you just
+   accessed.  Each row here is a separate heap allocation that can live
+   anywhere in memory.  Iterating across rows means jumping around in the
+   heap -- a "cache miss" (the CPU cache does not have the data ready and
+   must fetch it from slower memory) at every row boundary.
 3. **More space.**  You allocate one extra array of `rows` pointers on top of
    the data itself.
 4. **More bookkeeping.**  You must allocate and free each row individually.
@@ -295,4 +300,6 @@ Submit a single file named `matrix.cpp`. Do not rename it and do not submit
 - Implement the same nine functions using `std::vector<int>` with `operator[]`.
   Compare the code. Which version is clearer? Which is safer?
 - Compile with `-fsanitize=address` and deliberately pass wrong row/col counts
-  to `mat_transpose`. Read the ASan report to understand what it catches.
+  to `mat_transpose`. Read the report from ASan (AddressSanitizer, a compiler
+  tool that detects out-of-bounds memory accesses at runtime) to understand
+  what it catches.

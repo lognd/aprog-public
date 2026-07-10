@@ -40,6 +40,11 @@ int exponentiate(int base, int exp);
 
 ### Contracts
 
+A function's contract is the set of rules about what inputs it accepts and
+what it promises to return. A precondition is the part of the contract that
+lists what must be true about the inputs *before* the function is called --
+here, that means the caller must not pass negative numbers.
+
 | Function | Precondition | Edge case |
 |---|---|---|
 | `successor` | `n >= 0` | -- |
@@ -59,6 +64,11 @@ You do not need to handle negative inputs.
 | `visible-tests/CMakeLists.txt` | Builds the visible test suite against your submission |
 
 ## Compilation and Testing
+
+The visible tests use Catch2, a C++ testing framework that runs a set of
+checks and reports which ones pass or fail; you do not need to understand
+its internals for this assignment, only build and run it as shown below.
+You will cover testing frameworks properly in a later topic.
 
 Using the provided CMake setup (recommended -- this is what the grader uses):
 

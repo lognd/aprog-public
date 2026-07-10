@@ -13,8 +13,12 @@ directly.
 In Part 1 you define a pure-virtual interface, `TextFilter`, and four classes
 that inherit from it. Code that wants to work with "any filter" takes a
 `const TextFilter*` and calls `apply()` on it. Which `apply()` actually runs
-is decided at runtime, by looking up the object's vtable -- this is runtime
-polymorphism, the same mechanism you used in the inheritance assignment.
+is decided at runtime, by looking up the object's vtable (a hidden table of
+function pointers the compiler attaches to every object of a class with
+virtual functions, used to find the correct override) -- this is runtime
+polymorphism ("polymorphism" means one piece of calling code can work with
+several different concrete types), the same mechanism you used in the
+inheritance assignment.
 
 In Part 2 you write function templates that do the same kind of work --
 apply a filter, apply several filters, check a property of a filter -- but
@@ -158,6 +162,8 @@ bool is_idempotent(const std::string& s, const F& f);
 
 Returns `true` if applying `f` to `s` twice gives the same result as
 applying it once (`f.apply(f.apply(s)) == f.apply(s)`), `false` otherwise.
+Applying a filter twice and getting the same result as applying it once is
+called being **idempotent**.
 
 `F` can be any type with a method `std::string apply(const std::string&)
 const` -- it does not need to inherit from `TextFilter`. The hidden test

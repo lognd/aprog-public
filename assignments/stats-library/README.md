@@ -14,8 +14,9 @@ provided lightweight testing harness.
 - Implement descriptive statistics (mean, median, mode, variance, stddev, range) from scratch
 - Organize a C++ project as a multi-target CMake build: one library, one test executable
 - Write your own test suite using a provided harness, including edge cases
-- Signal an undefined result at a function boundary using a sentinel value,
-  and distinguish population vs sample statistics
+- Signal an undefined result at a function boundary using a sentinel value
+  (a special, reserved value like NaN that stands in for "no valid answer"
+  instead of a real result), and distinguish population vs sample statistics
 
 ## Task
 
@@ -73,7 +74,9 @@ double range(const std::vector<double>& data);
 
 You must also:
 
-- Write test cases in `tests/test_stats.cpp` using the provided harness.
+- Write test cases in `tests/test_stats.cpp` using the provided harness (a
+  harness is a small piece of support code that runs your test cases and
+  reports pass/fail, so you do not have to write that bookkeeping yourself).
 - Fill in `README.md`, `CONTRIBUTORS.md`, and `LICENSE` with real content
   (each must contain at least 20 non-whitespace characters).
 

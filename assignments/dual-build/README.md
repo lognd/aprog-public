@@ -6,7 +6,7 @@ and understand why the two tools approach the problem differently.
 
 ## Learning goals
 
-- Write a Makefile from scratch with correct prerequisite lists, automatic variables, and phony targets
+- Write a Makefile from scratch with correct prerequisite lists, automatic variables, and phony targets (a phony target is a target name in a Makefile that does not correspond to a real output file, like `clean` or `test`)
 - Write a CMakeLists.txt that builds a static library and links an executable against it
 - Understand why Make uses timestamps and what happens when a header is missing from prerequisites
 - See how the same build intent is expressed declaratively (CMake) vs procedurally (Make)
@@ -76,7 +76,10 @@ satisfies the following.
 ### Requirements
 
 1. Declare `cmake_minimum_required` and `project`.
-2. Build `stats.cpp` as a static library named `stats`.
+2. Build `stats.cpp` as a static library named `stats` (a static library is a
+   bundle of compiled `.o` files that gets copied into any executable that
+   links against it, as opposed to a shared/dynamic library that is loaded
+   separately at runtime).
 3. Expose the current source directory as a public include path on the
    `stats` target so that consumers can `#include "stats.h"` without
    specifying a path.

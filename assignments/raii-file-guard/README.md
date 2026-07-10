@@ -121,7 +121,9 @@ This is why `FileGuard` is always passed by reference (`const FileGuard&` or
 `FileGuard&`) in function signatures -- passing by value would require a
 copy, which is exactly what is forbidden.
 
-`close()` itself must also be idempotent for a related reason: even without
+`close()` itself must also be idempotent (calling it many times has the same
+effect as calling it once, with no extra side effects on the second or later
+call) for a related reason: even without
 copying, a caller might call `close()` explicitly and then let the
 `FileGuard` go out of scope normally. The destructor must recognize that the
 fd was already closed and do nothing, rather than closing whatever fd
@@ -206,7 +208,7 @@ read into a `std::string`, which it returns.
 
 | File | Purpose |
 |------|---------|
-| `file_guard.hpp` | Declarations and invariant contract -- do not modify |
+| `file_guard.hpp` | Declarations and invariant contract (the rules this class always guarantees, such as "an fd is closed exactly once") -- do not modify |
 | `file_guard.cpp` | Write your implementation here |
 | `visible-tests/test_catch.cpp` | Visible Catch2 tests you can run locally |
 
