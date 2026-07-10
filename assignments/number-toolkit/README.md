@@ -6,6 +6,10 @@ Implement five number-theory utility functions in `number_toolkit.hpp`.
 
 - Implement number-theory algorithms efficiently within explicit complexity bounds
 - Use O(sqrt(n)) trial division for primality testing instead of the naive O(n) approach
+  (the `O(...)` notation, called Big-O notation, describes roughly how many steps an
+  algorithm takes as its input `n` grows -- `O(n)` means the step count grows
+  proportionally to `n`, while `O(sqrt(n))` means it grows proportionally to the
+  square root of `n`, which is far fewer steps for large `n`)
 - Apply the Euclidean algorithm (a fast, ancient method for computing the
   greatest common divisor by repeated division instead of counting down) and
   understand why it is faster than looping from min(a, b)

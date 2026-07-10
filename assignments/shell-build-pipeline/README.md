@@ -41,7 +41,9 @@ g++    main.o greet.o math_utils.o -o program   # link
 ```
 
 A naive script runs all stages every time. The smart version only re-runs a stage when
-its input has changed -- exactly what `make` does with its dependency graph.
+its input has changed -- exactly what `make` does with its dependency graph (a map of
+which files depend on which other files, so a tool can tell exactly what needs
+rebuilding when one file changes).
 
 To check whether a file is newer than another, use:
 
@@ -127,6 +129,8 @@ g++ -E main.cpp | wc -l
 g++ -E main.cpp | grep '^# '
 
 # Does the assembly use a call instruction for greet?
+# (a "call" is the assembly-language instruction that jumps into another
+# function and remembers where to return to)
 g++ -S greet.i -o /dev/stdout 2>/dev/null | grep -c 'call'
 ```
 
@@ -206,7 +210,7 @@ Check with `ls -lt` to see modification times.
 | Incremental: changed file chain is rebuilt | 40 pts | Visible |
 | Redirection used (`build.log` created) | 15 pts | Visible |
 | Pipe used in script | 15 pts | Visible |
-| All four stages explicitly invoked | +5 EC | Visible |
+| All four stages explicitly invoked | +5 extra credit | Visible |
 
 **Total: 100 pts + 5 extra credit**
 
