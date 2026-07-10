@@ -15,6 +15,33 @@ each call, and then write a raw-syscall hex dump utility.
 
 ## Taught here
 
+Concept: what an operating system is
+- Know that an operating system (OS) is a resource manager and abstraction
+  layer that mediates between every running program and the physical
+  hardware -- it is not a user interface, not a programming language, and
+  not the hardware itself.
+- Know the distinction between a kernel (the privileged core program that
+  directly manages the CPU, memory, and devices) and an OS distribution
+  (that kernel bundled with a shell, utilities, libraries, and a package
+  manager into one installable product): Linux is a kernel; Ubuntu,
+  Fedora, and Debian are distributions built around it. macOS is built
+  around a kernel called XNU; Windows is built around a kernel called NT.
+- Know that the CPU itself enforces two privilege levels, user mode and
+  kernel mode: ordinary programs run in user mode and cannot execute the
+  instructions needed to touch hardware directly; only the kernel runs in
+  kernel mode.
+- Know that a system call (syscall) is the controlled doorway between the
+  two: it switches the CPU from user mode into kernel mode so the kernel
+  can perform privileged work, then returns control to user mode.
+- Know the three problems every OS solves: sharing (refereeing many
+  programs' access to one CPU, disk, and memory), isolation (containing
+  one program's crash so it cannot corrupt another program's memory), and
+  abstraction (letting a program say "open this file" without knowing the
+  disk-block and filesystem details underneath).
+- Know that a process is a running program plus its own private memory and
+  its own fd table; two runs of the same compiled program are two separate
+  processes, each with its own independent fd table.
+
 Concept: the file I/O stack and system calls
 - Know that `open()`, `read()`, `write()`, and `close()` are POSIX system
   calls -- requests a program sends to the kernel (the core OS program
@@ -78,4 +105,5 @@ Concept: raw syscall-level programming
 
 ## Practiced in
 
-`posix-file-tour`, `file-io-contracts`, `write-your-first-syscalls`, `hex-dump`
+`os-mental-models`, `posix-file-tour`, `file-io-contracts`,
+`write-your-first-syscalls`, `hex-dump`

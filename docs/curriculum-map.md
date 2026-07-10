@@ -148,6 +148,7 @@ Assignments:
 ## 15. Basic OS Theory (untested)
 
 Activities:
+- `os-mental-models` -- eleven no-code questions building the conceptual model of what an OS is, kernel vs distribution, user/kernel mode, syscalls, and the three problems (sharing, isolation, abstraction) an OS solves
 - `posix-file-tour` -- walk the file I/O stack from program down to the kernel fd table, layer by layer
 - `file-io-contracts` -- answer ten questions on the precise contracts of open/read/write/close, errno, and partial I/O
 - `write-your-first-syscalls` -- fill in three blanks to print a file's contents using only open/read/write/close
