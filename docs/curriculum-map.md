@@ -365,17 +365,25 @@ Activities:
 Assignments:
 - `sort-with-anything` -- generalize merge sort with a Compare template parameter and prove it works with all three callable species
 
-## 40. Libraries (static vs. dynamic) (planned)
+## 40. Libraries (static vs. dynamic) (untested)
 
-Nothing built yet.
+Activities:
+- `library-forge` -- build libmathx.a and libmathx.so by hand, hit the LD_LIBRARY_PATH loader error, and fix it; checker verifies both link modes
+- `link-order-lab` -- diagnose compile vs link vs load errors, -L/-l mechanics, and why library order on the link line matters
+
+Assignments: none.
 
 ## 41. SFML (planned)
 
 Nothing built yet.
 
-## 42. auto & Type Deduction (planned)
+## 42. auto & Type Deduction (untested)
 
-Nothing built yet.
+Activities:
+- `deduction-detective` -- name the type auto deduces in ten cases: dropped references, stripped const, const char*, the map pair trap
+- `auto-consequences` -- predict output of seven programs where auto-by-copy and auto& visibly diverge
+
+Assignments: none.
 
 ## 43. Modern C++ (C++11-C++17 features) (planned)
 
