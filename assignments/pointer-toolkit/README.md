@@ -11,14 +11,18 @@ using only pointer arithmetic -- no subscript operators on the core traversals.
 ## Learning goals
 
 - Navigate arrays and C strings using pointer arithmetic (`p++`, `*(p + i)`) without subscript operators
-- Use two-pointer technique for in-place reversal of arrays and strings
+- Use the two-pointer technique (walking two pointers toward each other from
+  opposite ends) for in-place reversal (rewriting the data in its own memory,
+  without copying it into a second array) of arrays and strings
 - Implement C string utilities (`strlen`, `strcpy`, `strcmp`) from first principles
 - Return `nullptr` to signal "not found" and use it correctly at the call site
 
 ## Task
 
 Implement all functions in `pointer_toolkit.cpp`. Declarations are in
-`pointer_toolkit.hpp` inside the `ptk` namespace.
+`pointer_toolkit.hpp` inside the `ptk` namespace (a named grouping that
+prevents these function names from clashing with other code that happens to
+define its own `reverse` or `find`).
 
 ### `reverse`
 

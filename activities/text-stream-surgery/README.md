@@ -71,7 +71,8 @@ g++ -std=c++17 -o no_check no_check.cpp && ./no_check
 ### Step 4 -- fix mixed_io.cpp
 
 The bio field is always empty even though `profile.txt` has two lines.  Trace
-what happens in the stream buffer between the `>>` call and the `getline`
+what happens in the stream buffer (the region of memory where characters
+wait to be read out of the stream) between the `>>` call and the `getline`
 call.
 
 ```bash

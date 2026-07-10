@@ -5,7 +5,8 @@
 You will implement a small 2D matrix library using a flat, one-dimensional
 array of integers.  The twist: the subscript operator `[]` is forbidden.
 Every element access must go through pointer arithmetic and explicit
-dereference.
+dereference (using `*` on a pointer to read or write the value it points to,
+rather than the pointer's address itself).
 
 This forces you to confront how 2D data is actually stored in memory,
 why "array of pointers" (`int**`) is usually the wrong representation for a

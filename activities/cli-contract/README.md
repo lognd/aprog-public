@@ -12,9 +12,13 @@ cannot guess them -- you have to find them.
 ## Concepts covered
 
 - `argc` and `argv` as the mechanism behind CLI flags and positional arguments
-- Distinguishing flags (`--flag`) from positional arguments (`CHARACTER MESSAGE`)
+- Distinguishing flags (`--flag`, an optional named switch usually starting
+  with `-` or `--`) from positional arguments (`CHARACTER MESSAGE`, values
+  identified by their order rather than a name)
 - The `-h`/`--help` and `--list` conventions as a tool's self-documentation
-- `usage:` as the standard no-argument error convention
+- `usage:` as the standard no-argument error convention -- a one-line summary
+  of how to invoke the program, printed when it is run incorrectly or asked
+  for help
 - Reading a binary's behavior as a black box (a program you can only run and
   observe, with no source code to read) before writing any code
 

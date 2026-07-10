@@ -139,6 +139,10 @@ python -m pytest visible-tests/test_visible.py -v
 
 ## Grading
 
+A "gate" component below means the requirement must pass before any other
+points are awarded -- if your code does not compile, none of the other rows
+count.
+
 | Component | Points |
 |-----------|--------|
 | Compilation | gate |
