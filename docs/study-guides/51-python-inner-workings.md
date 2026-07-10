@@ -63,6 +63,36 @@ Concept: dynamic access and bound methods
   trading flexibility for lower per-instance memory overhead and refusing
   any attribute not in the declared set.
 
+Concept: CPython object internals
+- Know every Python value is, under the hood, a C struct allocated on the
+  heap -- `PyObject { Py_ssize_t ob_refcnt; PyTypeObject *ob_type; }` is the
+  literal (simplified) struct every object starts with, from CPython's
+  `Include/object.h`.
+- Know `ob_refcnt` and `ob_type` are the two fields every PyObject carries:
+  a reference count, and a pointer to the object's type.
+- Know reference counting is the exact same shared-ownership mechanism as
+  `std::shared_ptr`: incremented on each new reference, decremented on each
+  lost reference, the object freed the instant the count hits zero --
+  automated, by the interpreter, on every object, with no opt-in required.
+- Know reference counting alone cannot free a reference cycle (two objects
+  holding references to each other), and that CPython's separate cyclic
+  garbage collector (the `gc` module) is what reclaims cycles refcounting
+  cannot.
+- Know `PyVarObject` adds one field, `ob_size`, for types whose size varies
+  per instance (`list`, `tuple`, `str`) -- fixed-size types (`float`,
+  `bool`) use plain `PyObject` with no `ob_size` at all.
+- Know `PyListObject`'s `ob_item` is a `PyObject**` -- an array of
+  POINTERS to the actual elements, not the elements themselves -- which is
+  the literal C-level mechanism behind two names sharing (and mutating
+  through) the same list.
+- Know rebinding a name (`x = 5; x = "five"`) is a pointer swap plus
+  refcount adjustments, never a conversion of the old value into the new
+  one.
+- Know `id()` returns a CPython implementation detail (the object's memory
+  address), not a language-level guarantee, and that `sys.getrefcount()`
+  should never be asserted against an exact number, since the call itself
+  takes a temporary reference to its argument.
+
 ## Study checklist
 
 - [ ] Trace an attribute read through instance __dict__ then class
@@ -74,7 +104,14 @@ Concept: dynamic access and bound methods
       before the patch.
 - [ ] Distinguish a bound method from a plain function object.
 - [ ] Explain what __slots__ trades away and what it gains.
+- [ ] Draw the PyObject fields every value carries, and explain what each
+      one is for.
+- [ ] Trace ob_refcnt through a small assignment/del sequence by hand.
+- [ ] Explain why a reference cycle defeats plain refcounting, and what
+      catches it instead.
+- [ ] Explain why `ob_item[0]` on a list holds a pointer, not a value, and
+      how that produces the aliasing behavior from python-culture-shock.
 
 ## Practiced in
 
-`dunder-dungeon`, `lookup-court`
+`dunder-dungeon`, `lookup-court`, `pyobject-autopsy`

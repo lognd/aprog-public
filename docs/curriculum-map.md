@@ -472,6 +472,7 @@ Assignments:
 Activities:
 - `dunder-dungeon` -- watch __dict__ grow, shadowing reverse under del, diamond __mro__, bound methods, and __slots__ refuse attributes
 - `lookup-court` -- rule where attributes resolve, what super() actually consults, and why monkey-patching hits existing instances
+- `pyobject-autopsy` -- the real (simplified) PyObject/PyVarObject/PyListObject structs from CPython's Include/object.h: refcounting as automated shared ownership, reference cycles, and why a list stores pointers, not values
 
 Assignments: none.
 
