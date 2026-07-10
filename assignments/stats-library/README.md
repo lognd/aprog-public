@@ -3,9 +3,11 @@
 ## Overview
 
 You will implement a statistics library in C++ and organize it as a proper
-multi-target CMake project.  The library provides eight functions that operate
-on a `std::vector<double>`.  You will also write your own test suite using a
-provided lightweight testing harness.
+multi-target CMake project (a CMake project that builds more than one output --
+here, one library and one test executable -- from a single configuration).
+The library provides eight functions that operate on a `std::vector<double>`.
+You will also write your own test suite using a provided lightweight testing
+harness.
 
 ---
 

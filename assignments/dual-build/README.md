@@ -6,8 +6,8 @@ and understand why the two tools approach the problem differently.
 
 ## Learning goals
 
-- Write a Makefile from scratch with correct prerequisite lists, automatic variables, and phony targets (a phony target is a target name in a Makefile that does not correspond to a real output file, like `clean` or `test`)
-- Write a CMakeLists.txt that builds a static library and links an executable against it
+- Write a Makefile from scratch with correct prerequisite lists (a prerequisite is a file a target depends on -- if it changes, the target must be rebuilt), automatic variables, and phony targets (a phony target is a target name in a Makefile that does not correspond to a real output file, like `clean` or `test`)
+- Write a CMakeLists.txt that builds a static library (a bundle of compiled `.o` files that gets copied into any executable that links against it) and links an executable against it
 - Understand why Make uses timestamps and what happens when a header is missing from prerequisites
 - See how the same build intent is expressed declaratively (CMake) vs procedurally (Make)
 

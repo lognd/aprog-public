@@ -27,8 +27,8 @@ But under the hood it runs four separate programs, one after another:
 | Stage | Tool | Input | Output |
 |-------|------|-------|--------|
 | Preprocess | `cpp` | `.cpp` | `.i` (expanded source) |
-| Compile | `cc1plus` | `.i` | `.s` (assembly) |
-| Assemble | `as` | `.s` | `.o` (object code) |
+| Compile | `cc1plus` | `.i` | `.s` (assembly -- human-readable text listing the exact CPU instructions the program will run) |
+| Assemble | `as` | `.s` | `.o` (object code -- the same instructions translated into raw bytes the CPU can execute, but not yet a runnable program) |
 | Link | `ld` | `.o` files | executable |
 
 You can ask `g++` to stop after each stage:
