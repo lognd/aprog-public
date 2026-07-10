@@ -42,6 +42,30 @@ Concept: std::vector capacity and reallocation
   iterator previously taken into the vector's old buffer, because that
   memory has been freed.
 
+Concept: size vs. capacity bookkeeping
+- Know that `size()` counts elements actually stored; `capacity()` counts
+  how much room is reserved before the next `push_back` would need to
+  reallocate a bigger buffer -- the two numbers are tracked separately and
+  move independently.
+- Know that `reserve(n)` is standard-guaranteed to leave `capacity() >= n`,
+  making a pre-`reserve`d capacity a portable, exactly-predictable number
+  across compilers.
+- Know that `std::vector`'s growth factor when it DOES reallocate (1.5x,
+  2x, or another factor) is implementation-defined by the standard, so raw
+  `capacity()` values after unpinned repeated `push_back` are not portable
+  and should never be predicted as an exact number.
+- Know which operations change only `size()`: `push_back`, `pop_back`,
+  `clear()`, and `resize()` to a size within the current capacity.
+- Know which operations can change `capacity()`: `reserve()`, and any
+  `push_back`/`resize()` that outgrows the current capacity (triggering a
+  reallocation).
+- Know that `clear()` and `pop_back()` never release already-allocated
+  capacity -- `size()` drops but `capacity()` stays exactly where it was.
+- Know that `resize(n)` to a smaller `n` drops trailing elements
+  (`size()` only shrinks); `resize(n)` to a larger `n` value-initializes
+  the new slots (0 for `int`), never copying an existing element into
+  them.
+
 Concept: std::string mechanics
 - Be able to build a string incrementally by appending pieces (e.g. words
   separated by spaces) inside a loop.
@@ -74,10 +98,15 @@ Concept: parsing structured text
       not solve the reallocation problem, and what fixes it.
 - [ ] Explain why a saved pointer into a vector can become invalid after a
       `push_back`.
+- [ ] List which operations move size() only vs. which can move
+      capacity() too.
+- [ ] Predict size()/capacity() after a reserve/push_back/pop_back/clear/
+      resize sequence.
 - [ ] Describe the "flush the last item" bug pattern and how to fix it.
 - [ ] Trace how a CSV parser should handle an escaped quote (`""`) inside a
       quoted field.
 
 ## Practiced in
 
-`array-foray`, `vector-inspector-corrector`, `string-methods`, `csv-parser`
+`array-foray`, `vector-inspector-corrector`, `string-methods`, `csv-parser`,
+`capacity-chronicles`

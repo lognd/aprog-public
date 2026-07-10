@@ -72,6 +72,7 @@ Activities:
 - `array-foray` -- see why std::array size is fixed at compile time versus std::vector's heap growth
 - `vector-inspector-corrector` -- diagnose and fix excessive std::vector reallocations using reserve
 - `string-methods` -- fix two bugs in a word-wrap function and decode a passcode from the corrected output
+- `capacity-chronicles` -- predict size/capacity output of seven vector programs with reserve-pinned, standard-guaranteed values
 
 Assignments:
 - `csv-parser` -- parse CSV text with quoting/escaping into a nested vector of strings
@@ -307,8 +308,8 @@ Assignments:
 ## 32. Standard Containers p1 (untested)
 
 Activities:
-- `container-casting-call` -- pick vector, deque, list, or array for nine workloads and learn why vector is the sane default
-- `capacity-chronicles` -- predict size/capacity output of seven vector programs with reserve-pinned, standard-guaranteed values
+- `container-casting-call` -- pick vector, deque, list, forward_list, or array for eight workloads, weighted toward list/forward_list's splice and iterator-stability strengths (vector/array covered at row 7 are mentioned, not centered)
+- `splice-circus` -- predict output of seven programs on std::list splice/sort/remove/unique and std::forward_list's before_begin/insert_after/no-size() API
 
 Assignments: none.
 
