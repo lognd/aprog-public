@@ -11,7 +11,8 @@
     "difficulty": "medium",
     "topics": [
       "algorithms",
-      "data-structures"
+      "data-structures",
+      "build-systems"
     ],
     "course": null
   },
@@ -25,5 +26,5 @@
     "visible_tests": "assignments/stats-library/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:b4ae310a8f0a2426e96e2b871bea3cf76b9c2d08fb238dd3d13be00921d64789"
+  "source_hash": "sha256:b9ca37062b2297b2ddc53298330a01153aaa2ed8afbcfd250b7dd2d2a1d7a552"
 }
