@@ -13,7 +13,10 @@ Implement five number-theory utility functions in `number_toolkit.hpp`.
 - Apply the Euclidean algorithm (a fast, ancient method for computing the
   greatest common divisor by repeated division instead of counting down) and
   understand why it is faster than looping from min(a, b)
-- Write iterative (not recursive) Fibonacci to avoid exponential call growth
+- Write iterative Fibonacci -- using a loop instead of a function that calls
+  itself (a technique called recursion, covered in a later topic) -- to avoid
+  exponential call growth (where the number of function calls roughly doubles
+  at every step, quickly becoming far too slow to run)
 
 ## Task
 

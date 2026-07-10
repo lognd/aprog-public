@@ -14,7 +14,9 @@ place.
 ## Learning goals
 
 - Build complex operations (multiply, exponentiate) from simpler primitives (successor, add)
-- Write mutually recursive functions that call each other through a defined interface
+- Write mutually recursive functions (functions that call each other in a
+  chain, rather than a single function calling itself) that call each other
+  through a defined interface
 - Understand how recursion replaces loops when iteration is forbidden
 - Reason about base cases (the input small enough to answer directly, with
   no further recursive call) and recursive cases (every other input, handled
@@ -46,7 +48,9 @@ int exponentiate(int base, int exp);
 A function's contract is the set of rules about what inputs it accepts and
 what it promises to return. A precondition is the part of the contract that
 lists what must be true about the inputs *before* the function is called --
-here, that means the caller must not pass negative numbers.
+here, that means the caller must not pass negative numbers. An edge case is
+an input at the boundary of what a function normally handles (like zero, or
+the smallest allowed value) -- exactly the kind of input where bugs like to hide.
 
 | Function | Precondition | Edge case |
 |---|---|---|
