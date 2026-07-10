@@ -538,10 +538,10 @@ Activities:
 
 Assignments: none.
 
-## 61. Large Projects (planned)
+## 61. Large Projects (covered)
 
-Nothing built yet.
+No artifact. Taught in lecture.
 
-## 62. What's Next (planned)
+## 62. What's Next (covered)
 
-Nothing built yet.
+No artifact. Taught in lecture.
