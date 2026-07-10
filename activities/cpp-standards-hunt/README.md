@@ -9,9 +9,12 @@ the features the code uses.
 
 Your job in this activity is not to understand what the code does. You only
 need to identify the language features it uses, look each one up on
-cppreference to find which standard version introduced it, and set
-`CMAKE_CXX_STANDARD` in `CMakeLists.txt` to the minimum version that covers
-all of them.
+cppreference (a community-maintained reference site documenting the C++
+language and standard library, including which standard version introduced
+each feature) to find which standard version introduced it, and set
+`CMAKE_CXX_STANDARD` -- the CMake variable that tells the compiler which
+version of the C++ language spec to compile against -- in `CMakeLists.txt`
+to the minimum version that covers all of them.
 
 You must find the minimum. Using a higher standard than necessary will not
 unlock the passphrase.

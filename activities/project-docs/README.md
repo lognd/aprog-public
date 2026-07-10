@@ -1,9 +1,14 @@
 # Activity: Project Docs
 
 Every professional software project ships with a set of standard
-documentation files: a README, a license, a changelog, a contributors list,
-a code of conduct, and a security policy. This activity teaches you what
-each file is for and what it conventionally contains.
+documentation files: a README (explains what the project is and how to use
+it), a LICENSE (states the legal terms under which others may use, copy, or
+modify your code), a CHANGELOG (a running log of notable changes between
+released versions), a CONTRIBUTORS list (credits everyone who has worked on
+the project), a CODE_OF_CONDUCT (the rules for how participants should treat
+each other), and a SECURITY policy (instructions for privately reporting
+security vulnerabilities instead of filing a public bug). This activity
+teaches you what each file is for and what it conventionally contains.
 
 ## Concepts covered
 
@@ -50,7 +55,8 @@ All six files pass the validator and the program prints the passphrase.
 
 - Look at the LICENSE file in three popular open-source projects (e.g., Linux,
   React, curl). Which license does each use, and why might they have chosen it?
-- Read the Semantic Versioning specification at semver.org and write a CHANGELOG
-  entry for a hypothetical v1.0.0 release.
+- Read the Semantic Versioning specification at semver.org (a MAJOR.MINOR.PATCH
+  scheme for numbering releases) and write a CHANGELOG entry for a
+  hypothetical v1.0.0 release.
 - Find a project on GitHub whose SECURITY.md links to a private disclosure
   process. What information do they ask reporters to include?
