@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "roster-wrangler",
+    "name": "Roster Wrangler",
+    "author": "lognd",
+    "description": "Six pure functions over a roster of student records: grouping, deduplication, averaging, ranking, and set/tuple-keyed lookups -- practice with Python's list/dict/set/tuple as a toolkit, not just individually."
+  },
+  "classification": {
+    "language": "python",
+    "difficulty": "easy",
+    "topics": [
+      "data-structures"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "python-pytest",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/roster-wrangler",
+    "readme": "assignments/roster-wrangler/README.md",
+    "visible_tests": "assignments/roster-wrangler/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:7ae62cc5e203b8a43dfd87d93b3a4279db716aaad3dc2b43d3da2c7dd84a35b2"
+}
