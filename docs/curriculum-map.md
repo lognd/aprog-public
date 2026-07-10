@@ -313,13 +313,22 @@ Activities:
 Assignments:
 - `word-ledger` -- implement six word-analysis functions over tokenized text using map, unordered_map, and set operations
 
-## 34. Standard Containers p2 (planned)
+## 34. Standard Containers p2 (untested)
 
-Nothing built yet.
+Activities:
+- `adaptor-roundup` -- choose stack, queue, priority_queue, or plain vector per scenario, including the adaptors-cannot-iterate trap
+- `multi-court` -- predict output of seven programs on multiset/multimap duplicate keys and priority_queue pop order
 
-## 35. Iterators (traversals) (planned)
+Assignments: none.
 
-Nothing built yet.
+## 35. Iterators (traversals) (untested)
+
+Activities:
+- `iterator-walk` -- predict output of eight programs walking containers with iterators: fence-post end(), reverse, map ->first/->second, safe erase
+- `invalidation-minefield` -- rule valid or undefined for eight held-iterator scenarios across vector, map, and deque
+
+Assignments:
+- `linked-list-iterators` -- add Iterator/ConstIterator, begin/end, insert_after, and erase_after to a provided linked list so range-for works
 
 ## 36. Proofs & Invariance (planned)
 
