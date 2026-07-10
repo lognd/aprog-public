@@ -13,6 +13,8 @@ one or two lines, each with an output that will surprise you the first time
   C++-like truncating operator) -- Python splits what C++'s `int / int`
   does into two separate operators
 - Python's `int` has no fixed width and never overflows
+  (`pyobject-autopsy` shows the C-level reason: `PyLongObject`'s
+  variable-length `ob_digit` array)
 - names are labels bound to objects, not typed storage slots -- a name can
   be rebound to any type at any time
 - assignment (`b = a`) shares one object between two names, closer to

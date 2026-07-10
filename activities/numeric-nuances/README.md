@@ -7,7 +7,9 @@ activity is seven questions, each built around a tiny snippet, covering
 Python's split of C++'s single `/` into two operators, a rounding rule
 that is not "always round up," integers that never overflow, and the one
 piece of advice worth memorizing even though you will not fully see why
-it matters yet: never use `is` to compare numbers.
+it matters yet: never use `is` to compare numbers. (`pyobject-autopsy`
+covers the C-level reason: the small-int cache is an implementation
+detail, not a guarantee, unlike the `None`/`True`/`False` singletons.)
 
 ## Concepts covered
 
