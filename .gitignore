@@ -227,3 +227,10 @@ __marimo__/
 .streamlit/secrets.toml
 /.testmondata-wal
 /.testmondata-shm
+
+# Agent-local working notes -- not part of the published repo
+CLAUDE.md
+**/CLAUDE.md
+FINDINGS*.md
+findings*.md
+TODO.md
