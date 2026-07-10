@@ -13,14 +13,32 @@ provided lightweight testing harness.
 
 - Implement descriptive statistics (mean, median, mode, variance, stddev, range) from scratch
 - Organize a C++ project as a multi-target CMake build: one library, one test executable
-- Write your own test suite using a provided harness, including edge cases and error conditions
-- Throw `std::invalid_argument` at the correct boundary and distinguish population vs sample statistics
+- Write your own test suite using a provided harness, including edge cases
+- Signal an undefined result at a function boundary using a sentinel value,
+  and distinguish population vs sample statistics
 
 ## Task
 
 Implement all eight functions declared in `include/stats.hpp` inside
-`src/statslib/stats.cpp`.  Each function must throw `std::invalid_argument`
-when given an empty vector.
+`src/statslib/stats.cpp`.  Statistics are undefined on an empty vector, so
+each function must signal that instead of computing garbage:
+
+- The seven functions that return `double` (`mean`, `median`, `variance`,
+  `stddev`, `minimum`, `maximum`, `range`) return
+  `std::numeric_limits<double>::quiet_NaN()` when `data` is empty.
+- `mode` returns an empty `std::vector<double>` when `data` is empty --
+  there are no modes of nothing, so an empty result is already the natural
+  sentinel.
+
+Remember `#include <limits>` to get `std::numeric_limits`.  NaN never
+compares equal to anything, including itself, so callers (and your tests)
+must check for it with `std::isnan(x)` (from `<cmath>`), never `x == NaN`.
+
+Later in the course you will learn better error-signaling mechanisms for
+situations like this -- exceptions (`std::invalid_argument`) and
+`std::optional` -- and revisit why a sentinel value like NaN is a limited
+tool: it only works for types that have a value to spare, and it is easy for
+a caller to forget to check for it.
 
 ```cpp
 namespace stats {
@@ -118,7 +136,9 @@ g++ -std=c++17 -I include -I src \
 - Use C++17.
 - Do not modify `include/stats.hpp` or `src/testing_harness/harness.hpp`.
 - Do not rename the CMake targets `statslib` or `stats_tests`.
-- Every function must throw `std::invalid_argument` on empty input.
+- On empty input, `mean`, `median`, `variance`, `stddev`, `minimum`,
+  `maximum`, and `range` return `std::numeric_limits<double>::quiet_NaN()`;
+  `mode` returns an empty vector. Do not throw.
 - `median` must sort a copy of the input, not the original.
 - `mode` must return results sorted in ascending order.
 - `variance` and `stddev` are population statistics (divide by n, not n-1).
