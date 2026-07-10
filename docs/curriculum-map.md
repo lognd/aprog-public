@@ -272,13 +272,21 @@ Activities:
 
 Assignments: none.
 
-## 29. List ADT & Supporting DS (planned)
+## 29. List ADT & Supporting DS (untested)
 
-Nothing built yet.
+Activities:
+- `list-tradeoff-tribunal` -- pick the right backing structure (dynamic array vs linked list) for nine workload scenarios
+- `index-vs-node` -- count element shifts vs pointer hops for the same operations on an array list and a linked list
 
-## 30. Linked List (operations, build your own) (planned)
+Assignments: none.
 
-Nothing built yet.
+## 30. Linked List (operations, build your own) (untested)
+
+Activities:
+- `link-tracer` -- predict traversal output of six programs that splice, reverse, and break raw linked-list nodes by hand
+
+Assignments:
+- `linked-list-from-scratch` -- implement a templated singly linked list with the full Big 5, O(1) push_back and size, graded under ASan and Valgrind
 
 ## 31. Stack, Queue, Deque (ADT) (planned)
 
