@@ -10,9 +10,12 @@ Status legend:
 - planned -- designed but not built
 - covered -- taught in lecture, no artifact needed
 
-## 1. Ethics (covered)
+## 1. Ethics (untested)
 
-No artifact.
+Activities: none.
+
+Assignments:
+- `ai-vector-i` -- "vibe-code" a fix for a broken AI-generated VectorI class using an AI assistant; the point is experiencing (and reflecting on) shipping code you do not understand
 
 ## 2. Environment Setup (done)
 
@@ -230,10 +233,7 @@ Assignments:
 
 ## 25. Dynamic Memory (Big 5, move semantics) (planned)
 
-Activities: none yet.
-
-Assignments:
-- `ai-vector-i` -- fix a buggy AI-generated VectorI dynamic array class so it correctly implements the Rule of Five
+Nothing built yet.
 
 ## 26. Memory & Profiling Tools (valgrind, asan, perf, gprof) (planned)
 
