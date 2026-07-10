@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "word-ledger",
+    "name": "Word Ledger",
+    "author": "lognd",
+    "description": "Implement a small text-analysis toolkit over a vector of already-tokenized words, exercising std::map, std::unordered_map, std::set, and std::unordered_set: frequency counting, first-occurrence lookup, deduplication, set operations, and a top-k report."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "data-structures",
+      "strings",
+      "algorithms"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/word-ledger",
+    "readme": "assignments/word-ledger/README.md",
+    "visible_tests": "assignments/word-ledger/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:9599c211241b2bb655fb08d254b8018d4b8470bc9fb63e338b20588faadef201"
+}
