@@ -14,8 +14,9 @@ This activity installs and configures three tools:
   It records every change you make as a "commit" and lets you browse,
   share, and revert your project history.
 - **GitHub** -- the website that hosts your git repositories in the
-  cloud. You push commits here so they are backed up and can be
-  submitted for grading.
+  cloud. A repository (or "repo") is a project folder that git is
+  tracking the history of. You push commits here so they are backed
+  up and can be submitted for grading.
 - **gh** (GitHub CLI) -- an official command-line tool that
   authenticates git with GitHub, lets you clone and create
   repositories, and opens pull requests from the terminal.

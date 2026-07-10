@@ -5,8 +5,14 @@
 > Next: [2. Python](../env-setup-python/)
 
 You need a Linux or macOS terminal before anything else in this course
-will work. This activity walks you through getting one and verifies it
-by having you run a small binary that prints a passphrase.
+will work. A terminal is a text-based window where you type commands
+and read their output, instead of clicking icons; the program that
+actually reads your typed commands and runs them is called a shell
+(examples: bash, zsh). People often use "terminal" and "shell"
+interchangeably. This activity walks you through getting one and
+verifies it by having you run a small binary -- a compiled, ready-to-run
+program (as opposed to source code you would have to build yourself)
+-- that prints a passphrase.
 
 <details>
 <summary>Why does this course require Linux/Unix?</summary>
@@ -215,9 +221,11 @@ moves the shell into that folder, so subsequent commands run there.
 
 The `./` prefix means "in the current directory." When you type a
 bare name like `shell-check`, the shell does NOT search the current
-directory -- it only searches the directories listed in PATH. Adding
-`./` explicitly tells it "run this file right here, not something from
-PATH." This is a deliberate safety feature: it prevents a malicious
+directory -- it only searches the directories listed in PATH (a list
+of folders the shell checks for programs by name; explained fully in
+the "Understanding PATH" section below). Adding `./` explicitly tells
+it "run this file right here, not something from PATH." This is a
+deliberate safety feature: it prevents a malicious
 file named `ls` or `cd` in the current folder from silently replacing
 a system command.
 

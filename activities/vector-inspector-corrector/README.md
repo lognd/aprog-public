@@ -1,9 +1,12 @@
 # Activity: Vector Inspector & Corrector
 
 A `std::vector` stores its elements in a block of memory called a buffer.
-As you add elements with `push_back`, the vector occasionally needs more
-room.  When that happens it allocates a brand-new buffer, copies every
-existing element into it, and frees the old one.  This is called a
+A vector tracks two separate numbers: its **size** (how many elements it
+currently holds) and its **capacity** (how many elements the current buffer
+has room for before it runs out of space).  As you add elements with
+`push_back`, size grows toward capacity.  Once size would exceed capacity,
+the vector needs more room: it allocates a brand-new, bigger buffer, copies
+every existing element into it, and frees the old one.  This is called a
 **reallocation**.
 
 The program in this activity is causing more reallocations than necessary.
@@ -40,8 +43,11 @@ happening that often.
 
 ### Step 2 -- read the documentation
 
-The program uses `reserve`.  Read what it does and, crucially, what the
-**Notes** section says about when and how it should be called:
+The program uses `reserve`, which asks the vector to grow its buffer's
+capacity to at least a given number of elements right away, without
+changing its size or adding any elements.  Read what it does and,
+crucially, what the **Notes** section says about when and how it should
+be called:
 
 > https://en.cppreference.com/cpp/container/vector/reserve
 
