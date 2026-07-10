@@ -73,7 +73,7 @@ dev = [
 requires-dist = [
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "jinja2", specifier = ">=3.1.0" },
-    { name = "lograder", editable = "../lograder" },
+    { name = "lograder", specifier = ">=0.3.8" },
     { name = "pydantic", specifier = ">=2.12.0" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.0" },
@@ -286,7 +286,7 @@ wheels = [
 [[package]]
 name = "lograder"
 version = "0.3.8"
-source = { editable = "../lograder" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansi2html" },
     { name = "colorama" },
@@ -299,25 +299,10 @@ dependencies = [
     { name = "tree-sitter-python" },
     { name = "types-colorama" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "ansi2html", specifier = ">=1.9.2" },
-    { name = "colorama", specifier = ">=0.4.6" },
-    { name = "pydantic", specifier = ">=2.12.0" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "pytest-xdist", marker = "extra == 'dev'" },
-    { name = "ruff", marker = "extra == 'dev'" },
-    { name = "strenum", marker = "python_full_version < '3.11'", specifier = ">=0.4.15" },
-    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.0" },
-    { name = "tree-sitter", specifier = ">=0.22" },
-    { name = "tree-sitter-c", specifier = ">=0.21" },
-    { name = "tree-sitter-cpp", specifier = ">=0.23" },
-    { name = "tree-sitter-python", specifier = ">=0.23" },
-    { name = "ty", marker = "extra == 'dev'" },
-    { name = "types-colorama", specifier = ">=0.4.15" },
+sdist = { url = "https://files.pythonhosted.org/packages/2d/67/6447ef90bb5fb417f9039d4cac568fc41c954a89715a197954fb04558cda/lograder-0.3.8.tar.gz", hash = "sha256:d88e1f398653d5bfd7aebe3a7f34b04e8918d07a3f37e57f5ed81e5623d79de5", size = 125954, upload-time = "2026-07-10T20:31:50.131Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/9e/0df79b806387761a9446840a4f2479fd4b58f00ec6fb586c7907faf3e20f/lograder-0.3.8-py3-none-any.whl", hash = "sha256:b81a41c966517ffe65f44c8b315c0767cd5c84da0e016f0dcfe854d0b54e60ec", size = 193630, upload-time = "2026-07-10T20:31:48.667Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "markdown-it-py"

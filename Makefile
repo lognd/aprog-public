@@ -100,3 +100,7 @@ verify-$(1):
 endef
 
 $(foreach slug,$(SLUGS),$(eval $(call SLUG_RULES,$(slug))))
+
+# Overlay a local editable lograder for hacking on both repos at once.
+dev-local: dev
+	@$(UV) pip install -e "$(LOGRADER)"
