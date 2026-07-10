@@ -76,7 +76,8 @@ This works, but it has real costs:
 
 A flat `int*` is strictly better for a dense, fixed-size matrix:
 - One allocation, one free.
-- All elements are contiguous -- the CPU prefetcher loves this.
+- All elements are contiguous -- the CPU prefetcher (hardware that guesses
+  which memory you will read next and fetches it ahead of time) loves this.
 - No extra pointer indirection.
 - The only cost is that you compute `r * cols + c` yourself instead of letting
   `[][]` hide it.
@@ -247,7 +248,7 @@ The autograder checks this with a source scan.  Every element access must use
 pointer arithmetic and explicit dereference: `*(ptr + offset)`.
 
 You may use standard headers (`<cstdio>`, `<iostream>`, `<cstring>`, etc.).
-You may not use STL containers (`std::vector`, `std::array`, etc.); all
+You may not use STL (Standard Template Library) containers (`std::vector`, `std::array`, etc.); all
 matrices are passed in as raw `int*` pointers allocated by the caller.
 
 ---

@@ -15,8 +15,9 @@ provided lightweight testing harness.
 - Organize a C++ project as a multi-target CMake build: one library, one test executable
 - Write your own test suite using a provided harness, including edge cases
 - Signal an undefined result at a function boundary using a sentinel value
-  (a special, reserved value like NaN that stands in for "no valid answer"
-  instead of a real result), and distinguish population vs sample statistics
+  (a special, reserved value like NaN -- "Not a Number", a bit pattern that
+  stands in for "no valid answer" instead of a real result), and distinguish
+  population vs sample statistics
 
 ## Task
 

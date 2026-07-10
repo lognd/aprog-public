@@ -94,7 +94,8 @@ CMake is declarative: you describe what to build and how targets relate to
 each other, not how to invoke the compiler. The `target_link_libraries` and
 `target_include_directories` calls propagate include paths and flags
 automatically. CMake turns the description into build commands appropriate
-for the platform and generator -- Makefiles on Linux, Ninja files if
+for the platform and generator (a generator is the specific tool CMake emits
+build instructions for) -- Makefiles on Linux, Ninja files if
 requested, project files on Windows.
 
 ---

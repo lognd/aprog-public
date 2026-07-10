@@ -16,7 +16,10 @@ place.
 - Build complex operations (multiply, exponentiate) from simpler primitives (successor, add)
 - Write mutually recursive functions that call each other through a defined interface
 - Understand how recursion replaces loops when iteration is forbidden
-- Reason about base cases and recursive cases for arithmetic functions
+- Reason about base cases (the input small enough to answer directly, with
+  no further recursive call) and recursive cases (every other input, handled
+  by calling the function again on a smaller piece of the problem) for
+  arithmetic functions
 
 ## Task
 
