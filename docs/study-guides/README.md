@@ -32,16 +32,22 @@ concept, one bullet per fact/skill, each starting with an imperative
 - Know <fact stated fully, self-contained, slide-ready>
 - Be able to <skill, concrete>
 
-## Per-artifact requirements
-
-### <slug> (activity|assignment)
-- Requires: <comma-separated knowledge items, each tagged [taught] or [assumed: row K]>
-- Produces: <what completing it proves the student can do, one line>
-
 ## Study checklist
 
 - [ ] <short imperative item a student can self-test>
+
+## Practiced in
+
+One line only: the module's activities and assignments as backticked slugs.
 ```
+
+Guides are organized module-by-module: the knowledge inventory is the
+MODULE's, synthesized across all of its artifacts and merged by concept --
+never broken out artifact-by-artifact.
+
+Only modules with built artifacts get a guide. Incomplete rows (planned,
+nothing built, or covered-in-lecture-only) get no file until their
+artifacts exist.
 
 Rules: ASCII only; no answers or passphrases from any activity may appear
 in a guide; knowledge items must be derived from the artifacts' actual
