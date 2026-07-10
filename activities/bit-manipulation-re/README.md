@@ -2,10 +2,12 @@
 
 Five mystery functions. No running the code.
 
-Each function uses bitwise operators to compute something -- isolating a bit,
-counting set bits, swapping bytes, encoding a value. Your job is to trace
-through each one by hand, using binary arithmetic, and predict exactly what
-it returns for a given input.
+Each function uses bitwise operators (operators that act on the individual
+0/1 bits of a number, rather than on its value as a whole) to compute
+something -- isolating a bit, counting set bits (bits equal to 1), swapping
+bytes, encoding a value. Your job is to trace through each one by hand,
+using binary arithmetic, and predict exactly what it returns for a given
+input.
 
 Wrong answers come with a full explanation. You must get all five correct to
 receive the passphrase.
@@ -14,9 +16,16 @@ receive the passphrase.
 
 You should be comfortable with:
 
-- Two's-complement negation: to negate x, flip all bits then add 1.
-- Bitwise AND, OR, XOR, and NOT.
-- Left and right shifts (`<<`, `>>`).
+- Two's complement (the standard way computers store negative integers,
+  where the sign is baked into the bit pattern itself). Two's-complement
+  negation: to negate x, flip all bits then add 1.
+- Bitwise AND, OR, XOR, and NOT: operators that combine two numbers (or, for
+  NOT, flip one number) one bit at a time -- AND is 1 only if both bits are
+  1, OR is 1 if either bit is 1, XOR is 1 if the bits differ, NOT flips
+  every bit.
+- Left and right shifts (`<<`, `>>`): slide every bit some number of places
+  left or right, filling the vacated positions with 0 (for a left shift or
+  an unsigned right shift).
 - Converting between decimal, binary, and hex.
 
 If any of those feel shaky, review them before starting -- the questions

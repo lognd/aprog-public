@@ -22,7 +22,11 @@ these rules:
 - Integer literal suffixes select a wider type: `LL` forces `long long`.
 - `signed`/`unsigned` variants of a type are always the same size as each
   other -- only the interpretation of the bits changes, never the width.
-- `int` is 4 bytes on every common 32-bit and 64-bit platform (ILP32, LP64, LLP64).
+- `int` is 4 bytes on every common 32-bit and 64-bit platform. These
+  platforms are grouped into "data models" -- naming conventions for how
+  many bytes the basic types use: ILP32 (Int, Long, Pointer all 32-bit),
+  LP64 (Long, Pointer 64-bit, but `int` stays 32-bit), and LLP64 (only
+  `long long` and Pointer are 64-bit).
 - `long` is 8 bytes on 64-bit Linux/macOS (LP64) but 4 bytes on 64-bit Windows (LLP64).
 - `long long` is guaranteed to be at least 8 bytes everywhere since C++11.
 
