@@ -19,7 +19,7 @@ Status: `done` = committed, `planned` = designed but not built, `wip` = in progr
 | C-Style Strings & Arrays | cstring-predictor, char-by-char, cstring-whodunit, cstring-vs-stdstring                                                       | sentence-tools                 | untested             |
 | Const | const-maze, const-contract, const-refactor                                                                                    | const-qualifier-toolkit        | untested             |
 | Command Line Arguments | argv-explorer, cli-contract                                                                                                   | connect-four                   | untested             |
-| Basic OS Theory | posix-file-tour, file-io-contracts, write-your-first-syscalls                                                                 | hex-dump                       | planned              |
+| Basic OS Theory | posix-file-tour, file-io-contracts, write-your-first-syscalls                                                                 | hex-dump                       | untested             |
 | Streams & Files | iostream-interceptor, sstream-formatter, text-stream-surgery, binary-stream-explorer                                          | log-analyzer                   | done                 |
 | Testing Tools (Catch2, gtest, gdb) | catch2-tour, gtest-tour, catch2-first-contact, gtest-cmake-lab, gdb-time-machine                                              | html-parser                    | untested             |
 | Programming Paradigms | --                                                                                                                            | --                             | planned              |
