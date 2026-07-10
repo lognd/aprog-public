@@ -250,6 +250,7 @@ Assignments:
 Activities:
 - `big5-tracer` -- predict which special member functions run in nine instrumented programs (copies, moves, elision, std::move)
 - `rule-of-five-whodunit` -- diagnose what goes wrong in seven resource-managing classes with missing or broken special members
+- `value-category-taxonomy` -- classify lvalue/xvalue/prvalue expressions and learn how value category drives which special member overload resolution picks
 
 Assignments: none yet.
 
