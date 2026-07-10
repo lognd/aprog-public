@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "tiny-ledger-api",
+    "name": "Tiny Ledger API",
+    "author": "lognd",
+    "description": "A small Flask web server implementing an in-memory ledger of items behind five REST routes (GET /items, GET /items/<id>, POST /items, DELETE /items/<id>, PUT /items/<id>), built with the app factory pattern so every test gets a fresh, isolated ledger -- graded via Flask's test_client for exact status codes, exact error bodies, id sequencing, and PUT-replaces-not-merges semantics, with no real network traffic."
+  },
+  "classification": {
+    "language": "python",
+    "difficulty": "medium",
+    "topics": [
+      "web-servers"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "python-pytest",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/tiny-ledger-api",
+    "readme": "assignments/tiny-ledger-api/README.md",
+    "visible_tests": "assignments/tiny-ledger-api/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:4a29b6cc127687baf850489856d2f0019f42a9dfb1294fae4d21461794ee7172"
+}
