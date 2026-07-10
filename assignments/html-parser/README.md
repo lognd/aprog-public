@@ -1,10 +1,15 @@
 # HTML Parser
 
-You will implement a minimal HTML parser in C++ and write a Catch2 test suite
-that covers every edge case the spec describes.  This assignment has two graded
-components that are roughly equal in weight: the correctness of your parser and
-the quality of your tests.  A parser that passes the staff's hidden tests but
-has a thin test suite will lose points, and vice versa.
+You will implement a minimal HTML parser in C++ and write a **test suite**
+(a Catch2 program made up of many small `TEST_CASE`s, each checking one
+behavior) that covers every **edge case** the spec describes -- an edge
+case is an input at the boundary of what the spec covers (empty strings,
+malformed tags, nesting) rather than a typical, easy input.  This
+assignment has two graded components that are roughly equal in weight: the
+correctness of your parser and the quality of your tests.  A parser that
+passes the staff's hidden tests (tests the course staff wrote and kept
+private, so you cannot simply write your parser to match them) but has a
+thin test suite will lose points, and vice versa.
 
 ## Overview
 
@@ -26,7 +31,10 @@ activities.
 - Apply case-insensitive string comparison to tag names
 - Distinguish open tags from close tags
 - Organize a Catch2 test suite with named `TEST_CASE`s and tags
-- Think adversarially: what inputs break a naive implementation?
+- Think adversarially (deliberately look for inputs that break your code,
+  the way an attacker or a strict grader would): what inputs break a
+  **naive implementation** (a straightforward first attempt that handles
+  the common case but has not been checked against tricky inputs)?
 
 ---
 
