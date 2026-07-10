@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "linked-list-iterators",
+    "name": "Linked List Iterators",
+    "author": "lognd",
+    "description": "Add a forward iterator to the LinkedList<T> you built last assignment: a nested Iterator/ConstIterator class wrapping a Node*, begin()/end() to make range-for work, and insert_after/erase_after/find_it, the classic singly-linked positional operations built on top of it."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "data-structures",
+      "linked-lists",
+      "memory-management"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/linked-list-iterators",
+    "readme": "assignments/linked-list-iterators/README.md",
+    "visible_tests": "assignments/linked-list-iterators/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:81352549275c1234ee6d44e8184333ccac3fa9c39f8a71f7435115eec290dc6f"
+}
