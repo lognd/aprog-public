@@ -1,0 +1,24 @@
+[assignment]
+slug        = "sfml-canvas"
+name        = "SFML Canvas"
+author      = "lognd"
+description = "Manipulate pixels directly with sf::Image: gradients, checkerboards, a filled circle, alpha blending, and a rectangle outline -- no window required."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["graphics"]
+concepts   = ["sfml", "cmake"]
+labels     = ["starter-code", "unit-tests"]
+
+[template]
+slug = "cpp-cmake"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "libsfml-dev"]

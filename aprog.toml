@@ -95,8 +95,14 @@ name = "Scientific Computing"
 [classification.topics.web-servers]
 name = "Web Servers"
 
+[classification.topics.graphics]
+name = "Graphics"
+
 [classification.concepts.makefile]
 name = "Makefile"
+
+[classification.concepts.sfml]
+name = "SFML"
 
 [classification.concepts.cmake]
 name = "CMake"
