@@ -1,0 +1,95 @@
+# Study Guide 25: Dynamic Memory (Big 5, move semantics)
+
+This module makes the compiler's silent special-member calls visible --
+which of the Big Five runs when an object is constructed, copied, moved,
+assigned, or destroyed -- and then trains the Rule of Five judgment needed
+to diagnose the classic resource-management bugs (shallow copy, double
+delete, leaks, dangling pointers, self-assignment).
+
+## Know before you start
+
+- Constructor/destructor lifetimes, scope-based destruction, and reverse
+  destruction order [assumed: row 21 -- OOP Implementation in C++]
+- Heap allocation with `new`/`delete` and manual lifetime control
+  [assumed: row 10 -- Memory Model]
+- Deleted copy operations as a fix for double-close/double-free of an
+  owned resource [assumed: row 21 -- OOP Implementation in C++]
+- Pass-by-value vs. pass-by-reference [assumed: row 11 -- Pointers]
+
+## Taught here
+
+Concept: the Big Five and when each runs
+- Know the Big Five special member functions: copy constructor, move
+  constructor, copy-assignment operator, move-assignment operator, and
+  destructor (alongside ordinary constructors), and that the compiler
+  calls them silently whenever objects are constructed, copied, moved,
+  assigned, or destroyed.
+- Know the constructor-vs-assignment rule: a constructor runs when a NEW
+  object comes into existence (`Tracer b = a;` with `b` freshly declared);
+  an assignment operator runs when an ALREADY-EXISTING object is
+  overwritten (`b = a;` with `b` declared earlier).
+- Know that `std::move(x)` is a cast, not an action: it marks `x` as
+  disposable so overload resolution selects the move constructor or
+  move-assignment instead of the copy versions -- the actual "stealing"
+  happens inside whichever move member runs.
+- Know that C++17 guarantees copy elision for `return SomeType(...);` (a
+  prvalue returned directly): the value is constructed straight into the
+  caller's storage with no move at all, whereas returning a named local
+  only permits (does not require) eliding the move.
+- Know that passing by `const&` performs no copy, while passing by value
+  runs the copy (or move) constructor for the parameter.
+- Know that destructors run in the reverse order of construction for
+  objects in the same scope, and that exact output prediction requires
+  tracking every construction, copy, move, assignment, and destruction in
+  order.
+
+Concept: the Rule of Three / Rule of Five
+- Know the rule: if a class needs a user-defined destructor, copy
+  constructor, or copy-assignment operator (the Rule of Three), it very
+  likely needs all of them -- plus, since C++11, the move constructor and
+  move-assignment (the Rule of Five).
+- Know that a compiler-generated copy member copies every field
+  field-by-field; for a raw pointer member that means copying the numeric
+  address -- a shallow copy leaving two objects pointing at the same
+  memory -- which is almost never correct for a resource-owning class.
+- Know a deep copy allocates fresh memory and copies the pointed-to data,
+  so each object owns its own resource.
+
+Concept: the classic resource-management bugs
+- Know double delete: `delete`/`delete[]` called twice on the same
+  address, typically because a shallow copy left two destructors owning
+  one allocation.
+- Know memory leak: allocated memory that nothing ever frees, typically
+  because an assignment operator overwrote an owning pointer without
+  freeing what it previously held.
+- Know dangling pointer: a pointer left referring to memory that has
+  already been freed, so any later use reads or writes freed storage.
+- Know the self-assignment bug: a naive `operator=` that frees its own
+  data before reading from `other` corrupts itself when `other` is
+  `*this` (which can happen indirectly through references or container
+  operations); the guard is `if (this == &other) return *this;` at the
+  top.
+- Know that a move constructor must leave the source object in a state
+  its destructor can safely handle -- usually by nulling out the stolen
+  pointer member -- or the source's destructor frees the memory the new
+  owner now holds.
+- Be able to read a resource-managing class, determine which of the five
+  members are missing (and thus compiler-generated shallow versions), and
+  diagnose which failure results -- including recognizing when a class is
+  actually correct.
+
+## Study checklist
+
+- [ ] Given a snippet, predict the exact sequence of
+      ctor/copy/move/assign/dtor lines it prints.
+- [ ] State the difference between `Tracer b = a;` and `b = a;` on a later
+      line.
+- [ ] Explain what `std::move` does and does not do.
+- [ ] Explain guaranteed copy elision and when it does not apply.
+- [ ] For a class with a raw pointer member and only a destructor
+      user-defined, name the bug that copying it produces.
+- [ ] Write the self-assignment guard and explain the failure it prevents.
+
+## Practiced in
+
+`big5-tracer`, `rule-of-five-whodunit`
