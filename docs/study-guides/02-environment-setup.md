@@ -2,8 +2,8 @@
 
 This module gets your machine ready for the entire course: a Unix-like
 shell, Python plus its tooling, two C/C++ compiler families, the CMake and
-Make build tools, an IDE, the class Discord, and git/GitHub. Every later
-row assumes all seven of these activities are complete.
+Make build tools, SFML, an IDE, git/GitHub, and the class Discord. Every
+later row assumes all eight of these activities are complete.
 
 ## Know before you start
 
@@ -70,6 +70,16 @@ Concept: build tools
   build files (Makefiles on Linux/macOS, Visual Studio projects on
   Windows).
 
+Concept: SFML
+- Know that SFML (Simple and Fast Multimedia Library) is a C++ library
+  for 2D graphics, windows, audio, and input, used by this course's
+  project.
+- Know that having SFML's headers present is not enough: the program
+  must also link against SFML's compiled library files (via `-l` flags
+  such as `-lsfml-graphics -lsfml-system`) and actually run, which is
+  why this activity's verification compiles, links, and runs a small
+  `sf::Image` program instead of just checking for headers.
+
 Concept: IDE
 - Know that an IDE (Integrated Development Environment) differs from a
   plain text editor by understanding your code: inline error checking,
@@ -96,4 +106,4 @@ Concept: git and GitHub
 
 ## Practiced in
 
-`env-setup-shell`, `env-setup-python`, `env-setup-compiler`, `env-setup-build-tools`, `env-setup-ide`, `env-setup-discord`, `env-setup-git`
+`env-setup-shell`, `env-setup-python`, `env-setup-compiler`, `env-setup-build-tools`, `env-setup-sfml`, `env-setup-ide`, `env-setup-git`, `env-setup-discord`

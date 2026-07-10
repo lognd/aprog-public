@@ -24,9 +24,10 @@ Activities:
 - `env-setup-python` -- install Python 3 and the course's Python tooling (uv, ruff, ty, pytest)
 - `env-setup-compiler` -- install both GCC/G++ and Clang/Clang++ compiler toolchains
 - `env-setup-build-tools` -- install CMake and Make, the course's build system tools
+- `env-setup-sfml` -- install SFML and verify a real sf::Image compile-link-run test
 - `env-setup-ide` -- install and configure an IDE (CLion, PyCharm, or VS Code)
-- `env-setup-discord` -- join the class Discord server and set a real-name nickname
 - `env-setup-git` -- install and configure git, GitHub, and the gh CLI
+- `env-setup-discord` -- join the class Discord server and set a real-name nickname
 
 Assignments: none.
 
