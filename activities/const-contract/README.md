@@ -27,9 +27,10 @@ files, recompile, and verify the output one at a time. When all five programs
 compile and produce the correct output, the launcher detects this and reveals
 the passphrase.
 
-The launcher also checks that you did not use `const_cast` anywhere. That would
-technically silence the compiler, but it defeats the purpose -- the point is to
-fix the type, not to cast it away.
+The launcher also checks that you did not use `const_cast` (an operator that
+forcibly strips `const` from a pointer or reference so you can write through it
+anyway) anywhere. That would technically silence the compiler, but it defeats
+the purpose -- the point is to fix the type, not to cast the promise away.
 
 ## Getting started
 

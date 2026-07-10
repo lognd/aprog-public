@@ -10,8 +10,9 @@ have to be consistent end to end.
 
 This activity starts you with a working, const-free 2D character grid library.
 The code compiles and runs correctly -- but the function signatures make no
-promises. A script called `./lint.sh` flags every location where `const` could
-legally be added. Your job is to add qualifiers one site at a time, recompile
+promises. A script called `./lint.sh` -- a linter, a program that scans source code for
+style or correctness issues without compiling it -- flags every location where
+`const` could legally be added. Your job is to add qualifiers one site at a time, recompile
 after each, and follow the propagation wherever it leads.
 
 This is also a preview of the grid library you will implement from scratch in the

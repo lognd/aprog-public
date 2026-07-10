@@ -76,8 +76,10 @@ counter = 42;                // perfectly legal: counter is still mutable
 ```
 
 `constinit` was introduced to prevent the static initialization order
-fiasco: when two global variables in different translation units depend on
-each other, initialization order is undefined. `constinit` ensures no
+fiasco: when two global variables in different translation units (the
+separate `.cpp` files the compiler processes one at a time, each becoming
+its own object file before linking) depend on each other, initialization
+order is undefined. `constinit` ensures no
 dynamic initialization is needed, eliminating the hazard.
 
 ## Concepts covered
@@ -108,8 +110,9 @@ All eleven questions are correct and the program prints the passphrase.
 
 ## Going further
 
-- Look up the "east const" convention (`int const*` instead of `const int*`)
-  and read the arguments for and against it.
+- Look up the "east const" convention (writing `int const*` instead of
+  `const int*` so the qualifier always reads left-to-right after the type
+  it applies to) and read the arguments for and against it.
 - Why can a `const` reference bind to a temporary (`const int& r = 5;`) but
   a non-const reference cannot? (This will be super important for something
   called the "Big 5" later on!)
