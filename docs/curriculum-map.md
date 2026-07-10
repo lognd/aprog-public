@@ -221,16 +221,20 @@ Activities:
 Assignments:
 - `media-library` -- design an abstract MediaItem base class and derived Book/Film/Album types cataloged by a Library class
 
-## 23. Polymorphism (Interfaces, Templating) (wip)
+## 23. Polymorphism (Interfaces, Templating) (untested)
 
-Activities: none yet.
+Activities:
+- `dispatch-detective` -- predict output of seven programs to learn when C++ binds a call at compile time vs run time
+- `duck-or-vtable` -- compare interface-based and template-based versions of the same code and answer what each can and cannot do
 
 Assignments:
 - `text-filters` -- implement four text filters twice: once via a virtual TextFilter interface, once via duck-typed templates
 
-## 24. Design Patterns (wip)
+## 24. Design Patterns (untested)
 
-Activities: none yet.
+Activities:
+- `smell-hunt` -- name the code smell in nine working-but-rotting snippets and learn which refactor fixes each
+- `pattern-matcher` -- match requirement scenarios to the right design pattern, including two where no pattern is needed
 
 Assignments:
 - `pattern-toolkit` -- implement Strategy, Observer, and Template Method patterns using non-owning base pointers, no dynamic memory
