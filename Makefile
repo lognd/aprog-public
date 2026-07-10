@@ -1,25 +1,8 @@
-VENV := .venv/bin
-VENV_PY := $(VENV)/python
-
-ifeq ($(wildcard $(VENV_PY)),)
-PYTHON := python3
-PIP    := pip3
-BLACK  := black
-RUFF   := ruff
-MYPY   := mypy
-ISORT  := isort
-PYTEST := pytest
-else
-PYTHON := $(VENV_PY)
-PIP    := $(VENV)/pip3
-BLACK  := $(VENV)/black
-RUFF   := $(VENV)/ruff
-MYPY   := $(VENV)/mypy
-ISORT  := $(VENV)/isort
-PYTEST := $(VENV)/pytest
-endif
-
-LOGRADER ?= ../lograder
+UV     := uv
+PYTEST := $(UV) run pytest
+RUFF   := $(UV) run ruff
+TY     := $(UV) run ty
+APROG  := .venv/bin/aprog
 
 PRIVATE ?= ../aprog-private
 
@@ -27,39 +10,29 @@ SLUGS          := $(notdir $(wildcard assignments/*))
 ZIPS           := $(patsubst %,dist/%-gradescope.zip,$(SLUGS))
 VERIFY_TARGETS := $(patsubst %,verify-%,$(SLUGS))
 
-.PHONY: all venv install dev uninstall check lint format typecheck test \
+.PHONY: all install dev check lint format typecheck test \
         test-verbose test-fast test-verbose-fast test-unit test-integration test-system \
         version self-esteem clean zips verify hashes $(VERIFY_TARGETS)
 
-all: uninstall dev check test
+all: dev check test
 
-venv:
-	python3 -m venv .venv
+install:
+	@$(UV) sync --no-group dev
 
-uninstall:
-	@$(PIP) uninstall -y aprog 2>/dev/null || true
+dev:
+	@$(UV) sync
 
-install: venv
-	@$(PIP) install -e "$(LOGRADER)" -e .
-
-dev: venv
-	@$(PIP) install -e "$(LOGRADER)" -e ".[dev]"
-
-check:
-	@$(BLACK) src/ tests/
-	@$(RUFF) format src/ tests/
-	@$(ISORT) src/ tests/
-	@$(MYPY) --config-file mypy.ini src/ tests/
+check: format lint typecheck
 
 lint:
 	@$(RUFF) check src/ tests/
 
 format:
-	@$(BLACK) src/ tests/
-	@$(ISORT) src/ tests/
+	@$(RUFF) format src/ tests/
+	@$(RUFF) check --fix src/ tests/
 
 typecheck:
-	@$(MYPY) --config-file mypy.ini src/ tests/
+	@$(TY) check src/
 
 test:
 	@$(PYTEST)
@@ -86,13 +59,10 @@ test-system:
 	@$(PYTEST) tests/system/ -v -s -m "slow" --no-testmon
 
 version:
-	@$(PYTHON) --version
-	@$(PIP) --version
+	@$(UV) --version
 	@$(PYTEST) --version
-	@$(BLACK) --version
 	@$(RUFF) --version
-	@$(ISORT) --version
-	@$(MYPY) --version
+	@$(TY) --version
 
 self-esteem:
 	@cloc --vcs=git src/
@@ -107,13 +77,13 @@ zips: $(ZIPS)
 
 hashes:
 	find . -type d \( -name ".claude" -o -name ".git" -o -name ".idea" -o -name ".mypy_cache" -o -name ".pytest_cache" -o -name ".ruff_cache" -o -name ".venv" \) -prune -o -type f -exec dos2unix {} +
-	$(VENV)/aprog generate-config --all --force
+	$(APROG) generate-config --all --force
 
 verify:
 ifdef SLUG
-	@scripts/verify-in-tmp.sh $(SLUG) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(VENV))/aprog
+	@scripts/verify-in-tmp.sh $(SLUG) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(APROG))
 else
-	$(MAKE) $(VERIFY_TARGETS)
+	$(APROG) verify --all --public $(CURDIR) --private $(abspath $(PRIVATE))
 endif
 
 define SLUG_RULES
@@ -121,11 +91,11 @@ dist/$(1)-gradescope.zip: \
     $$(shell find assignments/$(1) -type f 2>/dev/null) \
     $$(shell find $(PRIVATE)/grader/$(1) -type f 2>/dev/null)
 	@mkdir -p dist
-	$(VENV)/aprog generate-config $(1) --force
-	$(VENV)/aprog package-gradescope $(1) --private $(PRIVATE)
+	$(APROG) generate-config $(1) --force
+	$(APROG) package-gradescope $(1) --private $(PRIVATE)
 
 verify-$(1):
-	@scripts/verify-in-tmp.sh $(1) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(VENV))/aprog
+	@scripts/verify-in-tmp.sh $(1) $(abspath $(PRIVATE)) $(CURDIR) $(abspath $(APROG))
 
 endef
 

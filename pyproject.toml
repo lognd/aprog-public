@@ -23,15 +23,12 @@ dependencies = [
     "lograder>=0.3.1",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest",
     "pytest-testmon",
-    "mypy",
     "ruff",
-    "black",
-    "isort",
-    "types-requests",
+    "ty",
 ]
 
 [project.scripts]
@@ -48,6 +45,9 @@ packages = { find = { where = ["src"] } }
 [tool.setuptools.package-data]
 aprog = ["py.typed"]
 
+[tool.uv.sources]
+lograder = { path = "../lograder", editable = true }
+
 [tool.ruff]
 line-length = 88
 target-version = "py310"
@@ -55,10 +55,6 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I", "B"]
 ignore = ["E501"]
-
-[tool.black]
-line-length = 88
-target-version = ["py310"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -68,10 +64,3 @@ markers = [
     "integration: marks integration tests",
     "system: marks system/end-to-end tests",
 ]
-
-[tool.isort]
-profile = "black"
-line_length = 88
-py_version = 310
-src_paths = ["src", "tests"]
-known_first_party = ["aprog"]

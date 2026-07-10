@@ -8,9 +8,6 @@ on:
       - "tests/**"
       - "activities/**"
       - "pyproject.toml"
-      - "setup.cfg"
-      - "setup.py"
-      - "mypy.ini"
       - ".github/workflows/ci.yml"
   pull_request:
 
@@ -20,23 +17,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
         with:
           python-version: "3.10"
-          cache: pip
 
       - name: Install dependencies
-        run: pip install lograder -e ".[dev]"
+        run: uv sync
 
       - name: Lint
-        run: ruff check src/ tests/
+        run: uv run ruff check src/ tests/
 
       - name: Type check
-        run: mypy --config-file mypy.ini src/ tests/
+        run: uv run ty check src/
 
       - name: Test
-        run: pytest --no-testmon -m "not slow"
+        run: uv run pytest --no-testmon -m "not slow"
 
       - name: Activity structural tests
-        run: pytest tests/unit/test_real_activities.py -v
+        run: uv run pytest tests/unit/test_real_activities.py -v

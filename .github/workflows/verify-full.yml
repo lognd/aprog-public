@@ -27,20 +27,19 @@ jobs:
           ssh-key: ${{ secrets.APROG_PRIVATE_DEPLOY_KEY }}
           path: private
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
         with:
           python-version: "3.10"
-          cache: pip
 
       - name: Install AProg
-        run: pip install -e public
+        run: uv sync --project public
 
       - name: Verify
         run: |
           SLUG="${{ github.event.inputs.slug }}"
           if [ -n "$SLUG" ]; then
-            aprog verify "$SLUG" --public public --private private
+            uv run --project public aprog verify "$SLUG" --public public --private private
           else
-            aprog verify --all --public public --private private
+            uv run --project public aprog verify --all --public public --private private
           fi

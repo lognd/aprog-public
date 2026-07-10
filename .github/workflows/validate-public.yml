@@ -15,17 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
         with:
           python-version: "3.10"
-          cache: pip
 
       - name: Install AProg
-        run: pip install -e .
+        run: uv sync
 
       - name: Regenerate configs
-        run: aprog generate-config --all --force
+        run: uv run aprog generate-config --all --force
 
       - name: Fail if generated files were stale
         run: |
@@ -49,7 +48,7 @@ jobs:
         if: steps.changed.outputs.slugs != ''
         run: |
           for slug in ${{ steps.changed.outputs.slugs }}; do
-            aprog validate "$slug"
+            uv run aprog validate "$slug"
           done
 
       - name: Validate aprog.toml and templates (when touched)
@@ -57,4 +56,4 @@ jobs:
         run: echo "No assignment directories changed -- skipping per-assignment validation."
 
       - name: Scan for private file leaks
-        run: aprog scan-public --all
+        run: uv run aprog scan-public --all
