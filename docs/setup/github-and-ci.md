@@ -98,7 +98,7 @@ jobs:
         run: aprog scan-public --all
 ```
 
-`aprog validate --all` already calls `scan-public` and `check-generated` internally, but running them separately surfaces the specific failure reason more clearly in CI output.
+`aprog validate --all` already runs the same boundary scan as `scan-public` (both share `aprog.boundary.scan_public_violations`) and the same staleness check as `check-generated` (both share `aprog.utils.hashing.hash_assignment_public`), so a `validate` failure already covers those cases. Running `scan-public` and `check-generated` separately in CI just surfaces the specific failure reason more clearly in the log.
 
 ## Full verification workflow
 

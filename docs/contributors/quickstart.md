@@ -220,7 +220,11 @@ def make_pipeline(submission_dir=Path("/autograder/submission")):
 
 > **Gotchas** (see the template scaffold comments for details):
 > - Score keys are `"module::function"` (e.g. `"test_hidden::test_name"`), not file paths.
-> - `hidden-tests/` must live inside `grader/` -- not as a sibling.
+> - Hidden tests can live in either of two places: embedded at `grader/<slug>/hidden-tests/`
+>   (preferred -- the example above assumes this, since `_HIDDEN_TESTS` is resolved relative
+>   to `grader/pipeline.py`), or as a sibling directory at `hidden-tests/<slug>/`. Both are
+>   packaged automatically by `aprog package-gradescope`; pick whichever keeps your grader
+>   pipeline's relative paths simplest.
 > - PytestTest takes `paths=`, not `test_paths=`.
 
 ---
