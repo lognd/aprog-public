@@ -9,14 +9,14 @@ bugs.  One causes lines to break one word too early.  The other silently
 drops the last line entirely.
 
 When both bugs are fixed the output has exactly five lines.  Read the first
-letter of each line in order -- those five letters spell the LMS passcode for
-this activity.
+letter of each line in order -- those five letters spell the LMS (Learning
+Management System, e.g. Canvas or Blackboard) passcode for this activity.
 
 ## Concepts covered
 
 - `std::string` operations: building lines word by word with space separators
 - Off-by-one errors in string length comparisons (`<` vs `<=`)
-- The "flush the last item" pattern: loops that build up a buffer often need a post-loop push
+- The "flush the last item" pattern: loops that build up a buffer (a string being assembled piece by piece) often need a post-loop push
 - Reading a function carefully to find subtle logic errors vs. syntax errors
 
 ## Getting started
