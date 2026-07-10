@@ -485,13 +485,21 @@ Activities:
 Assignments:
 - `lazy-pipeline` -- build a five-stage generator log pipeline where instrumented iterables prove each stage consumes only what it must
 
-## 55. Python Async, Threads, Multiprocessing (planned)
+## 55. Python Async, Threads, Multiprocessing (untested)
 
-Nothing built yet.
+Activities:
+- `concurrency-court` -- choose asyncio, threads, multiprocessing, or plain sequential per workload; GIL and races taught from scratch
+- `await-tracer` -- predict deterministic asyncio output: unawaited coroutines, gather ordering, sleep(0) interleaving
 
-## 56. Python Contexts & Error Handling (planned)
+Assignments: none.
 
-Nothing built yet.
+## 56. Python Contexts & Error Handling (untested)
+
+Activities:
+- `with-wizardry` -- predict output of nine context-manager snippets: the unwind guarantee, suppression, contextmanager, try/else/finally
+
+Assignments:
+- `context-keeper` -- implement journaling, selective-suppression, and copy-then-commit transaction context managers plus a failure-proof cleanup chain
 
 ## 57. Python Scientific Computing (planned)
 
