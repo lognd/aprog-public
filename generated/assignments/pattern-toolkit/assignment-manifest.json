@@ -4,13 +4,13 @@
     "slug": "pattern-toolkit",
     "name": "Pattern Toolkit",
     "author": "lognd",
-    "description": "Implement three classic runtime-polymorphism design patterns -- Strategy, Observer, and Template Method -- each heap-free and built on abstract base classes and non-owning pointers."
+    "description": "Starting from working-but-messy legacy code, refactor into three classic runtime-polymorphism design patterns -- Strategy, Observer, and Template Method -- each heap-free and built on abstract base classes and non-owning pointers."
   },
   "classification": {
     "language": "cpp",
     "difficulty": "medium",
     "topics": [
-      "sorting",
+      "oop",
       "algorithms"
     ],
     "course": null
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/pattern-toolkit/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:80e1e0f5b8e4a69072d6d1d057b6bb188593bb3b75de32390781acd5a732129b"
+  "source_hash": "sha256:8fd8642fe9360441304a5385e266f1648f33687e7160d0ddf27d088dc5ffb57c"
 }

@@ -10,6 +10,7 @@
     "language": "cpp",
     "difficulty": "medium",
     "topics": [
+      "oop",
       "memory-management"
     ],
     "course": null
@@ -24,5 +25,5 @@
     "visible_tests": "assignments/unique-ptr-from-scratch/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:158b9a71988520779c9f98dd328cd08872329e5e2e46ae0a444df325bab63264"
+  "source_hash": "sha256:64555d916f3bfb12f7f2d24e2ca5c1ef937da70886887354bfb7357a02cc3f38"
 }

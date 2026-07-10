@@ -18,7 +18,7 @@ _RESULTS = Path("/autograder/results/results.json")
 if __name__ == "__main__":
     try:
         metadata = GraderMetadata.from_gradescope(
-            grader_name='Log Analyzer',
+            grader_name='HTML Parser',
             authors=[StaffAuthor(name='lognd', role="Instructor")],
             notes="Contact course staff within 3 days if you believe there is a grading error.",
         )

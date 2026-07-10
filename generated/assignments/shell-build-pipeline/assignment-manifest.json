@@ -11,9 +11,10 @@
     "difficulty": "medium",
     "topics": [
       "systems",
+      "build-systems",
       "io"
     ],
-    "course": "systems"
+    "course": null
   },
   "template": {
     "slug": "shell-script",
@@ -25,5 +26,5 @@
     "visible_tests": "assignments/shell-build-pipeline/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:04882415ac04c429f9e80a7852cf332fbbac6607b12d4e601a4cf46d73aaa40c"
+  "source_hash": "sha256:bc3b4a157e319b4a14cd551c5a0f8d625f7a51dce0c790f27cfb35082e6b89e0"
 }

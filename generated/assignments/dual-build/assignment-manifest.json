@@ -13,7 +13,7 @@
       "systems",
       "build-systems"
     ],
-    "course": "systems"
+    "course": null
   },
   "template": {
     "slug": "cpp-cmake",
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/dual-build/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:84d1c50a02aff8e91900bb14669eff766f41ff95ccdd4e92b349ee4c85ec6008"
+  "source_hash": "sha256:22ff729ef897d418f087338986949d0a1552b3e10d897a1df3346364f789d55c"
 }

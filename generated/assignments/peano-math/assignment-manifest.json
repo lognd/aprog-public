@@ -10,7 +10,8 @@
     "language": "cpp",
     "difficulty": "medium",
     "topics": [
-      "algorithms"
+      "algorithms",
+      "number-theory"
     ],
     "course": null
   },
@@ -24,5 +25,5 @@
     "visible_tests": "assignments/peano-math/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:55735120f60f9e26c9af8732d0ff70d0b0743878644629b6aeae8f3b25c6438e"
+  "source_hash": "sha256:2eb2997c60269f6f4116a12e22fbf129d57d4680314172d8069906b4918c0d8b"
 }

@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "html-parser",
+    "name": "HTML Parser",
+    "author": "lognd",
+    "description": "Implement a minimal 1970s-style HTML parser in C++ and write a Catch2 test suite that exercises every edge case in the spec."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "strings"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-cmake",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/html-parser",
+    "readme": "assignments/html-parser/README.md",
+    "visible_tests": "assignments/html-parser/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:e13c496e02c14fc3e5bdf8d2c3e35e67b050383c9b27f9d1668cfa631feaa98e"
+}

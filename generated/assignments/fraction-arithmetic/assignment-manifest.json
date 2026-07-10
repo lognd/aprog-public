@@ -10,7 +10,7 @@
     "language": "cpp",
     "difficulty": "easy",
     "topics": [
-      "data-structures",
+      "oop",
       "number-theory"
     ],
     "course": null
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/fraction-arithmetic/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:7075ab9efd589faa4031c46e8138e4234b880f9ec9a977897dc93ee0936e626e"
+  "source_hash": "sha256:2bd77c47ff6034a8ea91907b86d6ca48495a89ad82315b7ca3aacfa46a59586b"
 }

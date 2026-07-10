@@ -10,7 +10,8 @@
     "language": "cpp",
     "difficulty": "medium",
     "topics": [
-      "algorithms"
+      "algorithms",
+      "number-theory"
     ],
     "course": null
   },
@@ -24,5 +25,5 @@
     "visible_tests": "assignments/collatz-conjecture/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:2f43c9e4d74989d4f39f320e1612eef45e679b8875dc5c0895cc12ad33ae1bec"
+  "source_hash": "sha256:cd4b868203dd5c129c495e7b526bf6f03ce6d468f31cd95f645f3e7734b40f3b"
 }

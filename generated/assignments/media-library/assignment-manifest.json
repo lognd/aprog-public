@@ -10,7 +10,7 @@
     "language": "cpp",
     "difficulty": "medium",
     "topics": [
-      "data-structures"
+      "oop"
     ],
     "course": null
   },
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/media-library/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:fec90eb5a4c2492ba2a5dc395626379294f3e59fc785eb6e0a1c4970673f43c2"
+  "source_hash": "sha256:dd52e2a27ea56221402cca5ed2e0cb0794be8b5cd75dd9126ff593c799b5d40e"
 }

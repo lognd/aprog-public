@@ -10,7 +10,7 @@
     "language": "cpp",
     "difficulty": "medium",
     "topics": [
-      "algorithms",
+      "oop",
       "strings"
     ],
     "course": null
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/text-filters/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:4631559c10804fed60b7a3f34e45e4e4900f56c8ef1f826d62222edb2cd12e85"
+  "source_hash": "sha256:9465286f0535dd7b25a2e7a23c80b653c502f91791bc11d5ce496711d96aca0a"
 }
