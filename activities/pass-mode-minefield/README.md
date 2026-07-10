@@ -36,9 +36,13 @@ after:   n is now 10
 ```
 
 **Pass by pointer** (`void f(int* p)`) gives the function the *address* of
-the caller's variable, stored in its own local pointer variable `p`. This
-is a hybrid: `p` itself is a copy (a copy of an address), but dereferencing
-it with `*p` reaches back into the caller's original storage.
+the caller's variable -- obtained at the call site with the address-of
+operator `&` (`&n` means "the address where `n` lives") -- stored in its
+own local pointer variable `p` (a variable whose value is an address rather
+than an ordinary value). This is a hybrid: `p` itself is a copy (a copy of
+an address), but dereferencing it (following the address to reach the
+value stored there) with `*p` reaches back into the caller's original
+storage.
 
 ```
 caller:  n = 4
@@ -75,8 +79,8 @@ void swap_vals(int* a, int* b) {
 ```
 
 Arrays add one more wrinkle: a parameter written as `int arr[]` is, in
-reality, just `int* arr` -- arrays decay to a pointer to their first element
-the moment they are passed to a function. There is no copying of array
+reality, just `int* arr` -- arrays *decay* (automatically convert) to a
+pointer to their first element the moment they are passed to a function. There is no copying of array
 contents; the function receives the address of the caller's array and can
 modify its elements exactly as if it had been given a pointer explicitly.
 
