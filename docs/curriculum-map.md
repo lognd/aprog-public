@@ -501,13 +501,21 @@ Activities:
 Assignments:
 - `context-keeper` -- implement journaling, selective-suppression, and copy-then-commit transaction context managers plus a failure-proof cleanup chain
 
-## 57. Python Scientific Computing (planned)
+## 57. Python Scientific Computing (untested)
 
-Nothing built yet.
+Activities:
+- `broadcast-bureau` -- numpy shapes, broadcasting legality, views vs copies, boolean masks, and axis semantics
 
-## 58. Python Web Servers (planned)
+Assignments:
+- `grade-matrix` -- vectorize six grade-matrix operations with loops forbidden by a keyword gate; numpy is the only allowed import
 
-Nothing built yet.
+## 58. Python Web Servers (untested)
+
+Activities:
+- `http-anatomy` -- request anatomy, methods, status codes, idempotency, and statelessness from first principles
+
+Assignments:
+- `tiny-ledger-api` -- build a Flask CRUD API with an app factory, exact status codes and error bodies, graded via the test client
 
 ## 59. APIs (planned)
 
