@@ -1,0 +1,22 @@
+[assignment]
+slug = "cpp-to-python-phrasebook"
+name = "C++ to Python Phrasebook"
+author = "lognd"
+description = "Port the word-analysis functions you already built in C++ (word-ledger) to idiomatic, pure, stdlib-only Python."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "python"
+difficulty = "easy"
+topics = ["strings"]
+concepts = ["iteration", "functional", "mutation"]
+labels = ["unit-tests"]
+
+[template]
+slug = "python-pytest"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"

@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "cpp-to-python-phrasebook",
+    "name": "C++ to Python Phrasebook",
+    "author": "lognd",
+    "description": "Port the word-analysis functions you already built in C++ (word-ledger) to idiomatic, pure, stdlib-only Python."
+  },
+  "classification": {
+    "language": "python",
+    "difficulty": "easy",
+    "topics": [
+      "strings"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "python-pytest",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/cpp-to-python-phrasebook",
+    "readme": "assignments/cpp-to-python-phrasebook/README.md",
+    "visible_tests": "assignments/cpp-to-python-phrasebook/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:a94d1601a1944adc9d2c1dea756b2689425551bd4b4d8810930b022ca668af54"
+}
