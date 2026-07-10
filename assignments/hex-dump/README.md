@@ -77,6 +77,17 @@ xxd -g 1 test.txt
 
 The outputs should match exactly.
 
+You can also run the bundled visible tests, which check your binary against
+a small set of sample files (plain ASCII text, non-printable bytes, an
+exactly-16-byte file, an empty file, and a missing file):
+
+```bash
+bash visible-tests/run_tests.sh
+```
+
+The script assumes `build/hexdump` exists; pass an alternate path as the
+first argument if you built somewhere else.
+
 ## Constraints
 
 - Use only `open()`, `read()`, `write()`, `close()`, and `exit()` for I/O and process control.
