@@ -74,20 +74,10 @@ private:
 Fix every bug in `vector_i.hpp` so that `VectorI`:
 
 1. Compiles without warnings under `-Wall -Wextra`.
-2. Correctly copies elements in the copy constructor -- a **shallow copy**
-   (copying only a pointer's address, so two objects end up pointing at the
-   same memory) is not enough here; you need a deep copy that allocates its
-   own buffer and copies the actual elements into it, with the correct size.
-3. Correctly moves ownership in the move constructor -- the special
-   constructor that runs when a `VectorI` is built from a temporary or
-   `std::move`-marked source, and that steals the source's buffer instead of
-   copying it (leaves source in a valid empty state).
-4. Correctly implements copy and move assignment operators -- the `operator=`
-   overloads that run for `a = b;` (copy) and `a = std::move(b);` (move)
-   after `a` already exists -- (returns `*this`, no resource leaks, i.e. no
-   heap memory that is allocated but never freed).
-5. Correctly grows the backing array in `push_back` (doubles capacity from a
-   non-zero base).
+2. Correctly copies elements in the copy constructor (no shallow copies, correct size).
+3. Correctly moves ownership in the move constructor (leaves source in a valid empty state).
+4. Correctly implements copy and move assignment operators (returns `*this`, no resource leaks).
+5. Correctly grows the backing array in `push_back` (doubles capacity from a non-zero base).
 6. Returns a reference to the element just inserted by `push_back`.
 
 ## Submission
