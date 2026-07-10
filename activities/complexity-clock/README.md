@@ -1,28 +1,44 @@
 # Activity: Complexity Clock
 
-Seven programmers each wrote a function to compute the same value. Every
-function returns the correct answer. They are not equally fast.
+Seven functions all compute the same sum, sum(1 + 2 + ... + N). All seven
+give the right answer. They are not equally fast. Build the benchmark, watch
+the clock, then trace four short functions by hand to see exactly why some
+functions do far more work than others.
 
 ## Concepts covered
 
-- Reading wall-clock benchmark output (a table of measured running times) to identify the slow function
-- Analyzing nested loops where the inner loop's cost scales with the input
-- The taste of it: two correct functions can take wildly different amounts
-  of time as the input grows. Some do work roughly proportional to N; others
-  do work roughly proportional to N multiplied by itself -- double the
-  input, and the second kind takes roughly four times as long.
-- Why that "N times N" behavior emerges when a helper function is called N
-  times and the helper itself does proportional-to-N work on every call
-- The difference between how code looks and what it actually costs to execute
+- Reading a wall-clock benchmark table (a printed list of measured running
+  times) to spot which implementation is unexpectedly slow
+- Counting, by hand, how many times a specific line inside a loop actually
+  runs for a given input
+- Nested loops whose inner loop length depends on the outer loop's current
+  position, not a fixed number
+- The taste of it: two functions can both be "correct" and still take wildly
+  different amounts of time as the input grows. Some do work roughly
+  proportional to the input size; others do work that grows like the input
+  size multiplied by itself -- double the input, and that second kind takes
+  roughly four times as long, not twice.
+- Why code that "looks like one loop" can secretly cost as much as two
+  nested loops, and vice versa
 
 (Later in the course, in Complexity Theory, you will learn the formal
 notation for describing this precisely.)
 
 ## How it works
 
-A shell opens with `clock.cpp` and a `Makefile`. Build the benchmark and
-run it. Study the timing output and the source code. When you are ready,
-type `exit` and answer two questions.
+This activity has two parts. First, a shell opens inside a copy of
+`clock.cpp` and a `Makefile`. Build and run the benchmark to see seven
+functions -- alice, bob, carol, dave, eve, frank, and grace -- all compute
+the same sum, timed side by side. You cannot leave this shell until the
+program has been built at least once.
+
+After you exit the shell, the launcher asks four questions. Each question
+shows you a short function (again named alice, bob, carol, and dave, but
+with new code written out directly in the question -- these are not the
+same function bodies as the ones in `clock.cpp`). One line in each function
+is marked with `// <--`. Your job is to trace the function by hand for an
+input of 10 and say exactly how many times that marked line executes.
+Answer all four correctly to receive the passphrase.
 
 ## Getting started
 
@@ -30,7 +46,7 @@ type `exit` and answer two questions.
 python3 launch.py
 ```
 
-A shell opens with `clock.cpp` and a `Makefile`.
+A shell opens inside a fresh copy of the project.
 
 ### Step 1 -- build and run the benchmark
 
@@ -38,71 +54,68 @@ A shell opens with `clock.cpp` and a `Makefile`.
 make && ./clock
 ```
 
-Read every line of the timing output before continuing.
+You must build `clock` before the launcher will let you continue.
 
-### Step 2 -- read the source code
+### Step 2 -- read the output carefully
 
-Open `clock.cpp` and read every function, including any helpers. Note
-which function is dramatically slower than the others.
+All seven functions print the same answer. Note which ones are fast and
+which ones are slow. Open `clock.cpp` and read every function while the
+numbers are still fresh.
 
-### Step 3 -- exit and answer the questions
+### Step 3 -- exit and start the quiz
 
 ```
 exit
 ```
 
-The launcher will ask two questions. Answer both correctly to receive the
-passphrase.
+The launcher asks four short questions about counting loop executions.
 
 ## You will know you are done when...
 
-Both questions are correct and the launcher reveals the passphrase.
+All four questions are answered correctly and the launcher reveals the
+passphrase.
 
 ## Hints
 
 <details>
-<summary>Hint 1 -- reading the output</summary>
+<summary>Hint 1 -- reading the benchmark output</summary>
 
 The `Time` column shows how long each function took in milliseconds. All
-seven produce the same answer. Look for the one that is dramatically slower
-than the others. Once you have identified it, read its source code
-carefully -- all of it, including any functions it calls.
-
-Do not be misled by code that looks complicated or has nested loops.
-Read what the code actually does, not just what it looks like at a glance.
+seven produce the same answer, so the differences you see are purely about
+how much work each one does, not about correctness. Find the slowest one
+and reread its source with fresh eyes -- including any helper function it
+calls.
 
 </details>
 
 <details>
-<summary>Hint 2 -- why the slow one is slow</summary>
+<summary>Hint 2 -- a loop body only counts the line it wraps</summary>
 
-A function that calls another function is not necessarily cheap per call.
-The cost of a function call depends on what that function does. If a
-function contains a loop, every call to it runs that loop.
-
-Ask yourself: if the outer loop in the slow function runs N times, and
-each iteration calls a helper, how many total loop iterations happen?
-What does the helper do for a call with argument k?
+The marked line in each quiz question is inside a loop (or nested loops).
+It runs once for every time control reaches that exact spot -- not once per
+call to the function, and not once per outer-loop pass if there is an inner
+loop underneath. Write out the values the loop variable takes, one by one,
+if you are not sure.
 
 </details>
 
 <details>
-<summary>Hint 3 -- the doubling question</summary>
+<summary>Hint 3 -- nested loops and the doubling question</summary>
 
-Work out the total number of operations for small N.
-For N=4: tally(1) + tally(2) + tally(3) + tally(4) = 1+2+3+4 = 10
-For N=8: tally(1)+...+tally(8) = 1+2+...+8 = 36
-When N doubles from 4 to 8, the work goes from 10 to 36 -- roughly a
-factor of 4, not 2. The general formula is N*(N+1)/2: work that scales
-like N multiplied by itself.
+When one loop is nested inside another, and the inner loop's length depends
+on where the outer loop currently is, add up the inner-loop lengths across
+every outer step rather than multiplying by a fixed number. Try it for a
+small input by hand first, then see if you can spot the pattern before
+plugging in 10.
 
 </details>
 
 ## Going further
 
-- Rewrite the slow function to do work proportional to N (not N times N)
-  and verify the speedup in the benchmark.
+- Rewrite the slowest function in `clock.cpp` to do work roughly
+  proportional to N instead of N multiplied by itself, and confirm the
+  speedup in the benchmark.
 - Profile the original `clock.cpp` with `gprof` or `perf record` and read
   the output. Which line shows up hottest?
-- Look up what a flame graph is and how to generate one with `perf` on Linux.
-  Identify the slow function in the flame graph.
+- Look up what a flame graph is and how to generate one with `perf` on
+  Linux. Identify the slow function in the flame graph.
