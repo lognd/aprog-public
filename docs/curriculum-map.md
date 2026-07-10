@@ -373,9 +373,13 @@ Activities:
 
 Assignments: none.
 
-## 41. SFML (planned)
+## 41. SFML (untested)
 
-Nothing built yet.
+Activities:
+- `sfml-anatomy` -- the game-loop mental model: event-queue draining, clear/draw/display, top-left coordinates, dt-scaled movement, draw order
+
+Assignments:
+- `sfml-canvas` -- implement five sf::Image pixel routines (gradient, checkerboard, disk, blend, outline) graded per-pixel against reference PNGs, headless by construction
 
 ## 42. auto & Type Deduction (untested)
 
