@@ -13,7 +13,7 @@ fd table.  Each section ends with a short checkpoint question.
 
 ## Concepts covered
 
-- The layered structure of the file I/O stack (program -> POSIX -> kernel fd table -> VFS -> disk)
+- The layered structure of the file I/O stack (program -> POSIX -> kernel fd table -> VFS, the virtual file system layer that lets the kernel present many different filesystem types through one interface -> disk)
 - File descriptors as per-process integer handles
 - The contracts of `open()`, `read()`, `write()`, and `close()`
 - Partial reads and writes, and why callers must loop

@@ -13,11 +13,16 @@ apply them correctly.
 
 ## Concepts covered
 
-- `open()` return values and errno codes (ENOENT, EACCES, EMFILE, EBADF)
-- The lowest-available-fd rule
-- `read()` partial reads and the EOF sentinel (return value 0)
+- `open()` return values and errno codes -- ENOENT (no such file), EACCES
+  (permission denied), EMFILE (too many open files for this process), EBADF
+  (bad file descriptor)
+- The lowest-available-fd rule: the kernel hands out the smallest unused
+  file descriptor number, not a random one
+- `read()` partial reads and the EOF sentinel (a return value of 0, used as
+  a marker meaning "no more data" rather than an error)
 - `write()` partial writes and the retry obligation
-- EINTR: what it means and what to do
+- EINTR, the errno set when a slow syscall is interrupted by a signal
+  before finishing, and what the caller should do about it (retry)
 - `errno` semantics: when it is set, when it is stale
 - `perror()` output destination
 
