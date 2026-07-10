@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "fraction-arithmetic",
+    "name": "Fraction Arithmetic",
+    "author": "lognd",
+    "description": "Implement a Fraction class that encapsulates a rational number and maintains lowest-terms and sign-normalization invariants across every constructor and method."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "easy",
+    "topics": [
+      "data-structures",
+      "number-theory"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-header-impl",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/fraction-arithmetic",
+    "readme": "assignments/fraction-arithmetic/README.md",
+    "visible_tests": "assignments/fraction-arithmetic/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:7075ab9efd589faa4031c46e8138e4234b880f9ec9a977897dc93ee0936e626e"
+}
