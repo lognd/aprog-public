@@ -3,7 +3,9 @@
 A class is a promise about what state is reachable. `Fraction` promises that
 every instance you ever observe -- no matter which constructor built it or
 which method last touched it -- represents a rational number in a single
-canonical form. You will implement that promise.
+canonical form (one standard way of writing the value, so that two fractions
+which are mathematically equal are always stored identically). You will
+implement that promise.
 
 ## Learning goals
 
@@ -158,7 +160,8 @@ Submit a single file named `fraction.cpp`. Do not rename it.
 
 ## Going further
 
-- Learn about operator overloading and rewrite `plus`, `equals`, and
+- Learn about operator overloading (giving special meaning to operators like
+  `+` and `==` when used with your own class) and rewrite `plus`, `equals`, and
   `lessThan` as `operator+`, `operator==`, and `operator<` so that
   `a + b == c` reads naturally. What has to change about the class for this
   to work, and what stays the same?
