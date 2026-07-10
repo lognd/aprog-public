@@ -436,13 +436,22 @@ Activities:
 Assignments:
 - `roster-wrangler` -- implement six typed roster-analysis functions over list[dict] records, pytest-graded with a ty cleanliness bonus
 
-## 49. Python Decorators (planned)
+## 49. Python Decorators (untested)
 
-Nothing built yet.
+Activities:
+- `decorator-x-ray` -- predict output of nine snippets: closures, decoration-time vs call-time, stacking order, functools.wraps
+- `wrap-court` -- rule on what @deco desugars to, when decorator bodies run, and the forgot-to-return-the-wrapper trap
 
-## 50. Python Classes (instance, class, static) (planned)
+Assignments: none.
 
-Nothing built yet.
+## 50. Python Classes (instance, class, static) (untested)
+
+Activities:
+- `method-trinity` -- predict output of seven snippets contrasting instance, class, and static methods, properties, and attribute shadowing
+- `self-cls-court` -- match method kinds to jobs and rule on self mechanics, missing-instance calls, and name mangling
+
+Assignments:
+- `temperature-lab` -- build a Temperature class with classmethod factories, a validated property, computed read-only properties, and tolerant equality
 
 ## 51. Python Inner-Workings (__dict__, __mro__, etc.) (planned)
 
