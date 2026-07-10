@@ -385,13 +385,22 @@ Activities:
 
 Assignments: none.
 
-## 43. Modern C++ (C++11-C++17 features) (planned)
+## 43. Modern C++ (C++11-C++17 features) (untested)
 
-Nothing built yet.
+Activities:
+- `modernization-bureau` -- match ten pre-C++11 snippets to the modern feature that replaces them, with the rewrite shown each time
+- `seventeen-tracer` -- predict output of six programs using structured bindings, if-with-initializer, optional, and string_view
 
-## 44. Exception Handling (planned)
+Assignments: none.
 
-Nothing built yet.
+## 44. Exception Handling (untested)
+
+Activities:
+- `unwind-tracer` -- predict output of seven throw/catch programs where instrumented destructors print during stack unwinding
+- `throw-or-not-court` -- judge nine scenarios: throw, return a sentinel, assert, or never throw (destructors), with honest tradeoffs
+
+Assignments:
+- `parse-with-grace` -- build an exceptions-first parsing library with exact exception types/messages, propagation transparency, and RAII balance under throws
 
 ## 45. Intro to Python (planned)
 
