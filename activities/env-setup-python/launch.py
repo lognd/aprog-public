@@ -11,7 +11,7 @@ _SALT      = bytes.fromhex("a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6")
 _KDF_ITERS = 100000
 # Encrypted with answers=["python-verified", "pip-verified"]
 # Re-generate via aprog-private/activities/env-setup-shell/gen_blobs.py
-_BLOB = "da6fcb954b5aa6ad76741dfa0271eda01d068ad565070716b119283cb37a2ada8dc7cb1586b5c2442163cdd93bef0ea70be0385744"
+_BLOB = "df7096d14c47a1b87b7402a45b6ee3af058cace0fec3353efafb0d292cf67e819e7101e242286bc8babe0589f38e772f40"
 
 _LINE_WIDTH = 70
 _MIN_PYTHON = (3, 10)
