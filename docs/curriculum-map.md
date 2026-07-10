@@ -202,17 +202,21 @@ Activities:
 
 Assignments: none.
 
-## 21. OOP Implementation in C++ (wip)
+## 21. OOP Implementation in C++ (untested)
 
-Activities: none yet.
+Activities:
+- `ctor-dtor-tracer` -- predict the exact construction/destruction output of eight programs to learn object lifetime rules
+- `encapsulation-audit` -- diagnose what (if anything) is wrong with ten small class designs: public data, missing const, leaky getters
 
 Assignments:
 - `fraction-arithmetic` -- implement a Fraction class that maintains a lowest-terms invariant across every constructor and operation
-- `raii-file-guard` -- (wip) implement FileGuard, whose constructor opens a POSIX fd and destructor closes it, to learn RAII
+- `raii-file-guard` -- implement FileGuard, whose constructor opens a POSIX fd and destructor closes it, to learn RAII
 
-## 22. Inheritance (ABC, drawbacks, composition) (wip)
+## 22. Inheritance (ABC, drawbacks, composition) (untested)
 
-Activities: none yet.
+Activities:
+- `hiding-hunt` -- predict output of six programs distinguishing virtual overriding from name hiding, including the virtual-in-constructor classic
+- `slice-of-life` -- predict output of six programs where object slicing silently cuts derived objects down to their base class
 
 Assignments:
 - `media-library` -- design an abstract MediaItem base class and derived Book/Film/Album types cataloged by a Library class
