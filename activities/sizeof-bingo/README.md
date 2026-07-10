@@ -52,8 +52,9 @@ All sixteen questions are correct and the program prints the passphrase.
 
 ## Going further
 
-- Write a struct with three members and predict its `sizeof` before compiling.
-  Then add `__attribute__((packed))` and see how the size changes.
+- Write a struct (a user-defined type that groups several variables together
+  under one name) with three members and predict its `sizeof` before
+  compiling. Then add `__attribute__((packed))` and see how the size changes.
 - Look up `alignof` and `alignas`. How do they relate to the padding rules?
 - Find the size of `std::string` on your platform with `sizeof(std::string)`.
   The result is surprising -- read why in the libc++ or libstdc++ source.
