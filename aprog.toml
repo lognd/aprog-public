@@ -86,6 +86,9 @@ name = "Type Annotations and Generics"
 [classification.topics.generators]
 name = "Generators"
 
+[classification.topics.error-handling]
+name = "Error Handling"
+
 [classification.concepts.makefile]
 name = "Makefile"
 
@@ -178,6 +181,12 @@ name = "Laziness"
 
 [classification.concepts.iterators]
 name = "Iterators"
+
+[classification.concepts.context-managers]
+name = "Context Managers"
+
+[classification.concepts.exception-handling]
+name = "Exception Handling"
 
 [labels.requires-filesystem]
 name = "Requires filesystem access"

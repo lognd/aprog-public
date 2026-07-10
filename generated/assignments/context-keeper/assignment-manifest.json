@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "context-keeper",
+    "name": "Context Keeper",
+    "author": "lognd",
+    "description": "A small toolkit of context managers and exception-handling helpers -- a journaling RAII-style workspace, a type-selective exception suppressor, a copy-then-commit transaction, and a cleanup runner that never stops early -- graded on exact enter/exit ordering and exception-path behavior, not just happy-path output."
+  },
+  "classification": {
+    "language": "python",
+    "difficulty": "medium",
+    "topics": [
+      "error-handling",
+      "oop"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "python-pytest",
+    "version": "0.1"
+  },
+  "paths": {
+    "assignment_root": "assignments/context-keeper",
+    "readme": "assignments/context-keeper/README.md",
+    "visible_tests": "assignments/context-keeper/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:28ad2b7c59deb266957ef053846b078007decc6bbfcfbe7b6524b63d8256b52e"
+}
