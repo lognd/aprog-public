@@ -56,7 +56,7 @@ def cmd_verify(
 
     try:
         from lograder.pipeline.config import config
-        from pipeline import make_pipeline  # type: ignore[import-not-found]
+        from pipeline import make_pipeline  # ty: ignore[unresolved-import]
     except ImportError as e:
         console.print(f"[red]Import error:[/red] {e}")
         raise typer.Exit(1) from e
