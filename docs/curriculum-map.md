@@ -521,10 +521,12 @@ Assignments:
 ## 58. Python Web Servers (untested)
 
 Activities:
+- `osi-elevator` -- very basic networking first: why layers, encapsulation as nesting envelopes, which layer HTTP/TCP/IP/Ethernet live at, IP/port/MAC, DNS, and TCP vs. "just send it"
 - `http-anatomy` -- request anatomy, methods, status codes, idempotency, and statelessness from first principles
 
 Assignments:
 - `tiny-ledger-api` -- build a Flask CRUD API with an app factory, exact status codes and error bodies, graded via the test client
+- `typed-ledger-api` -- the same ledger domain rebuilt on FastAPI: a pydantic model replaces hand-written validation, graded via TestClient for framework-generated 422s and response_model field-stripping
 
 ## 59. APIs (untested)
 

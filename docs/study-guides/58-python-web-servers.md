@@ -1,11 +1,17 @@
 # Study Guide 58: Python Web Servers
 
-This module builds the vocabulary and mental model of HTTP itself --
-the four parts of a request, the method-to-action mapping, status
-code classes, idempotency, JSON, where a given piece of data belongs,
-and statelessness -- before writing any server code, then puts every
-piece to work in `tiny-ledger-api`, a small Flask app built with the
-app-factory pattern and a precise request/response contract.
+This module starts one floor lower than HTTP itself, with `osi-elevator`
+building the very basic networking picture -- why layers, encapsulation
+as nesting envelopes, and which layer HTTP/TCP/IP/Ethernet each live at
+-- then builds the vocabulary and mental model of HTTP itself -- the
+four parts of a request, the method-to-action mapping, status code
+classes, idempotency, JSON, where a given piece of data belongs, and
+statelessness -- before writing any server code. It then puts every
+piece to work twice: first in `tiny-ledger-api`, a small Flask app
+built with the app-factory pattern and a precise request/response
+contract, and then again in `typed-ledger-api`, the same ledger domain
+rebuilt on FastAPI, where a pydantic model replaces hand-written
+validation.
 
 ## Know before you start
 
@@ -24,6 +30,35 @@ app-factory pattern and a precise request/response contract.
   Data Structures]
 
 ## Taught here
+
+Concept: OSI stack, very basics (`osi-elevator` comes before
+`http-anatomy` -- it is the ground floor everything else in this
+module stands on)
+- Know networking is built in LAYERS specifically so each layer solves
+  exactly one problem and trusts every layer below it to have already
+  solved its own, instead of one piece of code solving everything at
+  once.
+- Know ENCAPSULATION means wrapping data in progressively more layers
+  on the way out, like nesting envelopes -- an HTTP request is wrapped
+  by TCP, then that is wrapped by IP, then that is wrapped by
+  Ethernet/WiFi -- and UNWRAPPED in the exact reverse order on
+  arrival.
+- Know the practical five-layer model and which layer each thing
+  lives at: HTTP (application), TCP (transport), IP (network),
+  Ethernet/WiFi (link), the cable/radio signal itself (physical) --
+  and honestly, that the traditional seven-layer count's session and
+  presentation layers fold into application-layer tools in day-to-day
+  web work rather than being treated as separate layers.
+- Know what each identifier identifies: an IP address identifies
+  which MACHINE, a port identifies which PROGRAM on that machine, and
+  a MAC address identifies which network CARD on the local segment.
+- Know DNS's one-sentence job: translating a human-readable name into
+  the IP address to actually connect to.
+- Know TCP's one-sentence job -- reliable, ordered delivery -- versus
+  a "just send it" alternative that guarantees neither.
+- Know a web developer's own code lives at the application layer and
+  relies on every layer below it to have already done its job, which
+  is why application code can treat the network as a simple pipe.
 
 Concept: anatomy of an HTTP request and response
 - Know every HTTP request has exactly four parts: the METHOD (the
@@ -113,6 +148,29 @@ Concept: building a Flask app with the factory pattern
   `app.test_client()` to call routes directly and inspect the exact
   status code and JSON body.
 
+Concept: FastAPI and typed validation
+- Know a pydantic `BaseModel` is a class whose fields are ordinary
+  type-annotated attributes that pydantic actively validates against
+  when an instance is built from raw data (like a JSON body), unlike
+  a plain class or `dataclass`, which does not check anything at
+  runtime.
+- Know declaring a route parameter's type as a `BaseModel` subclass is
+  itself the validation -- FastAPI parses and validates the request
+  body against that declared shape automatically, before the route
+  function's body runs, and rejects an invalid body with its own
+  `422` with no hand-written `isinstance` checks needed.
+- Know FastAPI's error convention uses a `detail` key (both for its
+  own generated errors and for a raised `HTTPException`), which is a
+  deliberate difference from the Flask assignment's `error` key.
+- Know `response_model` controls exactly what shape a route sends
+  back, stripping any field not declared on it -- this is how an
+  internal-only field (never meant for a client) is kept out of every
+  response without needing to build a fresh dict by hand on every
+  route.
+- Be able to test a FastAPI app with no real network traffic using
+  `fastapi.testclient.TestClient` to call routes directly and inspect
+  the exact status code and JSON body.
+
 ## Study checklist
 
 - [ ] Name the four parts of an HTTP request and explain what each
@@ -132,7 +190,17 @@ Concept: building a Flask app with the factory pattern
 - [ ] Write a route that validates a JSON body's required fields and
       types (including rejecting `bool` for an `int` field) and
       returns the correct `400`/`404`/`200`/`201`/`204`.
+- [ ] Explain why networking is layered, and name which layer HTTP,
+      TCP, IP, and Ethernet/WiFi each live at.
+- [ ] Trace the encapsulation order (TCP, then IP, then Ethernet/WiFi)
+      on the way out and the unwrapping order in reverse on the way
+      in.
+- [ ] Explain what a pydantic `BaseModel` field declaration buys you
+      that a plain class's type hints do not, and why declaring
+      `Item(BaseModel)` is itself the validation in a FastAPI route.
+- [ ] Explain what `response_model` does and why it is needed even
+      when a route function could just build a "clean" dict by hand.
 
 ## Practiced in
 
-`http-anatomy`, `tiny-ledger-api`
+`osi-elevator`, `http-anatomy`, `tiny-ledger-api`, `typed-ledger-api`
