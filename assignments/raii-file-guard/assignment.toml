@@ -10,7 +10,7 @@ status      = "draft"
 language   = "cpp"
 difficulty = "medium"
 topics     = ["io", "memory-management"]
-concepts   = ["object-oriented", "posix-file-io"]
+concepts   = ["object-oriented", "raii", "posix-file-io", "encapsulation"]
 labels     = ["starter-code", "unit-tests", "requires-filesystem"]
 
 [template]

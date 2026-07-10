@@ -9,8 +9,8 @@ status      = "draft"
 [classification]
 language   = "cpp"
 difficulty = "medium"
-topics     = ["memory-management"]
-concepts   = ["pointers", "object-oriented"]
+topics     = ["oop", "memory-management"]
+concepts   = ["pointers", "raii", "smart-pointers", "move-semantics", "templates"]
 labels     = ["starter-code", "unit-tests", "multi-file"]
 
 [template]

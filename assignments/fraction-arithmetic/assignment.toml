@@ -9,8 +9,8 @@ status      = "draft"
 [classification]
 language   = "cpp"
 difficulty = "easy"
-topics     = ["data-structures", "number-theory"]
-concepts   = ["object-oriented"]
+topics     = ["oop", "number-theory"]
+concepts   = ["object-oriented", "encapsulation"]
 labels     = ["starter-code", "unit-tests"]
 
 [template]
