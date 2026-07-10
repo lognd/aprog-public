@@ -330,13 +330,22 @@ Activities:
 Assignments:
 - `linked-list-iterators` -- add Iterator/ConstIterator, begin/end, insert_after, and erase_after to a provided linked list so range-for works
 
-## 36. Proofs & Invariance (planned)
+## 36. Proofs & Invariance (untested)
 
-Nothing built yet.
+Activities:
+- `invariant-inspector` -- pick the true loop invariant for nine loops and chain it with the exit condition to the postcondition
+- `termination-tribunal` -- rule whether seven loops always terminate, using the decreasing-measure argument (Collatz included, honestly)
 
-## 37. Searching (planned)
+Assignments: none.
 
-Nothing built yet.
+## 37. Searching (untested)
+
+Activities:
+- `search-stepper` -- trace binary search mid/lo/hi values and comparison counts numerically on concrete arrays
+- `binary-search-autopsy` -- diagnose six subtly broken binary searches: infinite loop, skipped answer, out-of-bounds, overflow mid
+
+Assignments:
+- `binary-bounds` -- implement binary search plus first/last-occurrence bounds and an O(log n) count_of enforced by a performance test
 
 ## 38. Sorting (planned)
 
