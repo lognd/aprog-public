@@ -7,10 +7,16 @@ function returns the correct answer. They are not equally fast.
 
 - Reading wall-clock benchmark output (a table of measured running times) to identify the slow function
 - Analyzing nested loops where the inner loop's cost scales with the input
-- O(...) ("big-O") is shorthand for how an algorithm's running time grows as its input size N grows: O(N) means
-  the cost grows in direct proportion to N, O(N^2) means it grows proportional to N multiplied by itself.
-  Why O(N^2) behavior emerges when a helper function is called N times and the helper itself does O(N) work.
+- The taste of it: two correct functions can take wildly different amounts
+  of time as the input grows. Some do work roughly proportional to N; others
+  do work roughly proportional to N multiplied by itself -- double the
+  input, and the second kind takes roughly four times as long.
+- Why that "N times N" behavior emerges when a helper function is called N
+  times and the helper itself does proportional-to-N work on every call
 - The difference between how code looks and what it actually costs to execute
+
+(Later in the course, in Complexity Theory, you will learn the formal
+notation for describing this precisely.)
 
 ## How it works
 
@@ -70,7 +76,7 @@ Read what the code actually does, not just what it looks like at a glance.
 <details>
 <summary>Hint 2 -- why the slow one is slow</summary>
 
-A function that calls another function is not necessarily O(1) per call.
+A function that calls another function is not necessarily cheap per call.
 The cost of a function call depends on what that function does. If a
 function contains a loop, every call to it runs that loop.
 
@@ -87,13 +93,15 @@ Work out the total number of operations for small N.
 For N=4: tally(1) + tally(2) + tally(3) + tally(4) = 1+2+3+4 = 10
 For N=8: tally(1)+...+tally(8) = 1+2+...+8 = 36
 When N doubles from 4 to 8, the work goes from 10 to 36 -- roughly a
-factor of 4, not 2. The general formula is N*(N+1)/2, which grows as N^2.
+factor of 4, not 2. The general formula is N*(N+1)/2: work that scales
+like N multiplied by itself.
 
 </details>
 
 ## Going further
 
-- Rewrite the slow function to be O(N) and verify the speedup in the benchmark.
+- Rewrite the slow function to do work proportional to N (not N times N)
+  and verify the speedup in the benchmark.
 - Profile the original `clock.cpp` with `gprof` or `perf record` and read
   the output. Which line shows up hottest?
 - Look up what a flame graph is and how to generate one with `perf` on Linux.

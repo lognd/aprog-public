@@ -58,7 +58,7 @@ Assignments:
 ## 6. Control & Functions (untested)
 
 Activities:
-- `complexity-clock` -- benchmark seven equivalent functions and diagnose why one is asymptotically slower
+- `complexity-clock` -- benchmark seven equivalent functions and diagnose why one is dramatically slower as input grows
 - `scope-safari` -- fix scope bugs (shadowing, static locals, loop-body scope) until program output matches
 - `control-gauntlet` -- fix three buggy programs involving short-circuit evaluation, break/continue, and De Morgan's law
 

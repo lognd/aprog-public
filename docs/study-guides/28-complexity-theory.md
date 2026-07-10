@@ -1,15 +1,17 @@
 # Study Guide 28: Complexity Theory
 
-This module formalizes the Big-O intuition introduced back in Control &
-Functions: classifying real code into the five common growth classes by
-counting how often the innermost line runs, and then reasoning numerically
-with growth rates -- scaling a measured time, comparing classes "eventually,"
-and estimating logarithms.
+This module introduces Big-O notation and formalizes the growth-rate
+intuition from Control & Functions: classifying real code into the five
+common growth classes by counting how often the innermost line runs, and
+then reasoning numerically with growth rates -- scaling a measured time,
+comparing classes "eventually," and estimating logarithms.
 
 ## Know before you start
 
-- The informal O(N)/O(N^2) intuition and the "helper called in a loop"
-  multiplication [assumed: row 6 -- Control & Functions]
+- The informal intuition that two correct functions can differ wildly in
+  running time as input grows, and the "helper called in a loop"
+  multiplication (without the formal notation, which is introduced here)
+  [assumed: row 6 -- Control & Functions]
 - `std::vector` size/capacity and reallocation copying every element
   [assumed: row 7 -- Standard Library Types]
 
