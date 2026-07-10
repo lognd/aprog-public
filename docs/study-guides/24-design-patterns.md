@@ -90,6 +90,38 @@ Concept: Template Method
   `header() + body() + footer()`, pure-virtual header/body hooks, and a
   shared non-virtual footer, matching required output byte for byte.
 
+Concept: misuse-resistant design
+- Know the "space between the lines" idea: every gap between an object's
+  construction and its actual readiness is a place a teammate can insert
+  code that compiles but is broken, and that a comment or an `assert`
+  only detects the misuse (sometimes only at runtime, sometimes only in
+  debug builds) rather than preventing it from compiling at all.
+- Know the fix ladder: comment (ignored) -> assert (too late, debug-only)
+  -> type design (the illegal state fails to compile).
+- Be able to design a fully-forming constructor (all real setup happens in
+  one constructor, with no separate `init()` step) and explain why it
+  closes the gap that a default constructor plus `init()` leaves open.
+- Know the zombie-object anti-pattern (a constructor that never fails, but
+  leaves an `is_valid_` flag every caller must remember to check) and why
+  a private constructor plus a static `create()` factory is stronger: it
+  makes the validating path the only path to an instance.
+- Know that `const` data members prevent mutation after construction the
+  same way a deleted default constructor prevents use before construction
+  -- both turn a runtime discipline into a compile error.
+- Be able to recognize invalid-states-representable data (a flag plus two
+  members that can both be populated at once) versus a sum type (the
+  tagged-union idea from `union-dissector`) that can only hold one
+  alternative at a time, and explain why the second cannot hold nonsense.
+- Know that calling a virtual function from a constructor (from
+  `hiding-hunt`) is the same disease as every other example here: the
+  derived part of the object does not exist yet, so C++ resolves the call
+  to the base class's own version rather than risk it.
+- Be able to state the honest exception: two-phase construction is
+  acceptable when chosen deliberately and for a real structural reason
+  (object pools, ABI/COM boundaries, frameworks requiring a default
+  constructor before configuration) -- the difference from the villain
+  case is that the tradeoff is named on purpose, not stumbled into.
+
 ## Study checklist
 
 - [ ] Name the five code smells and give a one-line description of each.
@@ -103,4 +135,4 @@ Concept: Template Method
 
 ## Practiced in
 
-`smell-hunt`, `pattern-matcher`, `pattern-toolkit`
+`smell-hunt`, `pattern-matcher`, `pattern-toolkit`, `space-between-the-lines`

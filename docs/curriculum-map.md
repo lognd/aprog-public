@@ -240,6 +240,7 @@ Assignments:
 Activities:
 - `smell-hunt` -- name the code smell in nine working-but-rotting snippets and learn which refactor fixes each
 - `pattern-matcher` -- match requirement scenarios to the right design pattern, including two where no pattern is needed
+- `space-between-the-lines` -- misuse-resistant API design: why a partially formed object must never be reachable, and how type design (not comments) prevents it
 
 Assignments:
 - `pattern-toolkit` -- implement Strategy, Observer, and Template Method patterns using non-owning base pointers, no dynamic memory
