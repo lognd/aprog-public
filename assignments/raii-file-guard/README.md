@@ -3,11 +3,18 @@
 Every file descriptor you open with `::open()` occupies a slot in your
 process's file descriptor table, and that table is finite. If you forget to
 call `::close()`, the slot stays occupied until the process exits -- there is
-no garbage collector coming to reclaim it for you. `FileGuard` exists so that
-"forgetting to close" becomes structurally impossible: the file descriptor's
-lifetime is tied to the lifetime of a `FileGuard` object, and the object's
-destructor -- not a line of code you have to remember to write at every exit
-point -- does the closing.
+no garbage collector coming to reclaim it for you. `FileGuard` is a class (a
+programmer-defined type that bundles data with the functions that operate on
+it) whose object -- an instance of that class, i.e. one concrete variable
+built from it -- owns a file descriptor. Every class has a **constructor**
+(a special function that runs automatically when an object is created,
+usually named after the class) and can have a **destructor** (a special
+function, named `~ClassName`, that runs automatically when the object's
+lifetime ends). `FileGuard` exists so that "forgetting to close" becomes
+structurally impossible: the file descriptor's lifetime is tied to the
+lifetime of a `FileGuard` object, and the object's destructor -- not a line
+of code you have to remember to write at every exit point -- does the
+closing.
 
 ## Learning goals
 
@@ -20,8 +27,9 @@ point -- does the closing.
   and what happens when it leaks
 - Understand the double-close hazard and why deleting the copy constructor
   and copy assignment operator is the correct fix, not an incidental detail
-- Practice the partial-write loop from POSIX I/O in a class method instead
-  of free-standing code
+- Practice the partial-write loop from POSIX I/O (POSIX is the standard that
+  defines the open/read/write/close system calls shared across Unix-like
+  operating systems) in a class method instead of free-standing code
 
 ## Background
 
@@ -30,9 +38,12 @@ point -- does the closing.
 A `FileGuard` constructor calls `::open()`. Its destructor calls
 `::close()`. Nothing else in the class touches the fd's existence. This
 means that anywhere a `FileGuard` variable goes out of scope -- the end of a
-function, an early `return`, a `break` out of a loop, an exception unwinding
-the stack (not something you will trigger in this assignment, since you are
-not using exceptions yet, but worth knowing) -- the destructor runs and the
+function, an early `return`, a `break` out of a loop, or an exception
+unwinding the stack (an exception is a signal thrown to report an error;
+"unwinding the stack" means the program leaves each function it is currently
+inside, one after another, running each one's destructors as it goes -- not
+something you will trigger in this assignment, since you are not using
+exceptions yet, but worth knowing) -- the destructor runs and the
 fd gets closed. You do not write a `close()` call at each of those exit
 points. You write it once, in the destructor, and the compiler guarantees it
 runs everywhere it needs to.
@@ -196,8 +207,8 @@ partial-write loop from the write-your-first-syscalls activity, now living
 inside a method.
 
 `read_some` is a thin wrapper: call `::read()` once with the given buffer
-and capacity, and return exactly what it returns (bytes read, 0 at EOF, or
--1 on error). Do not loop here -- that is the caller's job, and `read_all`
+and capacity, and return exactly what it returns (bytes read, 0 at EOF -- end of file,
+meaning there is nothing left to read -- or -1 on error). Do not loop here -- that is the caller's job, and `read_all`
 below is where the looping version lives.
 
 `read_all` reads in a loop (using a buffer of your choosing, in terms of
@@ -278,5 +289,6 @@ Submit a single file named `file_guard.cpp`. Do not rename it.
   the OS's point of view (each has to be closed separately, and neither
   closing one closes the other). What would it take to add a `duplicate()`
   method to `FileGuard` that returns a new, independently-owned fd instead
-  of aliasing the existing one? Why does this sidestep the double-close
-  hazard that copying does not?
+  of aliasing the existing one (aliasing means two names referring to the
+  same underlying thing, so an action through one name affects the other)?
+  Why does this sidestep the double-close hazard that copying does not?
