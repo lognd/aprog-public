@@ -1,7 +1,10 @@
 # Activity: Recursion Unwind
 
-Recursion is not magic -- every call has a cost in time (how many calls
-happen) and space (how many frames are alive at once). This activity builds
+Recursion -- a function calling itself, either directly or by calling
+another function that calls it back -- is not magic: every call has a cost
+in time (how many calls happen) and space (how many stack frames, the block
+of memory holding one call's local variables and return address, are alive
+at once). This activity builds
 intuition for both by comparing three implementations of the same function:
 naive recursive Fibonacci, memoized recursive Fibonacci (a version that
 caches each result the first time it is computed so later calls with the
@@ -43,5 +46,7 @@ All nine answers are correct and the program prints the passphrase.
   the call count matches your answer for `fib(5)`.
 - Use a debugger (`gdb` or `lldb`) to pause execution inside naive `fib` and
   print the call stack with `bt`. Count the frames at the deepest call.
-- Look up tail-call optimization. Can the compiler optimize naive `fib` into
-  a loop? Try compiling with `-O2` and inspecting the assembly.
+- Look up tail-call optimization (rewriting a recursive call that is the
+  very last action in a function into a plain loop, reusing the same stack
+  frame instead of pushing a new one). Can the compiler optimize naive `fib`
+  into a loop? Try compiling with `-O2` and inspecting the assembly.

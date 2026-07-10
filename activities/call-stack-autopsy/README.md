@@ -1,17 +1,21 @@
 # Activity: Call Stack Autopsy
 
 When a C++ program crashes, the operating system (or a tool like
-AddressSanitizer) prints a stack trace showing every function that was
-active at the moment of the crash. Reading a stack trace is a fundamental
-debugging skill. This activity teaches you to read one, identify the bug
-that caused the crash, and reason about how to fix it.
+AddressSanitizer, often shortened to ASan, a compiler-inserted checker that
+catches memory errors at runtime) prints a stack trace showing every
+function that was active at the moment of the crash. Reading a stack trace
+is a fundamental debugging skill. This activity teaches you to read one,
+identify the bug that caused the crash, and reason about how to fix it.
 
 ## Concepts covered
 
 - Stack trace format: frame numbering, addresses, function names, source lines
-- Recognizing infinite recursion from an AddressSanitizer stack-overflow report
+- Recognizing infinite recursion from an AddressSanitizer stack-overflow
+  report (the crash that happens when recursion never stops and the stack
+  runs out of room for new stack frames)
 - Why a program survives many recursive calls before crashing (stack depth limit)
-- The relationship between a missing base case and unbounded recursion
+- The relationship between a missing base case (the condition that is
+  supposed to stop the recursion) and unbounded recursion
 
 ## How it works
 
