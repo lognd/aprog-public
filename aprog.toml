@@ -89,6 +89,12 @@ name = "Generators"
 [classification.topics.error-handling]
 name = "Error Handling"
 
+[classification.topics.scientific-computing]
+name = "Scientific Computing"
+
+[classification.topics.web-servers]
+name = "Web Servers"
+
 [classification.concepts.makefile]
 name = "Makefile"
 
@@ -187,6 +193,15 @@ name = "Context Managers"
 
 [classification.concepts.exception-handling]
 name = "Exception Handling"
+
+[classification.concepts.numpy]
+name = "NumPy Arrays and Vectorization"
+
+[classification.concepts.http]
+name = "HTTP Protocol"
+
+[classification.concepts.web-frameworks]
+name = "Web Frameworks"
 
 [labels.requires-filesystem]
 name = "Requires filesystem access"
