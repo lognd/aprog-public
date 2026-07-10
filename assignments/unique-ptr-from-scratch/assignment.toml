@@ -1,0 +1,24 @@
+[assignment]
+slug        = "unique-ptr-from-scratch"
+name        = "Unique Pointer From Scratch"
+author      = "lognd"
+description = "Build a simplified std::unique_ptr from scratch to learn RAII and move-only ownership, then contrast it with std::unique_ptr and std::make_unique in a small set of factory/ownership-transfer functions."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["memory-management"]
+concepts   = ["pointers", "object-oriented"]
+labels     = ["starter-code", "unit-tests", "multi-file"]
+
+[template]
+slug = "cpp-header-impl"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++", "valgrind"]
