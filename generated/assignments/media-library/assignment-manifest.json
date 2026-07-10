@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1",
+  "assignment": {
+    "slug": "media-library",
+    "name": "Media Library",
+    "author": "lognd",
+    "description": "Build a small media catalog using an abstract base class (Book, Film, Album) and a Library class that composes non-owning pointers to those items."
+  },
+  "classification": {
+    "language": "cpp",
+    "difficulty": "medium",
+    "topics": [
+      "data-structures"
+    ],
+    "course": null
+  },
+  "template": {
+    "slug": "cpp-class",
+    "version": ""
+  },
+  "paths": {
+    "assignment_root": "assignments/media-library",
+    "readme": "assignments/media-library/README.md",
+    "visible_tests": "assignments/media-library/visible-tests"
+  },
+  "state": "draft",
+  "source_hash": "sha256:fec90eb5a4c2492ba2a5dc395626379294f3e59fc785eb6e0a1c4970673f43c2"
+}

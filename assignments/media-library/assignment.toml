@@ -1,0 +1,24 @@
+[assignment]
+slug        = "media-library"
+name        = "Media Library"
+author      = "lognd"
+description = "Build a small media catalog using an abstract base class (Book, Film, Album) and a Library class that composes non-owning pointers to those items."
+version     = "0.1.0"
+status      = "draft"
+
+[classification]
+language   = "cpp"
+difficulty = "medium"
+topics     = ["data-structures"]
+concepts   = ["object-oriented"]
+labels     = ["starter-code", "unit-tests", "multi-file"]
+
+[template]
+slug = "cpp-class"
+
+[grader]
+visibility        = "after_due_date"
+stdout_visibility = "after_due_date"
+
+[grader.dependencies]
+system = ["cmake", "g++"]
