@@ -1,6 +1,6 @@
 # Activity: Stale Build
 
-You have inherited a prime-counting utility. The CI pipeline always runs
+You have inherited a prime-counting utility. The CI (continuous integration) pipeline -- the automated system that builds and tests every change -- always runs
 `make clean && make` before testing, and it always passes. Your colleague
 reports that when they edit `limits.h` and run `make` locally (without
 cleaning first), the binary still prints the old result. They have gone on
@@ -21,8 +21,9 @@ the Makefile.
 `sieve.cpp` implements a trial-division primality test. For each candidate
 `n` in `[2, SIEVE_LIMIT]`, it checks every integer `d` from 2 up to the
 square root of `n`. If no `d` divides `n` evenly, `n` is prime. The limit
-is defined in `limits.h` as a compile-time constant. `main.cpp` calls
-`prime_count()` and prints the result.
+is defined in `limits.h` as a compile-time constant -- a value baked into
+the compiled machine code rather than read while the program runs. `main.cpp`
+calls `prime_count()` and prints the result.
 
 Because `SIEVE_LIMIT` is a compile-time constant, changing it in `limits.h`
 only takes effect if the files that include it are recompiled. That is the

@@ -9,7 +9,8 @@ A multi-module C++ project with no build system. Your job is to write
 - `add_library(STATIC ...)` and `add_executable` target definitions
 - `target_include_directories` with PUBLIC vs PRIVATE visibility
 - `target_link_libraries` and transitive dependency propagation
-- `enable_testing` and `add_test` for CTest integration
+- `enable_testing` and `add_test` for CTest integration (CTest is CMake's
+  built-in test runner)
 
 ## How it works
 
