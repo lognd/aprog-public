@@ -12,6 +12,9 @@ class from scratch with correct move semantics, `release`, and `reset`.
   -- Dynamic Memory]
 - RAII and why an owning type deletes its copy operations [assumed: row 21
   -- OOP Implementation in C++]
+- Operator overloading, the member-vs-free decision rule, and
+  `explicit operator bool` [assumed: row 21 -- OOP Implementation in
+  C++]
 - Double-delete, leaks, and dangling pointers as bug classes [assumed:
   row 25 -- Dynamic Memory]
 - Valgrind and ASan leak checking [assumed: row 26 -- Memory & Profiling

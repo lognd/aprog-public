@@ -210,6 +210,7 @@ Assignments: none.
 Activities:
 - `ctor-dtor-tracer` -- predict the exact construction/destruction output of eight programs to learn object lifetime rules
 - `encapsulation-audit` -- diagnose what (if anything) is wrong with ten small class designs: public data, missing const, leaky getters
+- `operator-overload-workshop` -- predict output of nine programs covering operator==/+/<</[]/++/bool overloading and the member-vs-free decision rule
 
 Assignments:
 - `fraction-arithmetic` -- implement a Fraction class that maintains a lowest-terms invariant across every constructor and operation

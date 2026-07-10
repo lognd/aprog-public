@@ -104,6 +104,40 @@ Concept: RAII (Resource Acquisition Is Initialization)
   the same acquire-in-constructor/release-in-destructor shape manages heap
   memory, locks, and sockets.
 
+Concept: operator overloading
+- Know that an operator like `+`, `==`, `<<`, or `[]` applied to a class
+  type is a function call in disguise: `a + b` means `a.operator+(b)`
+  (member) or `operator+(a, b)` (free function) -- the operator syntax is
+  shorthand the compiler provides for calling a function you wrote.
+- Be able to apply the member-vs-free decision rule: write the operator
+  as a member function when the class's own object is the left operand
+  (`a + b` where `a` is your type); write it as a free function when the
+  left operand belongs to a type you do not own (e.g. `std::cout << p`,
+  where `std::cout` is an `std::ostream`, not your class).
+- Know that `operator==` and similar comparison operators decide what
+  "equal" means for a class -- by default, comparing two objects compares
+  nothing at all unless `operator==` is written, and it is what lets
+  `std::string`'s `==` compare characters instead of addresses (the
+  mystery from row 12's C-string vs `std::string` activity).
+- Know that an arithmetic operator like `operator+` conventionally builds
+  and returns a NEW object rather than modifying either operand -- the
+  same shape as `int c = a + b;` leaving `a` and `b` unchanged.
+- Know `operator[]`'s two-overload pattern: a non-const overload
+  returning `T&` (so the caller can write through it) and a const
+  overload returning `T` by value (read-only, selected automatically
+  when the object itself is const).
+- Know the difference between `operator++()` (pre-increment: increments
+  first, returns the updated object by reference) and `operator++(int)`
+  (post-increment: saves a copy of the old value first, increments, then
+  returns the saved copy by value) -- this is the same distinction you
+  will meet again with iterators.
+- Know that `explicit operator bool` lets an object be used directly in
+  `if`/`while`/`!` conditions while blocking accidental implicit
+  conversions to `int` or unintended comparisons -- and that the compiler
+  enforces nothing about what an operator "should" do, so the real
+  constraint on writing one is never surprising the reader (an
+  `operator+` that subtracts compiles fine; it is simply a bug).
+
 ## Study checklist
 
 - [ ] Predict the construction/destruction print order for two locals, a
@@ -119,4 +153,5 @@ Concept: RAII (Resource Acquisition Is Initialization)
 
 ## Practiced in
 
-`ctor-dtor-tracer`, `encapsulation-audit`, `fraction-arithmetic`, `raii-file-guard`
+`ctor-dtor-tracer`, `encapsulation-audit`, `operator-overload-workshop`,
+`fraction-arithmetic`, `raii-file-guard`
