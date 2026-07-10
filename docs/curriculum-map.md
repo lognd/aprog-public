@@ -469,13 +469,21 @@ Activities:
 
 Assignments: none.
 
-## 53. Python Generics & Typing (planned)
+## 53. Python Generics & Typing (untested)
 
-Nothing built yet.
+Activities:
+- `annotation-arsenal` -- pick correct annotations, read Callable types, TypeVar vs overload, and the mutable-default trap
+- `typevar-tracer` -- observe that annotations and TypeVars vanish at runtime: no coercion, no enforcement, live mutable-default growth
 
-## 54. Python Generators (planned)
+Assignments: none.
 
-Nothing built yet.
+## 54. Python Generators (untested)
+
+Activities:
+- `yield-yard` -- predict output of nine generator snippets proving pause/resume, laziness, exhaustion, and pipeline chaining
+
+Assignments:
+- `lazy-pipeline` -- build a five-stage generator log pipeline where instrumented iterables prove each stage consumes only what it must
 
 ## 55. Python Async, Threads, Multiprocessing (planned)
 
