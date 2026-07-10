@@ -13,8 +13,8 @@ APROG=$4
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 
-mkdir -p "$tmp/grader" "$tmp/solutions"
+mkdir -p "$tmp/grader" "$tmp/solutions/assignments"
 cp -r "$PRIVATE/grader/$SLUG"    "$tmp/grader/"
-cp -r "$PRIVATE/solutions/assignments/$SLUG" "$tmp/solutions/"
+cp -r "$PRIVATE/solutions/assignments/$SLUG" "$tmp/solutions/assignments/"
 
 "$APROG" verify "$SLUG" --private "$tmp" --public "$PUBLIC"

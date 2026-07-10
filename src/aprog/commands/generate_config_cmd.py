@@ -6,8 +6,10 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+from jinja2 import Template
 from rich.console import Console
 
+from aprog.constants import GENERATOR_VERSION
 from aprog.models.assignment import AssignmentConfig
 from aprog.models.manifest import (
     AssignmentManifest,
@@ -17,7 +19,13 @@ from aprog.models.manifest import (
     ManifestTemplate,
     PrivateManifest,
 )
-from aprog.utils.hashing import hash_assignment_public
+from aprog.paths import (
+    generated_assignment_dir,
+    grader_dir,
+    sibling_hidden_tests_dir,
+    solution_dir,
+)
+from aprog.utils.hashing import hash_assignment_public, hash_paths
 from aprog.utils.repo import (
     all_assignment_slugs,
     find_public_root,
@@ -26,7 +34,12 @@ from aprog.utils.repo import (
 
 console = Console()
 
-_RUN_AUTOGRADER_PY_TEMPLATE = """\
+# Jinja renders the templated values (reprs computed in Python so the quoting
+# style matches exactly what the old str.format(...!r) call produced); the
+# literal Python dict/set braces in the exception handler are wrapped in
+# {% raw %} so Jinja does not try to parse them as expressions.
+_RUN_AUTOGRADER_PY_TEMPLATE = Template(
+    """\
 import json
 import sys
 import traceback
@@ -47,35 +60,36 @@ _RESULTS = Path("/autograder/results/results.json")
 if __name__ == "__main__":
     try:
         metadata = GraderMetadata.from_gradescope(
-            grader_name={assignment_name!r},
-            authors=[StaffAuthor(name={assignment_author!r}, role="Instructor")],
+            grader_name={{ assignment_name_repr }},
+            authors=[StaffAuthor(name={{ assignment_author_repr }}, role="Instructor")],
             notes="Contact course staff within 3 days if you believe there is a grading error.",
         )
         import inspect as _inspect
         _sig = _inspect.signature(make_pipeline)
-        _kwargs = {{"submission_dir": Path("/autograder/submission")}} if "submission_dir" in _sig.parameters else {{}}
+        {% raw %}_kwargs = {"submission_dir": Path("/autograder/submission")} if "submission_dir" in _sig.parameters else {}{% endraw %}
         with config(root_directory=Path("/autograder")):
             pipeline = make_pipeline(**_kwargs)
             score = pipeline(metadata=metadata)
             score.write_results_json(
                 config=GradescopeConfig(
-                    visibility={visibility!r},
-                    stdout_visibility={stdout_visibility!r},
+                    visibility={{ visibility_repr }},
+                    stdout_visibility={{ stdout_visibility_repr }},
                 )
             )
     except Exception:
         # Always write results.json so Gradescope receives a structured response
         # instead of a blank "no results" error.
         _RESULTS.parent.mkdir(parents=True, exist_ok=True)
-        _RESULTS.write_text(
-            json.dumps({{
+        {% raw %}_RESULTS.write_text(
+            json.dumps({
                 "score": 0,
                 "output": "Autograder error:\\n\\n" + traceback.format_exc(),
-            }}),
+            }),
             encoding="utf-8",
-        )
+        ){% endraw %}
         sys.exit(1)
 """
+)
 
 _RUN_AUTOGRADER_SH = """\
 #!/usr/bin/env bash
@@ -84,8 +98,6 @@ _RUN_AUTOGRADER_SH = """\
 # Reference run_autograder.py by its known absolute path.
 exec python3 /autograder/source/run_autograder.py "$@"
 """
-
-_GENERATOR_VERSION = "0.1"
 
 
 def _git_mark_executable(path: Path) -> None:
@@ -114,14 +126,12 @@ def cmd_generate_config(
         console.print(f"[red]Error:[/red] {e}")
         raise typer.Exit(1) from e
 
-    gen_dir = root / "generated" / "assignments" / slug
+    gen_dir = generated_assignment_dir(root, slug)
     manifest_path = gen_dir / "assignment-manifest.json"
     autograder_py = gen_dir / "run_autograder.py"
     autograder_sh = gen_dir / "run_autograder"
 
-    source_hash = hash_assignment_public(
-        root, slug, generator_version=_GENERATOR_VERSION
-    )
+    source_hash = hash_assignment_public(root, slug, GENERATOR_VERSION)
 
     # Check if regeneration is needed
     if manifest_path.exists() and not force:
@@ -167,11 +177,11 @@ def cmd_generate_config(
     manifest_path.write_text(json.dumps(manifest.model_dump(), indent=2) + "\n")
 
     autograder_py.write_text(
-        _RUN_AUTOGRADER_PY_TEMPLATE.format(
-            assignment_name=cfg.assignment.name,
-            assignment_author=cfg.assignment.author or "Course Staff",
-            visibility=cfg.grader.visibility,
-            stdout_visibility=cfg.grader.stdout_visibility,
+        _RUN_AUTOGRADER_PY_TEMPLATE.render(
+            assignment_name_repr=repr(cfg.assignment.name),
+            assignment_author_repr=repr(cfg.assignment.author or "Course Staff"),
+            visibility_repr=repr(cfg.grader.visibility),
+            stdout_visibility_repr=repr(cfg.grader.stdout_visibility),
         )
     )
 
@@ -195,34 +205,32 @@ def _generate_private(
     cfg: "AssignmentConfig",
     public_hash: str,
 ) -> None:
-    import hashlib
-
-    gen_dir = private_repo / "generated" / "assignments" / slug
+    gen_dir = generated_assignment_dir(private_repo, slug)
     gen_dir.mkdir(parents=True, exist_ok=True)
 
-    sol_dir = private_repo / "solutions" / slug
-    ht_dir = private_repo / "hidden-tests" / slug
-    gr_dir = private_repo / "grader" / slug
+    sol_dir = solution_dir(private_repo, slug)
+    ht_dir = sibling_hidden_tests_dir(private_repo, slug)
+    gr_dir = grader_dir(private_repo, slug)
 
     has_solution = sol_dir.exists()
-    has_hidden_tests = ht_dir.exists()
+    has_hidden_tests = ht_dir.exists() or (gr_dir / "hidden-tests").exists()
 
-    # Private source hash: extend public hash with private files
-    h = hashlib.sha256()
-    h.update(public_hash.encode())
-    for d in [sol_dir, ht_dir, gr_dir]:
-        if d.exists():
-            for p in sorted(d.rglob("*")):
-                if p.is_file():
-                    h.update(str(p.relative_to(private_repo)).encode())
-                    h.update(p.read_bytes())
-    private_hash = f"sha256:{h.hexdigest()}"
+    # Private source hash: extend the public hash with every private file's
+    # name and contents.
+    private_files = [
+        p
+        for d in (sol_dir, ht_dir, gr_dir)
+        if d.exists()
+        for p in d.rglob("*")
+        if p.is_file()
+    ]
+    private_hash = hash_paths(private_files, root=private_repo, extra=public_hash)
 
     private_manifest = PrivateManifest(
         assignment_slug=slug,
-        solution_path=f"solutions/{slug}",
-        hidden_tests_path=f"hidden-tests/{slug}",
-        grader_path=f"grader/{slug}",
+        solution_path=str(sol_dir.relative_to(private_repo)),
+        hidden_tests_path=str(ht_dir.relative_to(private_repo)),
+        grader_path=str(gr_dir.relative_to(private_repo)),
         has_solution=has_solution,
         has_hidden_tests=has_hidden_tests,
         private_source_hash=private_hash,
@@ -243,17 +251,11 @@ def _generate_private(
         except Exception:
             pass
 
-    verification_config = {
-        "schema_version": "0.1",
-        "assignment_slug": slug,
-        "solution_path": f"solutions/{slug}",
-        "hidden_tests_path": f"hidden-tests/{slug}",
-        "grader_path": f"grader/{slug}",
-        "has_solution": has_solution,
-        "has_hidden_tests": has_hidden_tests,
-        "private_source_hash": private_hash,
-        "verification_state": existing_state,
-    }
+    # Derive the verification config from the manifest model itself (rather
+    # than hand-building a near-identical dict) so the model stays the single
+    # source of truth for this shape.
+    verification_config = private_manifest.model_dump()
+    verification_config["verification_state"] = existing_state
     vc_path.write_text(json.dumps(verification_config, indent=2) + "\n")
 
     console.print(

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from aprog.commands.generate_config_cmd import cmd_generate_config
+from aprog.constants import GENERATOR_VERSION
 from aprog.utils.hashing import hash_assignment_public
 
 
@@ -71,7 +72,9 @@ def test_manifest_hash_matches_computed(public_root: Path) -> None:
         / "assignment-manifest.json"
     )
     data = json.loads(manifest_path.read_text())
-    expected = hash_assignment_public(public_root, "linked-list-insertion")
+    expected = hash_assignment_public(
+        public_root, "linked-list-insertion", GENERATOR_VERSION
+    )
     assert data["source_hash"] == expected
 
 

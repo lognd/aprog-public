@@ -9,6 +9,7 @@ from pydantic import ValidationError
 from rich.console import Console
 
 from aprog.boundary import scan_public_violations
+from aprog.constants import GENERATOR_VERSION
 from aprog.paths import (
     assignment_dir,
     generated_assignment_dir,
@@ -109,7 +110,7 @@ def cmd_validate(
     else:
         try:
             data = json.loads(manifest_path.read_text())
-            current_hash = hash_assignment_public(root, slug)
+            current_hash = hash_assignment_public(root, slug, GENERATOR_VERSION)
             if data.get("source_hash") != current_hash:
                 errors.append(
                     "Generated files are stale -- run: aprog generate-config " + slug

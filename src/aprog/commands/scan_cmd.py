@@ -8,6 +8,7 @@ import typer
 from rich.console import Console
 
 from aprog.boundary import scan_public_violations
+from aprog.constants import GENERATOR_VERSION
 from aprog.paths import assignment_dir, generated_assignment_dir
 from aprog.utils.hashing import hash_assignment_public
 from aprog.utils.repo import (
@@ -82,7 +83,7 @@ def cmd_check_generated(
 
         try:
             data = json.loads(manifest.read_text())
-            current = hash_assignment_public(root, s)
+            current = hash_assignment_public(root, s, GENERATOR_VERSION)
             stored = data.get("source_hash", "")
             if current != stored:
                 console.print(

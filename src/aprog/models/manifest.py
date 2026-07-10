@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from aprog.constants import SCHEMA_VERSION
+
 
 class ManifestAssignment(BaseModel):
     slug: str
@@ -31,7 +33,7 @@ class ManifestPaths(BaseModel):
 
 
 class AssignmentManifest(BaseModel):
-    schema_version: str = "0.1"
+    schema_version: str = SCHEMA_VERSION
     assignment: ManifestAssignment
     classification: ManifestClassification
     template: ManifestTemplate
@@ -41,7 +43,7 @@ class AssignmentManifest(BaseModel):
 
 
 class PrivateManifest(BaseModel):
-    schema_version: str = "0.1"
+    schema_version: str = SCHEMA_VERSION
     assignment_slug: str
     solution_path: str
     hidden_tests_path: str
@@ -53,7 +55,7 @@ class PrivateManifest(BaseModel):
 
 
 class PackageManifest(BaseModel):
-    schema_version: str = "0.1"
+    schema_version: str = SCHEMA_VERSION
     assignment_slug: str
     contains_solution: bool
     contains_hidden_tests: bool

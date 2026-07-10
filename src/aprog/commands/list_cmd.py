@@ -9,6 +9,14 @@ from pydantic import ValidationError
 from rich.console import Console
 from rich.table import Table
 
+from aprog.constants import GENERATOR_VERSION
+from aprog.paths import (
+    generated_assignment_dir,
+    grader_dir,
+    sibling_hidden_tests_dir,
+    solution_dir,
+)
+from aprog.utils.hashing import hash_assignment_public
 from aprog.utils.repo import (
     all_assignment_slugs,
     find_public_root,
@@ -108,19 +116,13 @@ def cmd_info(
     c = cfg.classification
     t = cfg.template
 
-    manifest_path = (
-        root / "generated" / "assignments" / slug / "assignment-manifest.json"
-    )
+    manifest_path = generated_assignment_dir(root, slug) / "assignment-manifest.json"
 
     hash_status = "missing"
     if manifest_path.exists():
-        import json as _json
-
         try:
-            manifest_data = _json.loads(manifest_path.read_text())
-            from aprog.utils.hashing import hash_assignment_public
-
-            current = hash_assignment_public(root, slug)
+            manifest_data = json.loads(manifest_path.read_text())
+            current = hash_assignment_public(root, slug, GENERATOR_VERSION)
             stored = manifest_data.get("source_hash", "")
             hash_status = "current" if current == stored else "stale"
         except Exception:
@@ -159,18 +161,12 @@ def cmd_info(
     if private_repo:
         console.print()
         console.print("[bold]Private:[/bold]")
-        sol = private_repo / "solutions" / slug
-        ht = private_repo / "hidden-tests" / slug
-        gr = private_repo / "grader" / slug
-        vc = (
-            private_repo
-            / "generated"
-            / "assignments"
-            / slug
-            / "verification-config.json"
-        )
+        sol = solution_dir(private_repo, slug)
+        ht = sibling_hidden_tests_dir(private_repo, slug)
+        gr = grader_dir(private_repo, slug)
+        vc = generated_assignment_dir(private_repo, slug) / "verification-config.json"
         console.print(
-            f"  Solution:     solutions/{slug}/      {'present' if sol.exists() else 'missing'}"
+            f"  Solution:     {sol.relative_to(private_repo)}/      {'present' if sol.exists() else 'missing'}"
         )
         console.print(
             f"  Hidden tests: hidden-tests/{slug}/   {'present' if ht.exists() else 'missing'}"
@@ -180,10 +176,8 @@ def cmd_info(
         )
         verified = "unknown"
         if vc.exists():
-            import json as _json
-
             try:
-                d = _json.loads(vc.read_text())
+                d = json.loads(vc.read_text())
                 verified = "yes" if d.get("verification_state") == "verified" else "no"
             except Exception:
                 verified = "error"
