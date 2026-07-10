@@ -69,28 +69,32 @@ Concept: async/await mechanics
 - Know a coroutine with no internal `await` still runs when awaited, but
   never yields the event loop partway through its own body.
 
-Concept: four machines, unmistakably distinguished
-- Event loop, threading, interrupts, and concurrency-vs-parallelism are
-  four DIFFERENT machines that get confused with each other constantly
-  -- know them well enough to classify any scenario on sight.
-- Event loop: one worker, switches happen where the running task's own
-  code chose to pause (`await`) -- cooperative scheduling.
+Concept: three machines, unmistakably distinguished
+- Event loop, threading, and concurrency-vs-parallelism are three
+  DIFFERENT machines that get confused with each other constantly --
+  know them well enough to classify any scenario on sight.
+- Event loop: a loop that waits for events/ready tasks and dispatches
+  them to handlers, switching where the running task's own code chose
+  to pause (`await`) -- cooperative scheduling. Commonly implemented as
+  one worker (`asyncio`, JavaScript, SFML's game loop), but the concept
+  itself does not require single-threadedness -- it can be implemented
+  multi-threaded/multi-core.
 - Threading: many workers, switches happen wherever the OS scheduler
   decides, with no cooperation from the running thread -- preemptive
   scheduling.
-- Hardware interrupt: the hardware forces the CPU to a handler
-  asynchronously, with no thread and no loop required at all.
-- Blast radius of a blocking call: freezes every task sharing an event
-  loop's one thread; stalls only its own thread inside threading.
+- Blast radius of a blocking call: freezes every task sharing a
+  single-threaded event loop's one thread; stalls only its own thread
+  inside threading.
 - Concurrency (structure: dealing with many things at once, needs no
   particular core count) vs. parallelism (simultaneous execution: doing
   many things at the same instant, requires multiple cores).
-- Layering 1: thread preemption is built on hardware timer interrupts
-  -- the timer's tick is what gives the OS scheduler its chance to act.
-- Layering 2: GUI/network "events" originate as hardware interrupts,
-  are absorbed by the OS, and are delivered to your event loop as
-  already-packaged queue items -- your code never sees the raw
-  interrupt itself.
+- Extra depth (see `who-handles-the-wait`'s README, not quizzed there):
+  hardware interrupts -- the hardware forces the CPU to a handler
+  asynchronously, with no thread and no loop required at all; thread
+  preemption is built on hardware timer interrupts; GUI/network "events"
+  originate as hardware interrupts, are absorbed by the OS, and are
+  delivered to your event loop as already-packaged queue items -- your
+  code never sees the raw interrupt itself.
 
 ## Study checklist
 
