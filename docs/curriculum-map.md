@@ -402,13 +402,22 @@ Activities:
 Assignments:
 - `parse-with-grace` -- build an exceptions-first parsing library with exact exception types/messages, propagation transparency, and RAII balance under throws
 
-## 45. Intro to Python (planned)
+## 45. Intro to Python (untested)
 
-Nothing built yet.
+Activities:
+- `python-culture-shock` -- predict output of nine Python snippets that surprise C++ programmers: names not owners, no overflow, slice copies
+- `indentation-court` -- rule on indentation structure, no-block-scope visibility, truthiness, and is None conventions
 
-## 46. Python Syntax (including OOP) (planned)
+Assignments: none.
 
-Nothing built yet.
+## 46. Python Syntax (including OOP) (untested)
+
+Activities:
+- `dunder-decoder` -- predict output of eight class snippets mapping C++ OOP onto __init__, self, __str__/__repr__, __eq__, and super()
+- `pythonic-or-not` -- pick the idiomatic version: enumerate over range(len), join over loop concat, attributes over getters
+
+Assignments:
+- `cpp-to-python-phrasebook` -- port six course-familiar string functions to stdlib-only Python, graded by pytest with a ty cleanliness bonus
 
 ## 47. Python Data Types (planned)
 
