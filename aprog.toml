@@ -77,6 +77,9 @@ name = "Memory Management"
 [classification.topics.concurrency]
 name = "Concurrency"
 
+[classification.topics.oop]
+name = "Object-Oriented Programming"
+
 [classification.concepts.makefile]
 name = "Makefile"
 
@@ -130,6 +133,36 @@ name = "CLI Arguments"
 
 [classification.concepts.shell-scripting]
 name = "Shell Scripting"
+
+[classification.concepts.stdin-stdout]
+name = "Standard Input/Output"
+
+[classification.concepts.encapsulation]
+name = "Encapsulation"
+
+[classification.concepts.inheritance]
+name = "Inheritance"
+
+[classification.concepts.polymorphism]
+name = "Polymorphism"
+
+[classification.concepts.templates]
+name = "Templates"
+
+[classification.concepts.design-patterns]
+name = "Design Patterns"
+
+[classification.concepts.raii]
+name = "RAII"
+
+[classification.concepts.smart-pointers]
+name = "Smart Pointers"
+
+[classification.concepts.move-semantics]
+name = "Move Semantics"
+
+[classification.concepts.dynamic-memory]
+name = "Dynamic Memory"
 
 [labels.requires-filesystem]
 name = "Requires filesystem access"
