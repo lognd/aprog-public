@@ -57,6 +57,67 @@ Concept: annotations have zero runtime effect
 - Be able to use `isinstance` against a Python 3.10+ union written with
   `|`.
 
+Concept: the local quality toolbox (linter, formatter, type checker)
+- Know each tool's job: `ruff check` is a linter (flags legal-but-
+  almost-certainly-wrong patterns like unused imports, undefined names,
+  mutable default arguments), `ruff format` is a formatter (rewrites
+  layout to one canonical style, never behavior), `ty` is a static type
+  checker (reads the annotations the interpreter ignores and reports
+  broken promises without running the code), and `pytest` runs the
+  tests. `mypy` and `black` are the classic equivalents of `ty` and
+  `ruff format`.
+- Know the fix loop discipline: run the tool, read the FIRST error,
+  fix the smallest thing it points at, rerun.
+- Know a type checker catches paths tests never exercise (a function
+  that can implicitly return `None` fails `ty` even when every test
+  passes), and that tools can overlap: one typo can show up as a ruff
+  F821 and a ty unresolved-reference at once.
+
+Concept: pytest in depth
+- Know discovery is naming: pytest collects `test_*.py` files and
+  `test_*` functions; `pytest --collect-only -q` lists what it found,
+  one node ID per line.
+- Know plain `assert` failures show both sides of the comparison
+  (pytest rewrites asserts for introspection -- no REQUIRE macro
+  needed).
+- Know `@pytest.mark.parametrize` runs one test body once per case,
+  each case its own node ID, failures reported individually.
+- Know fixtures are injected by parameter name (`tmp_path` gives a
+  fresh temporary directory; `monkeypatch` temporarily replaces
+  attributes or environment variables and undoes itself).
+- Be able to assert an expected exception with
+  `pytest.raises(ValueError)`.
+- Know markers (`@pytest.mark.slow`, registered in pyproject.toml) and
+  selection: `-m "not slow"` deselects by marker, `-k name` selects by
+  name substring.
+- Know a coverage percentage means lines EXECUTED by tests, not
+  correctness -- an assert-free suite can score 100%.
+
+Concept: CI/CD, secrets, and .env practices
+- Know CONTINUOUS INTEGRATION means a robot runs the project's checks
+  on every push, and CONTINUOUS DEPLOYMENT adds automated shipping
+  after the checks pass -- on top of CI, never instead of it.
+- Know GitHub Actions workflow anatomy: the `on:` trigger says WHEN
+  (push, pull_request, tags), each job is a fresh virtual machine, and
+  commands like `uv run pytest` are steps inside a job.
+- Know the red X blocking a merge is a feature: it moves "remember to
+  run the checks" out of human memory into a mechanism.
+- Know "passes locally, fails in CI" usually means version or
+  environment drift, fixed by installing from a committed lockfile
+  (`uv.lock`, `uv sync --locked`).
+- Know credentials live in GitHub Actions Secrets, never in the repo:
+  the runner masks secret values in logs, fork PRs run without
+  secrets, and environment secrets can require manual approval before
+  a production job runs.
+- Know the ssh deploy skeleton (authenticate via ssh-agent +
+  ssh-keyscan, rsync the artifacts, restart the service over ssh) and
+  the deploy-trigger tradeoff (push-to-main ships every merge;
+  tag/release keeps a human decision in the loop).
+- Know the .env pattern: real values in a gitignored `.env` read by
+  `load_dotenv()` at runtime, variable NAMES documented in a committed
+  `.env.example` with fake values, and code reading `os.environ`
+  identically in every environment.
+
 Concept: the mutable-default-argument trap
 - Know `def f(xs: list[int] = []):` builds that empty list object exactly
   ONCE, at the moment `f` is DEFINED -- not fresh on every call that omits
@@ -82,4 +143,5 @@ Concept: the mutable-default-argument trap
 
 ## Practiced in
 
-`annotation-arsenal`, `typevar-tracer`
+`annotation-arsenal`, `typevar-tracer`, `make-the-linter-happy`,
+`pytest-dojo`, `ship-it-pipeline`

@@ -489,6 +489,9 @@ Assignments: none.
 Activities:
 - `annotation-arsenal` -- pick correct annotations, read Callable types, TypeVar vs overload, and the mutable-default trap
 - `typevar-tracer` -- observe that annotations and TypeVars vanish at runtime: no coercion, no enforcement, live mutable-default growth
+- `make-the-linter-happy` -- fix seeded ruff/ty/pytest findings in a small typed project until all four quality gates run green
+- `pytest-dojo` -- write real pytest tests: a parametrized table, pytest.raises, a tmp_path fixture, and a slow marker that -m deselects
+- `ship-it-pipeline` -- CI/CD judgment calls: workflow anatomy, why the red X blocks merges, secrets and fork PRs, ssh deploys, .env practices
 
 Assignments: none.
 
