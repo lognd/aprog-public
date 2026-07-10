@@ -1,0 +1,22 @@
+[assignment]
+slug = "lazy-pipeline"
+name = "Lazy Pipeline"
+author = "lognd"
+description = "A generator-based log processing pipeline -- parse, filter, take, count, and chunk -- where laziness itself is the graded contract, proven with an instrumented iterable that counts how much of the source each stage actually consumes."
+version = "0.1.0"
+status = "draft"
+
+[classification]
+language = "python"
+difficulty = "medium"
+topics = ["generators", "typing"]
+concepts = ["generators", "laziness", "iterators"]
+labels = ["unit-tests"]
+
+[template]
+slug = "python-pytest"
+version = "0.1"
+
+[grader]
+visibility = "after_due_date"
+stdout_visibility = "after_due_date"

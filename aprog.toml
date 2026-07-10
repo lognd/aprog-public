@@ -80,6 +80,12 @@ name = "Concurrency"
 [classification.topics.oop]
 name = "Object-Oriented Programming"
 
+[classification.topics.typing]
+name = "Type Annotations and Generics"
+
+[classification.topics.generators]
+name = "Generators"
+
 [classification.concepts.makefile]
 name = "Makefile"
 
@@ -163,6 +169,15 @@ name = "Move Semantics"
 
 [classification.concepts.dynamic-memory]
 name = "Dynamic Memory"
+
+[classification.concepts.generators]
+name = "Generators"
+
+[classification.concepts.laziness]
+name = "Laziness"
+
+[classification.concepts.iterators]
+name = "Iterators"
 
 [labels.requires-filesystem]
 name = "Requires filesystem access"
