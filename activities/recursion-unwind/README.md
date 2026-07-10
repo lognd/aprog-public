@@ -3,7 +3,9 @@
 Recursion is not magic -- every call has a cost in time (how many calls
 happen) and space (how many frames are alive at once). This activity builds
 intuition for both by comparing three implementations of the same function:
-naive recursive Fibonacci, memoized recursive Fibonacci, and iterative
+naive recursive Fibonacci, memoized recursive Fibonacci (a version that
+caches each result the first time it is computed so later calls with the
+same input can look it up instead of recomputing it), and iterative
 Fibonacci.
 
 ## Concepts covered
