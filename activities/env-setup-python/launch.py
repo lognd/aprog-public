@@ -15,7 +15,7 @@ _BLOB = "df7096d14c47a1b87b7402a45b6ee3af058cace0fec3353efafb0d292cf67e819e7101e
 
 _LINE_WIDTH = 70
 _MIN_PYTHON = (3, 10)
-_TOOLS = ["uv", "ruff", "ty", "pytest"]
+_TOOLS = ["uv", "ruff", "ty", "pytest", "black", "mypy"]
 
 def _banner(title):
     print("=" * _LINE_WIDTH)
@@ -85,6 +85,15 @@ def main():
         print(f"  {'python3':20s} TOO OLD   Python {ver_str}  (need >= 3.10)")
         all_ok = False
 
+    # pip (via this interpreter; students must know the classic installer too)
+    ok_pip, ver_pip = _run([sys.executable, "-m", "pip", "--version"])
+    if ok_pip:
+        parts = ver_pip.split()
+        print(f"  {'pip':20s} FOUND     {parts[0]} {parts[1]}")
+    else:
+        print(f"  {'pip':20s} NOT FOUND")
+        all_ok = False
+
     # Course tools
     missing = []
     for tool in _TOOLS:
@@ -116,6 +125,10 @@ def main():
             _wrap("After installing, open a new terminal and run this script "
                   "again if the commands are still not found. If they are "
                   "still missing, see Troubleshooting in README.md (PATH).")
+        elif not ok_pip:
+            _wrap("pip is missing for this Python. Install it with your "
+                  "system package manager (e.g. sudo apt install python3-pip) "
+                  "-- see README.md Step 4.")
         elif (v.major, v.minor) < _MIN_PYTHON:
             _wrap(f"Python {ver_str} is too old. Install Python 3.10 or later "
                   "and re-run this script with the newer version.")

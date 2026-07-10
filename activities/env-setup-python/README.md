@@ -8,9 +8,12 @@
 > Next: [3. Compiler](../env-setup-compiler/)
 
 Several course utilities and activity launchers are written in Python.
-You also need a set of standard development tools -- a package manager,
-a formatter/linter, a type checker, and a test runner -- that you will
-use throughout the course.
+You also need the standard Python development tools -- package
+managers, formatters, a linter, type checkers, and a test runner --
+that you will use throughout the course. You will install both the
+modern tools (uv, ruff, ty) and the classic ones (pip, black, mypy):
+real projects use both generations, and you need to be comfortable in
+either world.
 
 <details>
 <summary>What is Python and why does this course use it?</summary>
@@ -26,8 +29,9 @@ This course uses Python for:
 - Build and grading scripts
 - Assignments that involve scripting or automation
 
-The tools you install below (uv, ruff, ty, pytest) are the modern
-standard for Python development quality. You will see them in
+The tools you install below (uv, ruff, ty, pytest, black, mypy, pip)
+are the standard toolbox for Python development quality -- both the
+modern generation and the classic one. You will see all of them in
 professional codebases.
 
 </details>
@@ -175,35 +179,60 @@ have to create and activate by hand.
 
 ## Step 3: Install the course tools
 
-Install the three course tools with `uv tool install`:
+You will install five tools. Two pairs of them do the same job as
+each other -- one classic tool and one modern replacement per pair.
+You need to be familiar with both members of each pair, because you
+will meet both in real projects: the classic ones dominate existing
+codebases and tutorials, and the modern ones are what new projects
+pick.
+
+| Job | Classic tool | Modern tool |
+|-----|--------------|-------------|
+| Format code | `black` | `ruff format` |
+| Lint code (find likely bugs without running it) | -- | `ruff check` |
+| Type checking | `mypy` | `ty` |
+| Run tests | `pytest` | `pytest` (no replacement needed) |
+
+Install all of them with `uv tool install`:
 
 ```bash
 uv tool install ruff
 uv tool install ty
 uv tool install pytest
+uv tool install black
+uv tool install mypy
 ```
 
 <details>
 <summary>What does each tool do?</summary>
 
 **ruff** -- an extremely fast Python formatter and linter in one
-tool. `ruff format myfile.py` reformats your code to a consistent
-style (so diffs are about logic, not whitespace). `ruff check .`
-lints it: it reads your code without running it and reports likely
-bugs, unused imports, undefined variables, and hundreds of other
-issues.
+tool. A formatter rewrites your source file into one consistent
+style (spacing, line breaks, quotes) so diffs are about logic, not
+whitespace: `ruff format myfile.py`. A linter reads your code
+without running it and reports likely bugs -- unused imports,
+undefined variables, suspicious comparisons: `ruff check .`.
 
-**ty** -- a fast static type checker for Python. Python is
-dynamically typed (types are checked at runtime), but you can add
-optional type annotations to your code. `ty check myfile.py` reads
-those annotations and reports type errors before you run the
-program -- similar to what a C++ compiler does at compile time.
+**black** -- the classic Python formatter, the one that made
+auto-formatting standard practice. `black myfile.py` does the same
+job as `ruff format` (ruff deliberately matches black's style).
+Most existing Python projects you encounter will use black.
 
-**pytest** -- the standard Python testing framework. It discovers and
-runs test functions (functions whose names start with `test_`) and
-reports which pass and which fail. The course uses pytest for visible
-tests you can run locally. Run it with `pytest` in a project
-directory.
+**ty** -- a fast static type checker. Python is dynamically typed
+(types are checked while the program runs), but you can add optional
+type annotations like `def f(x: int) -> str:`. A type checker reads
+those annotations and reports type errors before you run anything --
+similar to what a C++ compiler does at compile time. Run it with
+`ty check myfile.py`.
+
+**mypy** -- the original and most widely used Python type checker.
+`mypy myfile.py` does the same job as `ty`, more slowly but with a
+decade of maturity. Most real projects today configure mypy.
+
+**pytest** -- the standard Python testing framework. It discovers
+and runs test functions (functions whose names start with `test_`)
+and reports which pass and which fail. The course uses pytest for
+visible tests you can run locally.
 
 </details>
 
@@ -214,15 +243,81 @@ uv --version
 ruff --version
 ty --version
 pytest --version
+black --version
+mypy --version
 ```
 
 If any command is not found, see Troubleshooting below.
 
 ---
 
+## Step 4: Meet pip, the classic installer
+
+`uv` is new. The tool the Python world used for the last two decades
+is `pip`, and every tutorial, Stack Overflow answer, and existing
+project you touch will mention it. You need to know how to use it.
+
+First check that pip exists for your Python:
+
+```bash
+python3 -m pip --version
+```
+
+If that fails on Ubuntu/Debian/WSL, install it:
+
+```bash
+sudo apt install python3-pip
+```
+
+Now use pip once, the safe way -- inside a virtual environment:
+
+```bash
+python3 -m venv ~/pip-playground     # create an isolated environment
+source ~/pip-playground/bin/activate # activate it (prompt changes)
+pip install cowsay                   # install a package with pip
+python -c "import cowsay; cowsay.cow('pip works')"
+deactivate                           # leave the environment
+```
+
+<details>
+<summary>What is a virtual environment and why did we need one?</summary>
+
+A virtual environment (venv) is a private copy of Python's package
+folder for one project. Installing into it cannot break anything
+else on your system.
+
+If you run bare `pip install` outside a venv on a modern Linux, you
+will hit an `externally-managed-environment` error: the operating
+system protects its own Python packages from being changed, because
+system tools depend on them. The venv is the standard answer -- and
+the reason `uv tool install` "just worked" in Step 3 is that uv
+creates an isolated environment per tool for you automatically.
+
+The workflow you just ran (create venv, activate, pip install) is
+what virtually every existing Python project's README will ask you
+to do.
+
+</details>
+
+<details>
+<summary>How does pip actually work?</summary>
+
+When you run `pip install cowsay`, pip queries PyPI (the Python
+Package Index at pypi.org -- a public repository of hundreds of
+thousands of packages), downloads the package, and unpacks it into
+the active environment's `site-packages` directory, which is the
+folder Python searches when you write `import cowsay`. It does the
+same recursively for anything the package depends on. `uv` talks to
+the same PyPI; it is a faster client for the same ecosystem.
+
+</details>
+
+---
+
 ## Verify completion
 
-Once all four commands respond to `--version`, run the activity
+Once all six commands respond to `--version` (and `python3 -m pip
+--version` works), run the activity
 script. Open your WSL terminal (or any terminal on macOS/Linux),
 navigate to this activity's folder, and run:
 
