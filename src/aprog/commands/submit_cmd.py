@@ -65,7 +65,9 @@ def cmd_submit(
         console.print(
             "\nSubmit this file to your maintainer using the process documented at:"
         )
-        console.print("  https://your-org/instructions")
+        console.print(
+            "  https://github.com/lognd/aprog-public/blob/main/docs/contributors/quickstart.md"
+        )
 
 
 def _upload(bundle: Path, slug: str, url: str) -> None:

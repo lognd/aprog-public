@@ -5,7 +5,7 @@ version = "0.1"
 description = "Assignment where students write a shell script, graded by running it in a controlled environment."
 
 [classification]
-language = "cpp"
+language = "shell"
 default_difficulty = "medium"
 recommended_topics = ["systems"]
 

@@ -14,6 +14,9 @@ name = "C"
 [classification.languages.java]
 name = "Java"
 
+[classification.languages.shell]
+name = "Shell"
+
 [classification.difficulties.easy]
 name = "Easy"
 rank = 1
