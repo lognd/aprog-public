@@ -43,7 +43,7 @@ def test_assignment_validates_against_root_config(slug: str) -> None:
 
 @pytest.mark.parametrize("slug", _all_slugs())
 def test_no_private_content_in_public(slug: str) -> None:
-    from aprog.commands.validate_cmd import _scan_public_violations
+    from aprog.boundary import scan_public_violations
 
-    violations = _scan_public_violations(_ASSIGNMENTS_DIR / slug)
+    violations = scan_public_violations(_ASSIGNMENTS_DIR / slug)
     assert violations == [], f"{slug}: public/private boundary violations: {violations}"

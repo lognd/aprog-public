@@ -1,27 +1,10 @@
 from __future__ import annotations
 
-import re
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-_SLUG_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
-
-_RESERVED = frozenset(
-    {
-        "private",
-        "hidden",
-        "solution",
-        "solutions",
-        "answer",
-        "answers",
-        "key",
-        "generated",
-        "secret",
-        "grader",
-        "pipeline",
-    }
-)
+from aprog.boundary import RESERVED_SLUGS, SLUG_RE
 
 _VISIBILITY_VALUES = frozenset(
     {"visible", "hidden", "after_due_date", "after_published"}
@@ -39,9 +22,9 @@ class AssignmentSection(BaseModel):
     @field_validator("slug")
     @classmethod
     def slug_is_valid(cls, v: str) -> str:
-        if not _SLUG_RE.match(v):
+        if not SLUG_RE.match(v):
             raise ValueError(f"slug must be kebab-case, got {v!r}")
-        if v in _RESERVED:
+        if v in RESERVED_SLUGS:
             raise ValueError(f"slug {v!r} is a reserved name")
         return v
 

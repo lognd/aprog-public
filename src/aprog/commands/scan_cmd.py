@@ -7,6 +7,8 @@ from typing import Optional
 import typer
 from rich.console import Console
 
+from aprog.boundary import scan_public_violations
+from aprog.paths import assignment_dir, generated_assignment_dir
 from aprog.utils.hashing import hash_assignment_public
 from aprog.utils.repo import (
     all_assignment_slugs,
@@ -15,63 +17,12 @@ from aprog.utils.repo import (
 
 console = Console()
 
-_PRIVATE_DIRS = {
-    "solution",
-    "solutions",
-    "hidden",
-    "hidden-tests",
-    "hidden_tests",
-    "private",
-    "grader",
-}
-_PROHIBITED_NAMES = {
-    "solution",
-    "solutions",
-    "hidden",
-    "hidden-tests",
-    "hidden_tests",
-    "private",
-    "private-notes.md",
-    "answer-key.md",
-    "pipeline.py",
-}
-_PROHIBITED_PREFIXES = (
-    "solution.",
-    "answer.",
-    "reference-solution.",
-    "reference_solution.",
-)
-
 
 def _scan_one(assignment_root: Path) -> list[str]:
-    violations = []
-    for path in assignment_root.rglob("*"):
-        rel = path.relative_to(assignment_root)
-        parts = rel.parts
-        name = path.name
-
-        if name in _PROHIBITED_NAMES:
-            violations.append(
-                f"ERROR: {assignment_root.name}/{rel} -- prohibited name '{name}'"
-            )
-            continue
-
-        for part in parts[:-1]:
-            if part in _PRIVATE_DIRS:
-                violations.append(
-                    f"ERROR: {assignment_root.name}/{rel} -- '{part}/' directory is private"
-                )
-                break
-
-        if path.is_file():
-            for prefix in _PROHIBITED_PREFIXES:
-                if name.startswith(prefix) or name == prefix.rstrip("."):
-                    violations.append(
-                        f"ERROR: {assignment_root.name}/{rel} -- matches prohibited pattern '{prefix}*'"
-                    )
-                    break
-
-    return violations
+    return [
+        f"ERROR: {assignment_root.name}/{v}"
+        for v in scan_public_violations(assignment_root)
+    ]
 
 
 def cmd_scan_public(
@@ -88,7 +39,7 @@ def cmd_scan_public(
 
     all_violations = []
     for s in slugs:
-        assignment_root = root / "assignments" / s
+        assignment_root = assignment_dir(root, s)
         if not assignment_root.exists():
             console.print(f"[red]Error:[/red] Assignment not found: assignments/{s}/")
             raise typer.Exit(2)
@@ -117,7 +68,7 @@ def cmd_check_generated(
 
     any_stale = False
     for s in slugs:
-        gen_dir = root / "generated" / "assignments" / s
+        gen_dir = generated_assignment_dir(root, s)
         manifest = gen_dir / "assignment-manifest.json"
         autograder = gen_dir / "run_autograder.py"
 

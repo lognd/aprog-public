@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import shutil
 from pathlib import Path
 from typing import Optional
@@ -9,11 +8,10 @@ import typer
 from jinja2 import StrictUndefined
 from rich.console import Console
 
+from aprog.boundary import SLUG_RE
 from aprog.utils.repo import find_public_root, load_template_config, resolve_staging_dir
 
 console = Console()
-
-_SLUG_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
 
 
 def _render_jinja(source: str, variables: dict) -> str:
@@ -31,7 +29,7 @@ def cmd_new(
     force: bool = False,
     public_root: Optional[Path] = None,
 ) -> None:
-    if not _SLUG_RE.match(slug):
+    if not SLUG_RE.match(slug):
         console.print(f"[red]Error:[/red] Slug must be kebab-case, got {slug!r}")
         raise typer.Exit(2)
 
@@ -147,7 +145,8 @@ def _write_default_public(dst: Path, v: dict) -> None:
 
 def _write_default_private(dst: Path, v: dict) -> None:
     (dst / "solution").mkdir(parents=True, exist_ok=True)
-    (dst / "hidden-tests" / "tests").mkdir(parents=True, exist_ok=True)
+    (dst / "hidden-tests").mkdir(parents=True, exist_ok=True)
+    (dst / "hidden-tests" / "test_hidden.py").write_text("# Add hidden tests here.\n")
     (dst / "grader").mkdir(parents=True, exist_ok=True)
     (dst / "grader" / "pipeline.py").write_text(
         "from lograder.pipeline.input.local_directory import LocalDirectory\n"

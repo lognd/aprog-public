@@ -285,14 +285,21 @@ def intake(
 
 @app.command("verify")
 def verify(
-    slug: str,
+    slug: Annotated[Optional[str], typer.Argument()] = None,
+    all_: Annotated[bool, typer.Option("--all")] = False,
     public: _Public = None,
     private: _Private = None,
 ) -> None:
     """Run maintainer verification against the reference solution."""
-    from aprog.commands.verify_cmd import cmd_verify
+    from aprog.commands.verify_cmd import cmd_verify, cmd_verify_all
 
-    cmd_verify(slug, public_repo=public, private_repo=private)
+    if all_:
+        cmd_verify_all(public_repo=public, private_repo=private)
+    elif slug:
+        cmd_verify(slug, public_repo=public, private_repo=private)
+    else:
+        typer.echo("Provide a slug or --all", err=True)
+        raise typer.Exit(2)
 
 
 # -- package-gradescope --------------------------------------------------------

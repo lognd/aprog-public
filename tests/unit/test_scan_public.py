@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from aprog.commands.validate_cmd import _scan_public_violations
+from aprog.boundary import scan_public_violations as _scan_public_violations
 
 
 def _make_assignment(tmp_path: Path, files: list[str]) -> Path:

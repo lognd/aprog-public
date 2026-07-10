@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -7,6 +8,13 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
+from aprog.boundary import scan_public_violations
+from aprog.paths import (
+    assignment_dir,
+    generated_assignment_dir,
+    grader_pipeline_file,
+    solution_dir,
+)
 from aprog.utils.hashing import hash_assignment_public
 from aprog.utils.repo import (
     all_assignment_slugs,
@@ -16,60 +24,6 @@ from aprog.utils.repo import (
 )
 
 console = Console()
-
-_PROHIBITED_NAMES = {
-    "solution",
-    "solutions",
-    "hidden",
-    "hidden-tests",
-    "hidden_tests",
-    "private",
-    "private-notes.md",
-    "answer-key.md",
-    "grader",
-    "pipeline.py",
-}
-_PROHIBITED_PATTERNS = [
-    "solution.",
-    "answer.",
-    "reference-solution.",
-    "reference_solution.",
-]
-_PRIVATE_DIRS = {
-    "solution",
-    "solutions",
-    "hidden",
-    "hidden-tests",
-    "hidden_tests",
-    "private",
-    "grader",
-}
-_SAFE_DIRS = {"visible-tests", "assets", "expected"}
-
-
-def _scan_public_violations(assignment_root: Path) -> list[str]:
-    violations = []
-    for path in assignment_root.rglob("*"):
-        rel = path.relative_to(assignment_root)
-        parts = rel.parts
-        name = path.name
-
-        if name in _PROHIBITED_NAMES:
-            violations.append(f"{rel} -- prohibited name")
-            continue
-
-        for part in parts[:-1]:
-            if part in _PRIVATE_DIRS:
-                violations.append(f"{rel} -- '{part}/' directory is private")
-                break
-
-        if path.is_file():
-            for pat in _PROHIBITED_PATTERNS:
-                if name.startswith(pat) or name == pat.rstrip("."):
-                    violations.append(f"{rel} -- matches prohibited pattern '{pat}*'")
-                    break
-
-    return violations
 
 
 def cmd_validate(
@@ -128,7 +82,7 @@ def cmd_validate(
     if not tpl_dir.exists():
         errors.append(f"Template not found: templates/{cfg.template.slug}/")
 
-    assignment_root = root / "assignments" / slug
+    assignment_root = assignment_dir(root, slug)
 
     # README exists
     if not (assignment_root / "README.md").exists():
@@ -140,14 +94,12 @@ def cmd_validate(
         errors.append("Missing or empty visible-tests/")
 
     # Public/private boundary scan
-    violations = _scan_public_violations(assignment_root)
+    violations = scan_public_violations(assignment_root)
     for v in violations:
         errors.append(f"Boundary violation: {v}")
 
     # Generated files currency
-    manifest_path = (
-        root / "generated" / "assignments" / slug / "assignment-manifest.json"
-    )
+    manifest_path = generated_assignment_dir(root, slug) / "assignment-manifest.json"
     stale = False
     if not manifest_path.exists():
         errors.append(
@@ -155,8 +107,6 @@ def cmd_validate(
         )
         stale = True
     else:
-        import json
-
         try:
             data = json.loads(manifest_path.read_text())
             current_hash = hash_assignment_public(root, slug)
@@ -171,10 +121,10 @@ def cmd_validate(
 
     # Private validation
     if private_repo:
-        sol_dir = private_repo / "solutions" / slug
+        sol_dir = solution_dir(private_repo, slug)
         if not sol_dir.exists():
             errors.append("Private: missing solution directory")
-        grader_file = private_repo / "grader" / slug / "pipeline.py"
+        grader_file = grader_pipeline_file(private_repo, slug)
         if not grader_file.exists():
             errors.append("Private: missing grader/pipeline.py")
 
