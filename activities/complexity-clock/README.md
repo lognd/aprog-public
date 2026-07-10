@@ -5,9 +5,11 @@ function returns the correct answer. They are not equally fast.
 
 ## Concepts covered
 
-- Reading wall-clock benchmark output to identify the slow function
+- Reading wall-clock benchmark output (a table of measured running times) to identify the slow function
 - Analyzing nested loops where the inner loop's cost scales with the input
-- Why O(N^2) behavior emerges when a helper function is called N times and the helper itself does O(N) work
+- Why O(N^2) behavior emerges when a helper function is called N times and the helper itself does O(N) work.
+  O(...) ("big-O") is shorthand for how an algorithm's running time grows as its input size N grows: O(N) means
+  the cost grows in direct proportion to N, O(N^2) means it grows proportional to N multiplied by itself.
 - The difference between how code looks and what it actually costs to execute
 
 ## How it works
