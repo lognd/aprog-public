@@ -41,14 +41,53 @@ Then set `CMAKE_CXX_STANDARD` to the minimum correct value.
 python3 launch.py
 ```
 
-A Makefile is provided. Inside the shell:
+A shell opens inside a fresh copy of the project, containing `main.cpp`,
+`CMakeLists.txt`, and a `Makefile`.
+
+### Step 1 -- read main.cpp
+
+Open `main.cpp` and read through it. Each line that uses a feature worth
+looking up is marked with a `// check out:` or `// look up:` comment
+naming the feature.
+
+### Step 2 -- try to build it
+
+```bash
+make
+```
+
+`CMakeLists.txt` currently sets `CMAKE_CXX_STANDARD` to 11, which is too
+low, so the build will fail with one or more compiler errors. Read the
+errors -- they name the symbol that could not be compiled.
+
+### Step 3 -- look up each feature
+
+For every failing symbol (and every commented feature in `main.cpp`), search
+cppreference for it and find the version marker on the page, written like
+`(since C++11)`. That marker is the standard version that introduced the
+feature. The largest marker across all the features used is the minimum
+standard the project needs.
+
+### Step 4 -- edit CMakeLists.txt
+
+Open `CMakeLists.txt` and change the number in `set(CMAKE_CXX_STANDARD 11)`
+to the minimum version you found.
+
+### Step 5 -- rebuild and run
 
 ```bash
 make
 make run
 ```
 
-Type `exit` when you are ready for the validator to check your work.
+Repeat steps 2-4 if the build still fails or you are not confident you
+found every feature.
+
+### Step 6 -- exit
+
+    exit
+
+The validator checks your work automatically.
 
 ## You will know you are done when...
 
