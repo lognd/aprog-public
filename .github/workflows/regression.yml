@@ -92,8 +92,12 @@ jobs:
       - name: Install lograder
         run: pip install lograder
 
-      - name: Install test dependencies
-        run: pip install pytest
+      - name: Install test and grader dependencies
+        # pytest drives the suite; ruff is invoked by the make-the-linter-happy
+        # activity; numpy/flask/fastapi/httpx/pydantic are runtime dependencies
+        # of the Python assignment reference solutions (grade-matrix,
+        # tiny-ledger-api, typed-ledger-api, ...) that the graders build and run.
+        run: pip install pytest ruff numpy flask fastapi httpx pydantic
 
       - name: Regression tests
         working-directory: aprog-private
