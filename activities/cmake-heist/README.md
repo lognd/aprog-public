@@ -5,6 +5,11 @@ A multi-module C++ project with no build system. Your job is to write
 is the script CMake reads to know what to build: which source files form
 which programs and libraries, and how those pieces depend on each other.
 
+Each buildable thing you declare -- a library or an executable -- is called
+a target. A target has a name (chosen by you), a list of source files, and
+a set of properties (include paths, linked libraries) attached to it with
+commands like `target_include_directories` and `target_link_libraries`.
+
 ## Concepts covered
 
 - `cmake_minimum_required`, `project`, and `CMAKE_CXX_STANDARD` boilerplate
