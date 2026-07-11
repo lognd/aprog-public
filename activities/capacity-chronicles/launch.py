@@ -65,49 +65,49 @@ SNIPPETS = json.loads(r"""
     "id": 1,
     "title": "reserve() pins an exact capacity",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    printf(\"%zu %zu\\n\", v.size(), v.capacity());\n    v.reserve(10);\n    printf(\"%zu %zu\\n\", v.size(), v.capacity());\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    std::cout << v.size() << \" \" << v.capacity() << \"\\n\";\n    v.reserve(10);\n    std::cout << v.size() << \" \" << v.capacity() << \"\\n\";\n}\n",
     "prompt": "A default-constructed vector is printed as size()/capacity(), then reserve(10) is called and the pair is printed again. What are the two printed lines?"
   },
   {
     "id": 2,
     "title": "size grows with push_back; reserved capacity does not shrink",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(5);\n    v.push_back(10);\n    v.push_back(20);\n    v.push_back(30);\n    printf(\"%zu %zu\\n\", v.size(), v.capacity());\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(5);\n    v.push_back(10);\n    v.push_back(20);\n    v.push_back(30);\n    std::cout << v.size() << \" \" << v.capacity() << \"\\n\";\n}\n",
     "prompt": "reserve(5) is called on an empty vector, then three values are pushed. What single line does the program print, as \"size capacity\"?"
   },
   {
     "id": 3,
     "title": "clear() empties the vector but keeps its capacity",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(8);\n    v.push_back(1);\n    v.push_back(2);\n    v.push_back(3);\n    printf(\"%zu %zu\\n\", v.size(), v.capacity());\n    v.clear();\n    printf(\"%zu %zu\\n\", v.size(), v.capacity());\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(8);\n    v.push_back(1);\n    v.push_back(2);\n    v.push_back(3);\n    std::cout << v.size() << \" \" << v.capacity() << \"\\n\";\n    v.clear();\n    std::cout << v.size() << \" \" << v.capacity() << \"\\n\";\n}\n",
     "prompt": "reserve(8) is called, three values are pushed, the size/capacity pair is printed, then clear() is called and the pair is printed again. What are the two printed lines?"
   },
   {
     "id": 4,
     "title": "pop_back shrinks size but never touches capacity",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(6);\n    v.push_back(100);\n    v.push_back(200);\n    v.push_back(300);\n    v.pop_back();\n    printf(\"%zu %zu\\n\", v.size(), v.capacity());\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(6);\n    v.push_back(100);\n    v.push_back(200);\n    v.push_back(300);\n    v.pop_back();\n    std::cout << v.size() << \" \" << v.capacity() << \"\\n\";\n}\n",
     "prompt": "reserve(6) is called, three values are pushed, then pop_back() is called once. What single line does the program print, as \"size capacity\"?"
   },
   {
     "id": 5,
     "title": "assign() overwrites contents; capacity grows only if needed",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(4);\n    v.assign(3, 9);\n    printf(\"%zu %zu \", v.size(), v.capacity());\n    printf(\"%d %d %d\\n\", v[0], v[1], v[2]);\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(4);\n    v.assign(3, 9);\n    std::cout << v.size() << \" \" << v.capacity() << \" \";\n    std::cout << v[0] << \" \" << v[1] << \" \" << v[2] << \"\\n\";\n}\n",
     "prompt": "reserve(4) is called, then v.assign(3, 9) replaces the vector's contents with three copies of the value 9. What single line does the program print?"
   },
   {
     "id": 6,
     "title": "resize() to a smaller size drops elements but keeps capacity",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(7);\n    v.assign(5, 1);\n    v.resize(2);\n    printf(\"%zu %zu \", v.size(), v.capacity());\n    printf(\"%d %d\\n\", v[0], v[1]);\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(7);\n    v.assign(5, 1);\n    v.resize(2);\n    std::cout << v.size() << \" \" << v.capacity() << \" \";\n    std::cout << v[0] << \" \" << v[1] << \"\\n\";\n}\n",
     "prompt": "reserve(7) is called, then assign(5, 1) fills the vector with five 1s, then resize(2) shrinks it down to 2 elements. What single line does the program print?"
   },
   {
     "id": 7,
     "title": "resize() to a larger size within capacity value-initializes new elements",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(6);\n    v.assign(2, 7);\n    v.resize(5);\n    printf(\"%zu %zu \", v.size(), v.capacity());\n    printf(\"%d %d %d %d %d\\n\", v[0], v[1], v[2], v[3], v[4]);\n}\n",
+    "code": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> v;\n    v.reserve(6);\n    v.assign(2, 7);\n    v.resize(5);\n    std::cout << v.size() << \" \" << v.capacity() << \" \";\n    std::cout << v[0] << \" \" << v[1] << \" \" << v[2] << \" \" << v[3] << \" \" << v[4] << \"\\n\";\n}\n",
     "prompt": "reserve(6) is called, then assign(2, 7) fills the vector with two 7s, then resize(5) grows it to 5 elements (with no explicit fill value, so the new elements are value-initialized -- 0 for int). What single line does the program print?"
   }
 ]

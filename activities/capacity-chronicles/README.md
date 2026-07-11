@@ -28,8 +28,11 @@ the same on any conforming compiler.
   `capacity()` (room currently reserved)
 - `reserve()` pinning an exact, portable capacity
 - Which operations change `size()` only (`push_back`, `pop_back`, `clear`,
-  `resize`) versus which can change `capacity()` (`reserve`, and a
-  `push_back` or `resize` that outgrows the current capacity)
+  `assign`, `resize`) versus which can change `capacity()` (`reserve`, and a
+  `push_back`, `assign`, or `resize` that outgrows the current capacity)
+- `assign(count, value)` replacing a vector's entire contents with `count`
+  copies of `value`, growing capacity only if the existing capacity is not
+  already enough to hold them
 - `clear()` and `pop_back()` never releasing already-allocated capacity
 - `resize()` to a smaller size (drops elements) versus a larger size
   (value-initializes new elements, 0 for `int`)
