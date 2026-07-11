@@ -80,7 +80,7 @@ SNIPPETS = json.loads(r"""
     "title": "stack unwinding destroys local objects in reverse (LIFO) construction order",
     "platform_note": "any platform, g++ -std=c++17",
     "code": "#include <cstdio>\n#include <stdexcept>\n\nstruct Loud {\n    int id;\n    Loud(int i) : id(i) { printf(\"construct %d\\n\", id); }\n    ~Loud() { printf(\"destruct %d\\n\", id); }\n};\n\nint main() {\n    try {\n        Loud a(1);\n        Loud b(2);\n        Loud c(3);\n        throw std::runtime_error(\"fail\");\n    } catch (const std::exception& e) {\n        printf(\"caught: %s\\n\", e.what());\n    }\n}\n",
-    "prompt": "When a throw leaves a scope, every already-constructed local object in that scope gets its destructor called automatically during STACK UNWINDING, in the exact reverse of the order they were constructed (last constructed, first destroyed -- the same LIFO order destructors always run in when a scope ends normally). a, b, then c are constructed, in that order, before the throw. What does the program print (five lines)?"
+    "prompt": "When a throw leaves a scope, every already-constructed local object in that scope gets its destructor called automatically during STACK UNWINDING, in the exact reverse of the order they were constructed (last constructed, first destroyed -- the same LIFO order destructors always run in when a scope ends normally). a, b, then c are constructed, in that order, before the throw. What does the program print (seven lines)?"
   },
   {
     "id": 4,
