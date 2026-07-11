@@ -165,8 +165,10 @@ Types can be combined in two basic ways.
 A **product type** holds ALL of its parts simultaneously.  A `struct` with
 fields `int x` and `float y` always holds both an `int` AND a `float` at the
 same time.  The name comes from counting: if `int` has N possible values and
-`float` has M, then the struct has N times M possible states.  Every struct and
-class you have written so far is a product type.
+`float` has M, then the struct has N times M possible states.  Every struct
+you have written so far is a product type.  (Classes work the same way once
+you meet them later in the course -- a class is just a struct with member
+functions attached.)
 
 A **sum type** holds EXACTLY ONE of its variants at a time.  A type that is
 either an `int` OR a `float` OR a `bool` -- never more than one -- has N plus M
