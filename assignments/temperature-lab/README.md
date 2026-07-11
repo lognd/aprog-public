@@ -125,7 +125,21 @@ def __lt__(self, other: "Temperature") -> bool:
 `__repr__("Temperature(21.5C)")` uses Python's normal `:.1f` rounding
 behavior -- do not hand-write your own rounding logic. `__eq__` must
 return `False` (not raise) when compared against a non-`Temperature`
-object.
+object. `__lt__`, by contrast, must **raise `TypeError`** when compared
+against a non-`Temperature` object -- ordering a temperature against an
+arbitrary object is a programmer error, not a silent inequality.
+
+Do not implement this with an `isinstance` check that raises `TypeError`
+yourself. Instead, use Python's own comparison protocol: have `__eq__`
+and `__lt__` each `return NotImplemented` (not `False`) when `other` is
+not a `Temperature`. Python then retries the comparison from the other
+object's side, and once both sides give up, it raises `TypeError` for
+you for `<` (and falls back to identity/`False` for `==`, which is why
+`__eq__` still appears to "return False" to the caller even though your
+code never writes `return False` for that branch). This is why the
+signatures above are typed `-> bool` even though the real return value
+in that branch is `NotImplemented` -- type checkers special-case `__eq__`
+and `__lt__` to allow this.
 
 ### Examples
 
