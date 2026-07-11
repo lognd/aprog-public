@@ -104,8 +104,8 @@ def _extract_repo():
     with zipfile.ZipFile(REPO_ZIP, "r") as zf:
         zf.extractall(work_dir)
         # zipfile.extractall() does not restore Unix permission bits, so any
-        # script shipped in the zip (lint.sh) loses its executable bit here.
-        # Restore the mode recorded in the archive for each extracted file.
+        # script shipped in the zip (e.g. lint.sh) loses its executable bit
+        # here. Restore the mode recorded in the archive for each file.
         for info in zf.infolist():
             mode = info.external_attr >> 16
             if mode:

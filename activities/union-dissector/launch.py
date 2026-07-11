@@ -103,6 +103,13 @@ def _extract_repo():
     work_dir = tempfile.mkdtemp(prefix="union-dissector-")
     with zipfile.ZipFile(REPO_ZIP, "r") as zf:
         zf.extractall(work_dir)
+        # zipfile.extractall() does not restore Unix permission bits, so any
+        # script shipped in the zip (e.g. lint.sh) loses its executable bit
+        # here. Restore the mode recorded in the archive for each file.
+        for info in zf.infolist():
+            mode = info.external_attr >> 16
+            if mode:
+                os.chmod(os.path.join(work_dir, info.filename), mode)
     entries = os.listdir(work_dir)
     if len(entries) != 1:
         shutil.rmtree(work_dir, ignore_errors=True)

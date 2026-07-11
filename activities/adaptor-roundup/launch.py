@@ -188,7 +188,8 @@ class ActivityEngine:
 
 ENGINE = ActivityEngine()
 def _ask(item, index, total):
-    result = None
+    print(f"\n  Q{index:02}/{total:02}  {item['prompt']}")
+    print(f"           Hint: {item['hint']}")
     while True:
         raw = input("  Your answer: ").strip()
         if not raw:
