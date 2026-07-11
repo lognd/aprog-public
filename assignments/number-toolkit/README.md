@@ -1,6 +1,7 @@
 # Number Toolkit
 
-Implement five number-theory utility functions in `number_toolkit.hpp`.
+Implement eight number-theory and bit-manipulation utility functions in
+`number_toolkit.hpp`.
 
 ## Learning goals
 
@@ -24,7 +25,7 @@ between an approach that stays fast and one that does not.)
 
 ## Task
 
-Implement the following five functions in `number_toolkit.hpp`:
+Implement the following eight functions in `number_toolkit.hpp`:
 
 | Function | Signature | Notes |
 |----------|-----------|-------|
@@ -33,6 +34,9 @@ Implement the following five functions in `number_toolkit.hpp`:
 | `digit_sum` | `long long digit_sum(long long n)` | Sum of decimal digits. Handles negatives and zero. |
 | `count_divisors` | `long long count_divisors(long long n)` | Count all positive divisors of `n`. |
 | `nth_fibonacci` | `long long nth_fibonacci(long long n)` | 1-indexed iterative Fibonacci. `nth_fibonacci(1) == 1`. |
+| `is_power_of_two` | `bool is_power_of_two(long long n)` | `n > 0` and exactly one bit set. Must use bitwise operations only -- no loops, no division. |
+| `popcount` | `int popcount(unsigned long long n)` | Number of 1-bits in `n`. Must use bit manipulation (shifts and masks) -- no library functions. |
+| `is_abundant` | `bool is_abundant(long long n)` | `true` if the sum of `n`'s proper divisors (positive divisors strictly less than `n`) exceeds `n`. |
 
 Examples:
 
@@ -48,6 +52,11 @@ count_divisors(12)    // 6  (1,2,3,4,6,12)
 count_divisors(7)     // 2  (1,7)
 nth_fibonacci(1)      // 1
 nth_fibonacci(7)      // 13
+is_power_of_two(8)    // true
+is_power_of_two(6)    // false
+popcount(13)          // 3  (13 == 0b1101)
+is_abundant(12)       // true   (1+2+3+4+6 = 16 > 12)
+is_abundant(6)        // false  (1+2+3 = 6, perfect, not abundant)
 ```
 
 ## Files
@@ -71,6 +80,8 @@ g++ -std=c++17 -o toolkit_test visible-tests/test_visible.cpp -Iassets
 - `digit_sum`: treat negative input as its absolute value.
 - `count_divisors`: `n` is a positive integer.
 - `nth_fibonacci`: `n` is a positive integer; use an iterative loop (do-while or while).
+- `is_power_of_two`: no loops, no division -- bitwise operations only.
+- `popcount`: no library functions (e.g. no `std::popcount` or `__builtin_popcount`) -- shifts and masks only.
 - Do not add a `main` function to your header.
 - Do not use `std::gcd` or `__gcd`.
 
