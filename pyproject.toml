@@ -30,6 +30,18 @@ dev = [
     "ruff",
     "ty",
 ]
+# Third-party libraries that individual student assignments depend on, so
+# `aprog verify <slug>` can build/run their reference solutions without a
+# per-run `--with`. Kept out of `[project.dependencies]` because aprog itself
+# does not import them -- they belong to the graded assignments, not the CLI.
+assignment-runtime = [
+    "numpy>=1.26",
+    "flask>=3.0",
+    "fastapi>=0.110",
+]
+
+[tool.uv]
+default-groups = ["dev", "assignment-runtime"]
 
 [project.scripts]
 aprog = "aprog.cli:app"
