@@ -146,10 +146,11 @@ count.
 | Component | Points |
 |-----------|--------|
 | Compilation | gate |
-| `drop_piece` and `is_full` | 20 |
-| `check_win` -- all four directions | 30 |
-| `computer_move` -- all three priorities | 20 |
-| Integration: full game scripted tests | 20 |
+| `drop_piece` | 15 |
+| `is_full` | 10 |
+| `check_win` -- all four directions | 25 |
+| `computer_move` -- all three priorities | 30 |
+| Integration: full game scripted tests | 10 |
 | No dynamic allocation | 10 |
 | **Total** | **100** |
 
