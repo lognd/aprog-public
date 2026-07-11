@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "grade-matrix",
     "name": "Grade Matrix",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "A small toolkit of numpy-only functions over a scores matrix (rows = students, columns = assignments): per-student and per-assignment means, curving a column to a target mean, dropping each student's lowest score, a passing-threshold boolean mask, and per-column standardization -- graded on exact vectorized behavior, with a hard constraint that forbids writing the logic as a Python loop."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/grade-matrix/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:c16ee6c16cd884ef9da3a8c6084dce4b0e5978967b491aafdb0c7a33413633ea"
+  "source_hash": "sha256:4ce7fe63f2bd9e0458d356bfdd022d9ad734e8b0ab3b216d4191b25bddb0c925"
 }

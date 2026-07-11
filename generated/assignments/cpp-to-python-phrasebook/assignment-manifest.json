@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "cpp-to-python-phrasebook",
     "name": "C++ to Python Phrasebook",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Port the word-analysis functions you already built in C++ (word-ledger) to idiomatic, pure, stdlib-only Python."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/cpp-to-python-phrasebook/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:ce3e60616564d551641b2c2312906a64cfc76c7db072fac609702ba2e18ae3a6"
+  "source_hash": "sha256:d5b6b086e9689d8b53c4a73d1764c6465552bdc8e3e4c6fbf47065fb7aa935b2"
 }

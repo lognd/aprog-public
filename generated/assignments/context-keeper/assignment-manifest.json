@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "context-keeper",
     "name": "Context Keeper",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "A small toolkit of context managers and exception-handling helpers -- a journaling RAII-style workspace, a type-selective exception suppressor, a copy-then-commit transaction, and a cleanup runner that never stops early -- graded on exact enter/exit ordering and exception-path behavior, not just happy-path output."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/context-keeper/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:d9e4ea88f196a472910fd28686a3f0a0a2bf3f46b8715154071ce663c77208c6"
+  "source_hash": "sha256:51123118971f4557fe47fb508815dabf7e589d289e629c295b9c2450538e5d8b"
 }

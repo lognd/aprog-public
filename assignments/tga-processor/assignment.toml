@@ -1,7 +1,7 @@
 [assignment]
 slug = "tga-processor"
 name = "TGA Image Processor"
-author = "lognd"
+author = "Logan Dapp"
 description = "Implement a command-line TGA image processing tool using structs and binary file I/O."
 version = "0.1.0"
 status = "draft"

@@ -1,7 +1,7 @@
 [assignment]
 slug        = "pointer-toolkit"
 name        = "Pointer Toolkit"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement array and string utility functions using raw pointers and pointer arithmetic."
 version     = "0.1.0"
 status      = "draft"

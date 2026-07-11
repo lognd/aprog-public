@@ -1,7 +1,7 @@
 [assignment]
 slug = "peano-math"
 name = "Peano Math"
-author = "lognd"
+author = "Logan Dapp"
 description = "Build integer arithmetic from scratch using only the successor operation and recursion."
 version = "0.1.0"
 status = "draft"

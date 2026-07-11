@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "sentence-tools",
     "name": "Sentence Tools",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a small C-style string library that operates at the word level: counting, extracting, searching, and transforming words in a sentence."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/sentence-tools/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:8059063fd961cd408fd15ffbe7a6fd273e1b08aec6efacc14df7c7eebfd2f8f5"
+  "source_hash": "sha256:15648830b540b3b4ee3dee1be4854de2b9af0184e85784ca234d941a28baabf6"
 }

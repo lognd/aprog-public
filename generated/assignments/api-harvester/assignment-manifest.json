@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "api-harvester",
     "name": "API Harvester",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Python client functions (get_user, list_all_users, count_active, safe_get, merge_profiles) exercised against a deterministic in-process fake API through an injected fetch(path) -> (status, body) callable -- no real network traffic -- covering pagination, timeouts-in-spirit via retry limits, and idempotent-safe retries on 5xx only, never on 4xx."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/api-harvester/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:42274381cd03eaf815820a88ae484f4619a9f3db55e96a494caa6fbf4bb8b891"
+  "source_hash": "sha256:771de1c4535336f7cdb742f7ea495a98ace058279c8dceca34abd968a323cb5f"
 }

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "pattern-toolkit",
     "name": "Pattern Toolkit",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Starting from working-but-messy legacy code, refactor into three classic runtime-polymorphism design patterns -- Strategy, Observer, and Template Method -- each heap-free and built on abstract base classes and non-owning pointers."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/pattern-toolkit/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:091305b3094c22ef218cbcb92f654327df252bf40c98fce92ddaf577f0181c94"
+  "source_hash": "sha256:5482a49ff665495a89a6af48ee4b1236f0560a2676ab0473c17eed640a552896"
 }

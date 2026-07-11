@@ -1,7 +1,7 @@
 [assignment]
 slug        = "unique-ptr-from-scratch"
 name        = "Unique Pointer From Scratch"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Build a simplified std::unique_ptr from scratch to learn RAII and move-only ownership, then contrast it with std::unique_ptr and std::make_unique in a small set of factory/ownership-transfer functions."
 version     = "0.1.0"
 status      = "draft"

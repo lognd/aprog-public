@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "binary-bounds",
     "name": "Binary Bounds",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement binary search and its boundary variants over a sorted std::vector<int>: a plain search, first/last occurrence with duplicates, an O(log n) duplicate count, and a sorted insertion position -- built from the invariant that the answer, if present, is always inside the shrinking [lo, hi) range."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/binary-bounds/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:5295e4e38105ae698454a6f65b704fb25e624cbc3dd1af64ffc4e66c76a1de1a"
+  "source_hash": "sha256:b0ed521d6e4e448b9dcd182e36c88301b84cda9befbd8982ca8a77cd08e988a4"
 }

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "text-filters",
     "name": "Text Filters",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a set of text filters twice: once behind a pure-virtual interface using runtime polymorphism, and once as function templates using compile-time duck typing."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/text-filters/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:affb482d8cd28cba621ce9e439a7ac6178da6f9f205916e03c3efe2451b6773a"
+  "source_hash": "sha256:e2bc00cee283fdc81252c40297367f8f50c71f8afd46cb056af0fb4624128977"
 }

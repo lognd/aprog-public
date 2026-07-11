@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "dual-build",
     "name": "Dual Build",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Write a Makefile and a CMakeLists.txt for the same C++ library project."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/dual-build/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:53bdffda26ba53a821322c5c18ae2769111eb3fda8ae9450ad05fac5a136ce23"
+  "source_hash": "sha256:68f3fb5015ce19b050c7cdef9f4b7d3f2b7d4eaeb21ced5f81d2be0ddd87a119"
 }

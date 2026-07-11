@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "ai-vector-i",
     "name": "VectorI: Dynamic Integer Array",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Debug and complete a dynamic array class for integers."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/ai-vector-i/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:ca45712df8da95f76be86fc79bd48b727e34857012abe2c51cec342f7a2717a6"
+  "source_hash": "sha256:53db217873ad9d5913e2b817b3001e40d0e30d95f087072dbdc431b7b026e88c"
 }

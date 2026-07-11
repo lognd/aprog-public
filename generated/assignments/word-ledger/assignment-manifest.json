@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "word-ledger",
     "name": "Word Ledger",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a small text-analysis toolkit over a vector of already-tokenized words, exercising std::map, std::unordered_map, std::set, and std::unordered_set: frequency counting, first-occurrence lookup, deduplication, set operations, and a top-k report."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/word-ledger/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:5f21f867d3e55795d3a60cb8b0b1d604b7e8a15952e885a8776a59d280798e7f"
+  "source_hash": "sha256:ab5dce7cb89c5a3f6ba8b8aea648cd92830fe711c751e0ad46230150897b2ced"
 }

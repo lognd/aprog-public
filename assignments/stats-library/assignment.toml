@@ -1,7 +1,7 @@
 [assignment]
 slug        = "stats-library"
 name        = "Stats Library"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a statistics library as a properly organized CMake project."
 version     = "0.1.0"
 status      = "draft"

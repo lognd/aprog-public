@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "const-qualifier-toolkit",
     "name": "Const Qualifier Toolkit",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a flat 2D character grid library with const-correct function signatures."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/const-qualifier-toolkit/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:c970cf4bc60efbfd75409047cc9efe3bf889e0ae30b680bb7c3e2974166c2720"
+  "source_hash": "sha256:90ac8e1c8d864de3d1ca0457c66a6e24828514a99b1c6813a23e11e3c3e3c965"
 }

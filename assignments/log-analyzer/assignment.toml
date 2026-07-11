@@ -1,7 +1,7 @@
 [assignment]
 slug = "log-analyzer"
 name = "Log Analyzer"
-author = "lognd"
+author = "Logan Dapp"
 description = "Build a log-file analyzer that reads structured log entries with fstream, parses each line with istringstream, and reports per-level statistics formatted with iomanip."
 version = "0.1.0"
 status = "draft"

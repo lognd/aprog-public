@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "typed-ledger-api",
     "name": "Typed Ledger API",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "The same in-memory ledger domain as tiny-ledger-api, rebuilt with FastAPI: a pydantic BaseModel declares an item's shape once, and the framework validates every request body and generates 422 errors for bad input, instead of the hand-written 400 checks the Flask assignment required -- graded via FastAPI's TestClient for exact status codes, framework-generated 422 error shape, response_model field-stripping, id sequencing, PUT-replaces-not-merges semantics, and factory isolation, with no real network traffic."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/typed-ledger-api/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:153b41c3992394d90871519421be0e801cf20265180727d4c4fb1c877682333f"
+  "source_hash": "sha256:37f1feb38d3bba16f3f1ffe507f403f5e58b0e273f661003c33f68c5835b6ba7"
 }

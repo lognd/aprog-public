@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "pointer-matrix",
     "name": "Pointer Matrix",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a 2D matrix library using only pointer arithmetic -- the [] operator is forbidden."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/pointer-matrix/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:9098b758d13133e165bca053564b076b2237a67f121470762d8602885f6f99df"
+  "source_hash": "sha256:370dc3a881c109a18c2c7cdf61ef7b1c00ce6f8c6b3260c09f36fc83503520c3"
 }

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "csv-parser",
     "name": "CSV Parser",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a CSV parser that handles quoted fields, escaped quotes, missing trailing fields, and empty lines using std::vector<std::vector<std::string>>."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/csv-parser/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:62572147bc7bff816a0e2e98858b6d03ebd81f90a3ad95518d67de6fe9ddfc8d"
+  "source_hash": "sha256:dea2b65f9c188002110b1e01b8b080aed0b623b171a30b8e7a6f9fb898f923e3"
 }

@@ -1,7 +1,7 @@
 [assignment]
 slug = "lazy-pipeline"
 name = "Lazy Pipeline"
-author = "lognd"
+author = "Logan Dapp"
 description = "A generator-based log processing pipeline -- parse, filter, take, count, and chunk -- where laziness itself is the graded contract, proven with an instrumented iterable that counts how much of the source each stage actually consumes."
 version = "0.1.0"
 status = "draft"

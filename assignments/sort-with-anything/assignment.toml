@@ -1,7 +1,7 @@
 [assignment]
 slug        = "sort-with-anything"
 name        = "Sort With Anything"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Generalize your merge sort into a template that accepts ANY comparator -- a free function, a functor, or a lambda -- plus generic filter, for_each_apply, and count_matching helpers built the same way. One algorithm, any callable."
 version     = "0.1.0"
 status      = "draft"

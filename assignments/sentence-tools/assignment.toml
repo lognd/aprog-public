@@ -1,7 +1,7 @@
 [assignment]
 slug        = "sentence-tools"
 name        = "Sentence Tools"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a small C-style string library that operates at the word level: counting, extracting, searching, and transforming words in a sentence."
 version     = "0.1.0"
 status      = "draft"

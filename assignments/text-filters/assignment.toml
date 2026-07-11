@@ -1,7 +1,7 @@
 [assignment]
 slug        = "text-filters"
 name        = "Text Filters"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a set of text filters twice: once behind a pure-virtual interface using runtime polymorphism, and once as function templates using compile-time duck typing."
 version     = "0.1.0"
 status      = "draft"

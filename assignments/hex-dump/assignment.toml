@@ -1,7 +1,7 @@
 [assignment]
 slug        = "hex-dump"
 name        = "Hex Dump"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a hex dump utility using only open(), read(), write(), and close()."
 version     = "0.1.0"
 status      = "draft"

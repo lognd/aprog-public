@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "fraction-arithmetic",
     "name": "Fraction Arithmetic",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a Fraction class that encapsulates a rational number and maintains lowest-terms and sign-normalization invariants across every constructor and method."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/fraction-arithmetic/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:a9caaf7e7652083464bff5beee3204624690e7a5981e540d3b26395a1d7c043b"
+  "source_hash": "sha256:e2ebc7d0c5f599cbbaf5800c06aeb696cac74f3eaf4baaaf0554fe89acb5ca7a"
 }

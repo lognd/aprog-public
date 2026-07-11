@@ -1,7 +1,7 @@
 [assignment]
 slug        = "pattern-toolkit"
 name        = "Pattern Toolkit"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Starting from working-but-messy legacy code, refactor into three classic runtime-polymorphism design patterns -- Strategy, Observer, and Template Method -- each heap-free and built on abstract base classes and non-owning pointers."
 version     = "0.1.0"
 status      = "draft"

@@ -1,7 +1,7 @@
 [assignment]
 slug = "tiny-ledger-api"
 name = "Tiny Ledger API"
-author = "lognd"
+author = "Logan Dapp"
 description = "A small Flask web server implementing an in-memory ledger of items behind five REST routes (GET /items, GET /items/<id>, POST /items, DELETE /items/<id>, PUT /items/<id>), built with the app factory pattern so every test gets a fresh, isolated ledger -- graded via Flask's test_client for exact status codes, exact error bodies, id sequencing, and PUT-replaces-not-merges semantics, with no real network traffic."
 version = "0.1.0"
 status = "draft"

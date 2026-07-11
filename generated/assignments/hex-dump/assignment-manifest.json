@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "hex-dump",
     "name": "Hex Dump",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a hex dump utility using only open(), read(), write(), and close()."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/hex-dump/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:d6bd24d38ec24eb26f15a56bd5f1e315195d5952bb405870cda2bf62e9394b1f"
+  "source_hash": "sha256:921367df2f8b8a5ed9a8ac106673cf167863457f6bd4981e727be1493cb8c880"
 }

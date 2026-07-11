@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "deque-two-ways",
     "name": "Deque, Two Ways",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Build a double-ended queue (deque) ADT with two backends -- a circular-buffer array (ArrayDeque) and a doubly linked list (ListDeque) -- then implement Stack and Queue as thin container adapters over a deque backend, mirroring std::stack and std::queue."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/deque-two-ways/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:b832ce7f951916acd482649f991bc2f8623236317900126ccfc3e6f6a03d6cb2"
+  "source_hash": "sha256:39e64e44c822933e649d2a74c1a23b77fb9f13d389f3cf5e88e968568882b86d"
 }

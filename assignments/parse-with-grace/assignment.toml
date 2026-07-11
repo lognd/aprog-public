@@ -1,7 +1,7 @@
 [assignment]
 slug        = "parse-with-grace"
 name        = "Parse With Grace"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "A small parsing library built exceptions-first: parse_int, parse_fraction, parse_int_list (with transparent error propagation), parse_int_or (a caller-side catch), and ScopedTally (RAII balance through unwinding)."
 version     = "0.1.0"
 status      = "draft"

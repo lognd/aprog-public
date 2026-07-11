@@ -1,7 +1,7 @@
 [assignment]
 slug = "dual-build"
 name = "Dual Build"
-author = "lognd"
+author = "Logan Dapp"
 description = "Write a Makefile and a CMakeLists.txt for the same C++ library project."
 version = "0.1.0"
 status = "draft"

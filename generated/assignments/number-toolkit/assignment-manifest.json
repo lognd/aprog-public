@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "number-toolkit",
     "name": "Number Toolkit",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement five number-theory utility functions in C++."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/number-toolkit/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:2a0a8a990f13120126c58db35b0d5ba75231490a00ce50e9fa9e8679e1f877ea"
+  "source_hash": "sha256:7fb0c4a4f394c0faca85559562fadf7f351045b6f4c9ac46849ed55c0f46be87"
 }

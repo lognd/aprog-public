@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "roster-wrangler",
     "name": "Roster Wrangler",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Six pure functions over a roster of student records: grouping, deduplication, averaging, ranking, and set/tuple-keyed lookups -- practice with Python's list/dict/set/tuple as a toolkit, not just individually."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/roster-wrangler/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:301928004cefe1866748684053169199bebb9f57aabafd1d88e98c8d3060d9d0"
+  "source_hash": "sha256:badf757bb845a11c5d0d7a5199a8cb3c6e9d96add1f34581966b5b5fa8fb9d82"
 }

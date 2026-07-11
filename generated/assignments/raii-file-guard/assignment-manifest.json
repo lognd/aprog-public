@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "raii-file-guard",
     "name": "RAII File Guard",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement FileGuard, a class whose constructor opens a POSIX file descriptor and whose destructor closes it, to learn RAII through file lifetime management."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/raii-file-guard/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:7157cfcd6d189e2e0f614c6e8d3408c51d04c261e1257028903f7ab0d1096509"
+  "source_hash": "sha256:c87cca673d5847624b814492ac9aec8dd8a01a26eb7717c564ac61028dd04cc1"
 }

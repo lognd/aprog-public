@@ -1,7 +1,7 @@
 [assignment]
 slug = "temperature-lab"
 name = "Temperature Lab"
-author = "lognd"
+author = "Logan Dapp"
 description = "A Temperature class exercising Python's full method trinity: classmethod factories from Fahrenheit and Kelvin, a staticmethod physical-range check, and a validated property with read-only computed conversions."
 version = "0.1.0"
 status = "draft"

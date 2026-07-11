@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "collatz-conjecture",
     "name": "Collatz Conjecture",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement the Collatz sequence using only bitwise and shift operators."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/collatz-conjecture/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:6c899f47dc6ab3dec9652da5872963299ed9974e5ecea8d5e0c0cdda7d66b240"
+  "source_hash": "sha256:0436994209149c2b93fa66875c28fbe6e058e0a76aed4910256cd3856649822f"
 }

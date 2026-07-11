@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "log-analyzer",
     "name": "Log Analyzer",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Build a log-file analyzer that reads structured log entries with fstream, parses each line with istringstream, and reports per-level statistics formatted with iomanip."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/log-analyzer/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:272434208b51eb15ae8a6c74c2b63afa624d616beee20927b0b7e3890df02892"
+  "source_hash": "sha256:2717c72b39d8e22f586d1f89e78014795cd92ffb51b675e8f15f07ae1f8e88eb"
 }

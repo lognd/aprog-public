@@ -1,7 +1,7 @@
 [assignment]
 slug        = "fraction-arithmetic"
 name        = "Fraction Arithmetic"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a Fraction class that encapsulates a rational number and maintains lowest-terms and sign-normalization invariants across every constructor and method."
 version     = "0.1.0"
 status      = "draft"

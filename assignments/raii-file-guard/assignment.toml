@@ -1,7 +1,7 @@
 [assignment]
 slug        = "raii-file-guard"
 name        = "RAII File Guard"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement FileGuard, a class whose constructor opens a POSIX file descriptor and whose destructor closes it, to learn RAII through file lifetime management."
 version     = "0.1.0"
 status      = "draft"

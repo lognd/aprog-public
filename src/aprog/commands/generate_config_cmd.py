@@ -61,7 +61,7 @@ if __name__ == "__main__":
     try:
         metadata = GraderMetadata.from_gradescope(
             grader_name={{ assignment_name_repr }},
-            authors=[StaffAuthor(name={{ assignment_author_repr }}, role="Instructor")],
+            authors=[StaffAuthor(name={{ assignment_author_repr }}, role="Peer Instructor")],
             notes="Contact course staff within 3 days if you believe there is a grading error.",
         )
         import inspect as _inspect

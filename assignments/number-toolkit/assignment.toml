@@ -1,7 +1,7 @@
 [assignment]
 slug = "number-toolkit"
 name = "Number Toolkit"
-author = "lognd"
+author = "Logan Dapp"
 description = "Implement five number-theory utility functions in C++."
 version = "0.1.0"
 status = "draft"

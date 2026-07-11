@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "html-parser",
     "name": "HTML Parser",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a minimal 1970s-style HTML parser in C++ and write a Catch2 test suite that exercises every edge case in the spec."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/html-parser/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:c33c346603469140c16b7c1fc1d5b11f9968d786817794599ef1ed5d5a87e66b"
+  "source_hash": "sha256:b66f9a10c1910d23327616dbddd9d3369dfe8bee3b41e429585877fb03deb30a"
 }

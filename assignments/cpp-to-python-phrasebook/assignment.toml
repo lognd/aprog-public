@@ -1,7 +1,7 @@
 [assignment]
 slug = "cpp-to-python-phrasebook"
 name = "C++ to Python Phrasebook"
-author = "lognd"
+author = "Logan Dapp"
 description = "Port the word-analysis functions you already built in C++ (word-ledger) to idiomatic, pure, stdlib-only Python."
 version = "0.1.0"
 status = "draft"

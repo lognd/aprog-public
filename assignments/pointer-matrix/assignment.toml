@@ -1,7 +1,7 @@
 [assignment]
 slug = "pointer-matrix"
 name = "Pointer Matrix"
-author = "lognd"
+author = "Logan Dapp"
 description = "Implement a 2D matrix library using only pointer arithmetic -- the [] operator is forbidden."
 version = "0.1.0"
 status = "draft"

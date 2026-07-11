@@ -1,7 +1,7 @@
 [assignment]
 slug        = "binary-bounds"
 name        = "Binary Bounds"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement binary search and its boundary variants over a sorted std::vector<int>: a plain search, first/last occurrence with duplicates, an O(log n) duplicate count, and a sorted insertion position -- built from the invariant that the answer, if present, is always inside the shrinking [lo, hi) range."
 version     = "0.1.0"
 status      = "draft"

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "shell-build-pipeline",
     "name": "Shell Build Pipeline",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Write a shell script that replicates g++ compilation in stages with incremental rebuilds."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/shell-build-pipeline/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:6d7509251c66058e2cf49d28be1301ffdeae9cda87dd2c832f875fb20ad9f937"
+  "source_hash": "sha256:466ad7b64a0478350ca43b521207057094665b7777b0096e5dba500a097aef28"
 }

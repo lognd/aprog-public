@@ -1,7 +1,7 @@
 [assignment]
 slug = "shell-build-pipeline"
 name = "Shell Build Pipeline"
-author = "lognd"
+author = "Logan Dapp"
 description = "Write a shell script that replicates g++ compilation in stages with incremental rebuilds."
 version = "0.1.0"
 status = "draft"

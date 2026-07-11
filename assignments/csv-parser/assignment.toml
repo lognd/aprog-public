@@ -1,7 +1,7 @@
 [assignment]
 slug = "csv-parser"
 name = "CSV Parser"
-author = "lognd"
+author = "Logan Dapp"
 description = "Implement a CSV parser that handles quoted fields, escaped quotes, missing trailing fields, and empty lines using std::vector<std::vector<std::string>>."
 version = "0.1.0"
 status = "draft"

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "peano-math",
     "name": "Peano Math",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Build integer arithmetic from scratch using only the successor operation and recursion."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/peano-math/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:fd22894af2fef4463cc629657601028ddbcaada457158c66df6881d50f52a1dc"
+  "source_hash": "sha256:84294044b83f76cc850350febe6c053556dac52738ddce155f5982de4294ab79"
 }

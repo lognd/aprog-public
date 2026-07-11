@@ -1,7 +1,7 @@
 [assignment]
 slug        = "linked-list-iterators"
 name        = "Linked List Iterators"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Add a forward iterator to the LinkedList<T> you built last assignment: a nested Iterator/ConstIterator class wrapping a Node*, begin()/end() to make range-for work, and insert_after/erase_after/find_it, the classic singly-linked positional operations built on top of it."
 version     = "0.1.0"
 status      = "draft"

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "parse-with-grace",
     "name": "Parse With Grace",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "A small parsing library built exceptions-first: parse_int, parse_fraction, parse_int_list (with transparent error propagation), parse_int_or (a caller-side catch), and ScopedTally (RAII balance through unwinding)."
   },
   "classification": {
@@ -24,5 +24,5 @@
     "visible_tests": "assignments/parse-with-grace/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:46710e0f538987cc0a6cab5c9a67d3704d91873c7e40f329bf65f47c3de2ae01"
+  "source_hash": "sha256:8776415400843e09f8ac0fdc8ac8faf831bc64185c93dcff37d9b424c4b2fdd8"
 }

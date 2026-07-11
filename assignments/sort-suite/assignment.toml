@@ -1,7 +1,7 @@
 [assignment]
 slug        = "sort-suite"
 name        = "Sort Suite"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement selection sort, insertion sort, and merge sort over a std::vector<int>, plus a stable merge sort over std::vector<std::pair<int,std::string>> keyed on .first, and an is_sorted_asc helper -- all header-only, hand-written from scratch, with merge_sort required to actually run in O(n log n) time rather than just produce the right answer."
 version     = "0.1.0"
 status      = "draft"

@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "pointer-toolkit",
     "name": "Pointer Toolkit",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement array and string utility functions using raw pointers and pointer arithmetic."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/pointer-toolkit/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:c0cfe379ea6b5893997944ecd283b01406b1d74a0ebb1d47c41436240a04c6b0"
+  "source_hash": "sha256:495881a7b44cca2df2234df07f982edc8d36bb7111b50680fcf043e720cbc461"
 }

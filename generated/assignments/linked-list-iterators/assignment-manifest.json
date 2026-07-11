@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "linked-list-iterators",
     "name": "Linked List Iterators",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Add a forward iterator to the LinkedList<T> you built last assignment: a nested Iterator/ConstIterator class wrapping a Node*, begin()/end() to make range-for work, and insert_after/erase_after/find_it, the classic singly-linked positional operations built on top of it."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/linked-list-iterators/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:6db48521313d8b96851c727ef304a110c7a32d7ea08aa38070fa0fd5daf34384"
+  "source_hash": "sha256:9833965c452891cafca04069684d0f9c4600431665eb84370cd89f269ea496ca"
 }

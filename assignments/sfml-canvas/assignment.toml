@@ -1,7 +1,7 @@
 [assignment]
 slug        = "sfml-canvas"
 name        = "SFML Canvas"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Manipulate pixels directly with sf::Image: gradients, checkerboards, a filled circle, alpha blending, and a rectangle outline -- no window required."
 version     = "0.1.0"
 status      = "draft"

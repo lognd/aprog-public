@@ -1,7 +1,7 @@
 [assignment]
 slug        = "const-qualifier-toolkit"
 name        = "Const Qualifier Toolkit"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a flat 2D character grid library with const-correct function signatures."
 version     = "0.1.0"
 status      = "draft"

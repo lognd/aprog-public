@@ -1,7 +1,7 @@
 [assignment]
 slug = "collatz-conjecture"
 name = "Collatz Conjecture"
-author = "lognd"
+author = "Logan Dapp"
 description = "Implement the Collatz sequence using only bitwise and shift operators."
 version = "0.1.0"
 status = "draft"

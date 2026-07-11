@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "tga-processor",
     "name": "TGA Image Processor",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a command-line TGA image processing tool using structs and binary file I/O."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/tga-processor/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:c8477bf854cd0182cdf92552b551dfc89236700225748f0fee678def62e1bb4f"
+  "source_hash": "sha256:b99bd9a72a83925c35bce71e102818a3c893fea15ceb6523869945fba6c1f433"
 }

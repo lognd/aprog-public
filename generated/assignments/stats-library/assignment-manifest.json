@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "stats-library",
     "name": "Stats Library",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Implement a statistics library as a properly organized CMake project."
   },
   "classification": {
@@ -26,5 +26,5 @@
     "visible_tests": "assignments/stats-library/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:4beb7634f17c7101043f1973c35b24fc7674993a58026575467bd2dadfd40882"
+  "source_hash": "sha256:46c731d0488064243a64070285449e134e01a872ce9325dcd73d285362c4cc74"
 }

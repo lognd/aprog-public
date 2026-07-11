@@ -1,7 +1,7 @@
 [assignment]
 slug        = "linked-list-from-scratch"
 name        = "Linked List From Scratch"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Build a singly linked list class template from scratch, including a full Big-5 (copy/move construct/assign, destructor), to learn the node/next-pointer mental model and how ownership of a chain of heap nodes is copied, moved, and released."
 version     = "0.1.0"
 status      = "draft"

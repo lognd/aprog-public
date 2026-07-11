@@ -1,7 +1,7 @@
 [assignment]
 slug        = "html-parser"
 name        = "HTML Parser"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a minimal 1970s-style HTML parser in C++ and write a Catch2 test suite that exercises every edge case in the spec."
 version     = "0.1.0"
 status      = "draft"

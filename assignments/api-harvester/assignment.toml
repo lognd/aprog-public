@@ -1,7 +1,7 @@
 [assignment]
 slug = "api-harvester"
 name = "API Harvester"
-author = "lognd"
+author = "Logan Dapp"
 description = "Python client functions (get_user, list_all_users, count_active, safe_get, merge_profiles) exercised against a deterministic in-process fake API through an injected fetch(path) -> (status, body) callable -- no real network traffic -- covering pagination, timeouts-in-spirit via retry limits, and idempotent-safe retries on 5xx only, never on 4xx."
 version = "0.1.0"
 status = "draft"

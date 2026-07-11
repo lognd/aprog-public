@@ -1,7 +1,7 @@
 [assignment]
 slug        = "word-ledger"
 name        = "Word Ledger"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a small text-analysis toolkit over a vector of already-tokenized words, exercising std::map, std::unordered_map, std::set, and std::unordered_set: frequency counting, first-occurrence lookup, deduplication, set operations, and a top-k report."
 version     = "0.1.0"
 status      = "draft"

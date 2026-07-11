@@ -1,7 +1,7 @@
 [assignment]
 slug        = "deque-two-ways"
 name        = "Deque, Two Ways"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Build a double-ended queue (deque) ADT with two backends -- a circular-buffer array (ArrayDeque) and a doubly linked list (ListDeque) -- then implement Stack and Queue as thin container adapters over a deque backend, mirroring std::stack and std::queue."
 version     = "0.1.0"
 status      = "draft"

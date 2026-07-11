@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "unique-ptr-from-scratch",
     "name": "Unique Pointer From Scratch",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Build a simplified std::unique_ptr from scratch to learn RAII and move-only ownership, then contrast it with std::unique_ptr and std::make_unique in a small set of factory/ownership-transfer functions."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/unique-ptr-from-scratch/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:3f60b18e447e8bf4889d14e5fb048412e52ca26890675db3d2b29a039b4bc487"
+  "source_hash": "sha256:d1c061ebbac65b3fff5998304b11f437d1877545dfc793ffa8f8d63c69f8f8ff"
 }

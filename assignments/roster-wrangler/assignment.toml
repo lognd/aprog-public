@@ -1,7 +1,7 @@
 [assignment]
 slug = "roster-wrangler"
 name = "Roster Wrangler"
-author = "lognd"
+author = "Logan Dapp"
 description = "Six pure functions over a roster of student records: grouping, deduplication, averaging, ranking, and set/tuple-keyed lookups -- practice with Python's list/dict/set/tuple as a toolkit, not just individually."
 version = "0.1.0"
 status = "draft"

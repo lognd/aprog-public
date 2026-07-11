@@ -1,7 +1,7 @@
 [assignment]
 slug        = "connect-four"
 name        = "Connect Four"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Implement a command-line Connect Four game with two-player and vs-computer modes."
 version     = "0.1.0"
 status      = "draft"

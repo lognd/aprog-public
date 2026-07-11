@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "lazy-pipeline",
     "name": "Lazy Pipeline",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "A generator-based log processing pipeline -- parse, filter, take, count, and chunk -- where laziness itself is the graded contract, proven with an instrumented iterable that counts how much of the source each stage actually consumes."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/lazy-pipeline/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:dcca796838b8910a43a2b680aa917373f368da9ce9b036dba30ad85cdf489423"
+  "source_hash": "sha256:a10343a4e81f2e63a732c61e7f15607b5efda4993be9cf276252df71f5ddd5cf"
 }

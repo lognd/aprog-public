@@ -3,7 +3,7 @@
   "assignment": {
     "slug": "sort-with-anything",
     "name": "Sort With Anything",
-    "author": "lognd",
+    "author": "Logan Dapp",
     "description": "Generalize your merge sort into a template that accepts ANY comparator -- a free function, a functor, or a lambda -- plus generic filter, for_each_apply, and count_matching helpers built the same way. One algorithm, any callable."
   },
   "classification": {
@@ -25,5 +25,5 @@
     "visible_tests": "assignments/sort-with-anything/visible-tests"
   },
   "state": "draft",
-  "source_hash": "sha256:4c8506f16b3f150cfea2b6c555dd323fc5d43d60fbe600e627bc6fb5915dc93b"
+  "source_hash": "sha256:3a8cacd28867784835aff3de13faf4a9a87383efa2f75cd29a96920cf994db74"
 }

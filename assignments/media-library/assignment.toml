@@ -1,7 +1,7 @@
 [assignment]
 slug        = "media-library"
 name        = "Media Library"
-author      = "lognd"
+author      = "Logan Dapp"
 description = "Build a small media catalog using an abstract base class (Book, Film, Album) and a Library class that composes non-owning pointers to those items."
 version     = "0.1.0"
 status      = "draft"
