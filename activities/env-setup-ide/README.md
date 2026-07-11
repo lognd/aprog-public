@@ -150,8 +150,8 @@ int main() {
    within a second or two -- this confirms clangd is running.
 2. Press **Shift+F10** (or the green run triangle). An output panel
    opens and shows `hello`.
-3. Click in the left gutter (the line number by the source code) 
-   next to the `std::cout` line. A red octagon (breakpoint) 
+3. Click in the left gutter (the line number by the source code)
+   next to the `std::cout` line. A red octagon (breakpoint)
    appears. Press **Shift+F9**. The program pauses at
    that line and the Debug panel shows your variables.
 
