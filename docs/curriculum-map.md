@@ -498,7 +498,7 @@ Assignments: none.
 ## 54. Python Generators (untested)
 
 Activities:
-- `yield-yard` -- predict output of nine generator snippets proving pause/resume, laziness, exhaustion, and pipeline chaining
+- `yield-yard` -- predict output of eleven generator snippets proving pause/resume, laziness, exhaustion, and pipeline chaining
 
 Assignments:
 - `lazy-pipeline` -- build a five-stage generator log pipeline where instrumented iterables prove each stage consumes only what it must
