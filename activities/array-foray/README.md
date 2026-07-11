@@ -47,6 +47,13 @@ preferred to avoid stack-smashing. If you want to learn more, we encourage
 you to talk to course staff.
 </details>
 
+## Concepts covered
+
+- `std::array<T, N>` and why its size must be a compile-time value
+- Stack vs. heap memory and where each container stores its elements
+- `sizeof` and what it reveals about a type's layout
+- Compile-time constants vs. runtime variables
+
 ## How it works
 
 A shell opens inside a fresh copy of the project. You will run an
