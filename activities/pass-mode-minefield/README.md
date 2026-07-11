@@ -84,6 +84,19 @@ pointer to their first element the moment they are passed to a function. There i
 contents; the function receives the address of the caller's array and can
 modify its elements exactly as if it had been given a pointer explicitly.
 
+One snippet in this activity combines the two reference-like tools you now
+know -- a pointer, and a reference -- into a **reference to a pointer**:
+`int*& rp = p;`. Read this type right-to-left: `rp` is a reference (`&`) to
+an `int*` (a pointer to int). That makes `rp` an alias for the pointer
+variable `p` itself, not for the int `p` points at. Assigning `rp = &b;`
+therefore reassigns `p` (through its alias `rp`) to point at `b` -- exactly
+as if you had written `p = &b;` directly. This matters because ordinary
+pass-by-pointer (`int* p` as a parameter) only gives the callee a *copy* of
+the address, so reassigning the parameter never affects the caller's
+pointer (see the pointer-reassignment trap above); a reference to a
+pointer is what you would need if you *did* want a function to be able to
+repoint the caller's own pointer variable.
+
 A common trap worth naming: passing a large object by value when you only
 need to read it wastes an entire copy for no benefit (use `const T&`
 instead), and passing by pointer or non-const reference when you only need
@@ -102,6 +115,8 @@ the function must modify the caller's variable -> `T&` or `T*`.
   reaches the caller's storage, but reassigning the pointer itself does not
 - Reassigning a pointer parameter vs. modifying the pointee it refers to
 - Array-to-pointer decay when arrays are passed as function parameters
+- Reference to a pointer (`int*& rp`): an alias for the pointer variable
+  itself, distinct from a plain pointer parameter
 
 ## How it works
 
