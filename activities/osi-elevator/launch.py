@@ -63,43 +63,53 @@ QUESTIONS = json.loads(r"""
 [
   {
     "prompt": "Networking is built as a stack of LAYERS (physical, link, network, transport, application, with two more folded in between that this activity treats separately) instead of one single piece of code that does everything at once. Enumerate the actual reason for splitting it into layers: what does each layer get to assume about the layers below it?",
-    "hint": "Think about what a layer would have to worry about if there were no layers below it doing their own job -- and what it gets to stop worrying about once it can just trust them."
+    "hint": "Think about what a layer would have to worry about if there were no layers below it doing their own job -- and what it gets to stop worrying about once it can just trust them.",
+    "choices": true
   },
   {
     "prompt": "ENCAPSULATION, in networking, means wrapping data in progressively more layers before it leaves your machine -- like nesting envelopes. Enumerate the wrapping order: as your HTTP request leaves your computer, which protocol wraps it first, second, and third?",
-    "hint": "Work from the inside out: your actual HTTP request is the innermost letter. Which layer's job is immediately outside HTTP (application)? Which is outside that? And outside that?"
+    "hint": "Work from the inside out: your actual HTTP request is the innermost letter. Which layer's job is immediately outside HTTP (application)? Which is outside that? And outside that?",
+    "choices": true
   },
   {
     "prompt": "On the RECEIVING end, the process from the previous question runs in reverse -- envelopes get opened from the outside in. As a machine receives an incoming frame, in what order are the layers' wrappers removed: which wrapper comes off first, second, and third, and what is left once all three are gone?",
-    "hint": "The layer that wrapped the data LAST on the way out is the first thing the receiving machine actually sees. Unwrapping undoes the wrapping order exactly backwards."
+    "hint": "The layer that wrapped the data LAST on the way out is the first thing the receiving machine actually sees. Unwrapping undoes the wrapping order exactly backwards.",
+    "choices": true
   },
   {
     "prompt": "This activity's official model names five layers by what actually lives there day to day: physical (1), link (2), network (3), transport (4), application (7, using the traditional numbering). Enumerate which of these five layers each of the following actually lives at: (a) HTTP, (b) TCP, (c) IP, (d) Ethernet/WiFi, (e) the physical cable or radio signal itself.",
-    "hint": "Work top to bottom: HTTP is the rules for a browser/server conversation (the topmost, most abstract layer). TCP is about reliable delivery between two programs. IP is about finding the right machine anywhere on a big network. Ethernet/WiFi is about the one local hop. The cable/radio itself is the literal physical medium underneath everything."
+    "hint": "Work top to bottom: HTTP is the rules for a browser/server conversation (the topmost, most abstract layer). TCP is about reliable delivery between two programs. IP is about finding the right machine anywhere on a big network. Ethernet/WiFi is about the one local hop. The cable/radio itself is the literal physical medium underneath everything.",
+    "choices": true
   },
   {
     "prompt": "The traditional OSI model actually names SEVEN layers, including a session layer (5) and a presentation layer (6) between transport and application, which this activity has not mentioned until now. Honestly: in day-to-day web development, how much do the session and presentation layers actually come up as separate, distinct concerns?",
-    "hint": "Think about how many times you have heard a working web developer say the words 'presentation layer' or 'session layer' out loud, versus how many times you have heard them say 'HTTP,' 'TCP,' or 'the application layer.'"
+    "hint": "Think about how many times you have heard a working web developer say the words 'presentation layer' or 'session layer' out loud, versus how many times you have heard them say 'HTTP,' 'TCP,' or 'the application layer.'",
+    "choices": true
   },
   {
     "prompt": "Enumerate what each of these three identifiers actually identifies: (a) an IP address, (b) a port, (c) a MAC address.",
-    "hint": "One identifies a MACHINE on the network (out of potentially billions of machines worldwide). One identifies a PROGRAM running on that already-identified machine (out of possibly many running at once). One identifies a physical network CARD on the local segment (used for the one local hop, not the whole journey)."
+    "hint": "One identifies a MACHINE on the network (out of potentially billions of machines worldwide). One identifies a PROGRAM running on that already-identified machine (out of possibly many running at once). One identifies a physical network CARD on the local segment (used for the one local hop, not the whole journey).",
+    "choices": true
   },
   {
     "prompt": "In one paragraph, DNS (Domain Name System) translates human-readable names (like `example.com`) into something a computer can actually use to route a request. What does DNS return, specifically, when given a name like `example.com`?",
-    "hint": "Think back to the previous question: which of the three identifiers (IP address, port, or MAC address) is what a machine actually needs to know in order to route a request to the right machine anywhere on the network?"
+    "hint": "Think back to the previous question: which of the three identifiers (IP address, port, or MAC address) is what a machine actually needs to know in order to route a request to the right machine anywhere on the network?",
+    "choices": true
   },
   {
     "prompt": "State TCP's job in one sentence, and contrast it with the alternative approach of a protocol that just fires data off without any of TCP's guarantees (sometimes summarized as 'just send it'). What is the key difference?",
-    "hint": "TCP's guarantees are about the data arriving RELIABLY and in the right ORDER, even if the underlying network drops or reorders things along the way. The 'just send it' alternative (UDP) makes neither guarantee, trading reliability for having no cost."
+    "hint": "TCP's guarantees are about the data arriving RELIABLY and in the right ORDER, even if the underlying network drops or reorders things along the way. The 'just send it' alternative (UDP) makes neither guarantee, trading reliability for having no cost.",
+    "choices": true
   },
   {
     "prompt": "Honestly: of the five layers this activity covers (physical, link, network, transport, application), which one does a web developer actually spend their working time writing code at, day to day?",
-    "hint": "Think about which layer's vocabulary (methods, status codes, request/response bodies -- covered in the very next activity) is what a web developer actually reads and writes, versus which layers they simply trust to have already done their job."
+    "hint": "Think about which layer's vocabulary (methods, status codes, request/response bodies -- covered in the very next activity) is what a web developer actually reads and writes, versus which layers they simply trust to have already done their job.",
+    "choices": true
   },
   {
     "prompt": "Tie it together: your browser sends an HTTP GET request to a server. Enumerate, in order, the layers involved on the way out (from where the request originates to where it physically leaves your machine).",
-    "hint": "Start at the top (where the request itself is defined) and work down to the bottom (the actual physical signal leaving your machine) -- this is the same order as the encapsulation question earlier in this activity, just named layer by layer instead of protocol by protocol."
+    "hint": "Start at the top (where the request itself is defined) and work down to the bottom (the actual physical signal leaving your machine) -- this is the same order as the encapsulation question earlier in this activity, just named layer by layer instead of protocol by protocol.",
+    "choices": true
   }
 ]
 """)
@@ -119,9 +129,40 @@ ITEM_SECRETS = json.loads(r"""
 """)
 
 # -- Helpers --
+import difflib as _difflib
+import random as _random
 import textwrap as _tw
 
 _LINE_WIDTH = 70
+
+
+def _norm_answer(s):
+    # Fold away the differences that should not matter when matching a typed
+    # answer against an option: surrounding whitespace, internal run-length,
+    # letter case, and a trailing period.
+    return " ".join(s.strip().lower().split()).strip(" .")
+
+
+def _best_match(raw, options, cutoff=0.82):
+    # Resolve a typed answer to one of `options`, forgiving tiny typos. Returns
+    # the exact option string (so the caller can decrypt with the canonical
+    # value), or None if nothing is close enough.
+    norm = {}
+    for opt in options:
+        norm.setdefault(_norm_answer(opt), opt)
+    key = _norm_answer(raw)
+    if key in norm:
+        return norm[key]
+    close = _difflib.get_close_matches(key, list(norm.keys()), n=1, cutoff=cutoff)
+    return norm[close[0]] if close else None
+
+
+def _show_choices(options):
+    print("  Choose one (type or paste the exact phrase -- small typos are ok):")
+    for opt in options:
+        for ln in _tw.wrap(opt, width=_LINE_WIDTH - 6,
+                           initial_indent="    - ", subsequent_indent="      "):
+            print(ln)
 
 def _banner(title):
     print("=" * _LINE_WIDTH)
@@ -176,14 +217,46 @@ class ActivityEngine:
         """Return the public (non-secret) item dicts, in display order."""
         return QUESTIONS
 
-    def check(self, index, raw):
-        """Check a 1-based item's raw answer; return {correct, feedback, explanation}."""
+    def _options(self, index):
+        """Shuffled display options (answer + distractors) for a choices item.
+
+        Order is deterministic per item so the correct answer is not always in
+        the same position, but is stable across runs.
+        """
         secret = _secret_for_item(index)
-        correct = raw == secret["answer"]
+        opts = [secret["answer"]] + list((secret.get("wrong") or {}).keys())
+        _random.Random(self.slug + ":" + str(index)).shuffle(opts)
+        return opts
+
+    def check(self, index, raw):
+        """Check a 1-based item's raw answer; return {correct, feedback, explanation, canonical}.
+
+        For a concept "choices" item the raw input is matched against the
+        displayed options with small-typo tolerance, and `canonical` carries the
+        exact answer string to decrypt with; for other items an exact match is
+        required and `canonical` is the raw input.
+        """
+        secret = _secret_for_item(index)
+        answer = secret["answer"]
+        wrong = secret.get("wrong") or {}
+        item = self.items()[index - 1]
+        if item.get("choices"):
+            matched = _best_match(raw, self._options(index))
+            if matched is None:
+                return {"correct": False, "feedback": None, "explanation": None, "canonical": raw}
+            correct = matched == answer
+            return {
+                "correct": correct,
+                "feedback": None if correct else wrong.get(matched),
+                "explanation": secret.get("explanation", "") if correct else None,
+                "canonical": answer if correct else matched,
+            }
+        correct = raw == answer
         return {
             "correct": correct,
-            "feedback": None if correct else (secret.get("wrong") or {}).get(raw),
+            "feedback": None if correct else wrong.get(raw),
             "explanation": secret.get("explanation", "") if correct else None,
+            "canonical": raw,
         }
 
     def passphrase(self, answers):
@@ -195,6 +268,8 @@ ENGINE = ActivityEngine()
 def _ask(item, index, total):
     print(f"\n  Q{index:02}/{total:02}  {item['prompt']}")
     print(f"           Hint: {item['hint']}")
+    if item.get("choices"):
+        _show_choices(ENGINE._options(index))
     while True:
         raw = input("  Your answer: ").strip()
         if not raw:
@@ -204,7 +279,7 @@ def _ask(item, index, total):
             if result.get("explanation"):
                 for ln in _wrap(result["explanation"]):
                     print(ln)
-            return raw
+            return result.get("canonical", raw)
         _show_wrong(raw, {raw: result["feedback"]} if result.get("feedback") else {})
         print("           Trace through the function step by step and try again.")
 

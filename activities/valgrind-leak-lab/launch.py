@@ -27,9 +27,40 @@ def _decrypt(key_str):
     return bytes(a ^ b for a, b in zip(ct, stream)).decode()
 
 # -- Helpers --
+import difflib as _difflib
+import random as _random
 import textwrap as _tw
 
 _LINE_WIDTH = 70
+
+
+def _norm_answer(s):
+    # Fold away the differences that should not matter when matching a typed
+    # answer against an option: surrounding whitespace, internal run-length,
+    # letter case, and a trailing period.
+    return " ".join(s.strip().lower().split()).strip(" .")
+
+
+def _best_match(raw, options, cutoff=0.82):
+    # Resolve a typed answer to one of `options`, forgiving tiny typos. Returns
+    # the exact option string (so the caller can decrypt with the canonical
+    # value), or None if nothing is close enough.
+    norm = {}
+    for opt in options:
+        norm.setdefault(_norm_answer(opt), opt)
+    key = _norm_answer(raw)
+    if key in norm:
+        return norm[key]
+    close = _difflib.get_close_matches(key, list(norm.keys()), n=1, cutoff=cutoff)
+    return norm[close[0]] if close else None
+
+
+def _show_choices(options):
+    print("  Choose one (type or paste the exact phrase -- small typos are ok):")
+    for opt in options:
+        for ln in _tw.wrap(opt, width=_LINE_WIDTH - 6,
+                           initial_indent="    - ", subsequent_indent="      "):
+            print(ln)
 
 def _banner(title):
     print("=" * _LINE_WIDTH)

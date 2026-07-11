@@ -79,11 +79,13 @@ QUESTIONS = json.loads(r"""
   },
   {
     "prompt": "In the link command 'g++ app.o -L. -lmathx -o app', what does the -L. flag do? Answer format: a short phrase.",
-    "hint": "-L is spelled with a capital L, distinct from lowercase -l. One of them names a DIRECTORY, the other names a LIBRARY."
+    "hint": "-L is spelled with a capital L, distinct from lowercase -l. One of them names a DIRECTORY, the other names a LIBRARY.",
+    "choices": true
   },
   {
     "prompt": "Still 'g++ app.o -L. -lmathx -o app'. What exact filename(s) does the -lmathx flag tell the linker to search for? Answer format: two filenames separated by ' or ' (library naming convention: lib + name + extension).",
-    "hint": "The -l flag's argument is the library's BARE NAME with the 'lib' prefix and the file extension both stripped off. The linker adds them back on to build the real filename(s) it searches for."
+    "hint": "The -l flag's argument is the library's BARE NAME with the 'lib' prefix and the file extension both stripped off. The linker adds them back on to build the real filename(s) it searches for.",
+    "choices": true
   },
   {
     "prompt": "The current directory contains BOTH libmathx.a (static) and libmathx.so (dynamic) at once, and the link command is 'g++ app.o -L. -lmathx -o app' with no other flags. Which one does the linker choose by default? Answer format: one word -- static or dynamic.",
@@ -91,7 +93,8 @@ QUESTIONS = json.loads(r"""
   },
   {
     "prompt": "libmathx.a and libmathx.so are both present in the current directory, the default linker preference is dynamic (as established in the previous question), but you specifically need a fully static binary this time -- no runtime dependency on libmathx.so at all. What single flag do you add to the g++ link command to force static linking of -lmathx? Answer format: the flag exactly as typed on the command line.",
-    "hint": "This flag changes the linker's PREFERENCE for every -l flag that follows it on the command line -- it does not rename any file."
+    "hint": "This flag changes the linker's PREFERENCE for every -l flag that follows it on the command line -- it does not rename any file.",
+    "choices": true
   }
 ]
 """)
@@ -109,9 +112,40 @@ ITEM_SECRETS = json.loads(r"""
 """)
 
 # -- Helpers --
+import difflib as _difflib
+import random as _random
 import textwrap as _tw
 
 _LINE_WIDTH = 70
+
+
+def _norm_answer(s):
+    # Fold away the differences that should not matter when matching a typed
+    # answer against an option: surrounding whitespace, internal run-length,
+    # letter case, and a trailing period.
+    return " ".join(s.strip().lower().split()).strip(" .")
+
+
+def _best_match(raw, options, cutoff=0.82):
+    # Resolve a typed answer to one of `options`, forgiving tiny typos. Returns
+    # the exact option string (so the caller can decrypt with the canonical
+    # value), or None if nothing is close enough.
+    norm = {}
+    for opt in options:
+        norm.setdefault(_norm_answer(opt), opt)
+    key = _norm_answer(raw)
+    if key in norm:
+        return norm[key]
+    close = _difflib.get_close_matches(key, list(norm.keys()), n=1, cutoff=cutoff)
+    return norm[close[0]] if close else None
+
+
+def _show_choices(options):
+    print("  Choose one (type or paste the exact phrase -- small typos are ok):")
+    for opt in options:
+        for ln in _tw.wrap(opt, width=_LINE_WIDTH - 6,
+                           initial_indent="    - ", subsequent_indent="      "):
+            print(ln)
 
 def _banner(title):
     print("=" * _LINE_WIDTH)
@@ -166,14 +200,46 @@ class ActivityEngine:
         """Return the public (non-secret) item dicts, in display order."""
         return QUESTIONS
 
-    def check(self, index, raw):
-        """Check a 1-based item's raw answer; return {correct, feedback, explanation}."""
+    def _options(self, index):
+        """Shuffled display options (answer + distractors) for a choices item.
+
+        Order is deterministic per item so the correct answer is not always in
+        the same position, but is stable across runs.
+        """
         secret = _secret_for_item(index)
-        correct = raw == secret["answer"]
+        opts = [secret["answer"]] + list((secret.get("wrong") or {}).keys())
+        _random.Random(self.slug + ":" + str(index)).shuffle(opts)
+        return opts
+
+    def check(self, index, raw):
+        """Check a 1-based item's raw answer; return {correct, feedback, explanation, canonical}.
+
+        For a concept "choices" item the raw input is matched against the
+        displayed options with small-typo tolerance, and `canonical` carries the
+        exact answer string to decrypt with; for other items an exact match is
+        required and `canonical` is the raw input.
+        """
+        secret = _secret_for_item(index)
+        answer = secret["answer"]
+        wrong = secret.get("wrong") or {}
+        item = self.items()[index - 1]
+        if item.get("choices"):
+            matched = _best_match(raw, self._options(index))
+            if matched is None:
+                return {"correct": False, "feedback": None, "explanation": None, "canonical": raw}
+            correct = matched == answer
+            return {
+                "correct": correct,
+                "feedback": None if correct else wrong.get(matched),
+                "explanation": secret.get("explanation", "") if correct else None,
+                "canonical": answer if correct else matched,
+            }
+        correct = raw == answer
         return {
             "correct": correct,
-            "feedback": None if correct else (secret.get("wrong") or {}).get(raw),
+            "feedback": None if correct else wrong.get(raw),
             "explanation": secret.get("explanation", "") if correct else None,
+            "canonical": raw,
         }
 
     def passphrase(self, answers):
@@ -185,6 +251,8 @@ ENGINE = ActivityEngine()
 def _ask(item, index, total):
     print(f"\n  Q{index:02}/{total:02}  {item['prompt']}")
     print(f"           Hint: {item['hint']}")
+    if item.get("choices"):
+        _show_choices(ENGINE._options(index))
     while True:
         raw = input("  Your answer: ").strip()
         if not raw:
@@ -194,7 +262,7 @@ def _ask(item, index, total):
             if result.get("explanation"):
                 for ln in _wrap(result["explanation"]):
                     print(ln)
-            return raw
+            return result.get("canonical", raw)
         _show_wrong(raw, {raw: result["feedback"]} if result.get("feedback") else {})
         print("           Trace through the function step by step and try again.")
 

@@ -64,17 +64,20 @@ QUESTIONS = json.loads(r"""
   {
     "code": "",
     "prompt": "You are adding an alternate constructor to a class -- a way to build an instance from a different input format, like Date.from_iso_string(\"2024-01-01\") building a Date without the caller writing out year, month, day separately. Which of Python's three method kinds -- instance method, classmethod, or staticmethod -- fits this job, and why?",
-    "hint": "It needs to call the constructor -- but which constructor, if this class is later subclassed?"
+    "hint": "It needs to call the constructor -- but which constructor, if this class is later subclassed?",
+    "choices": true
   },
   {
     "code": "",
     "prompt": "You are writing a small pure helper inside a class -- say, a validation function that checks whether a raw string looks like a valid email address. It never reads or writes any instance's state, and it never needs to know which class (or subclass) it was called through -- it is grouped inside the class purely for organization, because it is conceptually related. Which method kind fits?",
-    "hint": "It needs neither self nor cls -- what is the method kind that opts out of both bindings?"
+    "hint": "It needs neither self nor cls -- what is the method kind that opts out of both bindings?",
+    "choices": true
   },
   {
     "code": "",
     "prompt": "You are writing a method whose behavior genuinely differs from one object to the next -- reading and using values stored specifically on the object it was called on, like Dog.bark() returning a string built from THIS dog's own name. Which method kind fits, and what does it need access to that the other two kinds do not provide?",
-    "hint": "It needs to reach into one SPECIFIC object's own stored data."
+    "hint": "It needs to reach into one SPECIFIC object's own stored data.",
+    "choices": true
   },
   {
     "code": "class Dog:\n    def __init__(self, name):\n        self.name = name\n\n    def bark(self):\n        return f\"{self.name} says woof\"\n\nd = Dog(\"Rex\")\nd.bark()\n",
@@ -89,7 +92,8 @@ QUESTIONS = json.loads(r"""
   {
     "code": "",
     "prompt": "In C++, private and protected member specifiers are enforced by the compiler -- code outside the class genuinely cannot access a private member; it will not compile. Does Python have anything equivalent -- true, compiler/interpreter-enforced private class members that external code cannot access at all?",
-    "hint": "Think about the leading-underscore convention you have already seen (Account._balance in method-trinity)."
+    "hint": "Think about the leading-underscore convention you have already seen (Account._balance in method-trinity).",
+    "choices": true
   },
   {
     "code": "class Account:\n    def __init__(self):\n        self.__secret = 42\n\na = Account()\nprint(vars(a))\n",
@@ -117,9 +121,40 @@ ITEM_SECRETS = json.loads(r"""
 """)
 
 # -- Helpers --
+import difflib as _difflib
+import random as _random
 import textwrap as _tw
 
 _LINE_WIDTH = 70
+
+
+def _norm_answer(s):
+    # Fold away the differences that should not matter when matching a typed
+    # answer against an option: surrounding whitespace, internal run-length,
+    # letter case, and a trailing period.
+    return " ".join(s.strip().lower().split()).strip(" .")
+
+
+def _best_match(raw, options, cutoff=0.82):
+    # Resolve a typed answer to one of `options`, forgiving tiny typos. Returns
+    # the exact option string (so the caller can decrypt with the canonical
+    # value), or None if nothing is close enough.
+    norm = {}
+    for opt in options:
+        norm.setdefault(_norm_answer(opt), opt)
+    key = _norm_answer(raw)
+    if key in norm:
+        return norm[key]
+    close = _difflib.get_close_matches(key, list(norm.keys()), n=1, cutoff=cutoff)
+    return norm[close[0]] if close else None
+
+
+def _show_choices(options):
+    print("  Choose one (type or paste the exact phrase -- small typos are ok):")
+    for opt in options:
+        for ln in _tw.wrap(opt, width=_LINE_WIDTH - 6,
+                           initial_indent="    - ", subsequent_indent="      "):
+            print(ln)
 
 def _banner(title):
     print("=" * _LINE_WIDTH)
@@ -175,14 +210,46 @@ class ActivityEngine:
         """Return the public (non-secret) item dicts, in display order."""
         return QUESTIONS
 
-    def check(self, index, raw):
-        """Check a 1-based item's raw answer; return {correct, feedback, explanation}."""
+    def _options(self, index):
+        """Shuffled display options (answer + distractors) for a choices item.
+
+        Order is deterministic per item so the correct answer is not always in
+        the same position, but is stable across runs.
+        """
         secret = _secret_for_item(index)
-        correct = raw == secret["answer"]
+        opts = [secret["answer"]] + list((secret.get("wrong") or {}).keys())
+        _random.Random(self.slug + ":" + str(index)).shuffle(opts)
+        return opts
+
+    def check(self, index, raw):
+        """Check a 1-based item's raw answer; return {correct, feedback, explanation, canonical}.
+
+        For a concept "choices" item the raw input is matched against the
+        displayed options with small-typo tolerance, and `canonical` carries the
+        exact answer string to decrypt with; for other items an exact match is
+        required and `canonical` is the raw input.
+        """
+        secret = _secret_for_item(index)
+        answer = secret["answer"]
+        wrong = secret.get("wrong") or {}
+        item = self.items()[index - 1]
+        if item.get("choices"):
+            matched = _best_match(raw, self._options(index))
+            if matched is None:
+                return {"correct": False, "feedback": None, "explanation": None, "canonical": raw}
+            correct = matched == answer
+            return {
+                "correct": correct,
+                "feedback": None if correct else wrong.get(matched),
+                "explanation": secret.get("explanation", "") if correct else None,
+                "canonical": answer if correct else matched,
+            }
+        correct = raw == answer
         return {
             "correct": correct,
-            "feedback": None if correct else (secret.get("wrong") or {}).get(raw),
+            "feedback": None if correct else wrong.get(raw),
             "explanation": secret.get("explanation", "") if correct else None,
+            "canonical": raw,
         }
 
     def passphrase(self, answers):

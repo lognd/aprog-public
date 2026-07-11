@@ -63,43 +63,53 @@ QUESTIONS = json.loads(r"""
 [
   {
     "prompt": "You call an API and get back a 200 status code with a JSON body. What should your client code do with it?",
-    "hint": "200 is the general-purpose success code from http-anatomy -- the request worked and the server is handing you exactly what you asked for."
+    "hint": "200 is the general-purpose success code from http-anatomy -- the request worked and the server is handing you exactly what you asked for.",
+    "choices": true
   },
   {
     "prompt": "You call `GET /users/42` and get back a 404. What should your client code do?",
-    "hint": "404 means the server looked and found nothing at that path. This is a normal, expected outcome your code should plan for -- not a crash."
+    "hint": "404 means the server looked and found nothing at that path. This is a normal, expected outcome your code should plan for -- not a crash.",
+    "choices": true
   },
   {
     "prompt": "You call an API repeatedly and start getting back 429 responses. First, define RATE LIMITING in your own words. Then say what your client code should do when it sees a 429.",
-    "hint": "429 is the code for 'you are calling me too often.' Rate limiting is the server-side policy that produces that code; your client's job is to slow itself down, not to keep hammering the server at the same pace."
+    "hint": "429 is the code for 'you are calling me too often.' Rate limiting is the server-side policy that produces that code; your client's job is to slow itself down, not to keep hammering the server at the same pace.",
+    "choices": true
   },
   {
     "prompt": "You call an API and get back a 500. Contrast this with a 400: whose fault is each one, and what should your client code do differently for a 500 versus a 400?",
-    "hint": "From http-anatomy: 400 is a content problem with YOUR request; 500 means the server itself broke while handling an otherwise-valid request. One of those is worth trying again; the other is not, since sending the exact same broken request again just breaks it the exact same way."
+    "hint": "From http-anatomy: 400 is a content problem with YOUR request; 500 means the server itself broke while handling an otherwise-valid request. One of those is worth trying again; the other is not, since sending the exact same broken request again just breaks it the exact same way.",
+    "choices": true
   },
   {
     "prompt": "Your client needs to send an API key to authenticate every request. Should the key go in a header, or in a query string appended to the URL? Explain why the other choice is risky.",
-    "hint": "Think about everywhere a full URL tends to get written down without anyone intending to record a secret there: web server access logs, browser history, proxy logs, and URLs pasted into chat or bug reports."
+    "hint": "Think about everywhere a full URL tends to get written down without anyone intending to record a secret there: web server access logs, browser history, proxy logs, and URLs pasted into chat or bug reports.",
+    "choices": true
   },
   {
     "prompt": "Define PAGINATION in one paragraph: what is it, and why do APIs page their results instead of returning everything in one response? Then contrast the two common styles: cursor-based and page-number-based.",
-    "hint": "Think about an API with a million records: returning all of them in a single response would be a huge, slow payload. Pagination breaks that into pages. A page-number style says 'give me page 3'; a cursor style says 'give me the results after this specific marker.'"
+    "hint": "Think about an API with a million records: returning all of them in a single response would be a huge, slow payload. Pagination breaks that into pages. A page-number style says 'give me page 3'; a cursor style says 'give me the results after this specific marker.'",
+    "choices": true
   },
   {
     "prompt": "Should a client ever make an HTTP call without setting a timeout? Explain why a call that hangs forever is worse than a call that fails quickly.",
-    "hint": "A TIMEOUT is a maximum amount of time your client is willing to wait for a response before giving up on its own. Think about what happens to your program -- and anything waiting on it -- if a single call never returns and there is no timeout to cut it off."
+    "hint": "A TIMEOUT is a maximum amount of time your client is willing to wait for a response before giving up on its own. Think about what happens to your program -- and anything waiting on it -- if a single call never returns and there is no timeout to cut it off.",
+    "choices": true
   },
   {
     "prompt": "Your client receives a response body that is supposed to be JSON, but it fails to parse (the text is malformed or truncated). What should your client code do?",
-    "hint": "This is a fallible operation -- something that can genuinely fail even when your own code is correct (a flaky connection can truncate a response, a server can have a bug). Treat it as an expected failure case, not a reason to let the program die with a raw unhandled exception."
+    "hint": "This is a fallible operation -- something that can genuinely fail even when your own code is correct (a flaky connection can truncate a response, a server can have a bug). Treat it as an expected failure case, not a reason to let the program die with a raw unhandled exception.",
+    "choices": true
   },
   {
     "prompt": "A GET request times out, so your client retries it. Is that safe? Now a POST request that creates a new order times out, so your client retries it the same way. Is THAT safe? Explain the difference, tying it back to idempotency from http-anatomy.",
-    "hint": "http-anatomy defined idempotent as: performing an operation multiple times has the same effect on server state as performing it once. Which of GET and POST has that property?"
+    "hint": "http-anatomy defined idempotent as: performing an operation multiple times has the same effect on server state as performing it once. Which of GET and POST has that property?",
+    "choices": true
   },
   {
     "prompt": "An API's base URL is `https://api.example.com`, the path for a specific user is `/users/42`, and you want to request only the `name` and `email` fields via a query parameter named `fields`. Compose the full URL a client should call.",
-    "hint": "Base URL, then path, then a `?` before any query parameters, with multiple query values for one parameter typically comma-separated or repeated -- pick the simpler, comma-separated form here."
+    "hint": "Base URL, then path, then a `?` before any query parameters, with multiple query values for one parameter typically comma-separated or repeated -- pick the simpler, comma-separated form here.",
+    "choices": true
   }
 ]
 """)
@@ -119,9 +129,40 @@ ITEM_SECRETS = json.loads(r"""
 """)
 
 # -- Helpers --
+import difflib as _difflib
+import random as _random
 import textwrap as _tw
 
 _LINE_WIDTH = 70
+
+
+def _norm_answer(s):
+    # Fold away the differences that should not matter when matching a typed
+    # answer against an option: surrounding whitespace, internal run-length,
+    # letter case, and a trailing period.
+    return " ".join(s.strip().lower().split()).strip(" .")
+
+
+def _best_match(raw, options, cutoff=0.82):
+    # Resolve a typed answer to one of `options`, forgiving tiny typos. Returns
+    # the exact option string (so the caller can decrypt with the canonical
+    # value), or None if nothing is close enough.
+    norm = {}
+    for opt in options:
+        norm.setdefault(_norm_answer(opt), opt)
+    key = _norm_answer(raw)
+    if key in norm:
+        return norm[key]
+    close = _difflib.get_close_matches(key, list(norm.keys()), n=1, cutoff=cutoff)
+    return norm[close[0]] if close else None
+
+
+def _show_choices(options):
+    print("  Choose one (type or paste the exact phrase -- small typos are ok):")
+    for opt in options:
+        for ln in _tw.wrap(opt, width=_LINE_WIDTH - 6,
+                           initial_indent="    - ", subsequent_indent="      "):
+            print(ln)
 
 def _banner(title):
     print("=" * _LINE_WIDTH)
@@ -176,14 +217,46 @@ class ActivityEngine:
         """Return the public (non-secret) item dicts, in display order."""
         return QUESTIONS
 
-    def check(self, index, raw):
-        """Check a 1-based item's raw answer; return {correct, feedback, explanation}."""
+    def _options(self, index):
+        """Shuffled display options (answer + distractors) for a choices item.
+
+        Order is deterministic per item so the correct answer is not always in
+        the same position, but is stable across runs.
+        """
         secret = _secret_for_item(index)
-        correct = raw == secret["answer"]
+        opts = [secret["answer"]] + list((secret.get("wrong") or {}).keys())
+        _random.Random(self.slug + ":" + str(index)).shuffle(opts)
+        return opts
+
+    def check(self, index, raw):
+        """Check a 1-based item's raw answer; return {correct, feedback, explanation, canonical}.
+
+        For a concept "choices" item the raw input is matched against the
+        displayed options with small-typo tolerance, and `canonical` carries the
+        exact answer string to decrypt with; for other items an exact match is
+        required and `canonical` is the raw input.
+        """
+        secret = _secret_for_item(index)
+        answer = secret["answer"]
+        wrong = secret.get("wrong") or {}
+        item = self.items()[index - 1]
+        if item.get("choices"):
+            matched = _best_match(raw, self._options(index))
+            if matched is None:
+                return {"correct": False, "feedback": None, "explanation": None, "canonical": raw}
+            correct = matched == answer
+            return {
+                "correct": correct,
+                "feedback": None if correct else wrong.get(matched),
+                "explanation": secret.get("explanation", "") if correct else None,
+                "canonical": answer if correct else matched,
+            }
+        correct = raw == answer
         return {
             "correct": correct,
-            "feedback": None if correct else (secret.get("wrong") or {}).get(raw),
+            "feedback": None if correct else wrong.get(raw),
             "explanation": secret.get("explanation", "") if correct else None,
+            "canonical": raw,
         }
 
     def passphrase(self, answers):
@@ -195,6 +268,8 @@ ENGINE = ActivityEngine()
 def _ask(item, index, total):
     print(f"\n  Q{index:02}/{total:02}  {item['prompt']}")
     print(f"           Hint: {item['hint']}")
+    if item.get("choices"):
+        _show_choices(ENGINE._options(index))
     while True:
         raw = input("  Your answer: ").strip()
         if not raw:
@@ -204,7 +279,7 @@ def _ask(item, index, total):
             if result.get("explanation"):
                 for ln in _wrap(result["explanation"]):
                     print(ln)
-            return raw
+            return result.get("canonical", raw)
         _show_wrong(raw, {raw: result["feedback"]} if result.get("feedback") else {})
         print("           Trace through the function step by step and try again.")
 
