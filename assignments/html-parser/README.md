@@ -25,6 +25,67 @@ activities.
 
 ---
 
+## Examples at a glance
+
+To make both functions concrete, here is **one** HTML snippet, with what
+`to_text` and `count_tag` each produce for it. Read this table first -- it is
+the whole assignment in miniature.
+
+```
+html = "<p>Hi <b>there</b><br>friend<i>!</i>"
+```
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `to_text(html)` | `"\n\nHi there\nfriend!"` | `<p>` opens with `\n\n`; `Hi ` passes through unchanged; `<b>`/`</b>` are stripped (no special meaning), leaving `there`; `<br>` becomes `\n`; `friend` passes through; `<i>`/`</i>` are stripped, leaving `!` |
+| `count_tag(html, "p")` | `1` | one open `<p>`, no close `</p>` in this snippet |
+| `count_tag(html, "b")` | `1` | only the OPEN `<b>` counts; `</b>` is a close tag and is never counted |
+| `count_tag(html, "br")` | `1` | one `<br>` |
+| `count_tag(html, "i")` | `1` | only the OPEN `<i>` counts; `</i>` is a close tag and is never counted |
+| `count_tag(html, "u")` | `0` | `<u>` never appears in this snippet at all |
+
+## Worked example: watch `to_text` and `count_tag("...", "b")` run, tag by tag
+
+This is the single most important thing to understand in the assignment, so
+here is every character-scanning step spelled out. The input this time
+deliberately mixes a case-different tag, a `<br>`, a close tag, and a
+malformed tag (one with no closing `>`) so you can see every rule fire:
+
+```
+html = "<B>Hi<br>bye</B>x<bad"
+```
+
+The scan keeps one index `i` that always points at the next unread
+character. Each row below is one pass through the loop.
+
+| `i` points at | What the scanner sees | Rule applied | Appended to `to_text` output | Effect on `count_tag(html, "b")` |
+|---|---|---|---|---|
+| `<B>` | `<` found; matching `>` found right after `B` | raw tag = `"B"`, lowercased = `"b"`, not a close tag (no leading `/`), name is not `br`/`p` -> strip | (nothing) | this IS an open `b` tag -> running count becomes `1` |
+| `Hi` | plain characters, no `<` | copy through unchanged | `Hi` | unchanged |
+| `<br>` | `<` found; matching `>` found right after `br` | lowercased name `"br"`, open tag -> special case | `\n` | unchanged |
+| `bye` | plain characters | copy through unchanged | `bye` | unchanged |
+| `</B>` | `<` found; matching `>` found; raw tag = `"/B"` | lowercased = `"/b"`, leading `/` means CLOSE tag -> strip, and close tags are never counted | (nothing) | unchanged (close tags do not count, even though the name matches) |
+| `x` | plain character, no `<` | copy through unchanged | `x` | unchanged |
+| `<bad` | `<` found; scan for `>` all the way to the end of the string and never find one | malformed (rule 2): treat this single `<` as a literal character and move on ONE character (not the whole `bad`) | `<` | unchanged (a malformed tag, having no `>`, is never counted, even though the letters `bad` are not the target name anyway) |
+| `bad` | plain characters (now read one at a time, since the earlier `<` was consumed alone) | copy through unchanged | `bad` | unchanged |
+
+Concatenating the "Appended" column in order gives the final result:
+
+```
+to_text("<B>Hi<br>bye</B>x<bad") == "Hi\nbyex<bad"
+count_tag("<B>Hi<br>bye</B>x<bad", "b") == 1
+```
+
+Notice two easy-to-miss details this example is built to expose: (1) tag name
+matching is case-insensitive, so the uppercase `<B>` still counts as a `b`
+tag and still gets stripped by `to_text` the same way a lowercase `<b>`
+would; and (2) a malformed tag consumes only the lone `<` character, not the
+rest of the text after it -- so `<bad` at the end still contributes the
+literal text `<bad` to the output, one character at a time, rather than
+being swallowed whole.
+
+---
+
 ## Learning goals
 
 - Scan a string character by character, recognizing delimited tokens (`<...>`)
@@ -57,11 +118,39 @@ Strip all HTML tags and return the plain text.  Apply these rules in order:
    - All other tags (including `<b>`, `<i>`, `<u>`, and unknown tags) -> strip
 5. Characters outside any tag are appended to the output unchanged.
 
+*Examples:*
+
+- `to_text("") == ""` -- empty input, nothing to strip.
+- `to_text("no tags here") == "no tags here"` -- no `<` at all, every
+  character is copied through unchanged.
+- `to_text("<b>Hi<br>there</b>") == "Hi\nthere"` -- `<b>` and `</b>` are
+  stripped (they carry no special meaning), `<br>` becomes a newline.
+- `to_text("a < b") == "a < b"` -- the `<` here never finds a matching `>`
+  anywhere in the rest of the string, so rule 2 says to treat it as a
+  literal character; the whole string passes through unchanged.
+- `to_text("<p></p>") == "\n\n"` -- the open `<p>` appends `\n\n`; the close
+  `</p>` is a close tag, so it is stripped and contributes nothing.
+- `to_text("<BR>") == "\n"` -- tag names are matched case-insensitively
+  (rule 3 lowercases before comparing), so uppercase `<BR>` is still
+  recognized as `br`.
+
 ### `int count_tag(const std::string& html, const std::string& tag_name)`
 
 Count the number of opening (non-closing) occurrences of `tag_name` in `html`.
 Tag name matching is case-insensitive.  Malformed tags (no closing `>`) are not
 counted.  Close tags (starting with `/`) are not counted.
+
+*Examples:*
+
+- `count_tag("", "b") == 0` -- empty input, nothing to count.
+- `count_tag("<b>hi</b>", "x") == 0` -- `tag_name` "x" never appears at all.
+- `count_tag("<b><B><b>", "b") == 3` -- three open tags, matched
+  case-insensitively (`<B>` counts the same as `<b>`).
+- `count_tag("</b>", "b") == 0` -- the only tag present is a CLOSE tag
+  (starts with `/`), so it is not counted; the open-tag count is zero.
+- `count_tag("<bad", "bad") == 0` -- `<bad` never finds a closing `>`, so
+  it is malformed and is not counted, even though the tag name would
+  otherwise match.
 
 ---
 

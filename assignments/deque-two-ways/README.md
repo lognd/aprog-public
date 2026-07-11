@@ -231,6 +231,80 @@ them is a real engineering tradeoff, not a correctness question.
 
 ---
 
+## Examples: every operation on one ArrayDeque
+
+To make the six deque operations concrete, here is **one** sequence of
+calls on a single `ArrayDeque<int>`, starting from a default-constructed
+(empty) deque, and what each call leaves behind. Read this table first --
+it is the whole assignment in miniature. (Every row in this table and the
+step-by-step trace below was run against the reference solution to
+confirm the exact numbers.)
+
+| Call | `front()` after | `back()` after | `size()` after | Why |
+|------|------------------|-----------------|-----------------|-----|
+| `push_back(10)` | `10` | `10` | `1` | first element -- also triggers the initial grow from capacity 0 to capacity 8 |
+| `push_back(20)` | `10` | `20` | `2` | appended at the back, front unchanged |
+| `push_front(5)` | `5` | `20` | `3` | inserted at the front by moving `head_` backward (wrapping), not by shifting `10`/`20` |
+| `pop_front()` | `10` | `20` | `2` | removes the `5` by moving `head_` forward one slot -- no element is shifted |
+| `push_back(30)` | `10` | `30` | `3` | appended at the back as usual |
+| `push_front(7)` | `7` | `30` | `4` | `head_` wraps backward again; happens to reuse the array slot the popped `5` used to occupy |
+| `pop_back()` | `7` | `20` | `3` | removes the `30` by decrementing `size_` only -- the physical value `30` is left in memory but is no longer logically part of the deque |
+| `pop_front()` on an EMPTY deque | -- | -- | -- | returns `false` and does nothing -- there is nothing to remove |
+
+## Worked example: watch a sequence of push/pop operations run, step by step
+
+This traces the exact same eight calls as the table above, but shows the
+underlying circular buffer itself: the `capacity_`, `head_` (index of the
+logical front), `size_`, and the physical array contents. `_` means "a
+slot with no logically-live value in it" (either never written, or its
+value was popped and left behind). Physical index 0 is always the
+leftmost column.
+
+Start: a default-constructed `ArrayDeque<int>` has `capacity_ = 0`,
+`head_ = 0`, `size_ = 0`, and no array allocated at all (`data_` is
+`nullptr`).
+
+| Step | Call | `capacity_` | `head_` | `size_` | Array (physical index 0 first) | Why |
+|------|------|------|------|------|-------------------------------|-----|
+| 1 | `push_back(10)` | 8 | 0 | 1 | `[10, _, _, _, _, _, _, _]` | the array starts at capacity 0, so `push_back` must grow FIRST; growing from 0 always jumps straight to capacity 8, then `10` is written at `(head_+size_)%capacity_ = 0` |
+| 2 | `push_back(20)` | 8 | 0 | 2 | `[10, 20, _, _, _, _, _, _]` | still under capacity, no grow; written at `(0+1)%8 = 1` |
+| 3 | `push_front(5)` | 8 | 7 | 3 | `[10, 20, _, _, _, _, _, 5]` | `head_` moves backward via `(head_+capacity_-1)%capacity_ = (0+8-1)%8 = 7`, wrapping past index 0 to the LAST slot, and `5` is written there; logical order (starting at `head_=7`) is `5, 10, 20` |
+| 4 | `pop_front()` | 8 | 0 | 2 | `[10, 20, _, _, _, _, _, 5]` (unchanged) | `head_` advances to `(7+1)%8 = 0`; the array is not touched at all, the `5` at index 7 is simply no longer reachable through `head_`/`size_` -- this is exactly why `pop_front` is O(1) |
+| 5 | `push_back(30)` | 8 | 0 | 3 | `[10, 20, 30, _, _, _, _, 5]` | written at `(0+2)%8 = 2`; logical order is `10, 20, 30` |
+| 6 | `push_front(7)` | 8 | 7 | 4 | `[10, 20, 30, _, _, _, _, 7]` | `head_` wraps back to `(0+8-1)%8 = 7` again, OVERWRITING the stale `5` left over from step 3 with `7`; logical order is `7, 10, 20, 30` |
+| 7 | `pop_back()` | 8 | 7 | 3 | `[10, 20, 30, _, _, _, _, 7]` (unchanged) | `pop_back` only decrements `size_`; the `30` at physical index 2 is still physically present but no longer logically part of the deque (logical order is now `7, 10, 20`) -- this stale slot is exactly what step 5's kind of overwrite would later reclaim if a `push_back` happened next |
+| 8 | `pop_front()` on a SEPARATE empty deque | 0 | 0 | 0 | (no array allocated) | `size_ == 0`, so the function returns `false` immediately and touches nothing -- popping from empty is a no-op, not an error |
+
+Notice step 4 and step 7: neither `pop_front` nor `pop_back` ever moves or
+overwrites array data. They only move `head_` or shrink `size_`. That is
+the entire reason both are O(1) regardless of how many elements are in
+the deque -- the opposite of the O(n) shifting `pop_front` described in
+Background above.
+
+### What happens when the buffer actually fills up
+
+Continuing the same deque from step 6 (capacity 8, seven live logical
+slots would still fit, but pushing enough elements eventually fills all 8
+physical slots and then goes one past): after `push_back(40)` (reusing
+the stale index-2 slot from step 7's leftover `30`), then `push_back(50)`,
+`push_back(60)`, `push_back(70)`, and `push_back(80)`, the array is
+completely full (`size_ == 8 == capacity_`) with logical order `7, 10,
+20, 40, 50, 60, 70, 80` starting at `head_ = 7`. The NEXT call,
+`push_back(90)`, must grow:
+
+| | `capacity_` | `head_` | `size_` | Array | Why |
+|---|------|------|------|-------|-----|
+| before grow | 8 | 7 | 8 | `[10, 20, 40, 50, 60, 70, 80, 7]` | full: `size_ == capacity_` |
+| after re-linearize, before write | 16 | 0 | 8 | `[7, 10, 20, 40, 50, 60, 70, 80, _, _, _, _, _, _, _, _]` | `ensure_capacity` allocates a new 16-slot array and copies elements in LOGICAL order starting at index 0 (reading the old array starting at old `head_ = 7` and wrapping), then resets `head_` to 0 -- this is the "re-linearize" step from Background |
+| after `push_back(90)` | 16 | 0 | 9 | `[7, 10, 20, 40, 50, 60, 70, 80, 90, _, _, _, _, _, _, _]` | written at `(0+8)%16 = 8`, the first fresh slot in the new array |
+
+Every one of these numbers -- including the exact stale-slot reuse in
+step 6 and the exact re-linearized order after growth -- was confirmed by
+compiling the reference solution and printing `size()`, `capacity()`,
+`front()`, and `back()` after each call.
+
+---
+
 ## Task
 
 Implement every member declared in three header files:
@@ -239,11 +313,33 @@ Implement every member declared in three header files:
   Full Big 5, `push_front`/`push_back`/`pop_front`/`pop_back` (all O(1)),
   `front()`/`back()`, `size()`/`empty()`/`capacity()`, and a private
   `ensure_capacity()` that doubles and re-linearizes on grow.
+  *Example (continuing the table above):* starting from an empty
+  `ArrayDeque<int>`, `push_back(10); push_back(20); push_front(5);` leaves
+  `front() == 5`, `back() == 20`, `size() == 3`. On that same deque,
+  `pop_front()` returns `true` and leaves `front() == 10`; calling
+  `pop_front()` again and again until empty, then one more time, returns
+  `false` and leaves `size() == 0`, `empty() == true`.
 - `list_deque.hpp` -- `ListDeque<T>`, a doubly linked list backend. Full
   Big 5, the same six deque operations, `size()`/`empty()`, and `clear()`.
+  *Example:* starting from an empty `ListDeque<int>`,
+  `push_back(1); push_back(2); push_front(0);` leaves `front() == 0`,
+  `back() == 2`, `size() == 3` (verified against the reference: a new
+  node is allocated for each call and linked in via `prev`/`next`, no
+  array or capacity involved at all). `pop_front()` on that deque returns
+  `true` and leaves `front() == 1`. `pop_front()` on a default-constructed
+  (empty) `ListDeque<int>` returns `false` and leaves `head_`/`tail_` both
+  null -- there is no node to unlink.
 - `stack_queue.hpp` -- `Stack<T, D>` and `Queue<T, D>`, container adapters
   over a deque backend `D` (defaulting to `ArrayDeque<T>`). Every member
   delegates to a private `D deque_` member.
+  *Example:* `Stack<int> s; s.push(1); s.push(2); s.push(3);` leaves
+  `s.top() == 3` (LIFO: last pushed is first out), `s.size() == 3`; after
+  `s.pop()`, `s.top() == 2`. `Queue<int> q; q.push(1); q.push(2);
+  q.push(3);` leaves `q.front() == 1`, `q.back() == 3` (FIFO: first
+  pushed is first out); after `q.pop()`, `q.front() == 2`, `q.back()`
+  is unchanged at `3`. A default-constructed (empty) `Stack<int>`'s
+  `pop()` returns `false` because it delegates directly to
+  `ArrayDeque<int>::pop_back()`, which itself returns `false` on empty.
 
 `pop_front()` and `pop_back()` on both backends, and `push()`/`pop()` on
 both adapters, return `true` on success or `false` and no-op on an empty

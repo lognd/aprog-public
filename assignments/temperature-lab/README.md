@@ -63,6 +63,10 @@ def from_kelvin(cls, k: float) -> "Temperature":
 Both must build and return `cls(...)`, not a hardcoded `Temperature(...)`
 -- called through a subclass, they must construct an instance of that
 subclass, exactly like `named_fido` in method-trinity.
+*Example:* `Temperature.from_fahrenheit(32.0).celsius == 0.0` (freezing
+point); `Temperature.from_fahrenheit(-40.0).celsius == -40.0` (the one
+temperature where the two scales agree); `Temperature.from_kelvin(0.0).celsius == -273.15`
+(absolute zero, still physical since the check is `>=`).
 
 ### Physical-range check
 
@@ -74,6 +78,9 @@ def is_physical(celsius: float) -> bool:
 
 A pure function of its `celsius` argument. It needs neither `self` nor
 `cls` -- it is grouped inside `Temperature` purely for organization.
+*Example:* `Temperature.is_physical(-273.15) == True` (the boundary
+itself counts as physical); `Temperature.is_physical(-273.16) == False`
+(anything colder does not); `Temperature.is_physical(100.0) == True`.
 
 ### The `celsius` property
 
@@ -92,6 +99,12 @@ The getter returns the stored value. The setter must raise
 otherwise store it. Because `__init__` assigns through this property,
 constructing a `Temperature` with an impossible value must also raise
 `ValueError`.
+*Example:* `Temperature(0.0).celsius == 0.0`; `Temperature(-300.0)`
+raises `ValueError` (colder than absolute zero, so the object is never
+even constructed); after `t = Temperature(0.0)`, `t.celsius = -273.15`
+succeeds (the boundary is allowed) but `t.celsius = -273.16` raises
+`ValueError` and leaves `t.celsius` unchanged at whatever it was before
+the failed assignment.
 
 ### Read-only computed properties
 
@@ -108,6 +121,10 @@ def kelvin(self) -> float:
 Both are computed from the stored Celsius value on every read. Neither
 has a setter -- assigning to `t.fahrenheit` or `t.kelvin` must raise
 `AttributeError`.
+*Example:* `Temperature(0.0).fahrenheit == 32.0`; `Temperature(0.0).kelvin == 273.15`;
+`Temperature(100.0).fahrenheit == 212.0` (boiling point); assigning
+`Temperature(0.0).fahrenheit = 100.0` raises `AttributeError` because
+there is no setter at all, not even one that rejects the value.
 
 ### Dunder methods
 
@@ -140,6 +157,65 @@ code never writes `return False` for that branch). This is why the
 signatures above are typed `-> bool` even though the real return value
 in that branch is `NotImplemented` -- type checkers special-case `__eq__`
 and `__lt__` to allow this.
+
+*Example (`__repr__`):* `repr(Temperature(21.5)) == 'Temperature(21.5C)'`;
+`repr(Temperature(21.55)) == 'Temperature(21.6C)'` (Python's own `:.1f`
+rounding, not anything you write by hand); `repr(Temperature(-273.15)) == 'Temperature(-273.1C)'`
+(this one looks like it should round to `-273.2`, but `-273.15` is not
+exactly representable in binary floating point -- the actual stored
+value is a hair above `-273.15`, so `:.1f` rounds it toward `-273.1`;
+this is exactly why the spec says "Python's normal `:.1f` rounding
+behavior," not a hand-rolled rounding rule).
+
+*Example (`__eq__`):* `Temperature(10.0) == Temperature(10.0)` is
+`True`; `Temperature(10.0) == Temperature(10.0 + 1e-12)` is `True` (well
+within the `1e-9` tolerance); `Temperature(10.0) == Temperature(10.1)`
+is `False` (the difference is `0.1`, far outside tolerance);
+`Temperature(10.0) == 5` is `False`, not a raised exception (`__eq__`
+returns `NotImplemented`, and Python falls back to `False` once neither
+side knows how to compare).
+
+*Example (`__lt__`):* `Temperature(10.0) < Temperature(20.0)` is `True`;
+`Temperature(20.0) < Temperature(10.0)` is `False`; `Temperature(10.0) < 5`
+raises `TypeError` (`__lt__` returns `NotImplemented` for a non-`Temperature`,
+and unlike `==`, Python has no fallback for `<` once both sides give up).
+
+## Examples at a glance
+
+To make every member concrete at once, here is **one** representative
+`Temperature`, `t = Temperature(100.0)` (the boiling point of water at
+sea level, in Celsius), and what every member returns for it or for a
+nearby edge case.
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `t.celsius`                              | `100.0`  | the getter just returns the stored value |
+| `t.fahrenheit`                           | `212.0`  | `F = C * 9/5 + 32` = `100 * 9/5 + 32` = `180 + 32` |
+| `t.kelvin`                               | `373.15` | `K = C + 273.15` = `100 + 273.15` |
+| `repr(t)`                                | `'Temperature(100.0C)'` | `:.1f` formats a whole number with one trailing zero decimal |
+| `Temperature.is_physical(-273.15)`       | `True`   | the check is `>=`, so absolute zero itself is physical, not just above it |
+| `Temperature.is_physical(-273.16)`       | `False`  | anything colder than absolute zero is not physically possible |
+| `Temperature(-300.0)`                    | raises `ValueError` | `__init__` assigns through the `celsius` setter, which rejects non-physical values before the object even exists |
+| `Temperature.from_fahrenheit(212.0).celsius` | `100.0` | `(212 - 32) * 5/9 = 180 * 5/9 = 100.0`, the boiling point round-trips exactly |
+| `Temperature.from_kelvin(373.15).celsius`    | `100.0` | `373.15 - 273.15 = 100.0` |
+| `Temperature(10.0) == Temperature(10.0 + 1e-12)` | `True` | the two values differ by far less than the `1e-9` tolerance, so they still compare equal |
+| `Temperature(10.0) < 5`                  | raises `TypeError` | `__lt__` returns `NotImplemented` for a non-`Temperature`; once both sides give up, Python raises `TypeError` for you |
+
+## Worked example: watch `Temperature.from_fahrenheit(98.6)` build a `Temperature`, step by step
+
+This traces the classmethod that most people get wrong first (forgetting
+to subtract 32 before multiplying), using human body temperature as the
+input, ending exactly where `t.celsius == 37.0`.
+
+| Step | Expression | Value | Why |
+|------|-----------|-------|-----|
+| 1 | `f` | `98.6` | the Fahrenheit value passed in |
+| 2 | `f - 32.0` | `66.6` | subtract 32 first -- this is the step that is easy to skip |
+| 3 | `(f - 32.0) * 5.0` | `333.0` | multiply by 5 before dividing, to match the exact formula `(F - 32) * 5 / 9` |
+| 4 | `(f - 32.0) * 5.0 / 9.0` | `37.0` | divide by 9 last; this is the Celsius value that gets passed to `cls(...)` |
+| 5 | `cls(37.0)` runs `__init__`, which assigns `self.celsius = 37.0` | -- | assignment goes through the `celsius` property setter, not a bare attribute write |
+| 6 | the setter calls `Temperature.is_physical(37.0)` | `True` | `37.0 >= -273.15`, so the value is accepted and stored in `self._celsius` |
+| end | `Temperature.from_fahrenheit(98.6).celsius` | `37.0` | the classmethod returns the new instance; reading `.celsius` gives back the stored value |
 
 ### Examples
 

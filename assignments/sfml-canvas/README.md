@@ -58,6 +58,90 @@ windowed game loop (`sf::RenderWindow`, the event queue, `clear`/`draw`/
 `display`) that your actual course project will use; that material is not
 tested here, precisely because it cannot be graded headlessly.
 
+## Examples at a glance
+
+To make all five functions concrete before you write any code, here is
+**one** running example: a `4x4` canvas. Read this section first -- it is
+the whole assignment in miniature. Colors are written as `(r, g, b, a)`,
+each channel `0` to `255`.
+
+`make_gradient(4, 4, from=(0,0,0,255), to=(30,60,90,255))` builds this image
+(every row is identical, so only one row is shown):
+
+```
+ column:   x=0            x=1             x=2             x=3
+ color :  (0,0,0,255)  (10,20,30,255)  (20,40,60,255)  (30,60,90,255)
+```
+
+`checkerboard(4, 4, 2, a=black(0,0,0,255), b=white(255,255,255,255))` builds
+this image (`A` = black, `B` = white):
+
+```
+ A A B B
+ A A B B
+ B B A A
+ B B A A
+```
+
+| Call | Result | Why |
+|------|--------|-----|
+| `make_gradient(4, 4, black, (30,60,90,255))` | grid above | column `x`'s color is `black` lerped toward `(30,60,90,255)` by `t = x / (width - 1)`; every row repeats it |
+| `make_gradient(1, 3, (10,20,30,255), (200,200,200,255))` | every one of the 3 pixels is `(10,20,30,255)` | `width <= 1` means there is no second column to lerp toward, so every pixel is `from` |
+| `checkerboard(4, 4, 2, black, white)` | grid above | block `(x/2, y/2)`; block `(0,0)` (top-left) is always `a` = black; even block-index sums stay black, odd sums flip to white |
+| `checkerboard(5, 5, 10, black, white)` | every pixel is black | `cell = 10` is bigger than the whole `5x5` image, so every pixel falls in block `(0,0)` -- no tiling is visible at all |
+| `draw_disk(img, 2, 2, 1, red)` on a 4x4 white canvas | paints `(2,1) (1,2) (2,2) (3,2) (2,3)` -- a plus/cross shape | each candidate pixel `(px,py)` is painted only if `(px-2)^2+(py-2)^2 <= 1^2`; see the worked example below |
+| `draw_disk(img, 5, 5, 0, red)` | paints only the single pixel `(5,5)` | with `r = 0`, only `dx = dy = 0` satisfies `dx*dx+dy*dy <= 0` |
+| `blend(gradient, checkerboard, 0.5)` at pixel `(2, 0)` | `(138,148,158,255)` | base `(20,40,60,255)` and overlay-white `(255,255,255,255)` average per channel, e.g. `r = 20*0.5 + 255*0.5 = 137.5`, which round-half-up turns into `138` |
+| `blend(base, overlay, 0.f)` (any images) | exactly `base`, pixel for pixel | `alpha = 0` means the overlay term is multiplied by `0` and drops out entirely |
+| `outline_rect(img, 1, 1, 3, 3, black)` on a 6x6 white canvas | paints the 8-pixel ring around `(2,2)`, leaves `(2,2)` white | the border traces the rectangle's 4 edges; `(2,2)` is the one interior pixel, never touched |
+| `outline_rect(img, 1, 1, 2, 2, black)` on a 4x4 canvas | paints all 4 pixels of the 2x2 block, no white pixel left inside | a `2x2` rectangle's border already covers every one of its pixels -- there is no interior left over |
+| `outline_rect(img, -2, -2, 7, 7, black)` on a 5x5 canvas | paints the entire bottom row (`y=4`) and the entire right column (`x=4`); the rest of the border (top row `y=-2`, left column `x=-2`) is clipped away | only the part of the rectangle's border that still lands inside `[0,5) x [0,5)` gets drawn; the rest is silently skipped, never a crash |
+
+## Worked example: watch `draw_disk` paint pixel by pixel, step by step
+
+This is the single most important thing to understand about `draw_disk`, so
+here is every candidate pixel checked, one at a time. We call
+`draw_disk(img, 2, 2, 1, red)` on a `4x4` all-white canvas: center
+`(cx, cy) = (2, 2)`, radius `r = 1`.
+
+The function loops `dy` from `-r` to `r`, and for each `dy`, loops `dx` from
+`-r` to `r` -- checking every pixel in the bounding square first, then using
+the distance test `dx*dx + dy*dy <= r*r` to decide whether that pixel is
+really inside the circle (not just the square). `r*r` here is `1`.
+
+| Step | `dx` | `dy` | `dx*dx+dy*dy` | Compare to `r*r = 1` | Pixel `(cx+dx, cy+dy)` | In bounds `[0,4)x[0,4)`? | Action |
+|------|------|------|---------------|-----------------------|------------------------|--------------------------|--------|
+| 1 | -1 | -1 | 2 | `2 > 1` | (1,1) | yes | skip -- outside the circle |
+| 2 | 0  | -1 | 1 | `1 <= 1` | (2,1) | yes | paint red |
+| 3 | 1  | -1 | 2 | `2 > 1` | (3,1) | yes | skip -- outside the circle |
+| 4 | -1 | 0  | 1 | `1 <= 1` | (1,2) | yes | paint red |
+| 5 | 0  | 0  | 0 | `0 <= 1` | (2,2) | yes | paint red (the center is always inside) |
+| 6 | 1  | 0  | 1 | `1 <= 1` | (3,2) | yes | paint red |
+| 7 | -1 | 1  | 2 | `2 > 1` | (1,3) | yes | skip -- outside the circle |
+| 8 | 0  | 1  | 1 | `1 <= 1` | (2,3) | yes | paint red |
+| 9 | 1  | 1  | 2 | `2 > 1` | (3,3) | yes | skip -- outside the circle |
+
+Every one of the 9 candidate pixels in the bounding square was in bounds
+here, so none were clipped in this example -- but the same in-bounds check
+(`px < 0 || py < 0 || px >= w || py >= h`) runs on every step regardless,
+which is what protects a disk near an edge from ever writing outside the
+image.
+
+The final `4x4` grid, `.` for untouched white and `X` for painted red:
+
+```
+ . . . .
+ . . X .
+ . X X X
+ . . X .
+```
+
+That is a plus/cross shape, not a diamond or a square -- notice steps 1, 3,
+7, and 9 (the four diagonal corners of the bounding square) were all
+skipped, because a corner of a square is always farther from the center
+than the square's own edge midpoints, and the distance test rejects
+anything farther than `r`.
+
 ## Task
 
 Implement these five functions in `canvas.cpp`, against the fixed
@@ -71,6 +155,16 @@ computed independently for each of the four channels (r, g, b, a). Every
 row is identical -- the whole image is a horizontal gradient repeated down
 every column. If `width <= 1`, every pixel is `from`.
 
+*Example:* `make_gradient(4, 4, (0,0,0,255), (30,60,90,255))` gives columns
+`x=0 -> (0,0,0,255)`, `x=1 -> (10,20,30,255)`, `x=2 -> (20,40,60,255)`,
+`x=3 -> (30,60,90,255)`, the same down every row.
+*Edge case (width <= 1):* `make_gradient(1, 3, (10,20,30,255),
+(200,200,200,255))` -- all 3 pixels are exactly `(10,20,30,255)`; `to` is
+never reached because there is no second column to lerp toward.
+*Rounding edge case:* `make_gradient(3, 1, (0,0,0,255), (9,10,11,255))` at
+`x=1` (`t = 0.5` exactly) gives `(5,5,6,255)` -- `4.5` rounds up to `5`,
+`5.0` stays `5`, `5.5` rounds up to `6` (round-half-up, per the rule below).
+
 ### `checkerboard(width, height, cell, a, b)`
 
 Tile the image into `cell x cell` pixel blocks, alternating between colors
@@ -78,6 +172,16 @@ Tile the image into `cell x cell` pixel blocks, alternating between colors
 (integer division); if the sum of those two block indices is even, use
 color `a`, otherwise `b`. Block `(0, 0)` -- the block containing the
 top-left pixel -- is always `a`.
+
+*Example:* `checkerboard(4, 4, 2, black, white)` gives the `4x4` grid
+`A A B B / A A B B / B B A A / B B A A` (`A` = black, `B` = white) -- see
+the "Examples at a glance" section above for the full picture.
+*Edge case (1x1 image):* `checkerboard(1, 1, 2, black, white)` -- the one
+pixel is block `(0/2, 0/2) = (0, 0)`, sum `0` is even, so the pixel is
+`black`.
+*Edge case (cell bigger than the image):* `checkerboard(5, 5, 10, black,
+white)` -- every pixel falls in block `(0, 0)`, so the entire `5x5` image
+is a single solid color, `black`, with no visible tiling at all.
 
 ### `draw_disk(img, cx, cy, r, color)`
 
@@ -87,6 +191,16 @@ exactly when `(px - cx)^2 + (py - cy)^2 <= r^2` -- the distance test, not
 a bounding square. Any part of the disk that would fall outside `img`'s
 bounds is simply skipped (clipped); never write outside
 `[0, img.getSize().x) x [0, img.getSize().y)`.
+
+*Example:* on a `4x4` white canvas, `draw_disk(img, 2, 2, 1, red)` paints
+exactly the plus-shaped 5 pixels `(2,1) (1,2) (2,2) (3,2) (2,3)` -- worked
+out step by step in the "Worked example" section above.
+*Edge case (r = 0):* `draw_disk(img, 5, 5, 0, red)` paints only the single
+center pixel `(5,5)` -- the distance test `0*0+0*0 <= 0*0` is true only for
+`dx = dy = 0`.
+*Edge case (fully off-image):* `draw_disk(img, -100, -100, 3, red)` on any
+image leaves every pixel untouched and does not crash or resize the image --
+every candidate pixel in the bounding square clips away.
 
 ### `blend(base, overlay, alpha)`
 
@@ -100,12 +214,36 @@ result_channel = base_channel * (1 - alpha) + overlay_channel * alpha
 exactly. `base` and `overlay` are always the same size in every graded
 case; the image you return must have that same size.
 
+*Example:* blending the gradient and checkerboard images from "Examples at
+a glance" at `alpha = 0.5`, pixel `(2, 0)`: base `(20,40,60,255)`, overlay
+white `(255,255,255,255)` -> `(138,148,158,255)` (channel r:
+`20*0.5 + 255*0.5 = 137.5`, which round-half-up turns into `138`).
+*Edge case (alpha = 0):* `blend(base, overlay, 0.f)` reproduces `base`
+exactly, pixel for pixel, for any two same-size images.
+*Edge case (1x1 images):* `blend` on two `1x1` images, `base = (0,0,0,255)`
+and `overlay = (9,10,11,255)`, at `alpha = 0.5` gives `(5,5,6,255)` -- the
+same rounding rule as `make_gradient`'s midpoint example, because the math
+is identical.
+
 ### `outline_rect(img, x, y, w, h, color)`
 
 Draw a 1-pixel-wide border directly onto `img`, tracing the rectangle
 whose pixels span `[x, x + w)` horizontally and `[y, y + h)` vertically:
 its top row, bottom row, left column, and right column. Do not fill the
 interior. Clip any border pixel that would fall outside `img`'s bounds.
+
+*Example:* on a `6x6` white canvas, `outline_rect(img, 1, 1, 3, 3, black)`
+paints the 8-pixel ring around `(2, 2)` -- `(1,1) (2,1) (3,1) (1,2) (3,2)
+(1,3) (2,3) (3,3)` -- and leaves `(2, 2)` (the one interior pixel) white.
+*Edge case (rect too small to have an interior):* `outline_rect(img, 1, 1,
+2, 2, black)` on a `4x4` canvas paints all 4 pixels of the 2x2 block -- a
+2x2 rectangle's own border already covers every pixel it has, leaving no
+interior pixel behind.
+*Edge case (clipping):* `outline_rect(img, -2, -2, 7, 7, black)` on a `5x5`
+canvas paints the entire bottom row (`y = 4`) and the entire right column
+(`x = 4`) -- the parts of the border still inside `[0,5) x [0,5)` -- while
+the top row (`y = -2`) and left column (`x = -2`) are clipped away
+entirely, with no crash.
 
 ### Rounding rule (applies to `make_gradient` and `blend`)
 

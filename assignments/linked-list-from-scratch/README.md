@@ -160,30 +160,224 @@ and Valgrind, both used in grading, will catch this class of bug directly.
 
 ---
 
+## Examples at a glance
+
+To make every member function concrete, here is **one** list state, with the
+index of every element written above it, and what each function call returns
+or does when run against it. Read this table first -- it is the whole
+assignment in miniature.
+
+```
+ index:    0    1    2    3
+ list  = { 5,  10,  15,  20 }
+
+ head_ -> [5] -> [10] -> [15] -> [20] -> nullptr
+                                   ^
+                                   |
+                                 tail_
+ size_ == 4
+```
+
+Each row below is a separate, independent call made against this same
+4-element list (none of these calls affect each other -- imagine resetting
+the list back to `{5, 10, 15, 20}` before each row):
+
+| Call | Result | Why |
+|------|--------|-----|
+| `size()` | `4` | tracked as a running count, so this is O(1) -- no walking the list |
+| `empty()` | `false` | `size_` is `4`, not `0` |
+| `front()` | `5` | the value stored in the node `head_` points to |
+| `back()` | `20` | the value stored in the node `tail_` points to (no walking needed, thanks to `tail_`) |
+| `find(15)` | `2` | `15` is the third element, at index 2 (0-based) |
+| `find(99)` | `-1` | `99` does not appear anywhere in the list |
+| `insert_at(0, 1)` | `true`; list becomes `{1, 5, 10, 15, 20}` | index `0` is always valid (even on a non-empty list) -- this is the same as `push_front(1)` |
+| `insert_at(4, 25)` | `true`; list becomes `{5, 10, 15, 20, 25}` | `index == size()` (here `4 == 4`) means "append at the end" -- this is the same as `push_back(25)` |
+| `insert_at(10, 99)` | `false`; list unchanged | `10 > size()` (`4`), so this is out of range -- no node is allocated, no-op |
+| `remove_at(0)` | `true`; list becomes `{10, 15, 20}` | removes the head; `head_` is rewired to point at the old second node |
+| `remove_at(3)` | `true`; list becomes `{5, 10, 15}` | index `3` is the last valid index (`size() - 1`), i.e. the tail; `tail_` is rewired to point at the old second-to-last node |
+| `remove_at(4)` | `false`; list unchanged | valid range is `[0, size())` = `[0, 4)`; index `4` is one past the last valid index, so this is out of range |
+| `clear()` | list becomes `{}` | every node is freed and `head_`/`tail_`/`size_` reset to `nullptr`/`nullptr`/`0` |
+
+## Worked example: watch a sequence of operations rewire the chain
+
+This is the single most important thing to understand in the assignment, so
+here is a full sequence of operations traced step by step, starting from an
+empty list, with the actual node chain drawn in ASCII after every step. Pay
+close attention to what happens to `head_` and `tail_` -- those are the two
+pointers that must be kept correct through every insert and remove.
+
+**Step 0: start empty.**
+
+```
+head_ = nullptr
+tail_ = nullptr
+size_ = 0
+```
+
+An empty list has no nodes at all -- both `head_` and `tail_` are `nullptr`.
+
+**Step 1: `push_back(7)`.**
+
+Since `tail_` is `nullptr` (the list is empty), the new node becomes both the
+head and the tail:
+
+```
+head_ -> [7] -> nullptr
+           ^
+           |
+         tail_
+size_ = 1
+```
+
+**Step 2: `push_front(3)`.**
+
+The new node's `next` is set to point at the *old* `head_` (`[7]`), then
+`head_` is moved to the new node. Because `tail_` is already non-null (it
+still points at `[7]`), `tail_` does NOT change:
+
+```
+head_ -> [3] -> [7] -> nullptr
+                  ^
+                  |
+                tail_
+size_ = 2
+```
+
+**Step 3: `insert_at(1, 99)`.**
+
+`size()` is `2`, and `1` is neither `0` nor `size()`, so this lands in the
+"insert in the middle" case: walk from `head_` to the node *just before*
+position `1` (that is `[3]`, at position `0`), then splice a new node in
+right after it, pointing the new node's `next` at whatever `[3]->next` used
+to point at (`[7]`):
+
+```
+head_ -> [3] -> [99] -> [7] -> nullptr
+                          ^
+                          |
+                        tail_
+size_ = 3
+```
+
+`tail_` is untouched here -- the insertion happened in the middle, nowhere
+near the last node.
+
+**Step 4: `remove_at(2)`.**
+
+Index `2` is the last valid index (`size() - 1` = `2`), i.e. the tail node
+`[7]`. Walk to the node just before it (`[99]`), unlink `[7]` by pointing
+`[99]->next` at `[7]`'s old `next` (`nullptr`), and because the removed node
+WAS `tail_`, move `tail_` back to `[99]`:
+
+```
+head_ -> [3] -> [99] -> nullptr
+                  ^
+                  |
+                tail_
+size_ = 2
+```
+
+**Step 5: `remove_at(0)`.**
+
+Index `0` always means "remove the head". `head_` moves forward to whatever
+`[3]->next` was pointing at (`[99]`). Since the new `head_` is not `nullptr`,
+`tail_` is left alone (it still correctly points at `[99]`, which is now
+both the head and the tail):
+
+```
+head_ -> [99] -> nullptr
+           ^
+           |
+         tail_
+size_ = 1
+```
+
+**Step 6: `remove_at(0)` again.**
+
+Once more, index `0` removes the head. `head_` moves forward to
+`[99]->next`, which is `nullptr` -- the list is now empty. This is the edge
+case that trips people up: whenever removing the head makes the new `head_`
+equal to `nullptr`, `tail_` must ALSO be reset to `nullptr` (otherwise
+`tail_` would dangle, pointing at freed memory with nothing before it):
+
+```
+head_ = nullptr
+tail_ = nullptr
+size_ = 0
+```
+
+The list is back to empty, and safe to keep using -- `push_back`/`push_front`
+on it now behave exactly like Step 1 again.
+
+---
+
 ## Task
 
 Implement every member of `LinkedList<T>` declared in `linked_list.hpp`:
 
 - Default constructor, destructor, copy constructor, copy assignment, move
   constructor, move assignment (the full Big 5)
+  *Examples:* `LinkedList<int> a; a.push_back(1); a.push_back(2);` then
+  `LinkedList<int> b(a);` gives `b == {1, 2}` with `a` still `{1, 2}`
+  afterward, and `b` and `a` own completely separate nodes (mutating one,
+  e.g. `b.push_back(3)`, never changes the other -- `a` stays `{1, 2}`,
+  `b` becomes `{1, 2, 3}`); `LinkedList<int> c(std::move(a));` gives
+  `c == {1, 2}` and leaves `a == {}` (`a.empty() == true`, and `a` is safe
+  to keep using -- `a.push_back(9)` afterward gives `a == {9}`).
 - `push_front(value)` -- insert at the head, O(1)
+  *Examples:* on `list = {}`, `push_front(1)` gives `list == {1}` with
+  `head_ == tail_` (the single node is both); on `list = {2, 3}`,
+  `push_front(1)` gives `list == {1, 2, 3}` and `tail_` is untouched.
 - `push_back(value)` -- insert at the tail, O(1) (use the `tail_` pointer;
   do not walk the list from `head_`)
+  *Examples:* on `list = {}`, `push_back(5)` gives `list == {5}` with
+  `head_ == tail_`; on `list = {5}`, `push_back(6)` gives `list == {5, 6}`
+  and `tail_` moves from the `5`-node to the new `6`-node.
 - `insert_at(index, value)` -- insert so the new element becomes position
   `index`. Valid range is `[0, size()]` inclusive (`index == size()` means
   "append"). Returns `true` on success, `false` and no-op if
   `index > size()`. No exceptions.
+  *Examples:* on `list = {}`, `insert_at(0, 9)` returns `true` and gives
+  `list == {9}` (equivalent to `push_front`); on `list = {1, 2}`,
+  `insert_at(2, 3)` returns `true` and gives `list == {1, 2, 3}` (`index ==
+  size()` here, `2 == 2`, so this appends, equivalent to `push_back`); on
+  `list = {1, 2}`, `insert_at(5, 9)` returns `false` and leaves `list ==
+  {1, 2}` unchanged (`5 > size()`, out of range).
 - `remove_at(index)` -- remove the element at position `index`. Valid range
   is `[0, size())`. Returns `true` on success, `false` and no-op if
   `index >= size()` (including on an empty list). No exceptions.
+  *Examples:* on `list = {7}`, `remove_at(0)` returns `true` and gives
+  `list == {}` with `head_` and `tail_` both reset to `nullptr` (removing
+  the only element must clear both pointers, not just `head_`); on `list =
+  {1, 2, 3}`, `remove_at(2)` returns `true` and gives `list == {1, 2}`
+  with `tail_` moved back to the `2`-node (removing the tail always
+  rewires `tail_`); on `list = {}`, `remove_at(0)` returns `false` (empty
+  list, so every index is out of range); on `list = {1, 2}`,
+  `remove_at(2)` returns `false` (`2 >= size()` (`2`), out of range even
+  though `2` was a valid `insert_at` index).
 - `find(value)` -- returns the index of the first matching element, or
   `-1` if none matches
+  *Examples:* on `list = {}`, `find(1)` returns `-1` (nothing to find); on
+  `list = {5, 10, 15}`, `find(10)` returns `1`; on `list = {5, 10, 15}`,
+  `find(99)` returns `-1` (`99` never appears).
 - `size()` -- O(1); track a running count as a member variable
+  *Examples:* on `list = {}`, `size()` returns `0`; after `list.push_back
+  (1); list.push_back(2);`, `size()` returns `2`.
 - `empty()`
+  *Examples:* on `list = {}`, `empty()` returns `true`; on `list = {1}`,
+  `empty()` returns `false`.
 - `clear()` -- frees every node and resets to the empty state; safe to
   call more than once and safe to keep using the list afterward
+  *Examples:* on `list = {1, 2, 3}`, `clear()` gives `list == {}` with
+  `size() == 0`; calling `clear()` again right after (on the now-empty
+  list) is a safe no-op, still `list == {}`; after `clear()`, the list
+  stays usable -- `list.push_back(9)` afterward gives `list == {9}`.
 - `front()` / `back()` -- reference to the first/last element (only called
   when the list is non-empty)
+  *Examples:* on `list = {5, 10, 15}`, `front()` returns `5` and `back()`
+  returns `15`; on `list = {42}` (a single-element list), `front()` and
+  `back()` both return `42` -- the one node is simultaneously the head and
+  the tail.
 
 The full declarations, with the exact contract for each function, are
 documented as comments in `linked_list.hpp`. Do not change any function

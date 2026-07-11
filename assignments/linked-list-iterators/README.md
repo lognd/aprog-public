@@ -172,6 +172,79 @@ is exactly what the hidden tests check for.
 
 ---
 
+## Examples at a glance
+
+To make every operation concrete, here is **one** list, built with three
+`push_back` calls, and what each iterator operation does to it or returns
+from it. Read this table first -- it is the whole assignment in miniature.
+
+```
+list.push_back(10);
+list.push_back(20);
+list.push_back(30);
+
++------+     +------+     +------+
+|  10  | --> |  20  | --> |  30  | --> nullptr
++------+     +------+     +------+
+   ^                          ^
+   |                          |
+begin()                 end() is one past this node (wraps nullptr)
+```
+
+| Call | Returns / Result | Why |
+|------|-------------------|-----|
+| `list.begin()` | `Iterator` wrapping the node holding `10` | `begin()` always wraps `head_`, the first real node |
+| `list.end()` | `Iterator` wrapping `nullptr` | `end()` is the fence post -- one position PAST `30`, never itself a real node |
+| `*list.begin()` | `10` | dereferencing reads the data stored in the node the cursor currently points at |
+| `auto it = list.begin(); ++it; *it` | `20` | prefix `++` moves the cursor to `head_->next` (the node holding `20`), then `*it` reads it |
+| `auto it = list.begin(); auto old = it++; *old` then `*it` | `*old == 10`, `*it == 20` | postfix `it++` saves the position BEFORE moving (`old` stays at `10`), then advances the real iterator (`it` moves to `20`) |
+| `list.find_it(20)` | `Iterator` at the node holding `20` | scans from `head_` until `cur->data == 20` |
+| `list.find_it(99)` | `list.end()` | `99` never appears, so the scan falls off the end and returns the fence post |
+| `list.insert_after(list.find_it(20), 25)` | `true`; list becomes `10 -> 20 -> 25 -> 30` | a new node holding `25` is spliced in right after the node holding `20` |
+| `list.insert_after(list.end(), 99)` | `false`, list unchanged | `end()` is not a real node -- there is nothing to insert "after" a fence post, so this is a documented no-op |
+| `list.erase_after(list.find_it(20))` (on the 4-node list above) | `true`; list becomes `10 -> 20 -> 30` again | the node right after `20` (holding `25`) is unlinked and `delete`d |
+| `list.erase_after(list.find_it(30))` | `false`, list unchanged | `30` is the last node -- there is nothing after it to erase |
+| `LinkedList<int>{}.begin() == LinkedList<int>{}.end()` | `true` | an empty list has `head_ == nullptr`, so `begin()` (wraps `head_`) and `end()` (wraps `nullptr`) wrap the same pointer |
+| `list.cbegin()` | `ConstIterator` at the node holding `10` | walks the exact same chain as `begin()`, but `*` returns `const T&`, so the list cannot be mutated through it |
+
+## Worked example: watch a sequence of iterator operations run, step by step
+
+This is the single most important thing to understand in the assignment, so
+here is every step spelled out. Start from the same list as above,
+`10 -> 20 -> 30 -> nullptr`, and run this sequence:
+
+```cpp
+auto it = list.begin();   // step 1
+int a = *it;              // step 2
+++it;                     // step 3
+int b = *it;              // step 4
+auto old = it++;          // step 5
+int c = *old;              // step 6
+int d = *it;                // step 7
+++it;                     // step 8
+bool done = (it == list.end()); // step 9
+```
+
+| Step | Code | Cursor position after this step | What happened and why |
+|------|------|----------------------------------|------------------------|
+| 1 | `auto it = list.begin();` | `it` wraps the node holding `10` | `begin()` always starts at `head_`, the first real node |
+| 2 | `int a = *it;` | unchanged, still at `10` | `operator*` only READS the current node's data; it never moves the cursor. `a == 10` |
+| 3 | `++it;` | `it` wraps the node holding `20` | prefix `++` follows `node_->next`: the node holding `10`'s `next` pointer leads to the node holding `20` |
+| 4 | `int b = *it;` | unchanged, still at `20` | reading again without moving. `b == 20` |
+| 5 | `auto old = it++;` | `it` now wraps `30`; `old` wraps `20` | postfix `it++` must save the CURRENT position first (`old` gets a copy pointing at `20`), THEN advance the real `it` to `30`. Getting this order backwards is the classic postfix bug. |
+| 6 | `int c = *old;` | (reading `old`, not `it`) | `old` was saved at step 5 pointing at `20`, so `c == 20` |
+| 7 | `int d = *it;` | (reading `it`) | `it` was advanced to `30` at step 5, so `d == 30` |
+| 8 | `++it;` | `it` wraps `nullptr` | `30` is the last node, so `30`'s `next` is `nullptr` -- advancing off the last real node naturally lands on the same `nullptr` that `end()` wraps. No special-case code is needed for this to work. |
+| 9 | `bool done = (it == list.end());` | -- | `list.end()` also wraps `nullptr`, and `operator==` compares the wrapped pointers, so `it == list.end()` compares `nullptr == nullptr`. `done == true`. |
+
+Final values: `a == 10`, `b == 20`, `c == 20`, `d == 30`, `done == true`.
+Dereferencing `it` after step 8 (i.e. `*it`) would be undefined behavior --
+`it` now wraps `nullptr`, and `end()` is a fence post that is never safe to
+read from. This is exactly why every loop in this assignment checks
+`it != list.end()` BEFORE dereferencing `it`, never after.
+
+---
+
 ## Task
 
 Implement everything under `// YOUR TASK: forward iterators` in
@@ -179,13 +252,50 @@ Implement everything under `// YOUR TASK: forward iterators` in
 
 - `Iterator`: constructor, `operator*`, `operator->`, prefix `operator++`,
   postfix `operator++(int)`, `operator==`, `operator!=`
+  *Examples* (list is `10 -> 20 -> 30`, `it = list.begin()`):
+  `*it == 10`; after `++it`, `*it == 20`; `auto old = it++` (from
+  `20`) leaves `*old == 20` and `*it == 30`; `it == list.end()` is
+  `false` while `it` is at any real node, and becomes `true` only once
+  `it` has been advanced past `30`; dereferencing `list.end()` (i.e.
+  `*list.end()`) is undefined behavior and must never be done.
 - `ConstIterator`: the same six operations, `const`-qualified
+  *Examples*: `list.cbegin() == list.cend()` is `true` only for an
+  empty list; `*list.cbegin()` on `10 -> 20 -> 30` is `const int&`
+  bound to `10` -- assigning through it, e.g. `*list.cbegin() = 5;`,
+  must not compile; a `ConstIterator` constructed from an `Iterator`
+  (via the implicit converting constructor) points at the same node,
+  so `ConstIterator(list.begin()) == list.cbegin()` is `true`.
 - `begin()` / `end()` (mutable), `cbegin()` / `cend()`, and the
   `const`-qualified `begin()` / `end()` overloads that forward to them
+  *Examples*: for `LinkedList<int> empty;` (nothing pushed),
+  `empty.begin() == empty.end()` is `true` (both wrap `nullptr`); for
+  `10 -> 20 -> 30`, `list.begin() == list.end()` is `false`; given
+  `const LinkedList<int>& clist = list;`, `clist.begin()` returns a
+  `ConstIterator` (the `const`-qualified overload), so
+  `for (int x : clist)` compiles and reads every element without
+  being able to modify any of them.
 - `find_it(value)` -- returns an `Iterator` to the first matching
   element, or `end()` if none matches
+  *Examples*: on `10 -> 20 -> 30`, `*list.find_it(20) == 20`;
+  `list.find_it(99) == list.end()` (not present); on an empty list,
+  `empty.find_it(0) == empty.end()` (nothing to find, so it falls
+  straight through to `end()`).
 - `insert_after(pos, value)` -- see the contract above and in the header
+  *Examples*: on `10 -> 20 -> 30`, `list.insert_after(list.find_it(20),
+  25)` returns `true` and the list becomes `10 -> 20 -> 25 -> 30`;
+  `list.insert_after(list.find_it(30), 40)` (inserting after the LAST
+  node) returns `true`, the list becomes `... -> 30 -> 40`, and
+  `list.back() == 40` afterward (`tail_` was correctly updated);
+  `list.insert_after(list.end(), 99)` returns `false` and changes
+  nothing, since `end()` is a fence post with no node to insert after.
 - `erase_after(pos)` -- see the contract above and in the header
+  *Examples*: on `10 -> 20 -> 30`, `list.erase_after(list.find_it(10))`
+  returns `true` and the list becomes `10 -> 30`; calling
+  `list.erase_after(list.find_it(30))` (`30` is the last node, nothing
+  after it) returns `false` and leaves the list unchanged;
+  `list.erase_after(list.end())` also returns `false` for the same
+  reason `insert_after(list.end(), ...)` does -- `end()` is not a real
+  node to erase "after".
 
 The Big-5 and the basic push/insert/remove/find/size operations are
 already implemented for you at the top of the file -- do not modify them.

@@ -54,6 +54,101 @@ Format rules:
   appears as itself; all other bytes appear as `.`.
 - **Newline:** each output line ends with `\n`.
 - An empty file produces no output and exits with code 0.
+  *Example:* running `hexdump` on a zero-byte file (e.g. `/dev/null`)
+  prints nothing at all -- no lines, not even a blank one -- and the
+  process exits with status 0, same as `xxd -g 1 /dev/null`.
+
+## Examples
+
+Every example below was produced by compiling the reference solution and
+running it against a real file, then diffed against `xxd -g 1` on the
+same file -- nothing here is guessed.
+
+Take this 17-byte input (shown here as hex bytes for reference):
+
+```
+00 01 02 1f 20 7e 7f 80 ff 41 42 0a 0d 09 78 79 7a
+```
+
+The exact output (every space significant -- this is a fenced code block
+so nothing gets collapsed):
+
+```
+00000000: 00 01 02 1f 20 7e 7f 80 ff 41 42 0a 0d 09 78 79  .... ~...AB...xy
+00000010: 7a                                               z
+```
+
+Why it looks like this:
+
+- **Offset column** (`00000000`, `00000010`): always exactly 8 lowercase
+  hex digits, zero-padded on the left, no `0x` prefix. It is the byte
+  offset of the FIRST byte on that line, so the second line -- which
+  starts at the 17th byte (0-indexed byte 16, since 16 bytes already
+  appeared on line one) -- reads `00000010` (16 in hex is `10`).
+- **Hex block**: each byte becomes exactly two lowercase hex digits
+  (`ff` not `FF`, `0a` not `A`), each followed by one space, up to 16
+  bytes per line. Line one is full (16 bytes, 16 trailing spaces). Line
+  two has only 1 real byte (`7a`) followed by 15 columns' worth of blank
+  padding (three spaces each, except the very last column which uses two
+  spaces) so the ASCII column below still lines up in the same screen
+  position on every line, whether the line is full or not.
+- **ASCII column**: one character per input byte, in the same
+  left-to-right order. A byte is shown as its own ASCII character only
+  if it falls in the printable range 0x20 (space) through 0x7e (`~`)
+  inclusive; every other byte -- including `0x00`, `0x1f`, `0x7f` (DEL,
+  one past the printable range), and `0x80`/`0xff` (high bytes with the
+  top bit set) -- is shown as a literal `.` instead. Note `0x20` itself
+  (space) is IN the printable range, so it appears as an actual space
+  character in the ASCII column, not a dot -- easy to misread as a gap.
+
+## Worked example: turning a few bytes into one output line, step by step
+
+Take this 8-byte input: `48 00 2e 7f 41 0a 20 ff`. Since it is only one
+line's worth of bytes (fewer than 16), `hexdump` writes a single output
+line and no more `read()` calls return any data. Tracing each byte in
+order:
+
+| Byte (hex) | Hex column shows | Reason | ASCII column shows | Reason |
+|------------|-------------------|--------|---------------------|--------|
+| `0x48` | `48` | every byte prints as two lowercase hex digits, high nibble first | `H` | `0x48` falls in 0x20-0x7e, so it appears as its own printable character |
+| `0x00` | `00` | same rule -- `0x00` is still two hex digits, not skipped | `.` | `0x00` is below 0x20 (it is the NUL byte), so it is not printable |
+| `0x2e` | `2e` | two hex digits as always | `.` | `0x2e` IS the printable character `.` itself -- this happens to look identical to the "not printable" placeholder, which is a coincidence worth noticing |
+| `0x7f` | `7f` | two hex digits | `.` | `0x7f` (DEL) is one past the printable range's upper bound (0x7e), so it is not printable |
+| `0x41` | `41` | two hex digits | `A` | `0x41` falls in 0x20-0x7e |
+| `0x0a` | `0a` | two hex digits | `.` | `0x0a` is the newline byte, below 0x20, not printable |
+| `0x20` | `20` | two hex digits | ` ` (a real space) | `0x20` is the LOWER boundary of the printable range, inclusive, so it prints as an actual space character, not a dot |
+| `0xff` | `ff` | two hex digits | `.` | `0xff` is above 0x7e, not printable |
+
+Since all 8 bytes fit in one line, the hex block still needs 8 more
+"columns" of blank padding after them (so the ASCII block would line up
+if a shorter line ever appeared next -- though here there is no next
+line) before the mandatory two-space separator and the ASCII block.
+Putting every column together, the exact final output line is:
+
+```
+00000000: 48 00 2e 7f 41 0a 20 ff                          H...A. .
+```
+
+Reading the tail end of that line carefully: `H...A. .` -- that is `H`
+`.` `.` `.` `A` `.` (a real space) `.`, matching the table above
+left to right, one character per input byte.
+
+### A partial final row
+
+`hexdump` does not pad the LAST row with fake `00` bytes to reach 16 --
+it only ever hex-dumps the real bytes it read, and pads the *columns*
+(with blank spaces, never digits) so the ASCII block still lines up.
+For a 5-byte input `41 42 00 ff 20`:
+
+```
+00000000: 41 42 00 ff 20                                   AB.. 
+```
+
+Only 5 of the 16 hex columns hold real bytes (`41 42 00 ff 20`); the
+remaining 11 columns are blank padding, not zeros. The ASCII column
+shows exactly 5 characters -- `A`, `B`, `.` (0x00), `.` (0xff), and a
+real space (0x20) -- never 16, because there is no byte to show for the
+columns that were never read.
 
 ## Files
 

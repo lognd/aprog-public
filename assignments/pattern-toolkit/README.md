@@ -193,6 +193,75 @@ differ in a few steps -- report formats, parsers, game turn loops.
 
 ---
 
+## Examples at a glance
+
+Three parts, three small domains. Each table below picks one concrete
+scenario and shows what every function/method in that part produces for
+it -- read these before Task if the prose above still feels abstract.
+
+### Part 1 -- Strategy, on `v = {-3, 5, -1, 3, 2}`
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `Ascending().before(-3, 5)` | `true` | `-3 < 5` |
+| `Ascending().before(5, -3)` | `false` | `5 < -3` is false |
+| `sort_with(v, Ascending())` | `{-3, -1, 2, 3, 5}` | plain increasing order |
+| `sort_with(v, Descending())` | `{5, 3, 2, -1, -3}` | plain decreasing order |
+| `ByAbsoluteValue().before(-3, 2)` | `false` | `abs(-3)=3` is not `< abs(2)=2` |
+| `ByAbsoluteValue().before(-3, 3)` | `true` | equal magnitude (`3 == 3`), so the tie-break `-3 < 3` decides it |
+| `sort_with(v, ByAbsoluteValue())` | `{-1, 2, -3, 3, 5}` | magnitudes `1, 2, 3, 3, 5`; the two magnitude-3 values (`-3` and `3`) keep ascending order between themselves |
+
+### Part 2 -- Observer, `HighAlarm(90)` and `TemperatureLog` both attached, readings `70, 95, 90` in that order
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `alarm.count()` after all three readings | `1` | only `95` is **strictly greater than** `90`; `70` and `90` itself do not count |
+| `log.values()` after all three readings | `{70, 95, 90}` | every reading is recorded, in the order it arrived |
+| `t.detach(&alarm)` then `t.set_temperature(200)` | `alarm.count()` stays `1`; `log.values()` becomes `{70, 95, 90, 200}` | detaching truly stops future notifications to `alarm`, but does not affect `log`, which was never detached |
+| `t.detach(&alarm)` a second time | nothing happens, no crash | detaching something not currently attached is a documented no-op |
+
+### Part 3 -- Template Method, no input (the reports are fixed data)
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `SalesReport().generate()` | `"=== Sales Report ===\nTotal Sales: $1000\n--- End of Report ---\n"` | `header() + body() + footer()`, in that order |
+| `InventoryReport().generate()` | `"=== Inventory Report ===\nItems In Stock: 42\n--- End of Report ---\n"` | same skeleton, different hooks |
+| Do `SalesReport` and `InventoryReport` footers ever disagree? | No, structurally impossible | `footer()` is written exactly once, in the base class, and neither subclass overrides it |
+
+## Worked example: watch `ByAbsoluteValue` sort `{-3, 5, -1, 3, 2}`, step by step
+
+This is the trickiest comparison in the assignment (the equal-magnitude
+tie-break), so here is the whole insertion sort traced by hand. The
+reference `sort_with` is an insertion sort: for each index `i` from `1`
+upward, it holds `key = v[i]` and shifts every preceding element that
+`strategy.before(key, v[j-1])` says should come after `key` one slot to
+the right, then drops `key` into the gap it opened. Every single
+comparison in the trace below is a call to `ByAbsoluteValue::before`,
+never a raw `<` on the ints themselves.
+
+Recall `ByAbsoluteValue().before(a, b)` compares `abs(a)` to `abs(b)`
+first; only when those magnitudes are EQUAL does it fall back to
+comparing `a` and `b` directly (ascending).
+
+| `i` | `key` | shifts (each one a `before` call) | array after this `i` |
+|-----|-------|-------------------------------------|-----------------------|
+| 1 | `5` | `before(5, -3)`: `abs(5)=5 < abs(-3)=3`? No -> no shift | `{-3, 5, -1, 3, 2}` |
+| 2 | `-1` | `before(-1, 5)`: `1 < 5`? Yes -> shift `5` right. `before(-1, -3)`: `1 < 3`? Yes -> shift `-3` right. Gap now at index 0. | `{-1, -3, 5, 3, 2}` |
+| 3 | `3` | `before(3, 5)`: `3 < 5`? Yes -> shift `5` right. `before(3, -3)`: `abs(3)=3 < abs(-3)=3`? Magnitudes tie, fall back to `3 < -3`? No -> stop. | `{-1, -3, 3, 5, 2}` |
+| 4 | `2` | `before(2, 5)`: `2 < 5`? Yes -> shift `5` right. `before(2, 3)`: `2 < 3`? Yes -> shift `3` right. `before(2, -3)`: `2 < 3`? Yes -> shift `-3` right. `before(2, -1)`: `2 < 1`? No -> stop. | `{-1, 2, -3, 3, 5}` |
+
+Final array: **`{-1, 2, -3, 3, 5}`**. Check the magnitudes in that
+order: `1, 2, 3, 3, 5` -- correctly non-decreasing. And the one tie
+(`-3` and `3`, both magnitude `3`) landed with `-3` before `3`, exactly
+as the tie-break rule ("break the tie by actual ascending value")
+requires. Notice this is precisely the case that a careless copy of
+"smaller magnitude first" with `>=` instead of `>` (or a forgotten
+tie-break) would get wrong -- which is exactly the kind of bug Strategy
+is meant to make easy to isolate and test in one small class, instead of
+buried inside a bigger sort function.
+
+---
+
 ## Task
 
 Read the corresponding `assets/legacy/` file for each part first, then
@@ -212,10 +281,20 @@ virtual bool before(int a, int b) const = 0;
 three concrete strategies:
 
 - `Ascending` -- `before(a, b)` is `a < b`.
+  *Example:* `Ascending().before(2, 5) == true`; `Ascending().before(5, 2) ==
+  false`; `Ascending().before(3, 3) == false` (equal values are never
+  "before" each other).
 - `Descending` -- `before(a, b)` is `a > b`.
+  *Example:* `Descending().before(5, 2) == true`; `Descending().before(2, 5)
+  == false`; `Descending().before(3, 3) == false`.
 - `ByAbsoluteValue` -- orders by absolute value, smaller magnitude first. When
   two values have equal absolute value (for example `-3` and `3`), break the tie
   by actual ascending value, so `-3` comes before `3`.
+  *Example:* `ByAbsoluteValue().before(2, -3) == true` (`abs(2)=2 <
+  abs(-3)=3`); `ByAbsoluteValue().before(-3, 2) == false`; `ByAbsoluteValue()
+  .before(-3, 3) == true` (magnitudes tie at `3`, so it falls back to
+  `-3 < 3`); `ByAbsoluteValue().before(3, -3) == false` (same tie, other
+  direction).
 
 Also implement the free function:
 
@@ -229,6 +308,11 @@ strategy's `before`. It must delegate every comparison to
 correct comparison-based sort is fine. `sort_with` is **not** required to be
 stable, so the relative order of elements the strategy considers equivalent is
 unspecified.
+*Example:* `sort_with({3, 1, 2, -5, 4}, Ascending())` sorts the vector to
+`{-5, 1, 2, 3, 4}`; `sort_with({3, -3, 1, -2}, ByAbsoluteValue())` sorts it
+to `{1, -2, -3, 3}` (magnitudes `1, 2, 3, 3`, tie broken ascending); an
+empty vector, `sort_with({}, Ascending())`, leaves it `{}` -- there is
+nothing to shift.
 
 ### Part 2 -- Observer (`thermometer.hpp`)
 
@@ -242,18 +326,38 @@ virtual void on_temperature(double temp) = 0;
 
 - `void attach(Observer* o)` -- registers `o` for future notifications. `o` is a
   non-owning pointer; the thermometer never allocates or frees it.
+  *Example:* after `t.attach(&alarm)`, the next `t.set_temperature(...)`
+  call reaches `alarm.on_temperature(...)`; before any `attach`, a
+  `Thermometer` with zero observers simply notifies no one.
 - `void detach(Observer* o)` -- removes `o` so it receives no further
   notifications. Does nothing if `o` was never attached.
+  *Example:* `t.attach(&alarm); t.detach(&alarm);` then
+  `t.set_temperature(500)` leaves `alarm.count() == 0` -- it was removed
+  before the reading arrived; calling `t.detach(&alarm)` a second time (or
+  on an observer that was never attached at all) does nothing and does not
+  crash.
 - `void set_temperature(double temp)` -- calls `on_temperature(temp)` on every
   attached observer, in the order they were attached.
+  *Example:* with `alarm` attached before `log`, `t.set_temperature(70)`
+  calls `alarm.on_temperature(70)` first, then `log.on_temperature(70)`;
+  with zero observers attached, `set_temperature` does nothing observable
+  at all.
 
 Implement two concrete observers:
 
 - `HighAlarm(double threshold)` -- `count()` returns how many notified
   temperatures were **strictly greater than** `threshold`. A value equal to the
   threshold does not count.
+  *Example:* `HighAlarm alarm(100.0);` then notifying `50.0`, `150.0`,
+  `200.0` in turn leaves `alarm.count() == 2`; notifying exactly `100.0`
+  (equal to the threshold) leaves `count()` unchanged -- it does not count;
+  a `HighAlarm` that has never been notified has `count() == 0`.
 - `TemperatureLog` -- records every notified temperature in order; `values()`
   returns them as a `const std::vector<double>&`.
+  *Example:* notifying `1.0`, `2.0`, `3.0` in turn leaves
+  `log.values() == std::vector<double>{1.0, 2.0, 3.0}`; a fresh
+  `TemperatureLog` that has never been notified has `values() == {}`
+  (empty).
 
 Notification order must equal attach order, and `detach` must truly remove the
 observer so it stops being notified.
@@ -276,6 +380,13 @@ every report. The exact strings are:
 - `InventoryReport::header()` returns `"=== Inventory Report ===\n"`
 - `InventoryReport::body()` returns `"Items In Stock: 42\n"`
 - `footer()` (base class, shared) returns `"--- End of Report ---\n"`
+  *Example:* `SalesReport().generate() ==
+  "=== Sales Report ===\nTotal Sales: $1000\n--- End of Report ---\n"`;
+  `InventoryReport().generate() ==
+  "=== Inventory Report ===\nItems In Stock: 42\n--- End of Report ---\n"`;
+  both share the exact same trailing `"--- End of Report ---\n"`, because
+  `footer()` is defined once, in the base class, and neither subclass
+  overrides it.
 
 So `SalesReport().generate()` returns exactly:
 

@@ -1,5 +1,14 @@
 # Number Toolkit
 
+Number theory shows up everywhere in real programs -- checking a key size is a
+power of two, deciding whether two rates share a common factor, hashing, or
+just summing digits for a checksum -- and most of these problems have both a
+slow, obvious solution and a fast one that is barely any more code. This
+assignment is a tour of eight such problems: for each one, the "obvious"
+approach works but does not scale, and a small change in HOW you loop (not
+how much code you write) is the difference between an answer that comes back
+instantly and one that never finishes.
+
 Implement eight number-theory and bit-manipulation utility functions in
 `number_toolkit.hpp`.
 
@@ -23,20 +32,58 @@ precisely -- Big-O notation -- arrives later in the course, in the
 Complexity Theory topic. For now, the goal is just to feel the difference
 between an approach that stays fast and one that does not.)
 
+## Examples at a glance
+
+To make all eight functions concrete, here is **one** number, `n = 28`, and
+what every function in this assignment produces for it. Read this table
+first -- it is the whole assignment in miniature. (`28` is a nice pick
+because it is even, not prime, and turns out to be a "perfect number" --
+which matters for the last row below.)
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `is_prime(28)`        | `false`  | `28` is even and greater than `2`, so `2` divides it -- not prime |
+| `gcd(28, 12)`         | `4`      | `28 = 4 * 7` and `12 = 4 * 3`; the largest factor they share is `4` |
+| `digit_sum(28)`       | `10`     | its digits are `2` and `8`, and `2 + 8 = 10` |
+| `count_divisors(28)`  | `6`      | `1, 2, 4, 7, 14, 28` all divide `28` evenly -- six divisors total |
+| `nth_fibonacci(28)`   | `317811` | the 28th Fibonacci number, built up one step at a time from `nth_fibonacci(1) == 1` |
+| `is_power_of_two(28)` | `false`  | `28` in binary is `11100` -- more than one bit is set |
+| `popcount(28)`        | `3`      | `28 == 0b11100`, which has three `1`-bits |
+| `is_abundant(28)`     | `false`  | `28`'s proper divisors are `1 + 2 + 4 + 7 + 14 = 28`, exactly equal to `28` (a "perfect number"), not more than it |
+
+## Worked example: watch `gcd(28, 12)` run step by step
+
+This is the trickiest function to get right efficiently, so here is every
+step of the Euclidean algorithm spelled out. We start with `a = 28`,
+`b = 12`, and repeat while `b != 0`: replace `a` with the old `b`, and
+replace `b` with the remainder of `a` divided by `b` (written `a % b`).
+
+| Step | `a` | `b` | Is `b == 0`? | Action |
+|------|-----|-----|--------------|--------|
+| start | 28 | 12 | no  | compute `28 % 12 = 4`; new `a` = old `b` = `12`, new `b` = the remainder = `4` |
+| 2     | 12 | 4  | no  | compute `12 % 4 = 0`; new `a` = old `b` = `4`, new `b` = the remainder = `0` |
+| end   | 4  | 0  | yes | loop stops; `gcd` returns `a`, which is `4` |
+
+The loop ends with `a == 4`, so `gcd(28, 12)` returns **`4`**. Notice the
+algorithm never counted down from `min(a, b)` one number at a time -- each
+step replaces the pair `(a, b)` with the smaller pair `(b, a % b)`, which
+shrinks far faster than counting down does. That speed is exactly why the
+Euclidean variant earns bonus credit over the loop-down version.
+
 ## Task
 
 Implement the following eight functions in `number_toolkit.hpp`:
 
 | Function | Signature | Notes |
 |----------|-----------|-------|
-| `is_prime` | `bool is_prime(long long n)` | Must not test every number up to `n` -- testing divisors up to the square root of `n` is enough and required; a loop that checks every number up to `n` fails the performance test on a large prime. |
-| `gcd` | `long long gcd(long long a, long long b)` | Loop down from `min(a, b)` for full points. Euclidean algorithm earns bonus credit. |
-| `digit_sum` | `long long digit_sum(long long n)` | Sum of decimal digits. Handles negatives and zero. |
-| `count_divisors` | `long long count_divisors(long long n)` | Count all positive divisors of `n`. |
-| `nth_fibonacci` | `long long nth_fibonacci(long long n)` | 1-indexed iterative Fibonacci. `nth_fibonacci(1) == 1`. |
-| `is_power_of_two` | `bool is_power_of_two(long long n)` | `n > 0` and exactly one bit set. Must use bitwise operations only -- no loops, no division. |
-| `popcount` | `int popcount(unsigned long long n)` | Number of 1-bits in `n`. Must use bit manipulation (shifts and masks) -- no library functions. |
-| `is_abundant` | `bool is_abundant(long long n)` | `true` if the sum of `n`'s proper divisors (positive divisors strictly less than `n`) exceeds `n`. |
+| `is_prime` | `bool is_prime(long long n)` | Must not test every number up to `n` -- testing divisors up to the square root of `n` is enough and required; a loop that checks every number up to `n` fails the performance test on a large prime. *Example:* `is_prime(17) == true`; `is_prime(9) == false`; `is_prime(1) == false` (anything less than `2` is never prime). |
+| `gcd` | `long long gcd(long long a, long long b)` | Loop down from `min(a, b)` for full points. Euclidean algorithm earns bonus credit. *Example:* `gcd(12, 8) == 4`; `gcd(7, 3) == 1` (coprime); `gcd(5, 5) == 5` (a number is its own gcd with itself). |
+| `digit_sum` | `long long digit_sum(long long n)` | Sum of decimal digits. Handles negatives and zero. *Example:* `digit_sum(123) == 6`; `digit_sum(-456) == 15` (negative input is treated as its absolute value); `digit_sum(0) == 0`. |
+| `count_divisors` | `long long count_divisors(long long n)` | Count all positive divisors of `n`. *Example:* `count_divisors(12) == 6`; `count_divisors(7) == 2` (every prime has exactly two divisors: `1` and itself); `count_divisors(1) == 1` (only `1` divides `1`). |
+| `nth_fibonacci` | `long long nth_fibonacci(long long n)` | 1-indexed iterative Fibonacci. `nth_fibonacci(1) == 1`. *Example:* `nth_fibonacci(1) == 1`; `nth_fibonacci(2) == 1` (the first two terms are both `1`); `nth_fibonacci(7) == 13`. |
+| `is_power_of_two` | `bool is_power_of_two(long long n)` | `n > 0` and exactly one bit set. Must use bitwise operations only -- no loops, no division. *Example:* `is_power_of_two(8) == true`; `is_power_of_two(6) == false`; `is_power_of_two(0) == false` (zero has no bits set at all, so it fails the "exactly one bit" test). |
+| `popcount` | `int popcount(unsigned long long n)` | Number of 1-bits in `n`. Must use bit manipulation (shifts and masks) -- no library functions. *Example:* `popcount(13) == 3` (`13 == 0b1101`); `popcount(0) == 0`; `popcount(1) == 1`. |
+| `is_abundant` | `bool is_abundant(long long n)` | `true` if the sum of `n`'s proper divisors (positive divisors strictly less than `n`) exceeds `n`. *Example:* `is_abundant(12) == true` (`1+2+3+4+6 = 16 > 12`); `is_abundant(6) == false` (`1+2+3 = 6`, a "perfect number", not abundant); `is_abundant(1) == false` (`1` has no proper divisors to sum). |
 
 Examples:
 

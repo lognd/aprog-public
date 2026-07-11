@@ -9,6 +9,15 @@ The library provides eight functions that operate on a `std::vector<double>`.
 You will also write your own test suite using a provided lightweight testing
 harness.
 
+Every one of these eight functions shows up constantly in real code -- a
+dashboard averaging response times, a grading script finding the median
+score, an anomaly detector flagging values far from the mean. The catch is
+always the edge cases: what does "the average" even mean for an empty list
+of numbers? What happens when several values are tied for "most common"?
+This assignment is about implementing the arithmetic correctly AND deciding,
+deliberately, what each function does when there is no good numeric answer
+to give.
+
 ---
 
 ## Learning goals
@@ -20,6 +29,65 @@ harness.
   (a special, reserved value like NaN -- "Not a Number", a bit pattern that
   stands in for "no valid answer" instead of a real result), and distinguish
   population vs sample statistics
+
+---
+
+## Examples at a glance
+
+To make all eight functions concrete, here is **one** dataset and what every
+function returns for it:
+
+```
+data = {2.0, 4.0, 4.0, 4.0, 9.0, 10.0}
+```
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `mean(data)`     | `5.5`              | sum is `2+4+4+4+9+10 = 33`, divided by count `6` gives `5.5` |
+| `median(data)`   | `4.0`              | sorted, there are 6 values (even count), so the median is the average of the two middle values, `data[2]` and `data[3]` (both `4.0`); an odd-count dataset would instead return the single middle value with no averaging |
+| `mode(data)`     | `{4.0}`            | `4.0` appears three times, more than any other value, so it is the only mode |
+| `variance(data)` | `8.583333...`      | population variance: average of the squared distance from each value to the mean `5.5`, dividing by `n = 6` (not `n - 1`) |
+| `stddev(data)`   | `2.929732...`      | the square root of `variance(data)` |
+| `minimum(data)`  | `2.0`              | the smallest value in the dataset |
+| `maximum(data)`  | `10.0`             | the largest value in the dataset |
+| `range(data)`    | `8.0`              | `maximum(data) - minimum(data)`, i.e. `10.0 - 2.0` |
+
+## Worked example: computing `variance` and `stddev` step by step
+
+This traces `variance({2.0, 4.0, 4.0, 4.0, 9.0, 10.0})` by hand, the same
+dataset as above, ending at the `8.583333...` shown in the table.
+
+| Step | Value | Deviation from mean (`value - 5.5`) | Squared deviation | Running sum |
+|------|-------|--------------------------------------|--------------------|-------------|
+| 1 | `2.0`  | `2.0 - 5.5 = -3.5` | `(-3.5)^2 = 12.25` | `12.25` |
+| 2 | `4.0`  | `4.0 - 5.5 = -1.5` | `(-1.5)^2 = 2.25`  | `14.5` |
+| 3 | `4.0`  | `4.0 - 5.5 = -1.5` | `(-1.5)^2 = 2.25`  | `16.75` |
+| 4 | `4.0`  | `4.0 - 5.5 = -1.5` | `(-1.5)^2 = 2.25`  | `19.0` |
+| 5 | `9.0`  | `9.0 - 5.5 = 3.5`  | `(3.5)^2 = 12.25`  | `31.25` |
+| 6 | `10.0` | `10.0 - 5.5 = 4.5` | `(4.5)^2 = 20.25`  | `51.5` |
+
+The mean (`5.5`) is computed first, using the same `mean` function -- that
+is why `mean` is one of the eight required functions even though `variance`
+also needs it internally. After all six deviations are squared and summed,
+the running total is `51.5`. Dividing by the count (`n = 6`, NOT `n - 1` --
+this is **population** variance, not sample variance) gives:
+
+```
+variance = 51.5 / 6 = 8.583333...
+```
+
+`stddev` is then just the square root of that number:
+
+```
+stddev = sqrt(8.583333...) = 2.929732...
+```
+
+If this had instead been **sample** variance (dividing by `n - 1 = 5`), the
+result would be `51.5 / 5 = 10.3` -- a different, larger number. This
+assignment always divides by `n`, never `n - 1`; see the Constraints
+section below.
+
+---
 
 ## Task
 
@@ -74,6 +142,48 @@ double range(const std::vector<double>& data);
 
 }  // namespace stats
 ```
+
+### Per-function examples
+
+Concrete `call == result` examples for each function, covering ties, empty
+input, and single-element input. All values below were checked against the
+reference implementation.
+
+- `mean(data)` -- the arithmetic mean (sum divided by count).
+  *Examples:* `mean({1.0, 2.0, 3.0, 4.0, 5.0}) == 3.0`;
+  `mean({7.0}) == 7.0` (a single element is its own mean);
+  `mean({})` is `NaN` (`std::isnan(mean({})) == true`).
+- `median(data)` -- the middle value once sorted; the average of the two
+  middle values when the count is even.
+  *Examples:* `median({5.0, 1.0, 3.0}) == 3.0` (sorts to `{1, 3, 5}`, middle
+  is `3.0` -- note the input did not need to already be sorted);
+  `median({1.0, 2.0, 3.0, 4.0}) == 2.5` (even count: average of `2.0` and
+  `3.0`); `median({})` is `NaN`.
+- `mode(data)` -- every value tied for the highest occurrence count,
+  sorted ascending.
+  *Examples:* `mode({1.0, 2.0, 2.0, 3.0}) == {2.0}` (only `2.0` repeats);
+  `mode({1.0, 1.0, 2.0, 2.0, 3.0}) == {1.0, 2.0}` (`1.0` and `2.0` are
+  tied at two occurrences each, `3.0` is not a mode); `mode({})` is `{}`
+  (empty in, empty out -- no exception, no NaN, since there is no single
+  numeric value to signal "no mode" with).
+- `variance(data)` -- population variance (divide by `n`, not `n - 1`).
+  *Examples:* `variance({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 8.583333...`
+  (see the worked example above); `variance({4.0, 4.0, 4.0}) == 0.0` (every
+  value equals the mean, so every squared deviation is `0`); `variance({})`
+  is `NaN`.
+- `stddev(data)` -- population standard deviation (`sqrt(variance(data))`).
+  *Examples:* `stddev({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 2.929732...`;
+  `stddev({4.0, 4.0, 4.0}) == 0.0`; `stddev({})` is `NaN`.
+- `minimum(data)` -- the smallest value.
+  *Examples:* `minimum({3.0, 1.0, 4.0}) == 1.0`; `minimum({7.0}) == 7.0`;
+  `minimum({})` is `NaN`.
+- `maximum(data)` -- the largest value.
+  *Examples:* `maximum({3.0, 1.0, 4.0}) == 4.0`; `maximum({7.0}) == 7.0`;
+  `maximum({})` is `NaN`.
+- `range(data)` -- `maximum(data) - minimum(data)`.
+  *Examples:* `range({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 8.0` (`10.0 -
+  2.0`); `range({7.0}) == 0.0` (a single element is both the min and the
+  max, so the range is `0`); `range({})` is `NaN`.
 
 You must also:
 

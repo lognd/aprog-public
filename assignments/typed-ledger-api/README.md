@@ -112,6 +112,70 @@ field never reaches the client. Every route in the table below that
 returns an item (`GET /items`, `GET /items/{id}`, `POST /items`,
 `PUT /items/{id}`) must set a `response_model`.
 
+## Examples at a glance
+
+To make all five routes concrete at once, here is **one** running
+ledger state and what every route produces for it. Start from a fresh
+app (`client = TestClient(create_app())`), then run these calls **in
+this order** -- each row's state depends on the rows above it:
+
+1. `POST /items {"name": "pen", "qty": 3}` -> item `id=1` created.
+2. `POST /items {"name": "mug", "qty": 1}` -> item `id=2` created.
+
+Now, with items `1` (`pen`, qty `3`) and `2` (`mug`, qty `1`) both in
+the ledger:
+
+| Call | Status | Response body | Why |
+|------|--------|----------------|-----|
+| `GET /items` | `200` | `[{"id": 1, "name": "pen", "qty": 3}, {"id": 2, "name": "mug", "qty": 1}]` | lists both items, in creation order; note `created_at` never appears -- `response_model` strips it |
+| `GET /items/1` | `200` | `{"id": 1, "name": "pen", "qty": 3}` | fetching an id that exists returns that one item |
+| `GET /items/999` | `404` | `{"detail": "not found"}` | no item has id `999`; the key is `detail`, not `error` |
+| `GET /items/abc` | `422` | `{"detail": [{"type": "int_parsing", "loc": ["path", "item_id"], "msg": "Input should be a valid integer, unable to parse string as an integer", "input": "abc"}]}` | `item_id` is declared as `int` in the path; a non-numeric path segment fails FastAPI's own path-parameter validation before your function runs, the same way a bad body does |
+| `POST /items {"name": "pen", "qty": 3}` | `201` | `{"id": 3, "name": "pen", "qty": 3}` | a third create gets id `3` -- ids keep counting up from however many items have ever existed, they never reuse a deleted id |
+| `POST /items {"qty": 3}` | `422` | `{"detail": [{"type": "missing", "loc": ["body", "name"], "msg": "Field required", "input": {"qty": 3}}]}` | `name` is a required field on `Item` with no default; a missing field never reaches your route function at all |
+| `POST /items {"name": "pen", "qty": "lots"}` | `422` | `{"detail": [{"type": "int_parsing", "loc": ["body", "qty"], "msg": "Input should be a valid integer, unable to parse string as an integer", "input": "lots"}]}` | `"lots"` cannot be parsed as an `int`; note `loc` is `["body", "qty"]`, pinpointing exactly which field failed |
+| `DELETE /items/2` | `204` | (empty body) | deleting an existing item returns no content at all, not even `{}` |
+| `DELETE /items/2` (again) | `404` | `{"detail": "not found"}` | item `2` no longer exists after the first delete -- deleting it twice is an error the second time |
+| `PUT /items/1 {"name": "pencil", "qty": 5}` | `200` | `{"id": 1, "name": "pencil", "qty": 5}` | `PUT` fully replaces `name` and `qty`; the `id` stays `1` |
+| `PUT /items/999 {"name": "x", "qty": 1}` | `404` | `{"detail": "not found"}` | no item has id `999` to replace |
+
+Each `422` body's `"detail"` is always a **list** of error objects (one
+per problem field), not a single string -- this is FastAPI's own
+generated shape via pydantic, and it is the same shape whether the bad
+data came from a JSON body or a path parameter. Your hand-written
+`404`s use `"detail"` too, but as a plain string, matching the
+convention FastAPI itself uses for `HTTPException`.
+
+## Worked example: a full request sequence, step by step
+
+This walks through one continuous sequence of requests against a
+single fresh app, showing exactly how the ledger's state changes after
+each call, and what triggers a validation error along the way. Assume
+`client = TestClient(create_app())` right before step 1.
+
+| Step | Request | Status | Response body | What changed |
+|------|---------|--------|----------------|---------------|
+| 1 | `GET /items` | `200` | `[]` | nothing yet -- a fresh app always starts with an empty ledger |
+| 2 | `POST /items {"name": "pen", "qty": 3}` | `201` | `{"id": 1, "name": "pen", "qty": 3}` | item `1` is created; the next id counter is now at `2` |
+| 3 | `GET /items/1` | `200` | `{"id": 1, "name": "pen", "qty": 3}` | reading back exactly what was just created; no `created_at` field leaks into the body |
+| 4 | `POST /items {"name": "pen", "qty": true}` | `422` | `{"detail": [{"type": "value_error", "loc": ["body", "qty"], "msg": "Value error, qty must be an int, not a bool", "input": true, "ctx": {"error": {}}}]}` | **nothing** -- the ledger is untouched; `True`/`False` looks like a valid `int` in Python (`bool` is an `int` subclass) but is rejected as a quantity before your route body ever runs, and no item is created |
+| 5 | `GET /items` | `200` | `[{"id": 1, "name": "pen", "qty": 3}]` | still just the one item from step 2 -- step 4's rejected request left no trace |
+| 6 | `PUT /items/1 {"name": "pencil"}` | `422` | `{"detail": [{"type": "missing", "loc": ["body", "qty"], "msg": "Field required", "input": {"name": "pencil"}}]}` | **nothing** -- `PUT` requires a full `Item` body (both `name` and `qty`); a partial body is invalid, so the existing item `1` is left completely unchanged, not partially merged |
+| 7 | `GET /items/1` | `200` | `{"id": 1, "name": "pen", "qty": 3}` | confirms step 6 changed nothing: still `pen`, qty `3`, exactly as after step 2 |
+| 8 | `PUT /items/1 {"name": "pencil", "qty": 5}` | `200` | `{"id": 1, "name": "pencil", "qty": 5}` | this time the body is a complete, valid `Item`, so the replacement actually happens; the `id` stays `1` |
+| 9 | `DELETE /items/1` | `204` | (empty body) | item `1` is gone from the ledger |
+| 10 | `GET /items/1` | `404` | `{"detail": "not found"}` | confirms the delete took effect |
+| 11 | `POST /items {"name": "clip", "qty": 10}` | `201` | `{"id": 2, "name": "clip", "qty": 10}` | the new item gets id `2`, **not** a reused `1` -- the id counter only ever goes up, regardless of deletes |
+
+Step 4's exact `422` body is the important one to internalize: pydantic's
+`"detail"` is always a list, each entry has `"type"`, `"loc"` (a path
+telling you exactly which field, e.g. `["body", "qty"]`), `"msg"` (a
+human-readable message), and `"input"` (the raw value that failed).
+Custom validators (like the one rejecting `bool` for `qty`) add an
+extra `"ctx"` key but otherwise produce the same shape as a built-in
+type-mismatch error. This is FastAPI generating the response entirely
+on its own -- no code in `app.py` builds this body by hand.
+
 ### Routes
 
 | Method | Path | Behavior |
@@ -121,6 +185,59 @@ returns an item (`GET /items`, `GET /items/{id}`, `POST /items`,
 | `POST` | `/items` | Create a new item from an `Item` body. `201` with the created object (including its assigned `id`), shaped by `response_model`. An invalid body produces FastAPI's own `422` -- do not hand-validate. |
 | `DELETE` | `/items/{item_id}` | Delete an item. `204` with an empty body, or `404` with `{"detail": "not found"}`. |
 | `PUT` | `/items/{item_id}` | Fully **replace** an existing item's `name` and `qty` from an `Item` body. `200` with the replaced object, shaped by `response_model`, or `404` with `{"detail": "not found"}` if the id does not exist. An invalid body produces FastAPI's own `422`. |
+
+**Examples for `GET /items`:**
+- Fresh app, nothing created yet: `client.get("/items")` -> `200`,
+  `[]` -- an empty ledger is a `200` with an empty array, not a `404`.
+- After creating two items: `client.get("/items")` -> `200`,
+  `[{"id": 1, ...}, {"id": 2, ...}]` -- every item currently stored,
+  in the order they were created.
+- After deleting the only item: `client.get("/items")` -> `200`,
+  `[]` again -- back to empty, same as the fresh-app case.
+
+**Examples for `GET /items/{item_id}`:**
+- Existing id: `client.get("/items/1")` -> `200`,
+  `{"id": 1, "name": "pen", "qty": 3}`.
+- Absent id (never created, or already deleted): `client.get("/items/999")`
+  -> `404`, `{"detail": "not found"}`.
+- Non-integer id in the URL: `client.get("/items/abc")` -> `422`
+  (not `404`) -- `item_id` is declared as `int`, so a value that cannot
+  even be parsed as an integer fails FastAPI's path validation before
+  your route body runs at all, exactly like an invalid JSON body does.
+
+**Examples for `POST /items`:**
+- Valid body: `client.post("/items", json={"name": "pen", "qty": 3})`
+  -> `201`, `{"id": 1, "name": "pen", "qty": 3}`.
+- Missing field: `client.post("/items", json={"qty": 3})` -> `422`
+  with `"detail"` listing `{"loc": ["body", "name"], "type": "missing", ...}`
+  -- no item is created.
+- Wrong type: `client.post("/items", json={"name": "pen", "qty": "lots"})`
+  -> `422` with `"type": "int_parsing"` for the `qty` field -- a string
+  that cannot be parsed as an int is rejected, not silently coerced.
+- `bool` for `qty`: `client.post("/items", json={"name": "pen", "qty": True})`
+  -> `422` -- `True`/`False` looks like an `int` in Python (`bool` is
+  an `int` subclass) but is not a valid quantity, so it must be
+  rejected rather than accepted as `1`/`0`.
+
+**Examples for `DELETE /items/{item_id}`:**
+- Existing id: `client.delete("/items/1")` -> `204`, empty body (not
+  even `{}` -- `204 No Content` means literally no body).
+- Absent id: `client.delete("/items/999")` -> `404`,
+  `{"detail": "not found"}`.
+- Deleting the same id twice: the first call is `204`; the second call
+  on that same id is `404`, because the item is already gone.
+
+**Examples for `PUT /items/{item_id}`:**
+- Existing id, valid full body: `client.put("/items/1", json={"name": "pencil", "qty": 5})`
+  -> `200`, `{"id": 1, "name": "pencil", "qty": 5}` -- both fields
+  replaced, `id` unchanged.
+- Absent id: `client.put("/items/999", json={"name": "x", "qty": 1})`
+  -> `404`, `{"detail": "not found"}`.
+- Partial body (only `name`, missing `qty`) against an id that DOES
+  exist: `client.put("/items/1", json={"name": "pencil"})` -> `422`
+  (not a partial merge) -- `PUT` requires a complete `Item` body, and
+  the existing item is left completely unchanged when the body is
+  invalid.
 
 `PUT` replaces the item's entire content -- it does not merge in just
 the fields present in the request body, same as the Flask assignment.

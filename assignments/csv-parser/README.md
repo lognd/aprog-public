@@ -37,6 +37,20 @@ std::vector<std::vector<std::string>> parse_csv(std::string text);
 Each element of the outer vector is one row.  Each element of the inner
 vector is one field.  Row 0 is the first line of the input.
 
+*Examples (all confirmed against the reference solution):*
+- `parse_csv("a,b,c")` -> `{{"a", "b", "c"}}` -- one row, three plain fields.
+- `parse_csv("a,\"b,c\"")` -> `{{"a", "b,c"}}` -- the comma inside quotes does
+  not split the field; see the step-by-step trace below for exactly why.
+- `parse_csv("a,\"say \"\"hi\"\"\",b")` -> `{{"a", "say \"hi\"", "b"}}` -- the
+  `""` escape inside a quoted field collapses to one literal `"`.
+- `parse_csv("")` -> `{{}}` -- one row with **zero fields**, not zero rows;
+  `parse_csv` never returns an empty outer vector.
+- `parse_csv("a,b\n\nc,d")` -> `{{"a","b"}, {}, {"c","d"}}` -- the blank line
+  in the middle produces its own zero-field row rather than being skipped.
+- There is no error case: `parse_csv` takes a `std::string` and always
+  returns some `vector<vector<string>>`, even for malformed-looking input
+  like an unterminated quote -- there is nothing for it to throw or fail on.
+
 ### Parsing rules (RFC 4180 subset)
 
 RFC 4180 is the internet standard document that defines the CSV format
@@ -88,6 +102,61 @@ rows[3] = {"Carol", "",             "75"   }
 
 Each row is independent -- `rows[i].size()` may differ from `rows[j].size()`.
 The parser does not pad short rows or truncate long ones.
+
+---
+
+## Examples at a glance
+
+To make the tricky cases concrete, here is **one** representative line, with
+exactly what `parse_csv` produces for it. This line packs in an embedded
+comma inside quotes, an empty field, and an escaped quote, all at once:
+
+```
+101,"Smith, John",,"He said ""hi"""
+```
+
+| Field index | Value produced | Why |
+|---|---|---|
+| 0 | `"101"` | plain field, read up to the next comma |
+| 1 | `"Smith, John"` | the field starts with `"`, so the comma inside it is just part of the field's text, not a separator -- the field ends only at the matching closing `"` |
+| 2 | `""` | two commas in a row with nothing between them means an empty field, not a skipped one |
+| 3 | `He said "hi"` (shown with real quote characters) | `""` inside a quoted field is RFC 4180's escape for a single literal `"` -- so `""hi""` becomes `"hi"` in the final string |
+
+`parse_csv` returns one row containing exactly these 4 fields:
+`rows[0] = {"101", "Smith, John", "", "He said \"hi\""}`.
+
+Two more small cases worth knowing, each confirmed by running the reference
+solution:
+
+| Input | Output | Why |
+|---|---|---|
+| `""` (empty string, zero characters) | `rows.size() == 1`, `rows[0].size() == 0` | an empty input is still one (empty) row, not zero rows |
+| `"a , b ,c"` | `rows[0] = {"a ", " b ", "c"}` | whitespace around commas is not trimmed -- the spaces are kept exactly as typed |
+
+---
+
+## Worked example: parsing one line, step by step
+
+This traces `parse_csv("a,\"b,c\"")` -- the C++ string literal
+`a,"b,c"` -- one character at a time, ending at the exact fields the
+function returns: `{"a", "b,c"}`.
+
+| Step | Character read | Parser state | Field buffer so far | Action / reason |
+|------|-----------------|---------------|----------------------|------------------|
+| 1 | `a` | outside quotes | `a` | not a comma, quote, or line ending -- append it to the current field |
+| 2 | `,` | outside quotes | `a` (field closes) | a bare comma outside quotes ends the current field; push `"a"` into the row, start a new field |
+| 3 | `"` | field starts quoted | (empty) | a field that starts with `"` is a quoted field -- enter "inside quotes" mode; the quote character itself is NOT added to the field |
+| 4 | `b` | inside quotes | `b` | inside quotes, ordinary characters are appended just like normal |
+| 5 | `,` | inside quotes | `b,` | **this comma is inside quotes**, so it is just a character to append, not a field separator -- this is the whole point of quoting |
+| 6 | `c` | inside quotes | `b,c` | still inside quotes, appended normally |
+| 7 | `"` | closing quote found | `b,c` (field closes) | this `"` is not followed by another `"`, so it is a plain closing quote (not an escaped `""`) -- exit quoted mode and push `"b,c"` into the row |
+| end | (end of input) | -- | -- | no more characters; the row `{"a", "b,c"}` is complete and becomes `rows[0]` |
+
+The key moment is step 5: an ordinary (unquoted) parser would have split the
+field there and produced three fields instead of two. Tracking "am I
+currently inside a quoted field?" as a piece of state, and consulting it
+before treating a comma as a separator, is the one idea that makes the rest
+of this assignment work.
 
 ---
 

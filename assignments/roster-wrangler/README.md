@@ -47,6 +47,33 @@ def index_by_key(roster: list[dict]) -> dict[tuple[str, str], int]:
     """Map (name, section) to grade. Duplicate pairs: last one wins."""
 ```
 
+### Per-function examples
+
+- `group_by_section(roster)`
+  - `group_by_section([{"name": "Zoe", "section": "A", "grade": 50}]) == {"A": ["Zoe"]}` -- a single record still becomes a one-name list, not a bare string.
+  - `group_by_section([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "A", "grade": 95}]) == {"A": ["Alice", "Alice"]}` -- this function does NOT deduplicate; `dedupe_names` is the function for that job.
+  - `group_by_section([]) == {}` -- empty roster in, empty dict out.
+- `dedupe_names(roster)`
+  - `dedupe_names([{"name": "Bob", "section": "A", "grade": 1}, {"name": "Bob", "section": "B", "grade": 2}]) == ["Bob"]` -- same name, two different sections, still counts as one student and is kept once.
+  - `dedupe_names([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Bob", "section": "A", "grade": 80}]) == ["Alice", "Bob"]` -- no duplicates present, so every name passes through unchanged.
+  - `dedupe_names([]) == []` -- empty roster in, empty list out.
+- `section_averages(roster)`
+  - `section_averages([{"name": "A", "section": "X", "grade": 1}, {"name": "B", "section": "X", "grade": 1}, {"name": "C", "section": "X", "grade": 2}]) == {"X": 1.33}` -- `(1 + 1 + 2) / 3 = 1.3333...`, rounded to 2 places, not truncated.
+  - `section_averages([{"name": "Alice", "section": "A", "grade": 90}]) == {"A": 90.0}` -- a single record is its own average, and the result is still a `float` (`90.0`, not the `int` `90`).
+  - `section_averages([]) == {}` -- empty roster in, empty dict out; there is no section to divide zero grades by, so nothing is computed.
+- `top_student_per_section(roster)`
+  - `top_student_per_section([{"name": "Zack", "section": "A", "grade": 90}, {"name": "Amy", "section": "A", "grade": 90}]) == {"A": "Amy"}` -- exact tie on grade; alphabetically-first name wins regardless of which record came first in the roster.
+  - `top_student_per_section([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "A", "grade": 60}]) == {"A": "Alice"}` -- the SAME student appears twice with different grades for the same section; the higher grade (`90`) is the one that counts.
+  - `top_student_per_section([]) == {}` -- empty roster in, empty dict out.
+- `enrollment_sets(roster_a, roster_b)`
+  - `enrollment_sets([{"name": "Bob", "section": "A", "grade": 1}], [{"name": "Bob", "section": "A", "grade": 1}]) == (set(), {"Bob"}, set())` -- identical single-student rosters: nobody is "only in A" or "only in B", `Bob` is in both.
+  - `enrollment_sets([], [{"name": "Eve", "section": "C", "grade": 100}]) == (set(), set(), {"Eve"})` -- an empty first roster means the "only in A" and "in both" sets are empty; everyone in `roster_b` falls into "only in B".
+  - `enrollment_sets([], []) == (set(), set(), set())` -- both rosters empty, all three sets empty.
+- `index_by_key(roster)`
+  - `index_by_key([{"name": "Bob", "section": "A", "grade": 1}, {"name": "Bob", "section": "A", "grade": 9}]) == {("Bob", "A"): 9}` -- the SAME `(name, section)` pair appears twice with different grades; the map ends up holding only the LAST one (`9`), the earlier `1` is fully overwritten, not averaged or summed.
+  - `index_by_key([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "B", "grade": 70}]) == {("Alice", "A"): 90, ("Alice", "B"): 70}` -- same name, different sections, so these are two DIFFERENT keys, not a collision.
+  - `index_by_key([]) == {}` -- empty roster in, empty dict out.
+
 ### Examples
 
 ```python
@@ -83,6 +110,81 @@ Every function must handle an empty roster (`[]`) without raising, and
 `group_by_section`, `dedupe_names`, `section_averages`,
 `top_student_per_section`, and `index_by_key` all return an empty
 container (`{}` or `[]`) for an empty input.
+
+---
+
+## Examples at a glance: every function on one roster
+
+To make all six functions concrete at once, here is **one** roster,
+deliberately built with every tricky case this assignment tests: a name
+(`Alice`) enrolled in two different sections, a duplicate `(name,
+section)` pair (a corrected grade for `Alice` in section `A`), and a
+grade tie in section `B` (`Carol` and `Dave` both scoring 88). Read this
+table first -- it is the whole assignment in miniature.
+
+```python
+roster = [
+    {"name": "Alice", "section": "A", "grade": 90},
+    {"name": "Bob",   "section": "A", "grade": 80},
+    {"name": "Alice", "section": "A", "grade": 95},  # correction: Alice's A grade
+    {"name": "Carol", "section": "B", "grade": 88},
+    {"name": "Dave",  "section": "B", "grade": 88},  # tie with Carol
+    {"name": "Alice", "section": "B", "grade": 70},  # Alice also enrolled in B
+]
+```
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `group_by_section(roster)` | `{'A': ['Alice', 'Bob', 'Alice'], 'B': ['Carol', 'Dave', 'Alice']}` | every record's name is appended in roster order, including the repeat of `Alice` in each section -- this function does not deduplicate |
+| `dedupe_names(roster)` | `['Alice', 'Bob', 'Carol', 'Dave']` | `Alice` appears three times across the roster (twice in `A`, once in `B`) but is kept only once, at her FIRST appearance |
+| `section_averages(roster)` | `{'A': 88.33, 'B': 82.0}` | section `A`: `(90 + 80 + 95) / 3 = 88.333...` rounds to `88.33`; section `B`: `(88 + 88 + 70) / 3 = 82.0` |
+| `top_student_per_section(roster)` | `{'A': 'Alice', 'B': 'Carol'}` | in `A`, `Alice`'s corrected `95` beats `Bob`'s `80`; in `B`, `Carol` and `Dave` TIE at `88`, so the alphabetically-first name (`Carol` < `Dave`) wins |
+| `index_by_key(roster)` | `{('Alice', 'A'): 95, ('Bob', 'A'): 80, ('Carol', 'B'): 88, ('Dave', 'B'): 88, ('Alice', 'B'): 70}` | `('Alice', 'A')` appears twice in the input (`90` then `95`) -- the LAST one wins, so the map holds `95`, not `90` |
+| `enrollment_sets(roster, roster_b)` where `roster_b = [{"name": "Bob", "section": "A", "grade": 80}, {"name": "Eve", "section": "C", "grade": 100}]` | `({'Alice', 'Carol', 'Dave'}, {'Bob'}, {'Eve'})` | by NAME only: `Alice`/`Carol`/`Dave` are only in the first roster, `Bob` is in both, `Eve` is only in the second |
+| `group_by_section([])` | `{}` | empty input, empty output -- same pattern for every function below |
+| `dedupe_names([])` | `[]` | empty input, empty output |
+| `section_averages([])` | `{}` | empty input, empty output |
+| `top_student_per_section([])` | `{}` | empty input, empty output |
+| `index_by_key([])` | `{}` | empty input, empty output |
+| `enrollment_sets([], [])` | `(set(), set(), set())` | no names anywhere, so all three sets are empty |
+
+## Worked example: watch `top_student_per_section` run, step by step
+
+This is the function most likely to trip you up (it needs to track the
+BEST grade seen so far per section, and break ties alphabetically), so
+here is every step spelled out on a small roster:
+
+```python
+roster = [
+    {"name": "Carol", "section": "B", "grade": 88},
+    {"name": "Dave",  "section": "B", "grade": 88},
+    {"name": "Alice", "section": "B", "grade": 70},
+]
+```
+
+We walk the roster once, front to back, keeping two running maps:
+`best_grade` (section -> highest grade seen so far) and `best_name`
+(section -> the name that earned it). For each record: if its section
+has not been seen before, it automatically becomes the best so far. If
+the section HAS been seen, compare the new grade to the current best --
+a strictly higher grade replaces both maps; an EQUAL grade replaces
+`best_name` only if the new name is alphabetically earlier (this is what
+makes ties deterministic instead of "whichever came first").
+
+| Step | Record | Section seen before? | Compare | Action | `best_grade` after | `best_name` after |
+|------|--------|----------------------|---------|--------|---------------------|-------------------|
+| 1 | `Carol`, `B`, `88` | no | -- (first record for `B`) | set `B` -> `88`/`Carol` | `{'B': 88}` | `{'B': 'Carol'}` |
+| 2 | `Dave`, `B`, `88` | yes | `88 == 88` (tie) -> compare names: `'Dave' < 'Carol'`? No | keep `Carol` (name is NOT earlier) | `{'B': 88}` | `{'B': 'Carol'}` |
+| 3 | `Alice`, `B`, `70` | yes | `70 < 88` -> not higher | no change | `{'B': 88}` | `{'B': 'Carol'}` |
+| end | -- | -- | -- | return `best_name` | -- | `{'B': 'Carol'}` |
+
+The loop ends with `best_name = {'B': 'Carol'}`, so
+`top_student_per_section(roster)` returns exactly **`{'B': 'Carol'}`**.
+Notice step 2: `Dave` arrived with an EQUAL grade to the current best,
+not a higher one -- if the tie-break compared "did the grade increase"
+alone, `Dave` would incorrectly overwrite `Carol` just for showing up
+second. The alphabetical check is what keeps the answer stable no matter
+what order tied records happen to appear in.
 
 ### On duplicate records
 

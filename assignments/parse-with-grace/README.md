@@ -79,6 +79,62 @@ and a constructor establishing an object's invariants (like `Fraction`'s
 denominator never being zero) has no return value to report failure with
 at all -- throwing is its only real option.
 
+## Examples at a glance
+
+To make the whole assignment concrete, here is **one** scenario: a user typed
+the raw text `"3,-7,x,999999999999"`, meaning to give a comma-separated list
+of integers, plus a companion fraction string `"3/-7"` built from its first
+two numbers. The table below shows what every function in this assignment
+does with pieces of that same scenario. Read this table first -- it is the
+whole assignment in miniature.
+
+```
+list input  = "3,-7,x,999999999999"
+             (piece 0: "3", piece 1: "-7", piece 2: "x", piece 3: "999999999999")
+frac input  = "3/-7"
+```
+
+| Call | Result | Why |
+|------|--------|-----|
+| `parse_int("3")` | `3` | an ordinary positive integer, no sign, no whitespace |
+| `parse_int(" -7 ")` | `-7` | leading/trailing spaces are trimmed before parsing; the sign is kept |
+| `parse_int("999999999999")` | throws `std::out_of_range`, `what() == "parse_int: value out of int range in '999999999999'"` | the digits fit in a `long long` just fine, but the resulting value is far bigger than `INT_MAX` |
+| `parse_int("x")` | throws `std::invalid_argument`, `what() == "parse_int: invalid character 'x' in 'x'"` | `'x'` is neither a digit nor a leading sign |
+| `parse_fraction("3/-7")` | `Fraction{3, -7}` | exactly one `/` splits the string into two valid integers |
+| `parse_fraction("3/0")` | throws `std::domain_error`, `what() == "parse_fraction: denominator cannot be zero in '3/0'"` | a fraction can never have a zero denominator |
+| `parse_int_list("3,-7,x,999999999999", ',')` | throws `std::invalid_argument`, `what() == "parse_int: invalid character 'x' in 'x'"` | piece 2 (`"x"`) fails inside `parse_int`, and that exact exception (same type, same message) propagates straight out -- `parse_int_list` never wraps or rewrites it |
+| `parse_int_list("", ',')` | `{}` | an empty string is a valid, empty list -- there is nothing to split |
+| `parse_int_or("3,-7,x,999999999999", -1)` | `-1` | the whole string is not a bare integer (the first comma is an invalid character), so `parse_int` throws and `parse_int_or` catches it and returns the fallback |
+| `parse_int_or("3", -1)` | `3` | parsing succeeds, so the fallback is never used |
+| `ScopedTally` around a normal scope | tally goes `0 -> 1 -> 0` | constructor increments on entry, destructor decrements on the normal way out |
+| `ScopedTally` around a scope that throws | tally still goes `0 -> 1 -> 0` | the destructor runs during stack unwinding too -- this is the whole point of RAII |
+
+## Worked example: watch `parse_int_list` hit a deliberate error, step by step
+
+This is the single most important thing to understand in the assignment, so
+here is every step spelled out. We call
+`parse_int_list("3,-7,x,999999999999", ',')`, splitting on `,` and parsing
+each piece with `parse_int` in order, left to right.
+
+| Step | Piece | `parse_int(piece)` | Outcome | Why |
+|------|-------|---------------------|---------|-----|
+| 1 | `"3"` | `3` | pushed onto the result vector -> `{3}` | ordinary positive integer |
+| 2 | `"-7"` | `-7` | pushed onto the result vector -> `{3, -7}` | leading `-` is a valid sign, `7` is a valid digit run |
+| 3 | `"x"` | throws `std::invalid_argument("parse_int: invalid character 'x' in 'x'")` | `parse_int_list` does **not** catch this -- it propagates immediately | `'x'` is not a digit and not a leading sign, so `parse_int` cannot parse it at all |
+| -- | `"999999999999"` | never reached | -- | the exception from piece 2 (index 2) already unwound out of the function; the loop never gets to the fourth piece |
+
+The final observable result of `parse_int_list("3,-7,x,999999999999", ',')` is:
+no vector is ever returned. The caller sees a `std::invalid_argument` exception
+whose `what()` is exactly `"parse_int: invalid character 'x' in 'x'"` -- the
+identical message `parse_int("x")` would have produced on its own, byte for
+byte. This is the "propagates unchanged" contract: `parse_int_list` is not
+allowed to catch this error, add context to it, wrap it in a different
+exception type, or swallow it -- it must let it pass through exactly as
+`parse_int` raised it. Notice also that the partial work already done (the
+`3` and `-7` already parsed) is simply discarded along with the abandoned
+`std::vector<int>` local -- nothing about that is a bug: the function has no
+well-defined partial answer to return once one piece has failed.
+
 ## What you will implement
 
 Everything lives in `parse_with_grace.hpp`. Do not use `std::stoi`,
@@ -115,6 +171,18 @@ allowed and ignored; an optional leading `+` or `-` is allowed.
   argument (unlike the `invalid_argument` messages above, this one does not
   strip leading/trailing spaces and tabs before reporting `s`).
 
+*Examples:* `parse_int("42") == 42`; `parse_int(" -17 ") == -17` (spaces and
+tabs trimmed before parsing); `parse_int("") == ` throws `std::invalid_argument`
+with `what() == "parse_int: empty string"`; `parse_int("   ") == ` throws the
+same (whitespace-only counts as empty); `parse_int("+") == ` throws
+`std::invalid_argument` with `what() == "parse_int: no digits found in '+'"`;
+`parse_int("12a") == ` throws `std::invalid_argument` with
+`what() == "parse_int: invalid character 'a' in '12a'"`;
+`parse_int("  -2147483649  ") == ` throws `std::out_of_range` with
+`what() == "parse_int: value out of int range in '  -2147483649  '"` (note
+the untrimmed original string appears in this particular message, unlike the
+`invalid_argument` cases above).
+
 ### `Fraction parse_fraction(const std::string& s)`
 
 Parses `"a/b"` into a `Fraction`. `a` and `b` follow the same digit rules as
@@ -130,6 +198,19 @@ Parses `"a/b"` into a `Fraction`. `a` and `b` follow the same digit rules as
 - Throws `std::domain_error` if the denominator parses to exactly zero:
   `"parse_fraction: denominator cannot be zero in '<s>'"`.
 
+*Examples:* `parse_fraction("3/4") == Fraction{3, 4}`;
+`parse_fraction("-3/-4") == Fraction{-3, -4}` (no reduction to lowest terms is
+required or performed); `parse_fraction("34") == ` throws
+`std::invalid_argument` with
+`what() == "parse_fraction: expected exactly one '/' in '34'"` (no slash at
+all); `parse_fraction("1/2/3") == ` throws the same kind, with
+`what() == "parse_fraction: expected exactly one '/' in '1/2/3'"` (too many
+slashes); `parse_fraction("a/4") == ` throws `std::invalid_argument` with
+`what() == "parse_fraction: invalid character 'a' in 'a'"` (same shape as
+`parse_int`'s message, but naming `parse_fraction`); `parse_fraction("3/0")
+== ` throws `std::domain_error` with
+`what() == "parse_fraction: denominator cannot be zero in '3/0'"`.
+
 ### `std::vector<int> parse_int_list(const std::string& s, char sep)`
 
 Splits `s` on `sep`, parsing each piece with `parse_int`. Empty `s` returns
@@ -137,6 +218,17 @@ an empty vector. **Any exception `parse_int` throws for one element must
 propagate out of `parse_int_list` completely unchanged** -- the exact same
 exception type, and the exact same `what()` message `parse_int` itself
 would have produced for that piece. Do not catch, wrap, or rewrap it.
+
+*Examples:* `parse_int_list("1,2,3", ',') == std::vector<int>{1, 2, 3}`;
+`parse_int_list("", ',') == std::vector<int>{}` (empty string, empty list --
+not an error); `parse_int_list("5", ',') == std::vector<int>{5}` (no
+separator found means one single piece); `parse_int_list("1,x,3", ',') == `
+throws `std::invalid_argument` with
+`what() == "parse_int: invalid character 'x' in 'x'"` (note the message says
+`parse_int`, not `parse_int_list` -- it is the unmodified exception
+`parse_int("x")` itself would have thrown); `parse_int_list("1,,3", ',') == `
+throws `std::invalid_argument` with `what() == "parse_int: empty string"`
+(the middle piece, between two commas, is empty).
 
 ### `int parse_int_or(const std::string& s, int fallback)`
 
@@ -146,6 +238,13 @@ this assignment required to use `try`/`catch` itself** -- every other
 function in this file either throws directly or (in `parse_int_list`'s
 case) deliberately lets an exception pass through untouched.
 
+*Examples:* `parse_int_or("5", -1) == 5` (parse succeeds, fallback unused);
+`parse_int_or("bad", -1) == -1` (malformed input, `std::invalid_argument`
+caught and swallowed); `parse_int_or("99999999999999", -1) == -1` (valid
+digits but out of `int` range -- `std::out_of_range` is also caught, since
+`parse_int_or` catches both exception types); `parse_int_or("", 0) == 0`
+(empty string is malformed too).
+
 ### `class ScopedTally`
 
 An RAII counter. `ScopedTally(int& tally)` increments `tally` in its
@@ -153,6 +252,15 @@ constructor; its destructor decrements the same `tally`. This must work
 correctly even when the destructor runs because an exception is unwinding
 the stack through a `ScopedTally` -- that is precisely the guarantee this
 class exists to demonstrate.
+
+*Examples:* constructing `ScopedTally t(tally)` when `tally == 0` leaves
+`tally == 1`; letting `t` go out of scope normally afterward brings it back
+to `tally == 0`; constructing `ScopedTally t(tally)` and then `throw`-ing
+past it (so its destructor runs during unwinding, not because the enclosing
+block ended normally) still brings `tally` back down by exactly one -- e.g.
+`tally == 0` before, `tally == 1` while `t` is alive and the exception is in
+flight, `tally == 0` again once the exception has been caught further up the
+stack.
 
 ## Getting started
 

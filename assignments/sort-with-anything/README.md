@@ -78,6 +78,59 @@ order, and it must do so by preserving whichever order they started in.
 That is exactly what **stability** means, and it is why `sort_by` is
 required to be stable.
 
+---
+
+## Examples at a glance
+
+Several concrete `call -> result` pairs, covering every function in this
+assignment:
+
+| Call | Result | Why |
+|------|--------|-----|
+| `sort_by(v = {5, 3, 8, 1, 4}, [](int a, int b) { return a < b; })` | `v` becomes `{1, 3, 4, 5, 8}` | a plain ascending lambda comparator |
+| `sort_by(v = {"ccc", "a", "bb", "dddd"}, by_length_asc)` | `v` becomes `{"a", "bb", "ccc", "dddd"}` | the FREE FUNCTION comparator orders by string length |
+| `sort_by(v = {3, -1, -5, 2, -2}, ByAbsoluteValue{})` | `v` becomes `{-1, -2, 2, 3, -5}` | ordered by absolute value (`1, 2, 2, 3, 5`); on the `2`/`-2` tie in absolute value, the smaller ACTUAL value (`-2`) goes first, per `ByAbsoluteValue`'s own tie rule |
+| `sort_by(v = {"z", "yy", "a", "bb"}, by_length_asc)` | `v` becomes `{"z", "a", "yy", "bb"}` | two ties in length (`"z"`/`"a"` both length 1, `"yy"`/`"bb"` both length 2); STABILITY keeps each tied pair in its original relative order (`"z"` before `"a"`, `"yy"` before `"bb"`) |
+| `filter(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x % 2 == 0; })` | `{2, 4, 6}` | keeps only the elements the predicate accepts, in original order; `v` itself is untouched |
+| `for_each_apply(v = {1, 2, 3}, [](int& x) { x *= 10; })` | `v` becomes `{10, 20, 30}` | mutates every element IN PLACE through a `T&` parameter |
+| `count_matching(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x > 3; })` | `3` | three elements (`4, 5, 6`) satisfy the predicate; `v` is not modified |
+
+---
+
+## Worked example: watch `sort_by({5, 3, 8, 1, 4}, cmp)` run, step by step
+
+This traces exactly what the reference algorithm does for a small vector.
+`sort_by` recurses with merge sort, but any range of `kSmallRunThreshold`
+(16) elements or fewer is sorted directly with **insertion sort** instead
+of splitting further -- a common real-world optimization, since insertion
+sort beats merge sort's overhead on small ranges. Because `v` here has
+only 5 elements, the whole sort is a single insertion-sort pass; no
+merging happens at all. `cmp(a, b)` is `a < b` (plain ascending).
+
+Insertion sort's idea: walk `i` from index 1 to the end, treating
+everything before `i` as already-sorted, and slide the "key" (`v[i]`)
+leftward past every element `cmp(key, v[j])` says the key belongs before,
+until it finds its resting spot.
+
+| `i` | `key` | Shifts (comparisons via `cmp`) | `v` after this `i` |
+|-----|-------|-------------------------------|---------------------|
+| start | -- | -- | `{5, 3, 8, 1, 4}` |
+| 1 | `3` | `cmp(3, 5)` is true (3 < 5) -> shift `5` right; nothing left of it -> place `3` at index 0 | `{3, 5, 8, 1, 4}` |
+| 2 | `8` | `cmp(8, 5)` is false (8 < 5 is false) -> stop immediately, `8` stays put | `{3, 5, 8, 1, 4}` |
+| 3 | `1` | `cmp(1, 8)` true -> shift `8` right; `cmp(1, 5)` true -> shift `5` right; `cmp(1, 3)` true -> shift `3` right; nothing left -> place `1` at index 0 | `{1, 3, 5, 8, 4}` |
+| 4 | `4` | `cmp(4, 8)` true -> shift `8` right; `cmp(4, 5)` true -> shift `5` right; `cmp(4, 3)` false -> stop, place `4` right after `3` | `{1, 3, 4, 5, 8}` |
+| end | -- | every `i` from 1 to 4 processed | `{1, 3, 4, 5, 8}` |
+
+The final array is `{1, 3, 4, 5, 8}` -- confirmed sorted ascending. Notice
+that each shift is decided purely by calling `cmp`, never by a hardcoded
+`<`: swap `cmp` for `ByAbsoluteValue{}` or any other comparator and the
+exact same shifting logic sorts by a completely different rule. On a
+larger vector (more than 16 elements), `sort_by` would instead split `v`
+into two halves, sort each half recursively (by this same process, or
+further splitting), and `_merge_by` those two already-sorted halves back
+together -- taking from the left half on every tie, which is what makes
+the whole algorithm stable.
+
 ### Closure and capture, recapped
 
 If you have completed capture-court, you already know this: a **closure**
@@ -113,19 +166,44 @@ inside the `swa` namespace.
   ordering elements according to `cmp` (see the comparator contract
   above). Must be **stable**. Must run in O(n log n) time. `Compare` may
   be a free function, a functor, or a lambda.
+  *Example:* `sort_by(v = {5, 3, 8, 1, 4}, [](int a, int b) { return a <
+  b; })` leaves `v == {1, 3, 4, 5, 8}`; `sort_by(v = {}, cmp)` leaves `v
+  == {}` (nothing to sort); `sort_by(v = {"z", "yy", "a", "bb"},
+  by_length_asc)` leaves `v == {"z", "a", "yy", "bb"}` (length ties broken
+  by original order, since `sort_by` must be stable).
 - `by_length_asc(a, b)` -> `bool` -- a FREE FUNCTION comparator: orders
   `std::string`s by ascending length.
+  *Example:* `by_length_asc("a", "bbb") == true`; `by_length_asc("bbb",
+  "a") == false`; `by_length_asc("cat", "dog") == false` (equal length 3,
+  so neither is "strictly before" the other -- a tie).
 - `ByAbsoluteValue` -- a FUNCTOR: `operator()(int a, int b)` orders ints
   by ascending absolute value. On a tie in absolute value, the smaller
   ACTUAL value comes first (e.g. `-3` belongs before `3`, since `-3 < 3`,
   even though both have absolute value `3`).
+  *Example:* `ByAbsoluteValue{}(-3, 3) == true` (tied absolute values, `-3
+  < 3`); `ByAbsoluteValue{}(3, -3) == false` (same tie, checked the other
+  direction); `ByAbsoluteValue{}(-5, 2) == false` (absolute value 5 is not
+  less than absolute value 2, so `-5` does not belong before `2`).
 - `filter(v, keep)` -> `std::vector<T>` -- returns a new vector containing
   every element of `v` for which `keep(element)` is `true`, in original
   relative order. Does not modify `v`.
+  *Example:* `filter(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x % 2 ==
+  0; }) == {2, 4, 6}`; `filter(v = {}, keep) == {}` (empty input, empty
+  result); `filter(v = {1, 3, 5}, [](int x) { return x % 2 == 0; }) ==
+  {}` (no element satisfies `keep`, so the result is empty even though `v`
+  is not).
 - `for_each_apply(v, f)` -> `void` -- applies `f` to every element of `v`
   IN PLACE: `f` takes a `T&` and mutates it directly.
+  *Example:* `for_each_apply(v = {1, 2, 3}, [](int& x) { x *= 10; })`
+  leaves `v == {10, 20, 30}`; `for_each_apply(v = {}, f)` leaves `v == {}`
+  (nothing to apply `f` to); `for_each_apply(v = {"a", "bb"}, [](std::string&
+  s) { s += "!"; })` leaves `v == {"a!", "bb!"}`.
 - `count_matching(v, pred)` -> `std::size_t` -- returns how many elements
   of `v` satisfy `pred(element)`. Does not modify `v`.
+  *Example:* `count_matching(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x
+  > 3; }) == 3`; `count_matching(v = {}, pred) == 0` (empty input, nothing
+  to count); `count_matching(v = {1, 3, 5}, [](int x) { return x % 2 ==
+  0; }) == 0` (no matches -- absent, not an error).
 
 `filter`, `for_each_apply`, and `count_matching` all work with any of the
 three callable species too, exactly like `sort_by`.

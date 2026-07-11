@@ -128,6 +128,60 @@ it deletes the very pointer it was about to re-store, leaving `p` holding a
 dangling address. The fix is to compare the incoming pointer against the
 one you already own before deleting anything.
 
+## Examples at a glance
+
+To make every operation concrete, here is **one** running scenario: a
+`MyUniquePtr<int>` named `p`, tracked through every operation it supports.
+"Underlying object" means the heap `int` that `new` allocated -- as long as
+some `MyUniquePtr` owns it, it is alive; once nothing owns it, `delete` has
+run and it is gone.
+
+| Call | Result | `p.get()` afterward | Underlying object | Why |
+|------|--------|----------------------|--------------------|-----|
+| `MyUniquePtr<int> p(new int(5));` | constructs `p` | address of the `int` (call it `A`) | alive, holds `5` | `p` now owns the object `new` just allocated |
+| `p.get()` | returns `A` | `A` (unchanged) | alive, holds `5` | `get()` only looks -- it does not transfer or affect ownership |
+| `*p` | `5` | `A` (unchanged) | alive, holds `5` | `operator*` dereferences the owned object; `p` still owns it afterward |
+| `p->` (on a struct member) | reads/writes that member | `A` (unchanged) | alive | `operator->` behaves like `get()` followed by `->` on the raw pointer |
+| `static_cast<bool>(p)` | `true` | `A` (unchanged) | alive | `operator bool` is `true` exactly when the owned pointer is non-null |
+| `int* raw = p.release();` | `raw == A` | `nullptr` | still alive, but **nobody owns it now** | `release()` hands ownership to the caller; `p` forgets the pointer entirely without deleting it -- `raw` must be `delete`d by hand or it leaks |
+| `p.reset(new int(9));` (starting from `p` owning `A`) | -- | address of the new `int` (call it `B`) | `A` is deleted, `B` is alive holding `9` | `reset(x)` deletes whatever `p` currently owns first, then takes ownership of `x` |
+| `p.reset();` (no argument, `p` owns `B`) | -- | `nullptr` | `B` is deleted | omitting the argument is the same as `reset(nullptr)` -- delete the old object, own nothing |
+| `p.reset();` again (already empty) | -- | `nullptr` | nothing to delete | resetting an already-empty `MyUniquePtr` is a no-op, not a crash -- there is no double-delete because `reset` compares against the pointer it already owns |
+| `MyUniquePtr<int> q(std::move(p));` (`p` owns `A` beforehand) | `q` now owns `A` | `p.get() == nullptr` | `A` still alive, owned by `q` now | move construction steals the pointer and nulls the source -- `p` is left in the valid-but-empty state, safe to destroy or reset |
+| `q = std::move(p);` where `q` owns `B` and `p` owns `A` | `q` now owns `A` | `p.get() == nullptr` | `B` is deleted, `A` is alive, owned by `q` | move assignment deletes whatever `q` used to own **before** stealing `p`'s pointer, so nothing leaks |
+| `p = std::move(p);` (self-move-assignment) | `p` still owns whatever it owned before | unchanged | unchanged, still alive | a correct move assignment checks `this == &other` and returns immediately; without that check, `p` would delete its own object out from under itself before "stealing" it back |
+| `p.swap(other);` | `p` and `other` trade owned pointers | `p.get()` becomes what `other.get()` was, and vice versa | both objects still alive, ownership swapped | `swap` exchanges the two raw pointers directly -- no allocation, no deletion, nothing is destroyed |
+
+## Worked example: a `MyUniquePtr<int>` through construct, move, reset, release
+
+This traces one sequence of calls end to end, the way you would step through
+it in a debugger. Read "owner" as "which variable's destructor will
+eventually call `delete` on this object" -- there must be exactly one owner
+(or zero) at every step, never two.
+
+```cpp
+MyUniquePtr<int> a(new int(10));      // step 1
+MyUniquePtr<int> b(std::move(a));     // step 2
+b.reset(new int(20));                 // step 3
+int* raw = b.release();               // step 4
+MyUniquePtr<int> c(raw);               // step 5
+```
+
+| Step | Code | `a.get()` | `b.get()` | Heap objects alive | Owner | Why |
+|------|------|-----------|-----------|---------------------|-------|-----|
+| 1 | `MyUniquePtr<int> a(new int(10));` | `ptr A` (holds `10`) | -- | `ptr A` | `a` | the constructor takes ownership of the pointer `new` just returned |
+| 2 | `MyUniquePtr<int> b(std::move(a));` | `nullptr` | `ptr A` | `ptr A` | `b` | move construction steals `a`'s pointer and nulls `a` out -- `a` is now a valid, empty `MyUniquePtr`; nothing double-owns `ptr A` |
+| 3 | `b.reset(new int(20));` | `nullptr` | `ptr B` (holds `20`) | `ptr B` (`ptr A` just got `delete`d) | `b` | `reset` deletes what `b` currently owns (`ptr A`) before taking ownership of the new pointer (`ptr B`) -- this is the only line in the whole trace where a `delete` actually runs |
+| 4 | `int* raw = b.release();` | `nullptr` | `nullptr` | `ptr B` (still alive, but unowned) | *nobody* (raw pointer `raw` in a plain `int*` variable) | `release()` hands `ptr B` to the caller as a plain pointer and forgets it -- `b` is now empty, and `ptr B` is temporarily not managed by any `MyUniquePtr` at all; if the program ended here without calling `delete raw` or wrapping it, `ptr B` would leak |
+| 5 | `MyUniquePtr<int> c(raw);` | `nullptr` | `nullptr` | `ptr B` | `c` | the constructor re-establishes RAII ownership over the raw pointer `release()` had cut loose -- `c`'s destructor will now `delete ptr B` automatically when `c` goes out of scope |
+
+At the end of this trace, `a` and `b` are both empty (safe to destroy or
+`reset` again with no effect), and `c` owns `ptr B` -- when `c`'s destructor
+runs, it deletes `ptr B` exactly once. Every heap object was deleted exactly
+once (step 3's `delete` of `ptr A`, and `c`'s eventual destructor deleting
+`ptr B`), and every step had exactly one owner or zero -- never two owners
+of the same object at once.
+
 ### Leak-checking
 
 Because this whole assignment is about getting deletion right, the grader
@@ -149,24 +203,82 @@ report on your machine than to find out about a leak from the grader.
 Implement every member declared in `my_unique_ptr.hpp`:
 
 - `explicit MyUniquePtr(T* p = nullptr)` -- takes ownership of `p`.
+  *Examples:* `MyUniquePtr<int> a(new int(5));` -- `a` now owns that `int`.
+  `MyUniquePtr<int> empty;` -- default argument `nullptr` means `empty` owns
+  nothing (`empty.get() == nullptr`, `static_cast<bool>(empty) == false`).
 - `~MyUniquePtr()` -- deletes the owned pointer, if any.
+  *Examples:* if `p` owns an `int`, its destructor calls `delete` on it
+  exactly once, whenever `p` goes out of scope. If `p` is empty (owns
+  `nullptr`), the destructor must **not** call `delete` on anything --
+  `delete nullptr` is technically legal C++ (a no-op), but the point is
+  there is nothing to free after `release()` was called, so a correct
+  destructor here does no work at all.
 - Copy constructor and copy assignment operator: `= delete`. (Already done
   for you -- do not remove these lines.)
 - Move constructor and move assignment operator: transfer ownership, leave
   the source owning nothing, and (for assignment) release whatever `*this`
   owned first. Move assignment must be self-move-safe.
+  *Examples:* `MyUniquePtr<int> b(std::move(a));` -- `b` now owns what `a`
+  owned; `a.get() == nullptr` afterward, even if `a` owned nothing to begin
+  with (moving from an already-empty `MyUniquePtr` just produces another
+  empty one -- no crash, no special case needed). `b = std::move(a);` where
+  `b` already owned something -- `b`'s old object must be deleted before
+  `b` takes `a`'s pointer, or it leaks. `p = std::move(p);` (self-move
+  assignment, same variable on both sides) must leave `p` owning exactly
+  what it owned before -- without an explicit `this == &other` check, `p`
+  would `delete` its own object and then try to "steal" the now-dangling
+  pointer from itself.
 - `T* get() const` -- returns the owned pointer without giving up ownership.
+  *Examples:* `p.get()` right after `MyUniquePtr<int> p(new int(5))` returns
+  that address, and calling `get()` again immediately after returns the
+  identical address -- `get()` never changes what `p` owns, no matter how
+  many times you call it.
 - `T* release()` -- returns the owned pointer and gives up ownership
   (`get()` becomes `nullptr` afterward).
+  *Examples:* `int* raw = p.release();` -- `raw` now equals what `p.get()`
+  used to return, `p.get()` is now `nullptr`, and the object itself is
+  still alive in memory (nothing was deleted) but now unmanaged -- the
+  caller must `delete raw` eventually or it leaks. Calling `release()` on
+  an already-empty `MyUniquePtr` is legal and returns `nullptr` -- there is
+  nothing to hand off, so there is nothing to do beyond that.
 - `void reset(T* p = nullptr)` -- deletes the current pointer, then owns
   `p`. Must be safe when called as `reset(get())`.
+  *Examples:* `p.reset();` on a `p` that already owns nothing is a no-op --
+  no `delete` runs, `p.get()` stays `nullptr`. `p.reset(p.get());` (the
+  self-reset trap) must leave `p` owning the exact same pointer it started
+  with and must **not** delete it -- your `reset` has to compare the
+  incoming pointer against the one already owned before deleting anything,
+  or this deletes the object out from under itself. Calling `reset()` twice
+  in a row (`p.reset(); p.reset();`) is safe both times -- the second call
+  is just another no-op on an already-empty `p`.
 - `void swap(MyUniquePtr& other)` -- exchanges ownership between `*this` and
   `other` (this assignment uses a **member** `swap`; do not add a
   non-member overload).
+  *Examples:* if `a` owns object `X` and `b` owns object `Y`, after
+  `a.swap(b)`, `a.get()` returns `Y`'s address and `b.get()` returns `X`'s
+  address -- no allocation or deletion happens, only the two internal
+  pointers trade places. `a.swap(a)` (swapping a `MyUniquePtr` with itself)
+  must leave `a` unchanged -- swapping a variable's own two fields with
+  themselves is always safe, but confirm your implementation does not
+  accidentally null it out.
 - `T& operator*() const`, `T* operator->() const` -- dereference/access the
   owned object. Undefined behavior if `get() == nullptr`, same as
   `std::unique_ptr`.
+  *Examples:* if `p` owns a `Point{3, 4}`, `(*p).x == 3` and `p->y == 4`;
+  writing through it (`p->x = 10;`) mutates the owned object in place, and
+  `p` still owns the same object afterward -- dereferencing never transfers
+  or affects ownership. Calling `*p` or `p->` when `p.get() == nullptr` is
+  undefined behavior (do not guard against it inside these operators --
+  the contract, like `std::unique_ptr`'s, is that the caller must not do
+  this).
 - `explicit operator bool() const` -- `true` if a non-null pointer is owned.
+  *Examples:* `static_cast<bool>(p)` is `true` right after
+  `MyUniquePtr<int> p(new int(5))`, becomes `false` right after
+  `p.release()` or `p.reset()` with no arguments, and is `false` for a
+  default-constructed `MyUniquePtr<int> p;` from the start. The `explicit`
+  keyword means `if (p)` still compiles (contexts that require a `bool`
+  convert implicitly) but `int x = p;` does not -- this prevents accidental
+  pointer-to-int conversions elsewhere in code that uses `MyUniquePtr`.
 
 ### Part 2 -- using `std::unique_ptr` (`std_smart_pointers.hpp`)
 

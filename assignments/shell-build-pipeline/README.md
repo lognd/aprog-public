@@ -56,10 +56,54 @@ To check whether a file is newer than another, use:
 Fill in `build.sh`. The script must:
 
 1. Run `g++ -E`, `g++ -S`, `g++ -c`, and `g++` (link) as separate invocations.
+   *Example:* `g++ -E greet.cpp -o greet.i` produces a 22,733-line expanded
+   file from a 5-line source file (see the worked example below).
+   *Example:* `g++ -S greet.i -o greet.s` produces 490 lines of assembly
+   containing the mangled symbol
+   `_Z5greetRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE`.
+   *Tricky case:* `g++ -c greet.s -o greet.o` only works if `greet.s` already
+   exists -- run it against a missing file (e.g. `g++ -c doesnotexist.s -o
+   x.o`) and the assembler reports `Error: can't open doesnotexist.s for
+   reading: No such file or directory` and exits nonzero; your script must not
+   treat that as success.
 2. Only run each stage if the input file is newer than the output file (or the output does not exist yet).
+   *Example:* on the very first run, no `.i`/`.s`/`.o` files exist yet, so
+   every stage's `[ ! -f "${src}.i" ]` check is true and every stage runs.
+   *Example:* run the script a second time with nothing changed -- every
+   `-nt` (newer-than) check is now false, so `g++` is not invoked again and
+   `greet.o`'s modification time is unchanged (verified with `stat -c %Y
+   greet.o` before and after).
+   *Tricky case:* `touch greet.cpp` and rerun -- only `greet.i`, `greet.s`,
+   `greet.o`, and the relinked `program` get newer modification times;
+   `main.o` and `math_utils.o` are untouched, because their own `.cpp` inputs
+   did not change (verified: after touching only `greet.cpp` and rebuilding,
+   `main.o`'s and `math_utils.o`'s timestamps were identical before and
+   after, while `greet.o` and `program` both got strictly newer timestamps).
 3. Redirect compiler error output to `build.log` using `2>` or `2>>`.
+   *Example:* a clean build's `build.log` contains just `22` -- the pipe
+   count from item 4 below, with zero compiler errors appended after it.
+   *Example (error case):* if `greet.cpp` has a syntax error (a missing
+   closing `}`), `build.log` gains real `g++` diagnostics, e.g.
+   `greet.cpp:4:35: error: expected '}' at end of input`, followed by
+   `Assembler messages: Error: can't open greet.s for reading` and
+   `/usr/bin/ld: cannot find greet.o: No such file or directory` -- because
+   the later stages still ran (nothing stops them) but had nothing to
+   consume, so each one failed loudly into `build.log` instead of silently;
+   `program` is correctly never produced.
+   *Empty-input case:* preprocessing a completely empty `.cpp` file still
+   succeeds and produces a small non-empty `.i` file (6 lines of boilerplate
+   `#` line markers, no error) -- an empty file is not the same as a missing
+   one.
 4. Use at least one pipe -- for example, count how many lines the preprocessor produces
    before you save the result to disk.
+   *Example:* `cat main.cpp greet.cpp math_utils.cpp | wc -l` prints `22`
+   (13 + 5 + 4 lines across the three source files), which the reference
+   script appends to `build.log` at the very start of the run.
+   *Example:* `g++ -E main.cpp | wc -l` prints `22733`+ lines (the expanded
+   size of just one translation unit) -- a different, much larger number
+   than the raw source line count, which is exactly the point of this
+   pipe: it makes the "preprocessing expands the file a lot" fact visible
+   as a single piped number instead of something you have to take on faith.
 
 The project has three translation units (a translation unit is one `.cpp`
 file plus everything it `#include`s -- the compiler runs the four stages
@@ -99,6 +143,53 @@ g++ -S greet.i -o /dev/stdout 2>/dev/null | grep -c 'call'
 ```
 
 These patterns -- pipe to `wc`, `grep`, redirect stderr -- belong in your `build.sh` too.
+
+---
+
+## Examples at a glance
+
+To make the four stages concrete, here is **one** small file, `greet.cpp` (5
+lines, shown below), and exactly what each stage produces for it when you run
+the reference build. Read this table first -- it is the whole pipeline in
+miniature, and every number below was produced by actually running the
+commands, not guessed.
+
+```cpp
+#include "greet.h"
+
+std::string greet(const std::string& name) {
+    return "Hello, " + name + "!";
+}
+```
+
+| Command | Output file | Size / shape | Why |
+|---------|-------------|--------------|-----|
+| `g++ -E greet.cpp -o greet.i` | `greet.i` | 22,733 lines (versus 5 lines of source) | preprocessing pulls in the ENTIRE contents of every header `greet.cpp` transitively `#include`s (here, `<string>` drags in a huge chunk of the C++ standard library headers), so the expanded file balloons even though your own code barely changed |
+| `g++ -S greet.i -o greet.s` | `greet.s` | 490 lines of text, containing the mangled symbol `_Z5greetRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE` | compiling boils the huge preprocessed file down to just the assembly instructions actually needed for the functions greet.cpp defines -- the mangled name is how C++ encodes `greet`'s parameter types into a unique linker symbol |
+| `g++ -c greet.s -o greet.o` | `greet.o` | an ELF relocatable object file (binary, not human-readable) | assembling turns the text instructions into raw machine bytes, but the file is not runnable yet -- it still has unresolved references to things like `std::string`'s constructor that live in OTHER object files |
+| `g++ main.o greet.o math_utils.o -o program` | `program` | an ELF executable | linking is what actually resolves those cross-file references and produces something the OS can run directly |
+| `cat main.cpp greet.cpp math_utils.cpp \| wc -l` | (piped to `wc -l`, then appended to `build.log`) | `22` | this is the "at least one pipe" requirement -- `main.cpp` is 13 lines, `greet.cpp` is 5, `math_utils.cpp` is 4, and `13 + 5 + 4 = 22` |
+
+## Worked example: `greet.cpp` through all four stages, step by step
+
+This is the single most important thing to understand in the assignment, so
+here is every step spelled out for one translation unit, `greet.cpp`. (A
+translation unit is one `.cpp` file plus everything it `#include`s -- see the
+Task section below.)
+
+| Step | Command | Consumes | Produces | Reason |
+|------|---------|----------|----------|--------|
+| 1. Preprocess | `g++ -E greet.cpp -o greet.i` | `greet.cpp` (5 lines) and everything `greet.h` and `<string>` pull in | `greet.i` (22,733 lines of plain C++ text -- `#include` lines are gone, replaced by the literal contents of the included files) | the preprocessor's whole job is textual substitution: expand `#include`, expand macros, strip comments -- nothing here understands C++ semantics yet |
+| 2. Compile | `g++ -S greet.i -o greet.s` | `greet.i` | `greet.s` (490 lines of human-readable assembly, containing the function `_Z5greetRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE`) | `cc1plus` parses the expanded C++, understands types and control flow, and emits the exact CPU instructions that implement `greet` -- this is where "C++ becomes assembly" happens |
+| 3. Assemble | `g++ -c greet.s -o greet.o` | `greet.s` | `greet.o` (a 9,272-byte ELF relocatable object file -- confirmed with `file greet.o`) | the assembler translates human-readable instruction mnemonics into the raw machine-code bytes the CPU actually executes, but leaves placeholders ("relocations") for anything defined in another file, like `std::string`'s internals |
+| 4. Link | `g++ main.o greet.o math_utils.o -o program` | `main.o`, `greet.o`, `math_utils.o` | `program` (a 22,816-byte executable) | the linker is the only stage that looks at ALL three object files together -- it resolves every placeholder left by step 3 (for example, `main.o`'s call into `greet.o`'s `greet` function) and produces one runnable binary |
+| Run | `./program` | `program` | prints:<br>`Hello, world!`<br>`answer: 42`<br>`passphrase: STAGES_COMPLETE` | this exact three-line output, verified by actually running the built binary, is what every stage above was building toward |
+
+Notice how the file only gets SMALLER after preprocessing: 22,733 lines of
+expanded text shrink to 490 lines of assembly, because compiling throws away
+everything that was only needed to understand types (declarations, template
+definitions never instantiated, etc.) and keeps only the instructions this
+one file's functions actually need.
 
 ---
 

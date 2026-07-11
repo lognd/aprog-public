@@ -170,6 +170,77 @@ for single values.
 
 ---
 
+## Examples at a glance
+
+To make all nine functions concrete, here is **one** representative matrix,
+`m`, with 3 rows and 4 columns, and what every function produces for it.
+Read this table first -- it is the whole assignment in miniature.
+
+```
+Matrix m (rows = 3, cols = 4):
+  [ 1  2  3  4 ]   row 0
+  [ 5  6  7  8 ]   row 1
+  [ 9 10 11 12 ]   row 2
+
+Flat storage:
+  index:  0  1  2  3  4  5  6  7  8  9 10 11
+  value:  1  2  3  4  5  6  7  8  9 10 11 12
+```
+
+| Call | Returns / effect | Why |
+|------|-------------------|-----|
+| `mat_get(m, 4, 0, 0)`        | `1`  | offset `0*4+0 = 0`, the very first flat element |
+| `mat_get(m, 4, 1, 2)`        | `7`  | offset `1*4+2 = 6`, and flat index 6 holds `7` |
+| `mat_get(m, 4, 2, 3)`        | `12` | offset `2*4+3 = 11`, the last flat element |
+| `mat_set(m, 4, 1, 2, 99)` then `mat_get(m, 4, 1, 2)` | `99` | `mat_set` writes to the same offset formula `mat_get` reads from -- the two functions are mirror images |
+| `mat_fill(m, 3, 4, 0)` then any `mat_get(m, 4, r, c)` | `0`  | `mat_fill` overwrites all `rows*cols = 12` flat elements, so every subsequent read returns the fill value |
+| `mat_add(m, b, dst, 3, 4)` where `b` is all `100`s | `dst` = `{101,102,...,112}` row-major | element-wise: `dst[i] = m[i] + b[i]` on the flat array, no need to know rows/cols separately from the total count |
+| `mat_transpose(m, dst, 3, 4)` | `dst` (4 rows x 3 cols) = rows `{1,5,9}`, `{2,6,10}`, `{3,7,11}`, `{4,8,12}` | `dst` has `cols` rows and `rows` columns -- the ORIGINAL COLUMNS of `m` become the rows of `dst` |
+| `mat_row_sum(m, 4, 0)`       | `10` | `1+2+3+4` |
+| `mat_row_sum(m, 4, 2)`       | `42` | `9+10+11+12` |
+| `mat_col_sum(m, 3, 4, 0)`    | `15` | `1+5+9`, stepping by `cols` each row |
+| `mat_col_sum(m, 3, 4, 3)`    | `24` | `4+8+12`, the last column |
+| `mat_print(m, 3, 4)`         | prints `1 2 3 4` / `5 6 7 8` / `9 10 11 12` (three lines) | one row per line, single spaces between elements, no trailing space |
+
+`mat_is_symmetric` requires a SQUARE matrix, so `m` above (3x4) does not
+qualify -- here is a separate 3x3 matrix `s` for it:
+
+```
+s (n = 3):
+  [ 1  2  3 ]
+  [ 2  4  5 ]
+  [ 3  5  6 ]
+```
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `mat_is_symmetric(s, 3)` | `true`  | `s[0][1]==s[1][0]==2`, `s[0][2]==s[2][0]==3`, `s[1][2]==s[2][1]==5` -- every mirrored pair matches |
+| `mat_is_symmetric(m2, 2)` where `m2 = {1, 2, 3, 4}` | `false` | `m2[0][1] = 2` but `m2[1][0] = 3` -- they differ, so the function returns `false` on this first mismatched pair |
+| `mat_is_symmetric(m3, 1)` where `m3 = {5}` | `true`  | a 1x1 matrix has no off-diagonal pairs to compare, so it is trivially symmetric |
+
+## Worked example: watch `mat_get(m, 4, 2, 3)` turn into an address, step by step
+
+This is the single most important thing to understand in the assignment, so
+here is every step spelled out. We are reading row `r = 2`, column `c = 3` of
+the same matrix `m` from above (3 rows, 4 columns, flat values `1..12`).
+Suppose the flat array starts at address `m = 0x1000`, and (as on almost
+every real machine) `sizeof(int) == 4` bytes.
+
+| Step | Expression | Computes to | Why |
+|------|------------|-------------|-----|
+| 1. Row offset | `r * cols` = `2 * 4` | `8` | rows 0 and 1 have 4 elements each, so row 2's first element is 8 flat positions past the start |
+| 2. Column offset | `r * cols + c` = `8 + 3` | `11` | within row 2, column 3 is 3 more positions past that row's start |
+| 3. Pointer arithmetic | `m + 11` | address `0x1000 + 11*4` = `0x102C` | `m + 11` in C++ means "11 `int`s past where `m` points," not "11 bytes past" -- the compiler automatically scales the offset by `sizeof(int)`, which is exactly why raw pointer arithmetic is type-aware |
+| 4. Dereference | `*(m + 11)` | `12` | reading the 4 bytes stored at address `0x102C` yields the `int` value `12` -- row 2, column 3 of the matrix |
+
+So `mat_get(m, 4, 2, 3)` returns `12`, matching flat index 11 in the array
+above. Notice this is exactly the offset formula from the Background
+section (`r * cols + c`) computed as pointer arithmetic instead of `[]` --
+`*(m + r*cols + c)` and `m[r*cols + c]` produce identical machine code, but
+only the pointer-arithmetic form is legal in this assignment's `matrix.cpp`.
+
+---
+
 ## Task
 
 Submit a single file `matrix.cpp` that implements the nine functions declared
@@ -182,19 +253,35 @@ Return the value at row `r`, column `c` of matrix `m`.
 `cols` is the number of columns per row.
 You may assume `r` and `c` are in bounds.
 The `const int*` parameter signals that this function is read-only.
+*Example:* for `m = {1,2,3,4,5,6,7,8,9,10,11,12}` (3 rows, 4 cols),
+`mat_get(m, 4, 0, 0) == 1`; `mat_get(m, 4, 1, 2) == 7`;
+`mat_get(m, 4, 2, 3) == 12` (the last element).
 
 **`void mat_set(int* m, int cols, int r, int c, int val)`**
 Set the element at row `r`, column `c` to `val`.
 No return value; the matrix is modified in place.
+*Example:* `mat_set(m, 4, 1, 2, 99)` followed by `mat_get(m, 4, 1, 2)`
+returns `99` (it overwrote the `7` from the example above); `mat_set(m, 4,
+0, 3, -1)` followed by `mat_get(m, 4, 0, 3)` returns `-1` (negative values
+are stored the same way as positive ones -- there is nothing special
+about them).
 
 **`void mat_fill(int* m, int rows, int cols, int val)`**
 Set every element in the matrix to `val`.
 Both `rows` and `cols` are needed to know the total element count.
+*Example:* `mat_fill(m, 3, 4, 0)` on the 12-element matrix above sets
+all 12 flat elements to `0`, so every subsequent `mat_get(m, 4, r, c)`
+returns `0`; `mat_fill(m, 1, 1, 7)` on a 1x1 matrix sets its single
+element to `7` (the smallest possible matrix still works -- `rows*cols`
+is just `1`).
 
 **`void mat_add(const int* a, const int* b, int* dst, int rows, int cols)`**
 Element-wise addition: `dst[r][c] = a[r][c] + b[r][c]` for every cell.
 `a` and `b` are read-only; `dst` is written.
 All three matrices have the same dimensions.
+*Example:* `a = {1,2,3,4}`, `b = {10,20,30,40}` (both 2x2), `mat_add(a, b,
+dst, 2, 2)` gives `dst = {11,22,33,44}`; if every element of `b` is `0`,
+`dst` ends up identical to `a` (adding zero changes nothing).
 
 **`void mat_transpose(const int* src, int* dst, int rows, int cols)`**
 Write the transpose of `src` into `dst`.
@@ -206,24 +293,45 @@ This is the most common wrong-answer trap in this assignment.  Think carefully:
 if `src` has 3 rows and 5 columns, `dst` has 5 rows and 3 columns.  The offset
 formula for `dst` uses `rows` (the original row count) as its column count,
 not `cols`.
+*Example:* square case: `src = {1,2,3,4}` (2x2), `mat_transpose(src, dst,
+2, 2)` gives `dst = {1,3,2,4}` (rows `{1,3}` and `{2,4}`). Non-square
+case: `src = {1,2,3,4,5,6}` (2 rows, 3 cols), `mat_transpose(src, dst, 2,
+3)` gives `dst = {1,4,2,5,3,6}` (3 rows, 2 cols: `{1,4}`, `{2,5}`,
+`{3,6}`). For the 3x4 matrix `m` from the examples above, `mat_transpose(m,
+dst, 3, 4)` gives a 4x3 result with rows `{1,5,9}`, `{2,6,10}`,
+`{3,7,11}`, `{4,8,12}` -- the original COLUMNS of `m` become the rows of
+`dst`.
 
 **`int mat_row_sum(const int* m, int cols, int r)`**
 Return the sum of all elements in row `r`.
 Only `cols` is needed, not `rows`, because you only access one row.
+*Example:* for the 3x4 matrix `m` above, `mat_row_sum(m, 4, 0) == 10`
+(`1+2+3+4`); `mat_row_sum(m, 4, 2) == 42` (`9+10+11+12`, the last row).
 
 **`int mat_col_sum(const int* m, int rows, int cols, int c)`**
 Return the sum of all elements in column `c`.
 Both `rows` and `cols` are needed to step from one row to the next.
+*Example:* for the same 3x4 matrix `m`, `mat_col_sum(m, 3, 4, 0) == 15`
+(`1+5+9`); `mat_col_sum(m, 3, 4, 3) == 24` (`4+8+12`, the last column).
 
 **`bool mat_is_symmetric(const int* m, int n)`**
 `m` is a square `n x n` matrix.
 Return `true` if `m[r][c] == m[c][r]` for all `r` and `c`.
 Return `false` on the first pair that differs.
+*Example:* `s = {1,2,3,2,4,5,3,5,6}` (3x3), `mat_is_symmetric(s, 3) ==
+true`; `m2 = {1,2,3,4}` (2x2), `mat_is_symmetric(m2, 2) == false`
+(`m2[0][1] = 2` but `m2[1][0] = 3`); `m3 = {5}` (1x1),
+`mat_is_symmetric(m3, 1) == true` (a single element has no off-diagonal
+pair to fail, so it is trivially symmetric).
 
 **`void mat_print(const int* m, int rows, int cols)`**
 Print the matrix, one row per line, elements separated by spaces.
 The last element on a line has no trailing space.
 Use `printf` or `std::cout`; either is fine.
+*Example:* `mat_print(m, 3, 4)` on the 3x4 matrix above prints exactly
+three lines, `"1 2 3 4"`, `"5 6 7 8"`, `"9 10 11 12"`, each followed by a
+newline and none with a trailing space; `mat_print(row, 1, 3)` on a
+single-row matrix `row = {7,8,9}` prints one line, `"7 8 9"`.
 
 Example for a 2x3 matrix with values 1-6:
 ```

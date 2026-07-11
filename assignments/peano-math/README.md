@@ -24,6 +24,49 @@ place.
   by calling the function again on a smaller piece of the problem) for
   arithmetic functions
 
+## Examples at a glance
+
+To make all four functions concrete, here is **one** representative pair of
+inputs, `a = 2` and `b = 3`, with what each function returns. Read this
+table first -- it is the whole assignment in miniature.
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `successor(2)` | `3` | the successor of a number is just that number plus one |
+| `add(2, 3)` | `5` | adding is applying `successor` to `2`, three times in a row (once per unit of `b`) |
+| `multiply(2, 3)` | `6` | multiplying is adding `2` to itself, three times: `2 + 2 + 2 = 6` |
+| `exponentiate(2, 3)` | `8` | raising to a power is multiplying `2` by itself, three times: `2 * 2 * 2 = 8` |
+| `add(0, 5)` | `5` | adding zero changes nothing -- the edge case `add(0, x) == x` |
+| `multiply(0, 5)` | `0` | multiplying by zero is always zero, no matter how large the other number is |
+| `exponentiate(5, 0)` | `1` | any number to the power zero is `1` -- this is a base case, not something computed by repeated multiplication |
+
+## Worked example: watch `add(2, 3)` run, step by step
+
+This is the single most important thing to understand in the assignment, so
+here is every recursive call spelled out. We are computing `add(2, 3)`,
+which the reference implementation defines as: if `b == 0`, return `a`
+directly (the base case); otherwise, return `add(successor(a), b - 1)` (the
+recursive case) -- trade one unit off of `b` for one application of
+`successor` on `a`, and try again with a smaller problem.
+
+| Call | Is `b == 0`? | Action | Reason |
+|------|--------------|--------|--------|
+| `add(2, 3)` | no (`b = 3`) | calls `add(successor(2), 2)` = `add(3, 2)` | `b` is not yet zero, so trade one unit of `b` for one `successor` on `a` |
+| `add(3, 2)` | no (`b = 2`) | calls `add(successor(3), 1)` = `add(4, 1)` | same rule -- `b` is still not zero |
+| `add(4, 1)` | no (`b = 1`) | calls `add(successor(4), 0)` = `add(5, 0)` | same rule -- one unit of `b` still remains |
+| `add(5, 0)` | **yes** (`b = 0`) | returns `a`, which is `5` | base case reached -- no more `successor` calls needed, `a` already holds the answer |
+
+The recursion bottoms out at `add(5, 0)`, which returns `5` directly. That
+`5` is then handed back up through every call that was waiting on it --
+`add(4, 1)` returns `5`, `add(3, 2)` returns `5`, and finally the original
+call `add(2, 3)` returns **`5`**. Notice that all the real work happened in
+`successor`: three calls to it (turning `2` into `3`, `3` into `4`, and `4`
+into `5`) is the entire mechanism behind "`2 + 3`". `multiply` and
+`exponentiate` work the same way one level up: `multiply(a, b)` peels one
+unit off `b` per call and hands off to `add`, and `exponentiate(base, exp)`
+peels one unit off `exp` per call and hands off to `multiply` -- the same
+"peel off one unit, recurse, then combine" shape all the way up the chain.
+
 ## Task
 
 Implement the four functions declared in `peano.hpp` inside `peano.cpp`.
@@ -43,6 +86,29 @@ int multiply(int a, int b);
 // base^0 == 1 for all base.
 int exponentiate(int base, int exp);
 ```
+
+Each function's behavior, spelled out with concrete examples:
+
+- `successor(n)` -- returns `n + 1`. This is the ONLY place the `+` operator
+  is allowed to appear anywhere in the file.
+  *Example:* `successor(0) == 1`; `successor(1) == 2`; `successor(9) == 10`.
+- `add(a, b)` -- returns `a + b`, computed by calling `successor` on `a`
+  exactly `b` times (see the worked example above for the full trace).
+  *Example:* `add(2, 3) == 5`; `add(0, 5) == 5` (adding zero changes
+  nothing); `add(5, 0) == 5` (the base case -- `b` is already zero, so `a`
+  is returned immediately with no `successor` calls at all).
+- `multiply(a, b)` -- returns `a * b`, computed by adding `a` to itself
+  `b` times.
+  *Example:* `multiply(2, 3) == 6`; `multiply(0, 5) == 0` (multiplying by
+  zero is always zero, regardless of the other number); `multiply(1, 7)
+  == 7` (multiplying by one is `add`ing `a` to zero exactly once).
+- `exponentiate(base, exp)` -- returns `base` raised to the power `exp`,
+  computed by multiplying `base` by itself `exp` times.
+  *Example:* `exponentiate(2, 3) == 8`; `exponentiate(5, 0) == 1` (the
+  base case -- ANY base raised to the power zero is `1`, including
+  `exponentiate(0, 0) == 1`); `exponentiate(3, 1) == 3` (raising to the
+  power one just multiplies `base` by the identity result of the
+  zero-power base case).
 
 ### Contracts
 

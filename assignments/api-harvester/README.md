@@ -24,6 +24,65 @@ parsing a response.
   pointed at a real HTTP client with no changes to the logic itself
 - Read and apply type hints on a `Callable` parameter
 
+## Examples at a glance: every function on one dataset
+
+To make the five functions concrete, here is **one** small fake user
+dataset -- 3 users, split across pages of 2 -- and what every function
+returns for it. Read this table first; it is the whole assignment in
+miniature.
+
+```
+users = [
+    {"id": 1, "name": "ada", "active": True},
+    {"id": 2, "name": "bo",  "active": False},
+    {"id": 3, "name": "cy",  "active": True},
+]
+```
+
+The fake `fetch` behind this dataset serves two kinds of path:
+`/users/<id>` (one profile, or a 404 if the id does not exist), and
+`/users?page=N` (a page of at most 2 items, with a `"next"` link to the
+following page, or `None` once there is no more data). With a page
+size of 2 and 3 users total, page 1 holds `ada` and `bo` (with
+`"next": "/users?page=2"`), and page 2 holds just `cy` (with
+`"next": None`).
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `get_user(fetch, 1)` | `{"id": 1, "name": "ada", "active": True}` | user `1` exists, so the profile dict comes back as-is |
+| `get_user(fetch, 999)` | `None` | no user has id `999`, so `fetch` reports a 404, and `get_user` turns that into `None` -- not a crash |
+| `list_all_users(fetch)` | `[{"id": 1, ...}, {"id": 2, ...}, {"id": 3, ...}]` | page 1 gives `ada` and `bo` plus `next = "/users?page=2"`; page 2 gives `cy` plus `next = None`, so the loop stops after exactly 2 fetches |
+| `count_active(fetch)` | `2` | of the three users, `ada` and `cy` have `"active": True`; `bo` does not |
+| `merge_profiles(fetch, [1, 999, 3])` | `{1: {"id": 1, ...}, 3: {"id": 3, ...}}` | id `1` and `3` exist and are included; id `999` is silently skipped because `get_user` returned `None` for it |
+| `safe_get(fetch, "/users/1", retries=3)` where the first 2 calls return `(500, None)` and the 3rd returns `(200, {...})` | `{"id": 1, "name": "ada", "active": True}` | 2 server errors get retried, the 3rd attempt succeeds, so `safe_get` returns that body after exactly 3 total calls |
+| `safe_get(fetch, "/users/1", retries=2)` where every call returns `(500, None)` | `None` | `retries=2` allows 2 EXTRA attempts beyond the first (3 total); all 3 come back `>= 500`, so every attempt is exhausted and the function gives up |
+| `safe_get(fetch, "/users/999", retries=3)` where the call returns `(404, None)` | `None`, after exactly **1** call | a 4xx is never retried -- `safe_get` returns immediately instead of burning any of its `retries` budget |
+
+## Worked example: watch `list_all_users` and `count_active` run, page by page
+
+This is the pattern most students get wrong on the first try (stopping
+after page 1), so here is every step spelled out, using the same
+3-user dataset above with a page size of 2.
+
+`list_all_users(fetch)`:
+
+| Step | Path requested | Body returned | What happens |
+|------|-----------------|---------------|---------------|
+| 1 | `/users?page=1` | `{"items": [ada, bo], "next": "/users?page=2"}` | `ada` and `bo` are appended to the running list; `next` is NOT `None`, so the loop keeps going |
+| 2 | `/users?page=2` | `{"items": [cy], "next": None}` | `cy` is appended; `next` IS `None`, so the loop stops here |
+| end | -- | -- | the running list is `[ada, bo, cy]` -- every user across both pages, in order |
+
+If the loop had stopped after step 1 (a common bug), it would have
+silently returned only `[ada, bo]` and dropped `cy` -- no error, no
+crash, just a wrong (too-short) answer. This is why pagination bugs are
+dangerous: they do not look like bugs, they look like "a smaller than
+expected but plausible-looking result."
+
+`count_active(fetch)` reuses exactly the list above instead of
+re-fetching anything itself: it walks `[ada, bo, cy]`, checks each
+user's `"active"` key, and counts `True` for `ada` and `cy` but not
+`bo` -- giving `2`.
+
 ## Task
 
 Implement five functions in a file named `harvester.py`. Every
@@ -65,11 +124,11 @@ instead of a hardcoded library.
 
 | Function | Behavior |
 |----------|----------|
-| `get_user(fetch, user_id)` | `GET /users/<user_id>`. Return the parsed profile dict, or `None` on a 404. |
-| `list_all_users(fetch)` | Fetch every user by following pagination starting at `/users?page=1`. Each page's body looks like `{"items": [...], "next": "/users?page=N"}` or `{"items": [...], "next": None}`. Keep requesting `next` until it is `None`, collecting every item along the way. |
-| `count_active(fetch)` | Paginate through every user (reuse `list_all_users`) and count how many have `"active": True`. |
-| `safe_get(fetch, path, retries)` | Call `fetch(path)`. If the status is `>= 500`, retry, up to `retries` EXTRA attempts beyond the first (so `retries=2` means at most 3 total calls). Never retry a 4xx -- return its body immediately. Return `None` if every attempt came back `>= 500`. |
-| `merge_profiles(fetch, ids)` | Call `get_user` for every id in `ids`. Return a dict mapping `id -> profile` for every id that was found, silently skipping any id that came back 404. |
+| `get_user(fetch, user_id)` | `GET /users/<user_id>`. Return the parsed profile dict, or `None` on a 404.<br>*Examples:* `get_user(fetch, 1) == {"id": 1, "name": "ada", "active": True}` (found)<br>`get_user(fetch, 999) is None` (404 -- id does not exist)<br>`get_user(fetch, 0) is None` on a `fetch` where nothing has id `0` (absent, same as any other 404 -- there is nothing special about id `0`) |
+| `list_all_users(fetch)` | Fetch every user by following pagination starting at `/users?page=1`. Each page's body looks like `{"items": [...], "next": "/users?page=N"}` or `{"items": [...], "next": None}`. Keep requesting `next` until it is `None`, collecting every item along the way.<br>*Examples:* on the 3-user, page-size-2 dataset above, `list_all_users(fetch)` makes 2 calls (`page=1` then `page=2`) and returns all 3 users in order<br>on an empty dataset (page 1's body is `{"items": [], "next": None}`), `list_all_users(fetch) == []` -- one call, empty list, not an error<br>on a dataset that fits entirely on page 1 (`"next": None` already on the first call), `list_all_users(fetch)` makes exactly 1 call, never a second |
+| `count_active(fetch)` | Paginate through every user (reuse `list_all_users`) and count how many have `"active": True`.<br>*Examples:* on the 3-user dataset above (`ada` and `cy` active, `bo` not), `count_active(fetch) == 2`<br>on a dataset where no user is active, `count_active(fetch) == 0` -- not an error, just zero<br>on an empty dataset, `count_active(fetch) == 0` as well |
+| `safe_get(fetch, path, retries)` | Call `fetch(path)`. If the status is `>= 500`, retry, up to `retries` EXTRA attempts beyond the first (so `retries=2` means at most 3 total calls). Never retry a 4xx -- return its body immediately. Return `None` if every attempt came back `>= 500`.<br>*Examples:* first call already returns `(200, body)` with `retries=3` -- `safe_get` returns `body` after exactly **1** call, no retries spent<br>first 2 calls return `(500, None)`, 3rd returns `(200, body)`, `retries=3` -- returns `body` after exactly **3** calls<br>every call returns `(500, None)`, `retries=2` -- makes exactly **3** total calls (1 + 2 extra), then returns `None`<br>first call returns `(404, None)`, `retries=3` -- returns `None` after exactly **1** call; a 4xx never gets retried, no matter how large `retries` is |
+| `merge_profiles(fetch, ids)` | Call `get_user` for every id in `ids`. Return a dict mapping `id -> profile` for every id that was found, silently skipping any id that came back 404.<br>*Examples:* `merge_profiles(fetch, [1, 999, 3])` on the 3-user dataset above `== {1: {"id": 1, ...}, 3: {"id": 3, ...}}` -- note `999` is missing from the result entirely, not mapped to `None`<br>`merge_profiles(fetch, [])` returns `{}` -- an empty id list gives an empty dict, no calls made<br>`merge_profiles(fetch, [999])` where `999` does not exist returns `{}` -- every id 404'd, so nothing is added |
 
 ### A tiny fake `fetch` you can test with
 

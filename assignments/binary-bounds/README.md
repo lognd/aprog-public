@@ -85,36 +85,110 @@ index minus `first_occurrence`'s index, plus one.
 
 ---
 
+## Examples: every function on one array
+
+To make the six functions concrete, here is **one** sorted array, with the
+index of every element written above it, and what each function returns
+for it. Read this table first -- it is the whole assignment in miniature.
+
+```
+ index:   0   1   2   3   4   5   6   7
+ v     = { 1,  3,  3,  3,  5,  7,  7,  9 }
+```
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `linear_search(v, 7)`      | `5`  | the first `7` sits at index 5 (found by scanning left to right) |
+| `binary_search_idx(v, 3)`  | `1`, `2`, or `3` | any index holding a `3` is acceptable -- this function does not promise which |
+| `first_occurrence(v, 3)`   | `1`  | of the three `3`s (indices 1, 2, 3), the FIRST is at index 1 |
+| `last_occurrence(v, 3)`    | `3`  | of the three `3`s, the LAST is at index 3 |
+| `count_of(v, 3)`           | `3`  | there are three `3`s; note `3 - 1 + 1 = 3` (last index - first index + 1) |
+| `count_of(v, 4)`           | `0`  | there are no `4`s at all |
+| `insert_position(v, 4)`    | `4`  | a `4` would go between the last `3` (index 3) and the first `5` (index 4), i.e. at index 4 |
+| `insert_position(v, 0)`    | `0`  | `0` is smaller than everything, so it goes at the very front |
+| `insert_position(v, 10)`   | `8`  | `10` is larger than everything, so it goes at the very end (`v.size()` is 8) |
+| `first_occurrence(v, 4)`   | `-1` | `4` is not present, so every search function returns `-1` |
+
+## Worked example: watch `first_occurrence(v, 3)` run, step by step
+
+This is the single most important thing to understand in the assignment, so
+here is every step spelled out. We are searching the same array
+`v = {1, 3, 3, 3, 5, 7, 7, 9}` for the FIRST index holding a `3`.
+
+We track a half-open range `[lo, hi)` (`lo` is a real candidate index, `hi`
+is one past the last candidate) and repeat while `lo < hi`. The trick for
+"first occurrence": whenever `v[mid]` is **greater than or equal to** the
+target, the earliest match must be at `mid` or to its left, so we move `hi`
+down to `mid`; otherwise (`v[mid]` is smaller) the match must be to the
+right, so we move `lo` up to `mid + 1`. The midpoint is always
+`mid = lo + (hi - lo) / 2`.
+
+| Step | `lo` | `hi` | `mid` | `v[mid]` | Compare to target `3` | Action |
+|------|------|------|-------|----------|-----------------------|--------|
+| start | 0 | 8 | 4 | `v[4] = 5` | `5 >= 3` -> match is at `mid` or left | `hi = 4` |
+| 2 | 0 | 4 | 2 | `v[2] = 3` | `3 >= 3` -> match is at `mid` or left | `hi = 2` |
+| 3 | 0 | 2 | 1 | `v[1] = 3` | `3 >= 3` -> match is at `mid` or left | `hi = 1` |
+| 4 | 0 | 1 | 0 | `v[0] = 1` | `1 < 3`  -> match is to the right    | `lo = 1` |
+| end | 1 | 1 | -- | -- | `lo == hi`, loop stops | `lo` is `1` |
+
+The loop ends with `lo == 1`. Now check: is `v[1]` actually equal to `3`?
+Yes (`v[1] == 3`), so `first_occurrence` returns **`1`**. (If `v[lo]` had
+NOT equaled the target -- or if `lo` had run off the end of the array --
+that would mean the target is absent, and the function returns `-1`.)
+
+Notice the loop kept shrinking even after it first saw a `3` at index 2,
+instead of stopping there. That is the entire difference between
+`first_occurrence` and `binary_search_idx`: the plain search is allowed to
+stop at the first `3` it stumbles on; `first_occurrence` must keep going
+left to prove it has the earliest one. `last_occurrence` is the mirror
+image -- it treats `v[mid] == target` as "too small" and moves `lo` up,
+chasing the rightmost match instead.
+
+---
+
 ## Task
 
 Implement every function declared in `binary_bounds.hpp`, inside the
 `bbounds` namespace. `v` is always already sorted in ascending order for
 every function below (nothing in this assignment sorts anything itself).
+Each bullet ends with a concrete example using the array
+`v = {1, 3, 3, 3, 5, 7, 7, 9}` from above.
 
 - `linear_search(v, x)` -> `long` -- the index of the first element
   equal to `x`, found by an ordinary O(n) front-to-back scan (this one
   does not need to be O(log n) -- it exists as the baseline contrast for
   the rest of the assignment), or `-1` if absent.
+  *Example:* `linear_search(v, 7) == 5`; `linear_search(v, 2) == -1`.
 - `binary_search_idx(v, x)` -> `long` -- the index of SOME element equal
   to `x`, found in O(log n) time, or `-1` if absent. If `x` appears more
   than once, any one matching index is acceptable.
+  *Example:* `binary_search_idx(v, 5) == 4`; `binary_search_idx(v, 3)` is
+  any of `1`, `2`, `3`; `binary_search_idx(v, 8) == -1`.
 - `first_occurrence(v, x)` -> `long` -- the index of the FIRST (lowest
   index) element equal to `x`, in O(log n) time, or `-1` if absent.
+  *Example:* `first_occurrence(v, 3) == 1`; `first_occurrence(v, 7) == 5`;
+  `first_occurrence(v, 4) == -1`.
 - `last_occurrence(v, x)` -> `long` -- the index of the LAST (highest
   index) element equal to `x`, in O(log n) time, or `-1` if absent.
+  *Example:* `last_occurrence(v, 3) == 3`; `last_occurrence(v, 7) == 6`;
+  `last_occurrence(v, 4) == -1`.
 - `count_of(v, x)` -> `long` -- how many elements equal `x`, built from
   `first_occurrence`/`last_occurrence` (or the same underlying bound
   logic) in O(log n) time -- not a scan. `0` if `x` is absent or `v` is
   empty.
+  *Example:* `count_of(v, 3) == 3`; `count_of(v, 7) == 2`;
+  `count_of(v, 4) == 0`.
 - `insert_position(v, x)` -> `long` -- the index `x` would need to be
   inserted at to keep `v` sorted, in O(log n) time. Works for values not
   present in `v` too: `0` if `x` is smaller than every element,
   `v.size()` if `x` is larger than every element. If `x` is already
   present, this matches `first_occurrence`'s answer.
+  *Example:* `insert_position(v, 4) == 4`; `insert_position(v, 0) == 0`;
+  `insert_position(v, 10) == 8`; `insert_position(v, 3) == 1`.
 
-Every function on an empty `v` returns the documented empty-input
-value (`-1` for the search functions, `0` for `count_of` and
-`insert_position`) -- see the comment above each declaration in
+Every function on an empty `v` (`v = {}`) returns the documented
+empty-input value: `-1` for the search functions, `0` for `count_of` and
+`insert_position` -- see the comment above each declaration in
 `binary_bounds.hpp` for the exact contract.
 
 ---

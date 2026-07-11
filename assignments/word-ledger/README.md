@@ -66,7 +66,80 @@ matter" functions return `std::unordered_map`.
 
 Every function in this assignment treats words **case-sensitively**:
 `"The"` and `"the"` are counted as two different words. Nothing lowercases
-your input for you.
+your input for you. A consequence students often trip on: `std::map`'s
+"sorted order" means sorted by **byte value** (ASCII), not dictionary
+order, and every uppercase letter has a SMALLER ASCII value than every
+lowercase letter (`'A'` is 65, `'a'` is 97). So a word starting with an
+uppercase letter, like `"Cat"`, sorts BEFORE every word starting with a
+lowercase letter, including `"bird"` -- `"Cat"` is not anywhere near where
+a dictionary would put it. See the worked example below for this exact
+case.
+
+---
+
+## Examples at a glance
+
+To make all six functions concrete, here is **one** representative input,
+`words`, with what every function returns for it. Read this table first
+-- it is the whole assignment in miniature.
+
+```
+ index:  0      1      2      3       4      5      6
+ words = {"cat", "dog", "cat", "bird", "dog", "cat", "Cat"}
+```
+
+A second vector, `b = {"dog", "fish", "dog"}`, is used for the two
+functions that take two inputs.
+
+| Call | Returns | Why |
+|------|---------|-----|
+| `word_frequencies(words)` | `{"Cat": 1, "bird": 1, "cat": 3, "dog": 2}` | `std::map` sorts keys by ASCII value, not dictionary order -- uppercase `"Cat"` (`'C'` = 67) sorts BEFORE lowercase `"bird"` (`'b'` = 98), even though a dictionary would put `bird` first |
+| `first_occurrence_index(words)` | `{"cat": 0, "dog": 1, "bird": 3, "Cat": 6}` (some order) | this returns `std::unordered_map`, whose iteration order is unspecified -- do not rely on any particular order, only on the values stored for each key |
+| `unique_words_sorted(words)` | `{"Cat", "bird", "cat", "dog"}` | same ASCII-before-dictionary-order surprise as `word_frequencies` -- `"Cat"` and `"cat"` are two different keys, and `"Cat"` sorts first |
+| `common_words(words, b)` | `{"dog"}` | `"dog"` is the only word appearing in both `words` and `b`; `"fish"` is only in `b`, everything else is only in `words` |
+| `words_only_in(words, b)` | `{"Cat", "bird", "cat"}` | every distinct word of `words` that never appears in `b` -- `"dog"` is excluded because `b` contains it |
+| `most_frequent(words, 2)` | `[("cat", 3), ("dog", 2)]` | `cat` has the highest count (3), `dog` is next (2) -- no tie to break yet |
+| `most_frequent(words, 3)` | `[("cat", 3), ("dog", 2), ("Cat", 1)]` | the third slot is a tie between `"bird"` (count 1) and `"Cat"` (count 1); ties break alphabetically ASCENDING, and by ASCII order `"Cat"` (`'C'` = 67) comes before `"bird"` (`'b'` = 98), so `"Cat"` wins the slot |
+| `most_frequent(words, 0)` | `[]` (empty) | `k <= 0` always returns empty, regardless of input |
+
+## Worked example: watch `most_frequent(words, 3)` run, step by step
+
+This is the trickiest function in the assignment (it is the only one with a
+tie to break), so here is every step spelled out, using the same
+`words = {"cat", "dog", "cat", "bird", "dog", "cat", "Cat"}` from above.
+
+**Step 1 -- build the frequency map.** This is exactly `word_frequencies(words)`:
+
+```
+freq = {"Cat": 1, "bird": 1, "cat": 3, "dog": 2}
+```
+
+Because `freq` is a `std::map`, iterating it always visits these four
+entries in this exact order (ASCII order of the key): `Cat`, `bird`, `cat`,
+`dog`.
+
+**Step 2 -- repeated max-scan, `k = 3` times.** Each round scans every entry
+not yet chosen and keeps the entry with the strictly highest count seen so
+far (so on a tie, the FIRST entry encountered in map order -- i.e. the
+alphabetically/ASCII-earliest one -- keeps its lead, since a later equal
+count is not STRICTLY greater):
+
+| Round | Entries considered (in map order) | Running best | Chosen this round | Why |
+|-------|-----------------------------------|---------------|--------------------|-----|
+| 1 | `Cat`(1), `bird`(1), `cat`(3), `dog`(2) | starts at `Cat`(1), then `cat`(3) beats it (3 > 1), `dog`(2) does not beat `cat` | `("cat", 3)` | `cat` has the single highest count in the whole map |
+| 2 | `Cat`(1), `bird`(1), `dog`(2) (`cat` already chosen, skipped) | starts at `Cat`(1), then `dog`(2) beats it | `("dog", 2)` | `dog` is the highest remaining count |
+| 3 | `Cat`(1), `bird`(1) (`cat`, `dog` already chosen, skipped) | starts at `Cat`(1); `bird`(1) does NOT beat it because `1 > 1` is false (not a STRICT improvement) | `("Cat", 1)` | `Cat` and `bird` are tied at count 1, but `Cat` was seen FIRST in map order (ASCII `'C'` < `'b'`), so it keeps the lead and wins the tie |
+
+**Final result:** `[("cat", 3), ("dog", 2), ("Cat", 1)]`.
+
+Notice the tie-break is not implemented by any explicit alphabetical
+comparison -- it falls out for free from two facts working together:
+`std::map` already iterates in ASCII-sorted key order, and the max-scan
+only replaces its running best on a STRICT `>` comparison. That combination
+is exactly why `most_frequent` is built on top of `word_frequencies`
+(a `std::map`) instead of `first_occurrence_index`'s `std::unordered_map`,
+whose iteration order is unspecified and would make the tie-break
+unpredictable.
 
 ---
 
@@ -77,20 +150,50 @@ Implement every function declared in `word_ledger.hpp`, inside the
 
 - `word_frequencies(words)` -> `std::map<std::string, int>` -- how many
   times each distinct word appears, sorted by word.
+  *Examples:* `word_frequencies({"the", "cat", "the"})` ==
+  `{"cat": 1, "the": 2}`; `word_frequencies({})` == `{}` (empty in, empty
+  out); `word_frequencies({"Cat", "cat"})` == `{"Cat": 1, "cat": 1}` --
+  two entries, because comparison is case-sensitive and `"Cat"` sorts
+  before `"cat"` (uppercase letters have smaller ASCII values); a single
+  repeated word like `word_frequencies({"go", "go", "go"})` == `{"go": 3}`.
 - `first_occurrence_index(words)` -> `std::unordered_map<std::string, int>`
   -- for each distinct word, the 0-based index of its first appearance.
   Order does not matter here, so this returns the faster hash-table-backed
   map rather than a sorted one.
+  *Examples:* `first_occurrence_index({"a", "b", "a"})` == `{"a": 0, "b":
+  1}` (note `"a"`'s SECOND appearance at index 2 does not change its
+  recorded index); `first_occurrence_index({})` == `{}`;
+  `first_occurrence_index({"only"})` == `{"only": 0}`.
 - `unique_words_sorted(words)` -> `std::set<std::string>` -- every distinct
   word, in sorted order (a `std::set`'s own iteration order already gives
   you this, for free).
+  *Examples:* `unique_words_sorted({"banana", "apple", "banana"})` ==
+  `{"apple", "banana"}`; `unique_words_sorted({})` == `{}`;
+  `unique_words_sorted({"Cat", "bird", "cat"})` == `{"Cat", "bird",
+  "cat"}` -- three distinct entries in ASCII order, not dictionary order
+  (`"Cat"` first, since uppercase sorts before lowercase).
 - `common_words(a, b)` -> `std::set<std::string>` -- the set
   **intersection**: every word that appears in both `a` and `b`.
+  *Examples:* `common_words({"cat", "dog"}, {"dog", "fish"})` ==
+  `{"dog"}`; `common_words({}, {"x"})` == `{}` (either side empty means no
+  overlap is possible); `common_words({"a", "A"}, {"a"})` == `{"a"}` --
+  `"A"` does not match `"a"` because comparison is case-sensitive.
 - `words_only_in(a, b)` -> `std::set<std::string>` -- the set
   **difference**: every word in `a` that does not appear anywhere in `b`.
+  *Examples:* `words_only_in({"cat", "dog", "bird"}, {"dog"})` == `{"bird",
+  "cat"}`; `words_only_in({"x"}, {})` == `{"x"}` (`b` empty means nothing
+  gets excluded); `words_only_in({}, {"x"})` == `{}` (`a` empty means
+  there is nothing to report, regardless of `b`).
 - `most_frequent(words, k)` -> `std::vector<std::pair<std::string, int>>`
   -- the top `k` most frequent words, ordered by count descending, with
   ties broken alphabetically ascending.
+  *Examples:* `most_frequent({"a", "b", "a", "c", "b", "a"}, 2)` ==
+  `[("a", 3), ("b", 2)]`; `most_frequent({"cat", "bird", "Cat"}, 2)` ==
+  `[("Cat", 1), ("bird", 1)]` -- a three-way count tie (all count 1),
+  broken by ASCII order, so `"Cat"` (uppercase `'C'`) beats `"bird"` and
+  `"cat"`; `most_frequent({}, 3)` == `[]` (empty input); `most_frequent({"x",
+  "y"}, 0)` == `[]` (`k <= 0` always returns empty, even with real words
+  available).
 
 The full contract for every function -- exact return type, tie-breaking
 rule, and behavior on empty input -- is documented as a comment directly

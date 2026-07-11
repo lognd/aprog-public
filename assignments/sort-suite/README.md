@@ -80,6 +80,59 @@ and an O(n^2) implementation cannot.
 
 ---
 
+## Examples: every function on one array
+
+To make the five functions concrete, here is **one** unsorted array, and
+what each function does to it. Read this table first -- it is the whole
+assignment in miniature.
+
+```
+v = { 5, 3, 8, 1, 4 }
+```
+
+| Call | Result (what `v` becomes, or return value) | Why |
+|------|---------------------------------------------|-----|
+| `selection_sort(v)` | `v` becomes `{1, 3, 4, 5, 8}` | repeatedly finds the minimum of the remaining unsorted region and swaps it into place -- see the worked example below for every swap |
+| `insertion_sort(v)` | `v` becomes `{1, 3, 4, 5, 8}` | grows a sorted prefix one element at a time, shifting larger elements right to make room |
+| `merge_sort(v)` | `v` becomes `{1, 3, 4, 5, 8}` | splits in half recursively, sorts each half, merges the two sorted halves back together with an O(n) scratch array |
+| `is_sorted_asc(v)` (on the ORIGINAL `{5, 3, 8, 1, 4}`) | `false` | `5 > 3`, so the array is not currently in ascending order |
+| `is_sorted_asc(v)` (on the SORTED `{1, 3, 4, 5, 8}`) | `true` | every element is `<=` the one after it |
+
+Note that all three sorting functions produce the exact same final array
+-- that is the point of the assignment: three different strategies,
+one correct answer. What differs between them is not the *result* but
+*how they get there* (which elements get compared and swapped, and how
+fast that process is as the array grows), which is exactly what the
+worked example below makes visible step by step.
+
+## Worked example: watch `selection_sort({5, 3, 8, 1, 4})` run, step by step
+
+This is the single most important thing to understand about selection
+sort, so here is every pass spelled out. Selection sort keeps a growing
+"sorted region" at the front of the array (initially empty) and a
+shrinking "unsorted region" after it. On each pass, it scans the ENTIRE
+unsorted region to find its minimum, then swaps that minimum into the
+first open slot of the sorted region -- growing the sorted region by
+exactly one element per pass.
+
+Starting array: `v = {5, 3, 8, 1, 4}` (indices `0..4`).
+
+| Pass | Unsorted region (indices) | Minimum found (value, index) | Swap performed | `v` after this pass |
+|------|---------------------------|-------------------------------|-----------------|----------------------|
+| 1 | `0..4` (`5, 3, 8, 1, 4`) | `1` at index 3 | swap index 0 (`5`) with index 3 (`1`) | `{1, 3, 8, 5, 4}` |
+| 2 | `1..4` (`3, 8, 5, 4`) | `3` at index 1 | swap index 1 with itself (already the minimum, no-op) | `{1, 3, 8, 5, 4}` |
+| 3 | `2..4` (`8, 5, 4`) | `4` at index 4 | swap index 2 (`8`) with index 4 (`4`) | `{1, 3, 4, 5, 8}` |
+| 4 | `3..4` (`5, 8`) | `5` at index 3 | swap index 3 with itself (already the minimum, no-op) | `{1, 3, 4, 5, 8}` |
+| end | -- | -- | loop stops (only one element, index 4, would be left as its own "unsorted region") | `{1, 3, 4, 5, 8}` |
+
+The loop ends after pass 4 because once the first `n - 1` positions
+(indices `0..3`) are known to hold the correct values, the last
+remaining position (index 4) has nowhere else to go and must already be
+correct -- there is nothing left to compare it against. Final result:
+**`{1, 3, 4, 5, 8}`**, matching every other sort function's output above.
+
+---
+
 ## Task
 
 Implement every function declared in `sort_suite.hpp`, inside the
@@ -89,20 +142,54 @@ given directly (in place); none of them return a new vector.
 - `selection_sort(v)` -> `void` -- sorts `v` ascending in place using
   selection sort (find the minimum of the remaining unsorted region,
   swap it into place, repeat).
+  *Example:* `selection_sort` on `{5, 3, 8, 1, 4}` leaves `v` as
+  `{1, 3, 4, 5, 8}` (see the worked example above for every pass);
+  on the already-sorted `{1, 2, 3}` it leaves `v` unchanged;
+  on the reverse-sorted `{3, 2, 1}` it leaves `v` as `{1, 2, 3}`;
+  on the empty `{}` it is a no-op (`v` stays `{}`).
 - `insertion_sort(v)` -> `void` -- sorts `v` ascending in place using
   insertion sort (grow a sorted prefix one element at a time, shifting
   larger elements right to make room).
+  *Example:* `insertion_sort` on `{5, 3, 8, 1, 4}` leaves `v` as
+  `{1, 3, 4, 5, 8}`;
+  on the single-element `{42}` it leaves `v` as `{42}` (a documented
+  no-op, since a one-element array is already sorted);
+  on the duplicate-heavy `{2, 2, 1, 1, 3}` it leaves `v` as
+  `{1, 1, 2, 2, 3}` (duplicates are compared with `>`, not `>=`, so
+  equal elements are never needlessly shifted past each other).
 - `merge_sort(v)` -> `void` -- sorts `v` ascending using merge sort
   (split in half recursively, sort each half, merge the two sorted
   halves back together). May allocate an O(n) scratch array for the
   merge step. Must run in O(n log n) time -- see Background above for
   why this is checked directly, not just inferred from correctness.
+  *Example:* `merge_sort` on `{5, 3, 8, 1, 4}` leaves `v` as
+  `{1, 3, 4, 5, 8}`;
+  on the empty `{}` it is a documented no-op (`v` stays `{}`);
+  on the already-sorted `{1, 2, 3, 4, 5}` it leaves `v` unchanged (still
+  runs the full split/merge process, but every merge step takes
+  entirely from the left half first).
 - `stable_sort_pairs(v)` -> `void` -- sorts `v` (a vector of
   `std::pair<int, std::string>`) ascending by `.first` ONLY, built from
   the same merge sort logic as `merge_sort`. Must be stable: pairs with
   equal `.first` keep their original relative order.
+  *Example:* `stable_sort_pairs` on
+  `{(2, "b"), (1, "x"), (2, "a"), (1, "y")}` leaves `v` as
+  `{(1, "x"), (1, "y"), (2, "b"), (2, "a")}` -- notice `(2, "b")` still
+  comes before `(2, "a")`, and `(1, "x")` still comes before `(1, "y")`,
+  because both pairs in each tied group kept their ORIGINAL relative
+  order (an unstable sort would be allowed to swap `"b"` and `"a"`, or
+  `"x"` and `"y"`, since both orderings are equally valid by `.first`
+  alone);
+  on the empty `{}` it is a documented no-op.
 - `is_sorted_asc(v)` -> `bool` -- returns whether `v` is currently sorted
   in ascending order. Does not modify `v`.
+  *Example:* `is_sorted_asc({1, 2, 2, 5, 9}) == true` (duplicates are
+  fine -- ascending allows `<=` between neighbors, not strict `<`);
+  `is_sorted_asc({1, 5, 2}) == false` (`5 > 2`, so it is not ascending);
+  `is_sorted_asc({}) == true` and `is_sorted_asc({7}) == true` (an
+  empty array and a single-element array are both documented as
+  trivially sorted -- there are no neighboring pairs to violate
+  ascending order).
 
 Every function on an empty or single-element `v` is a documented no-op
 (for the four sorting functions) or returns `true` (for
