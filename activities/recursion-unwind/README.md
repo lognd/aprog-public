@@ -4,7 +4,11 @@ Recursion -- a function calling itself, either directly or by calling
 another function that calls it back -- is not magic: every call has a cost
 in time (how many calls happen) and space (how many stack frames, the block
 of memory holding one call's local variables and return address, are alive
-at once). This activity builds
+at once). Every recursive function needs a base case: the condition (such
+as `n <= 1` in the code below) that stops the recursion and returns
+directly instead of calling itself again. Without one, the calls never
+stop and the program crashes when it runs out of stack space. This
+activity builds
 intuition for both by comparing three implementations of the same function:
 naive recursive Fibonacci, memoized recursive Fibonacci (a version that
 caches each result the first time it is computed so later calls with the
