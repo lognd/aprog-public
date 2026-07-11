@@ -110,7 +110,10 @@ allowed and ignored; an optional leading `+` or `-` is allowed.
   - A lone `+`/`-` with no digits after it: `"parse_int: no digits found in '<s>'"`
   - Any other invalid character `c`: `"parse_int: invalid character '<c>' in '<s>'"`
 - Throws `std::out_of_range` if the value does not fit in `int` (checked
-  against `INT_MAX`/`INT_MIN`, from `<climits>`): `"parse_int: value out of int range in '<s>'"`
+  against `INT_MAX`/`INT_MIN`, from `<climits>`): `"parse_int: value out of
+  int range in '<s>'"`, with `<s>` here as the **original, untrimmed**
+  argument (unlike the `invalid_argument` messages above, this one does not
+  strip leading/trailing spaces and tabs before reporting `s`).
 
 ### `Fraction parse_fraction(const std::string& s)`
 
