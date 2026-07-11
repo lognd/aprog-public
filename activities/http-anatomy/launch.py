@@ -3,7 +3,7 @@
 # To update: edit quiz-data/http-anatomy.json and re-run the generator.
 """Activity: HTTP Anatomy
 
-Ten no-code scenarios and definitions covering the anatomy of an HTTP request and response: the four parts of a request, which method fits reading/creating/replacing/deleting a resource, status code classes and specific codes, idempotency, what JSON is, where a given piece of data belongs (query param, path param, or body), and the statelessness of HTTP and why sessions and tokens exist to compensate for it. Every term (protocol, endpoint, route, header) is defined from scratch before it is used.
+Ten no-code scenarios and definitions covering the anatomy of an HTTP request and response: the four parts of a request, which method fits reading/creating/replacing/deleting a resource, status code classes and specific codes, idempotency, what JSON is, where a given piece of data belongs (query param, path param, or body), and the statelessness of HTTP and why sessions and tokens exist to compensate for it. Every term (protocol, method, status code, header) is defined from scratch before it is used.
 """
 import json, sys
 
@@ -175,7 +175,7 @@ class ActivityEngine:
 
     slug = "http-anatomy"
     title = "Activity: HTTP Anatomy"
-    description = 'Ten no-code scenarios and definitions covering the anatomy of an HTTP request and response: the four parts of a request, which method fits reading/creating/replacing/deleting a resource, status code classes and specific codes, idempotency, what JSON is, where a given piece of data belongs (query param, path param, or body), and the statelessness of HTTP and why sessions and tokens exist to compensate for it. Every term (protocol, endpoint, route, header) is defined from scratch before it is used.'
+    description = 'Ten no-code scenarios and definitions covering the anatomy of an HTTP request and response: the four parts of a request, which method fits reading/creating/replacing/deleting a resource, status code classes and specific codes, idempotency, what JSON is, where a given piece of data belongs (query param, path param, or body), and the statelessness of HTTP and why sessions and tokens exist to compensate for it. Every term (protocol, method, status code, header) is defined from scratch before it is used.'
 
     def items(self):
         """Return the public (non-secret) item dicts, in display order."""
