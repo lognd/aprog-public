@@ -160,12 +160,13 @@ roster against every name in the other.
   skip past it.
 - All six functions must be **pure**: no `print`, no reading from a file,
   no mutating the `roster` (or any record inside it) that was passed in.
-- **Type hints are required** on every function's parameters and return
-  type. The starter file already has them filled in -- keep them exactly
-  as given; do not widen or remove them.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern Python
-  type checker, run over `roster.py`) earns a bonus. `ty check roster.py`
-  should report no errors once your implementation is type-correct.
+- **Type-annotation bonus (10 pts):** every function must annotate all of
+  its parameters and its return type. The starter file has them filled in --
+  keep them exactly as given; do not widen or remove them. The bonus is
+  awarded only when every function is fully annotated. A separate,
+  informational [ty](https://docs.astral.sh/ty/) check then flags any
+  annotation that does not hold up -- `ty check roster.py` should report no
+  errors once your implementation is type-correct.
 
 ## Grading
 
@@ -174,7 +175,7 @@ roster against every name in the other.
 | No `collections`/`statistics` shortcuts   | 0 (gate) |
 | Visible correctness tests                 | 35     |
 | Hidden correctness tests                  | 50     |
-| Clean `ty` type-check (bonus)              | 10     |
+| Complete type annotations (bonus)         | 10     |
 
 ## Submission
 

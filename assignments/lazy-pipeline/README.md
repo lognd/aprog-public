@@ -133,8 +133,11 @@ python -m pytest visible-tests/test_visible.py -v
 - `pipeline.py` must not import `itertools` -- write every stage's
   pause/resume logic yourself rather than reaching for
   `itertools.islice`, `itertools.chain`, or similar to do it for you.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern Python
-  type checker, run over `pipeline.py`) earns a bonus.
+- **Type-annotation bonus (10 pts):** every function must annotate all of
+  its parameters and its return type (the `Iterable`/`Iterator` signatures
+  above). The bonus is awarded only when every function is fully annotated;
+  a separate, informational [ty](https://docs.astral.sh/ty/) check then flags
+  any annotation that does not hold up.
 
 ## Grading
 
@@ -143,7 +146,7 @@ python -m pytest visible-tests/test_visible.py -v
 | Import constraints (gate)            | 5      |
 | Visible correctness tests            | 35     |
 | Hidden correctness tests             | 50     |
-| Clean `ty` type-check (bonus)        | 10     |
+| Complete type annotations (bonus)    | 10     |
 | **Total**                            | **100** |
 
 Hidden tests cover: laziness (an instrumented source proves `take`
