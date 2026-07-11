@@ -27,8 +27,10 @@ use the real `std::unique_ptr` to see the same idea from the caller's side.
 - Use `std::unique_ptr` and `std::make_unique` as a caller: write a
   **factory function** (a function whose only job is to construct and
   return an object, so callers never write `new` themselves) that returns
-  one, and functions that take one by reference
-  (inspect only) versus by value (which forces the caller to `std::move` it)
+  one, a function that takes a container of them by reference to inspect
+  it without taking ownership of anything inside, and a function that
+  moves one out of that container and returns it by value (which forces
+  the caller to `std::move` it out of the slot it currently lives in)
 
 ## Background
 
