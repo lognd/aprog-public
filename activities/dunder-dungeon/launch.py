@@ -71,7 +71,7 @@ SNIPPETS = json.loads(r"""
   {
     "id": 2,
     "title": "a class's own __dict__ holds its methods (and other class-body definitions)",
-    "code": "class Greeter:\n    def hello(self):\n        return \"hi\"\n\n    def bye(self):\n        return \"bye\"\n\nnames = sorted(n for n in Greeter.__dict__ if not n.startswith(\"__\"))\nprint(names)\n",
+    "code": "class Greeter:\n    def hello(self):\n        return \"hi\"\n\n    def bye(self):\n        return \"bye\"\n\nnames = []\nfor n in Greeter.__dict__:\n    if not n.startswith(\"__\"):\n        names.append(n)\nnames.sort()\nprint(names)\n",
     "prompt": "A CLASS also has its own __dict__ -- separate from any instance's __dict__ -- and it holds everything defined directly in the class body: here, the two function objects hello and bye. Greeter.__dict__ also contains several automatically-added dunder entries (like __module__ and __qualname__) that clutter a raw print, so this snippet filters them out with `not n.startswith(\"__\")` and sorts what remains, keeping the output deterministic. What does this print?",
     "platform_note": "any platform, CPython 3.10+"
   },
