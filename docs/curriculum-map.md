@@ -22,6 +22,7 @@ Assignments:
 Activities:
 - `env-setup-shell` -- get a Linux/Unix shell and verify it by running a binary that prints a passphrase
 - `env-setup-python` -- install Python 3 and the course's Python tooling (uv, ruff, ty, pytest)
+- `venv-workshop` -- hands-on: build a Python virtual environment two ways (python3 -m venv + pip, and uv) and install a package into each
 - `env-setup-compiler` -- install both GCC/G++ and Clang/Clang++ compiler toolchains
 - `env-setup-build-tools` -- install CMake and Make, the course's build system tools
 - `env-setup-sfml` -- install SFML and verify a real sf::Image compile-link-run test
