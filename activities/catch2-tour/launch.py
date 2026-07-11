@@ -92,7 +92,7 @@ QUESTIONS = json.loads(r"""
     "code": "$ ./my_tests\nRandomness seeded to: 12345678\n===============================================================================\nAll tests passed (7 assertions in 3 test cases)"
   },
   {
-    "prompt": "A student writes a suite of TEST_CASEs. One of them segfaults partway through. What kind of tests does Catch2 run, compared to a hand-rolled main()-based test harness, that lets the REST of the suite still report results?\n\n  Type exactly one of: isolated / shared state / sequential only",
+    "prompt": "A student writes a suite of TEST_CASEs. One of them throws an unexpected exception partway through. What kind of tests does Catch2 run, compared to a hand-rolled main()-based test harness, that lets the REST of the suite still report results?\n\n  Type exactly one of: isolated / shared state / sequential only",
     "hint": "Think about what happens when one test crashes or fails -- does it affect the others?"
   }
 ]
@@ -105,7 +105,7 @@ ITEM_SECRETS = json.loads(r"""
   "s&ZIaFu(V0?%}wV=@onN!dKUfq%B(nze`@tonBzBOeoE?QeSShcoisTy2MyW>2GW(1|{A&Hs&$;teH2FDC8NqwK_3~L<fDrce*xcEEuu$#YIWZXf*#zgqPxXZ$0d)5O`<#4Pgbu0>_lyEwD4`0mDPPl!e4%kOZZB!yz${K%uLT(xU&^W2wogbpv<ISN4j~jZV&;snrU+B}_z_XmhPsz+bSdyC`M1x6RT3p&rOev7Vd>=l7?skucTsB89&oDD9EE#Lvneo%#x;UhA+yObND?vv&PuKb2jwJvOw{lsw`NXKF-UM$@eL+Z6S2<YhSZo84#kcA&vBNSiPwp(~|kqD3S?)-%>eGsnCU*Eznb!cuIk#g-r6",
   "CI(gAH^if7B6J(YQu6%&^@ejt$%k?F4<{qt=ewzU$~k)!?(kCe>^^DgBP~Kq9F>;2J<7R0>dor*#%_)IjV!F@@S(OSvggvRyeg@-D0OveC|76<pL@Z+P|<HAMs&sMM7KKbZ;wv$56exwIpF8mkX-SlZndcnMy%(k<RCJf)}Wn^DYxVz;1@YdDPeWleEj~UYg@tf?Qibc{0uAk;ErN@41QKVK*wn_COITV&H)T`%=3W8^3CM6L`e2o5?cE>sWSpD>=%qi_uaqvF(MgtSm+~FF9Pqi0n5Ea{+lv&?>hNI6CDG+6OGp&Lw?)fpU?&+xnS<PJbJ~hEs2j14B2hpn3w9Vo<6dIWL(=o`+%mV^(A~33Yplr^<WH1AW*5#3U_i{QPK2Ed4x5Bi+TwhoL`Yit-5?2S)MqjHlk#$%d*D3g;@SOtkgF!Qo?lRb?La?<Cq^FnT<of9m4|1Okst>U0^vYPeAh",
   "bOv*eZ_U$hAVU&$07JQz*TPNfYLFE9A9!ogQ6AnzPMvu7V3!T|{`_br5j32OGW$=>8y4kPP4DctA2VDZ@HWVy{6iGF;RA=HT)WlrIt-RFZLO7W8douXQ;Wd^CmyQLGqkK@^!IB1b%$0JVT|&O)>}ogLqW#bM2KuJ1~1j23T5ZeV=SJ|_A+K#tE^^3_B)ks@BCA(;?Ihqw+~Ic%)xs~gP_W5d3l3tA!sg+44%1*+Dy|sT8^~>lp;cZT|HBn^P)K1w1B4gJ~?eu|J0mLR_uoqs$>aC7@@qSzC~j2Xp*MelQ7nj?=`2kj-ImC9sP8Fl}bP*oDw0BQV*}N<@%NENv>U}X0M0z1SZ4Do}jQP9&CNFbemS^9`*+r1=a4~ZGb;x^OmbQ21wlAd2nWB2>xeps*ZFzXWb%g?;74x01pw)URF{cY*Zfv",
-  "i+ZB@v1n6)++V?M-TzMGm$3wyb&)_xPCLtLTg|=S-RpC?mtwLOb7s&Ycv0fIsEY-wF4g)ay52;mnTNvtpTt0B!-I)`^dprZ*Glel=?ZU8epH@61z{4_s*nM`an5nn(-}uc^+3ub2kNkXR1=7;n;PBH@c9L$_fN{Ujf6ATq%@R&3zR+jM4eidD>Y@b9IZ#ov0$FGl{uAE6G6^}PBcPa2Y@nfo(dq}>oBo|6BDRyy}ve#f{OfdN-whLd!*4zR}8<VYR#o~6+WSQ<ZKsnj{=aMA-8+!(>R8csZBcN0|QwM){2q0rS%$cQQk+p6)84Tx0A&h)~!w9#6A`-r!dP|^lKp4X2vQZFP7S-G+)!yU6)74bxi8vrw3O;_I(BbS|DTIF|o@~C*U>@FtDp44vj`E*2DasqEFf+yDU_7A0avYo|Ee@)^nrVBjn|Sk(*aUuLE#vCL)DDs^_Wtt;Zau0$z*oQwcL*d@cuRMUrp%lv7FF6x=<H?2I<Hs5Q|V^>K3Xle7EKz=l74@H4ddU!Zg_RTja?g^K3M2Y&dQ_KuS"
+  "i+Y;)M`={?++P2y?ae+nJf@I{ns#SYsoWFPF4|ulez58yV>$Ytw2LT{8oXFVQb1e91Z6(N$#LtkYEQPt?BR-eJUbM6OoKFfqGjw3rOYXSxdXlMM&~gy_s2BRJbDx^UUr%*lHN!Qa?DLm4<fvv9CZe?%svE->4HfPaO0E96xN_K4+5n6LP<l3q&*V!VYr3sk<%7xRYVNuA+GO)+{sh#k+WM-9F7@i9hwU-sWKS31|q3|2&gn>Lee9}%h!K=*{~{a>OFg3!*YrGiO#cJu!SX@m<2^SDoBQRAc`feNji2-Wu02N7I(;sRs4BMYaN$mMQ}eyrM$_M@szTy=*0_>N)@N>Lpy$sPTeYlw=4hxV)XMh<3x*m^8eL)GQ1N!L96&vb><e)w}Cuc$e}zf8Jf&J6+h&<ry{9T0;UMS%D`MB;GD_>;3?@s3gLOHlhkc*Xo>U{J+Rg{ipQR$<n&8Um)&0pN(EZJn!!f0d3@z>|EvxC51Ut0Ra>4(?}cjcsS9%0iRRt7#?zVOdEFeS+-AD0#ch#d@7hQibrF9;d72!EU0aK2-{V;3W`Yn+s))1`(6>{=DWQBw5zF;bIeHfJnoR>5hBe}SM?UE8I?Q7!X-pZowLsbad2|LV*~uZ5gZ53-Lw277OX_~9EbXY}X9o`!za5!5)eaFO>)JRpaAXuJQ%rpj?ZnM#3Tvzu0T#@f#K}t"
 ]
 """)
 

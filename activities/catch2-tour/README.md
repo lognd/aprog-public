@@ -4,8 +4,13 @@ Catch2 is a **test framework**: a library that lets you write small, automated
 checks (called tests) for your code and run all of them with one command,
 instead of manually re-running your program and eyeballing the output each
 time.  Catch2 is the test framework you will use in every Data Structures
-assignment.  This tour walks you through the concepts you need before your
-first graded submission: how to wire Catch2 into a CMake project, how
+assignment.  You will pull Catch2 into your project with CMake's
+**`FetchContent`** module: a pair of CMake commands (`FetchContent_Declare` to
+say where the source lives, `FetchContent_MakeAvailable` to download and build
+it) that fetches a dependency's source code at configure time, so you never
+have to install Catch2 by hand.  This tour walks you through the concepts you
+need before your first graded submission: how to wire Catch2 into a CMake
+project, how
 `TEST_CASE` (a labeled block of test code) and `SECTION` (a sub-block inside a
 `TEST_CASE` for one specific scenario) work, when to use `REQUIRE` vs `CHECK`
 (both check a condition and fail the test if it is false; the difference is
@@ -14,6 +19,7 @@ line.
 
 ## Concepts covered
 
+- Fetching Catch2 as a dependency with CMake's `FetchContent`
 - Declaring the `Catch2::Catch2WithMain` link target in CMake
 - Defining test cases with `TEST_CASE` and `SECTION`
 - Difference between `REQUIRE` (abort on failure) and `CHECK` (continue on failure)
