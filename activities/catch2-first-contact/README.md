@@ -6,8 +6,9 @@ this activity you complete a real CMake project: fill in four blanks in a
 `CMakeLists.txt` that pulls in Catch2 via `FetchContent` (a CMake mechanism
 that downloads a third-party library's source and makes it part of your build,
 so you do not have to install anything by hand), then write a test suite --
-a collection of `TEST_CASE` blocks, each a labeled test -- for a small
-statistics library and get every test to pass.
+a collection of `TEST_CASE` blocks, each a labeled test, containing `REQUIRE`
+assertions (a check that fails the test if the condition inside it is false)
+-- for a small statistics library and get every test to pass.
 
 ## Concepts covered
 
@@ -43,7 +44,8 @@ The four blanks are:
 1. `GIT_REPOSITORY` -- the GitHub URL for Catch2
 2. `GIT_TAG` -- the version tag to pin
 3. `FetchContent_MakeAvailable(...)` -- the package name to pass
-4. `target_link_libraries(... PRIVATE ___)` -- the target that includes `main()`
+4. `target_link_libraries(... PRIVATE ___)` (the CMake command that tells your
+   executable which libraries to link against) -- the target that includes `main()`
 
 ### Step 2 -- write test bodies in test_stats.cpp
 
