@@ -96,10 +96,12 @@ Return a pointer to the first occurrence of c in s, or nullptr if not found.
 
 ## Files
 
-- `pointer_toolkit.hpp` -- declarations; do not modify
-- `pointer_toolkit.cpp` -- your implementations (create this file)
+| File | Purpose |
+|------|---------|
+| `pointer_toolkit.hpp` | Declarations -- do not modify |
+| `pointer_toolkit.cpp` | Write your implementation here (create this file) |
 
-## Compilation & Testing
+## Compilation and Testing
 
 ```bash
 g++ -std=c++17 -Wall -I. -o tests pointer_toolkit.cpp visible-tests/test_visible.cpp
