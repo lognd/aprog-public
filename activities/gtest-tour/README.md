@@ -64,9 +64,10 @@ assertion on line A uses ASSERT_ and fails, ask yourself: can line B ever run?
 <details>
 <summary>Hint -- Q5: fixture setup method</summary>
 
-Look at the method name in the fixture class body.  GTest calls it
-automatically before each TEST_F.  The name follows PascalCase (both words
-capitalized).
+You do not need to understand class inheritance or the `override` keyword yet
+(those are covered later in the course) -- just look at the method name
+defined in the fixture class body.  GTest calls it automatically before each
+TEST_F.  The name follows PascalCase (both words capitalized).
 
 </details>
 
