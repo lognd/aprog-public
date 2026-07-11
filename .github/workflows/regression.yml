@@ -1,0 +1,100 @@
+name: Assignment Regression
+
+# The assignment-grader regression suite (grader/<slug> pipelines run against
+# their reference and wrong-solution fixtures) is the course's longest CI job:
+# it builds every C++ grader, runs valgrind, and builds SFML 3 from source for
+# sfml-canvas. It lives here in the public repo -- which has free GitHub Actions
+# minutes -- rather than in aprog-private, and checks the private repo out via a
+# read-only deploy key. Because the graders live in the private repo, which
+# cannot trigger this workflow directly, it runs on a nightly schedule and can
+# be started on demand with workflow_dispatch; public-side changes to
+# assignments also trigger it.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "assignments/**"
+      - "generated/**"
+      - "activities/**"
+      - "aprog.toml"
+      - ".github/workflows/regression.yml"
+
+concurrency:
+  group: regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Public repo is the workflow host; check it out as the sibling
+      # `aprog-public` the private test suite expects (it resolves the public
+      # root as ../aprog-public).
+      - uses: actions/checkout@v4
+        with:
+          path: aprog-public
+
+      - name: Checkout aprog-private
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/aprog-private
+          ssh-key: ${{ secrets.APROG_PRIVATE_DEPLOY_KEY }}
+          path: aprog-private
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends g++ cmake valgrind
+
+      # The sfml-canvas grader is built against SFML 3, which Ubuntu's apt does
+      # not package (libsfml-dev is still 2.5.1). Build SFML 3 from source into
+      # a cached prefix so the regression suite can compile and grade
+      # sfml-canvas. The prefix is exposed to CMake (find_package) and the
+      # runtime loader via env vars below.
+      - name: Install SFML 3 build dependencies
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libxrandr-dev libxcursor-dev libxi-dev \
+            libudev-dev libgl1-mesa-dev libfreetype-dev \
+            libopenal-dev libflac-dev libvorbis-dev
+
+      - name: Cache SFML 3
+        id: cache-sfml
+        uses: actions/cache@v4
+        with:
+          path: ~/sfml-build/install
+          key: sfml-3.0.0-${{ runner.os }}
+
+      - name: Build and install SFML 3
+        if: steps.cache-sfml.outputs.cache-hit != 'true'
+        run: |
+          git clone --branch 3.0.0 --depth 1 https://github.com/SFML/SFML.git ~/sfml-build/src
+          cmake -S ~/sfml-build/src -B ~/sfml-build/build \
+            -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX="$HOME/sfml-build/install"
+          cmake --build ~/sfml-build/build -j"$(nproc)"
+          cmake --install ~/sfml-build/build
+
+      - name: Put SFML 3 on the toolchain paths
+        run: |
+          echo "CMAKE_PREFIX_PATH=$HOME/sfml-build/install" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$HOME/sfml-build/install/lib" >> "$GITHUB_ENV"
+
+      - name: Install lograder
+        run: pip install lograder
+
+      - name: Install test dependencies
+        run: pip install pytest
+
+      - name: Regression tests
+        working-directory: aprog-private
+        run: pytest -m slow -v
