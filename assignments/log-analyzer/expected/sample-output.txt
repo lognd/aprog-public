@@ -1,1 +1,5 @@
-TODO
+LEVEL     COUNT  MOST RECENT
+DEBUG         2  loop iteration
+ERROR         3  connection refused
+INFO          3  request handled
+WARNING       2  retrying connection

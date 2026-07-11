@@ -1,1 +1,10 @@
-TODO
+2024-01-15T10:00:00 INFO server starting
+2024-01-15T10:00:01 DEBUG loading config
+2024-01-15T10:00:02 INFO listening on port 8080
+2024-01-15T10:00:03 WARNING retrying connection
+2024-01-15T10:00:04 ERROR connection refused
+2024-01-15T10:00:05 ERROR connection refused
+2024-01-15T10:00:06 DEBUG loop iteration
+2024-01-15T10:00:07 WARNING retrying connection
+2024-01-15T10:00:08 INFO request handled
+2024-01-15T10:00:09 ERROR connection refused

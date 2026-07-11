@@ -3,13 +3,15 @@ Visible tests for Log Analyzer.
 
 Compile and run locally:
     g++ -std=c++17 -Wall -o log-analyzer log-analyzer.cpp
-    echo "TODO" | ./log-analyzer
+    ./log-analyzer visible-tests/logs/basic_two.log
 
 These tests are also run by the autograder and shown immediately.
 """
 
 import subprocess
 from pathlib import Path
+
+LOGS_DIR = Path(__file__).parent / "logs"
 
 
 def compile_binary() -> Path:
@@ -22,21 +24,38 @@ def compile_binary() -> Path:
     return out
 
 
-def run(binary: Path, stdin: str) -> str:
-    result = subprocess.run(
-        [str(binary)],
-        input=stdin,
+def run(binary: Path, logfile: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [str(binary), str(logfile)],
         capture_output=True,
         text=True,
         timeout=10,
     )
-    return result.stdout
 
 
 BINARY = compile_binary()
 
 
-# FILL IN: visible test cases matching the examples in README.md.
-def test_example_1():
-    output = run(BINARY, "TODO\n")
-    assert output.strip() == "TODO"
+def test_basic_two_levels():
+    result = run(BINARY, LOGS_DIR / "basic_two.log")
+    assert result.returncode == 0
+    assert result.stdout == (
+        "LEVEL     COUNT  MOST RECENT\n"
+        "ERROR         1  disk full on /dev/sda1\n"
+        "INFO          2  request handled\n"
+    )
+
+
+def test_single_entry():
+    result = run(BINARY, LOGS_DIR / "single.log")
+    assert result.returncode == 0
+    assert result.stdout == (
+        "LEVEL     COUNT  MOST RECENT\n"
+        "ERROR         1  catastrophic failure in subsystem A\n"
+    )
+
+
+def test_missing_file_exits_nonzero():
+    result = run(BINARY, LOGS_DIR / "does_not_exist.log")
+    assert result.returncode == 1
+    assert "error: cannot open" in result.stderr
