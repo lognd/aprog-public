@@ -1,11 +1,11 @@
 # Activity: OS Mental Models
 
-Every activity in this row has had you calling `open()`, `read()`,
-`write()`, and `close()` -- but none of them stopped to ask the more basic
-question: what are you actually talking to when you make one of those
-calls? This activity is that missing conversation. No code, no shell, no
-compiler -- just the mental model every other activity in this row quietly
-assumes you already have.
+Later in this row, every other activity will have you calling `open()`,
+`read()`, `write()`, and `close()` -- but none of them stop to ask the more
+basic question: what are you actually talking to when you make one of
+those calls? This activity is that missing conversation, first, before any
+of that code. No code, no shell, no compiler -- just the mental model
+every other activity in this row will quietly assume you already have.
 
 Think of the operating system (OS) as a hotel manager. Hundreds of guests
 (your running programs) share one building (the computer): one kitchen
@@ -30,9 +30,9 @@ ask for anything privileged at all.
   convention -- stops your program from touching hardware directly
 - A syscall as the one controlled doorway between user mode and kernel mode
 - The three problems every OS solves: sharing, isolation, and abstraction
-- What a process is, and how it relates to the fd table from
+- What a process is, and how it relates to the fd table you will meet in
   `posix-file-tour`
-- Where `errno` (covered in `file-io-contracts`) actually comes from
+- Where `errno` (covered next in `file-io-contracts`) actually comes from
 
 ## How it works
 
@@ -93,17 +93,17 @@ around a kernel called XNU, and Windows is built around a kernel called
 NT -- in both cases, the product name you know is the distribution, and
 the kernel underneath has its own, much less famous, name.
 
-## Why this activity comes first in this row
+## What comes next in this row
 
-Every other activity you'll do in Basic OS Theory -- `posix-file-tour`,
-`file-io-contracts`, `write-your-first-syscalls`, `hex-dump` -- is you
-talking through the doorbell in the diagram above. `posix-file-tour` walks
-the stack that request travels through. `file-io-contracts` drills the
+Every other activity in Basic OS Theory will have you talking through the
+doorbell in the diagram above. `posix-file-tour`, up next, walks the stack
+that request travels through. `file-io-contracts`, after that, drills the
 precise promises the kernel makes (and doesn't make) once it answers.
-`write-your-first-syscalls` has you actually ring the doorbell yourself.
-`hex-dump` has you build a real program out of nothing but those rings.
-None of them stop to explain what's on the other side of the door, or why
-a door is needed at all -- that's what this activity is for.
+`write-your-first-syscalls` will have you actually ring the doorbell
+yourself. `hex-dump` will have you build a real program out of nothing but
+those rings. None of them stop to explain what's on the other side of the
+door, or why a door is needed at all -- that's what this activity, first,
+is for.
 
 ## You will know you are done when...
 
