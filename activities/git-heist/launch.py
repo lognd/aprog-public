@@ -58,6 +58,39 @@ def main():
     shell = os.environ.get("SHELL", "/bin/bash")
     subprocess.run([shell, "--rcfile", rcfile.name])
 
+    _check_history_clean(repo_dir)
+
+
+# Markers that only ever appear in the leaked .env file. If any of these
+# show up in the full history of any ref after the student exits, the
+# credentials commit was not actually removed (or was reintroduced, e.g.
+# via a merge that replayed it onto a rewritten branch). Best-effort
+# sanity check only, not a grading gate -- git-heist is self-checked via
+# `cat PASSPHRASE.txt`.
+_CREDENTIAL_MARKERS = ("DB_PASSWORD", "API_KEY", "SECRET_TOKEN")
+
+
+def _check_history_clean(repo_dir):
+    """Scan every ref's full history for leaked-credential markers and warn if found."""
+    if not os.path.isdir(os.path.join(repo_dir, ".git")):
+        return
+    try:
+        result = subprocess.run(
+            ["git", "log", "--all", "-p"],
+            cwd=repo_dir, capture_output=True, text=True, check=True,
+        )
+    except subprocess.CalledProcessError:
+        return
+
+    hits = [m for m in _CREDENTIAL_MARKERS if m in result.stdout]
+    if hits:
+        print("")
+        print("  warning: the repo's history still contains leaked credentials")
+        print(f"  (found: {', '.join(hits)}) on at least one ref.")
+        print("  The credentials commit was not fully removed -- check every")
+        print("  branch, not just main, for its own copy of the problem.")
+        print("")
+
 
 if __name__ == "__main__":
     main()
