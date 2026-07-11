@@ -8,7 +8,7 @@ activity walks you through each one so you can distinguish them precisely.
 
 | Keyword | Applies to | Read-only? | When is the value set? |
 |---------|-----------|------------|------------------------|
-| `const` | variables, parameters, member functions | yes | compile time OR runtime |
+| `const` | variables, parameters, member functions (functions that belong to a class/struct) | yes | compile time OR runtime |
 | `constexpr` | variables and functions | yes (for variables) | must be evaluable at compile time |
 | `consteval` | functions only | N/A | must be called at compile time |
 | `constinit` | variables only | NO | must be initialized at compile time |
@@ -81,6 +81,27 @@ separate `.cpp` files the compiler processes one at a time, each becoming
 its own object file before linking) depend on each other, initialization
 order is undefined. `constinit` ensures no
 dynamic initialization is needed, eliminating the hazard.
+
+### `const` member functions
+
+A member function is a function that belongs to a class or struct (you
+will meet classes formally later in the course, but the short version:
+a class bundles data together with functions that operate on that data,
+called member functions; the data fields themselves are called data
+members). Marking a member function `const` promises that calling it
+will not modify the object's data members:
+
+```cpp
+struct Counter {
+    int value;
+    int get() const { return value; }   // read-only: cannot modify value
+};
+```
+
+This lets const objects call the function safely, since the compiler
+enforces that the function never writes to a data member (unless that
+member is explicitly marked `mutable`, an escape hatch you are unlikely
+to need yet).
 
 ## Concepts covered
 
