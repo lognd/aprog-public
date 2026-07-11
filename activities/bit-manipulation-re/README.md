@@ -4,10 +4,10 @@ Five mystery functions. No running the code.
 
 Each function uses bitwise operators (operators that act on the individual
 0/1 bits of a number, rather than on its value as a whole) to compute
-something -- isolating a bit, counting set bits (bits equal to 1), swapping
-bytes, encoding a value. Your job is to trace through each one by hand,
-using binary arithmetic, and predict exactly what it returns for a given
-input.
+something -- isolating a bit, counting set bits (bits equal to 1),
+swapping bytes (a byte is a group of 8 bits), encoding a value. Your job
+is to trace through each one by hand, using binary arithmetic, and
+predict exactly what it returns for a given input.
 
 Wrong answers come with a full explanation. You must get all five correct to
 receive the passphrase.
@@ -26,7 +26,8 @@ You should be comfortable with:
 - Left and right shifts (`<<`, `>>`): slide every bit some number of places
   left or right, filling the vacated positions with 0 (for a left shift or
   an unsigned right shift).
-- Converting between decimal, binary, and hex.
+- Converting between decimal, binary, and hex (hexadecimal, base-16 --
+  digits 0-9 then a-f, written with a leading `0x`, e.g. `0x0F` = 15).
 
 If any of those feel shaky, review them before starting -- the questions
 build on all of them.
