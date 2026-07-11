@@ -128,8 +128,9 @@ def _make_rcfile(repo_dir):
          It should print two lines and need nothing else at run time.
        
        Step 2 -- build and link DYNAMICALLY
-         Fill in the TODOs for the shared side:
-           3. compile add.cpp and mul.cpp with -fPIC
+         Fill in the TODOs for the shared side (step 3 below is already
+         written for you -- only steps 4 and 5 are TODOs):
+           3. (already provided) add.cpp and mul.cpp compiled with -fPIC
            4. link the position-independent objects into libmathx.so
               with -shared
            5. link app.cpp against libmathx.so to produce app_dynamic
