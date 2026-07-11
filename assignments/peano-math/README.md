@@ -14,9 +14,10 @@ place.
 ## Learning goals
 
 - Build complex operations (multiply, exponentiate) from simpler primitives (successor, add)
-- Write mutually recursive functions (functions that call each other in a
-  chain, rather than a single function calling itself) that call each other
-  through a defined interface
+- Write a chain of recursive functions, where each function is defined in
+  terms of the one below it (`exponentiate` calls `multiply`, `multiply`
+  calls `add`, `add` calls `successor`) as well as recursively calling
+  itself, rather than a single function doing all the work alone
 - Understand how recursion replaces loops when iteration is forbidden
 - Reason about base cases (the input small enough to answer directly, with
   no further recursive call) and recursive cases (every other input, handled
@@ -82,10 +83,15 @@ Using the provided CMake setup (recommended -- this is what the grader uses):
 ```bash
 cd visible-tests
 mkdir build && cd build
-cmake .. -DSUBMISSION_DIR=../../assets
+cmake .. -DSUBMISSION_DIR=../assets
 cmake --build .
 ./peano-math_tests
 ```
+
+Note: `SUBMISSION_DIR` is resolved relative to `visible-tests/` (where
+`CMakeLists.txt` lives), not relative to the `build/` directory you are
+standing in when you run `cmake`. That is why the path above is `../assets`
+(one level up from `visible-tests/`) rather than `../../assets`.
 
 Or compile directly with g++, linking Catch2 yourself:
 
@@ -100,11 +106,16 @@ g++ -std=c++17 -Wall -Wextra -o peano_tests assets/peano.cpp visible-tests/test_
 - **No `+` operator in `add`, `multiply`, or `exponentiate`.**
   The `+` operator (and `++`, `+=`) may only appear inside `successor`.
 - **No `*`, `/`, `%` operators anywhere.**
-- **No standard library arithmetic functions** (`std::pow`, `__builtin_popcount`, etc.).
+- **No standard library arithmetic functions** (`std::pow`, `__builtin_popcount`, etc.) --
+  this defeats the point of building arithmetic from `successor` yourself,
+  even though it is not the kind of thing an automated scan can reliably catch.
 - All four functions must be implemented recursively.
 
-The grader enforces these constraints automatically.  Submissions that violate
-them will receive zero on the affected function.
+The no-loops rule and the operator rules above are enforced automatically by
+the grader as two separate checks (10 points each; see Grading below).
+Violating either check costs you those points regardless of whether your
+tests otherwise pass -- it does not zero out any individual function's test
+score.
 
 ## Grading
 
