@@ -93,7 +93,7 @@ SNIPPETS = json.loads(r"""
     "id": 5,
     "title": "std::priority_queue of pairs orders lexicographically -- first element compared first",
     "platform_note": "any platform, g++ -std=c++17",
-    "code": "#include <cstdio>\n#include <queue>\n#include <utility>\n\nint main() {\n    std::priority_queue<std::pair<int, int>> pq;\n    pq.push({2, 5});\n    pq.push({2, 9});\n    pq.push({1, 100});\n    pq.push({3, 1});\n\n    while (!pq.empty()) {\n        auto [a, b] = pq.top();\n        pq.pop();\n        printf(\"(%d,%d) \", a, b);\n    }\n    printf(\"\\n\");\n}\n",
+    "code": "#include <cstdio>\n#include <queue>\n#include <utility>\n\nint main() {\n    std::priority_queue<std::pair<int, int>> pq;\n    pq.push({2, 5});\n    pq.push({2, 9});\n    pq.push({1, 100});\n    pq.push({3, 1});\n\n    while (!pq.empty()) {\n        printf(\"(%d,%d) \", pq.top().first, pq.top().second);\n        pq.pop();\n    }\n    printf(\"\\n\");\n}\n",
     "prompt": "Four std::pair<int,int> values are pushed onto a std::priority_queue<std::pair<int,int>>, in this order: (2,5), (2,9), (1,100), (3,1). std::pair's built-in comparison is LEXICOGRAPHIC: two pairs are compared by their FIRST element first, and only compared by their second element as a tie-breaker when the first elements are equal. What single line does the program print?"
   },
   {
