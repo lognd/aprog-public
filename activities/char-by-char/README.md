@@ -14,7 +14,8 @@ from each end) emerge naturally from this pattern.
 - The null-terminated C string sentinel pattern (`'\0'` marking where the
   real data ends and the loop should stop)
 - Pointer increment (`p++`) as character-by-character string traversal
-- How `strlen`, `strcpy`, and `reverse` all reduce to the same loop skeleton
+- How counting, in-place mutation, and reversal all reduce to the same
+  sentinel-loop skeleton
 - The two-pointer technique for in-place string operations
 
 ## How it works
