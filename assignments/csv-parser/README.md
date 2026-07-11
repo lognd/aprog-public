@@ -98,6 +98,10 @@ g++ -std=c++17 -o test visible-tests/test_csv_parser.cpp
 ./test
 ```
 
+## Submission
+
+Submit a single file named `csv_parser.hpp`. Do not rename it.
+
 ## Going further
 
 - Extend `parse_csv` to support `\r\n` line endings if it does not already,
