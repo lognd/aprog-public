@@ -34,8 +34,8 @@ make run
 ```
 
 The program prints however many lines the broken function produces, along
-with a count.  It also tells you whether that count is correct.  Read the
-output carefully and note what looks wrong.
+with a count.  Compare the count to what the fixed version should produce
+(see below) and read the output carefully to note what looks wrong.
 
 ### Step 2 -- open wrap.cpp and read the function
 
@@ -76,7 +76,8 @@ you exit. That word is the LMS passcode -- submit it directly.
 
 ## You will know you are done when...
 
-The program prints exactly 5 lines and says "Correct!"
+The program prints exactly 5 lines, each at most 36 characters long, with
+no word split across a line boundary.
 
 ## Hints
 
