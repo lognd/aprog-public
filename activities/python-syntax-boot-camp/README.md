@@ -9,11 +9,11 @@ quietly behaves differently from C++ (mutation, overflow, `is` vs `==`)
 are saved for a later activity -- here you are just learning to read the
 shape of Python code.
 
-In this activity you will read twelve tiny, complete Python programs, one
-at a time. For each one, you predict exactly what it prints, before you
-run it. This "predict, then verify" loop is the same skill you built
-reading C++ snippets earlier in this course -- it works exactly as well
-on a new language.
+Twelve tiny, complete Python programs are shown one at a time. For each
+one, you predict exactly what it prints, before you run it. This
+"predict, then verify" loop is the same skill you built reading C++
+snippets earlier in this course -- it works exactly as well on a new
+language.
 
 ---
 
