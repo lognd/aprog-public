@@ -18,7 +18,7 @@ Predict the exact output of each one -- spaces, zeros, stars, and all.
 
 - `std::ostringstream` as an in-memory output buffer; `str()` to extract the string
 - `std::setw` is one-shot: it resets to 0 after each insertion
-- `std::setfill`, `std::left`, `std::right`, `std::fixed`, `std::hex`, `std::showbase`, and `std::boolalpha` are sticky
+- `std::setfill`, `std::left`, `std::right`, `std::fixed`, `std::hex`, and `std::showbase` are sticky
 - `std::setprecision` controls decimal digits for floating-point output
 - `std::hex` + `std::showbase` and the special case of zero
 
