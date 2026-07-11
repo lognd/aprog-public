@@ -237,7 +237,8 @@ g++ -std=c++17 -fsanitize=address -g -I. your_test.cpp -o test && ./test
 | Source constraints (no `std::vector`/`std::list`/`std::deque`) | 10 |
 | Compilation | 0 |
 | Visible correctness (Catch2) | 30 |
-| Hidden correctness (Catch2) | 40 |
+| Hidden correctness (Catch2) | 30 |
+| Performance (O(1) `push_back` and `size`) | 10 |
 | Memory safety (Valgrind, visible) | 5 |
 | Memory safety (Valgrind, hidden) | 5 |
 | Memory safety (ASan, visible) | 5 |

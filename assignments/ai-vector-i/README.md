@@ -1,20 +1,92 @@
 # VectorI: Dynamic Integer Array
 
-For this lab you will use AI or a friend's code to produce a working implementation
-of a dynamic integer array -- and then fix it.
+You are going to "vibe code" a fix for a broken class. **Vibe coding** means
+using an AI assistant (or a friend, or a Stack Overflow answer you do not
+fully read) to produce code and accepting it because it seems to work,
+without checking that you understand every line. That is exactly what you
+are asked to do here: hand the broken file below to an AI assistant, get it
+to a state where it compiles and passes the tests, and submit it.
 
-You are given the following **intentionally broken** starter code. It has **several bugs**.
-Your job is to find and fix every one of them so that `VectorI` compiles and behaves correctly.
+The point of this assignment is not the fix itself. The point is what
+happens after: once your submission passes, you will be asked to explain,
+line by line, why each bug was a bug and why your fix works (see
+**Reflection** below). If the only thing you can say is "the AI changed it
+and now it passes," you have just experienced, first-hand, why shipping
+code you do not understand is a bad habit to build this early in a
+programming course. Later courses and jobs will not have a visible-tests
+folder checking your work for you.
+
+---
 
 ## Learning goals
 
-- Learn how to vibe code.
-- Understand why relying on code-generation tools in a course designed to teach you how to program is a bad idea.
-- Understand that you will be shooting yourself in the foot in later courses and work if you rely on code-generation tools.
+- Experience the difference between code that passes tests and code you
+  can explain, by producing one without (yet) having the other
+- Recognize a **shallow copy** (copying a pointer, so two objects share one
+  buffer) versus a **deep copy** (copying the pointed-to data, so each
+  object owns its own buffer)
+- Recognize a mismatched allocator: memory obtained with `malloc` must be
+  freed with `free`, and memory obtained with `new[]` must be freed with
+  `delete[]` -- mixing them is **undefined behavior** (the C++ standard
+  places no requirement on what happens; it will often "seem to work" and
+  then fail unpredictably later)
+- Explain what a **move** must do that a copy does not: leave the source
+  object in a valid, empty state instead of leaving two objects pointing at
+  the same memory
+- Explain why every class that manually manages a heap buffer needs a
+  destructor, and what happens if you forget one (a **memory leak**: memory
+  that is never freed because nothing owns it anymore)
 
-## Starter file
+## Background
 
-**`vector_i.hpp`** (see `assets/`)
+<details>
+<summary>What is a dynamic array, and what do "size" and "capacity" mean?</summary>
+
+A dynamic array is a data structure that stores its elements in one
+contiguous block of memory on the heap (memory you request at runtime with
+`new` or `malloc`, as opposed to memory a local variable gets automatically
+on the stack), and can grow as more elements are added. It tracks two
+numbers: **size** is how many elements are actually stored right now;
+**capacity** is how many elements the current buffer *could* hold before it
+needs to be replaced with a bigger one. `std::vector<int>` is the standard
+library's version of exactly this idea; `VectorI` is a hand-built version
+that only stores `int`, so you can see how it works underneath.
+
+</details>
+
+<details>
+<summary>What are the copy constructor, move constructor, and assignment operators?</summary>
+
+Every class in C++ gets, or can define, five special member functions
+(sometimes called the "Rule of Five"):
+
+- **Copy constructor** -- `VectorI(const VectorI& other)` -- runs when a
+  new object is built as a copy of an existing one (`VectorI b = a;`).
+- **Move constructor** -- `VectorI(VectorI&& other)` -- runs when a new
+  object is built by *stealing* the guts of a temporary or explicitly
+  `std::move`-d object, instead of copying them.
+- **Copy assignment operator** -- `operator=(const VectorI& other)` --
+  runs when an *already-existing* object is overwritten with a copy of
+  another (`b = a;`).
+- **Move assignment operator** -- `operator=(VectorI&& other)` -- the move
+  version of the above.
+- **Destructor** -- `~VectorI()` -- runs automatically when the object's
+  lifetime ends, and is the one place that should free whatever the object
+  owns.
+
+The `&&` in `VectorI&& other` is an **rvalue reference**: a reference that
+can only bind to a temporary value or something explicitly marked with
+`std::move`, which is how the compiler tells "please copy this" apart from
+"this source is about to be discarded, so it is safe to steal from it."
+
+</details>
+
+## Task
+
+Below is the starter file, reproduced exactly as given to you (the full
+version is in `assets/vector_i.hpp`). It is **intentionally broken**: it
+has several bugs, marked with comments telling you how many errors are on
+each line, but not what they are.
 
 ```cpp
 class VectorI {
@@ -69,17 +141,98 @@ private:
 };
 ```
 
-## Your task
-
-Fix every bug in `vector_i.hpp` so that `VectorI`:
+Give this file to an AI assistant (or fix it yourself, if you already see
+the bugs) and get it to a state where `VectorI`:
 
 1. Compiles without warnings under `-Wall -Wextra`.
-2. Correctly copies elements in the copy constructor (no shallow copies, correct size).
-3. Correctly moves ownership in the move constructor (leaves source in a valid empty state).
-4. Correctly implements copy and move assignment operators (returns `*this`, no resource leaks).
-5. Correctly grows the backing array in `push_back` (doubles capacity from a non-zero base).
-6. Returns a reference to the element just inserted by `push_back`.
+2. Correctly copies elements in the copy constructor -- no shallow copies,
+   correct size, and a matching allocator (whatever you allocate with, free
+   with the same family: `malloc`/`free` or `new[]`/`delete[]`, never mixed).
+3. Correctly moves ownership in the move constructor -- leaves the source
+   in a valid, empty state (`data == nullptr`, `size == 0`, `capacity == 0`).
+4. Correctly implements copy and move assignment operators -- both return
+   `*this`, and neither leaks the object's previous buffer.
+5. Correctly grows the backing array in `push_back` -- doubles capacity
+   from a non-zero base (a capacity of 0 should become 1, not stay 0).
+6. Returns a reference to the element just inserted by `push_back`, not a
+   reference to the local parameter.
+7. Has a destructor that frees the buffer, and public `int& operator[](size_t i)`
+   and `size_t get_size() const` accessors -- none of these three exist yet
+   in the starter file, and the visible test below will not catch their
+   absence, but the class cannot be used or graded without them.
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `vector_i.hpp` | The broken starter class -- fix it and submit this file |
+
+## Compilation and Testing
+
+```bash
+cd visible-tests
+g++ -std=c++17 -Wall -Wextra -o test_vi test_vector_i.cpp -I../assets
+./test_vi
+```
+
+A clean compile with no warnings and a printed `ok` is a good first
+indicator your fixes are correct. It does not exercise `operator[]`,
+`get_size()`, or the destructor -- check those by hand, or write a quick
+extra `main` of your own locally (do not submit one).
+
+## Constraints
+
+- Submit only `vector_i.hpp`. Do not add a `main` function to it.
+- Pick one allocator family and use it everywhere in the file. Do not free
+  `malloc`-allocated memory with `delete`/`delete[]`, and do not free
+  `new[]`-allocated memory with `free`.
+
+## Grading
+
+| Component | Points |
+|-----------|--------|
+| Compilation | 0 (required to proceed) |
+| `push_back` stores values correctly | 10 |
+| `push_back` tracks size correctly | 5 |
+| `push_back` returns a reference to the stored element | 10 |
+| Copy constructor (deep copy) | 15 |
+| Move constructor | 15 |
+| Copy assignment operator | 15 |
+| Move assignment operator | 15 |
+| Growth strategy (`push_back` past initial capacity) | 15 |
+| **Total** | **100** |
 
 ## Submission
 
-Submit only `vector_i.hpp`. Do not add a `main` function.
+Submit a single file named `vector_i.hpp`. Do not rename it.
+
+---
+
+## Reflection
+
+This part is not scored by the autograder -- follow your instructor's
+instructions for where to submit it. After your `vector_i.hpp` passes the
+visible tests, write a short paragraph (5-10 sentences) answering:
+
+- For each of the seven fixes above, can you explain in your own words why
+  the original code was wrong and why your fix is correct? List any you
+  cannot explain.
+- Did you read and understand every line the AI assistant produced before
+  you accepted it, or did you accept something because it "made the errors
+  go away"?
+- If you had submitted this without being asked to explain it afterward,
+  would you have caught the allocator mismatch (constraint above) or the
+  missing destructor (item 7) on your own?
+
+## Going further
+
+- Run your fixed class under AddressSanitizer
+  (`g++ -std=c++17 -fsanitize=address -g ...`) with a small `main` that
+  copies and destroys several `VectorI` objects. If you picked `malloc` in
+  the copy constructor but `delete[]` in the destructor (or vice versa),
+  ASan will report an "alloc-dealloc-mismatch" -- this is exactly the bug
+  described in the constraints above, and it is easy to introduce by
+  accident when different fixes come from different AI suggestions.
+- Compare your fixed `vector_i.hpp` against `std::vector<int>`. What does
+  the standard library version do differently around growth strategy,
+  exception safety, or allocator flexibility?
