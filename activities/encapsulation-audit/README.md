@@ -4,11 +4,11 @@
 code that is allowed to change it, and restricting direct access to that data
 from the outside. It is one of the foundational ideas in object-oriented
 programming (writing code as interacting objects, each responsible for its
-own data). In this activity, you will read small C++ class snippets -- some
-well-designed, some with a specific, common flaw -- and diagnose exactly what
-is wrong, or confirm that nothing is. This is the kind of judgment a code
-reviewer exercises on every pull request that touches a class's public
-interface.
+own data). Each question below shows a small C++ class snippet -- some
+well-designed, some with a specific, common flaw -- and asks you to diagnose
+exactly what is wrong, or confirm that nothing is. This is the kind of
+judgment a code reviewer exercises on every pull request that touches a
+class's public interface.
 
 ---
 
