@@ -41,9 +41,16 @@ iterators.
 
 Each question shows a short code snippet holding an iterator, pointer, or
 reference into a container, followed by an operation on that container.
-Decide the verdict: still valid, or invalidated. Getting a question wrong
-shows a detailed explanation of the memory layout that determines the
-answer; answer every question correctly to reveal the passphrase.
+Decide the verdict and type it exactly as one of these two strings:
+
+```
+still valid
+invalidated -- using it is undefined behavior
+```
+
+Getting a question wrong shows a detailed explanation of the memory
+layout that determines the answer; answer every question correctly to
+reveal the passphrase.
 
 ## Getting started
 
