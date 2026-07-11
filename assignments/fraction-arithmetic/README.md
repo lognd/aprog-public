@@ -148,35 +148,58 @@ and drops the denominator entirely for whole numbers -- `"5"`, not `"5/1"`
 
 ### Per-method examples
 
-- `Fraction()` -- the default constructor. *Example:* `Fraction().num() == 0`,
-  `Fraction().den() == 1`, `Fraction().to_string() == "0"`.
-- `Fraction(int n)` -- a whole number. *Example:* `Fraction(5).to_string() ==
-  "5"`; `Fraction(0).to_string() == "0"`; `Fraction(-5).num() == -5`.
-- `Fraction(int numerator, int denominator)` -- reduces and normalizes sign.
-  *Example:* `Fraction(3, 6).num() == 1`, `Fraction(3, 6).den() == 2` (reduced
-  by `gcd(3, 6) == 3`); `Fraction(3, -4).num() == -3`, `Fraction(3, -4).den()
-  == 4` (sign moved onto the numerator); `Fraction(0, 5).to_string() ==
-  "0"` (zero always normalizes to `0/1`); `Fraction(1, 0)` violates the
-  precondition (denominator must not be `0`) -- behavior is unspecified,
-  see Contract below.
-- `plus`/`minus`/`times`/`dividedBy` -- return a new, already-reduced
-  `Fraction`; none of them mutate `*this` or `other`. *Examples:*
-  `Fraction(3, 6).plus(Fraction(1, 3)).to_string() == "5/6"`;
-  `Fraction(-1, 2).times(Fraction(2, 3)).to_string() == "-1/3"` (a negative
-  times a positive stays negative, and the result is still reduced);
-  `Fraction(1, 2).dividedBy(Fraction(-1, 3)).to_string() == "-3/2"` (dividing
-  by a negative fraction flips the sign); `Fraction(1, 2).dividedBy(Fraction(0))`
-  violates `dividedBy`'s precondition (the argument must not be zero-valued)
-  -- behavior is unspecified.
-- `equals`/`lessThan` -- compare by value, not by raw digits. *Examples:*
-  `Fraction(2, 4).equals(Fraction(1, 2)) == true` (both reduce to `1/2`
-  before comparison); `Fraction(1, 3).lessThan(Fraction(1, 2)) == true`;
-  `Fraction(-1, 2).lessThan(Fraction(1, 3)) == true` (any negative fraction
-  is less than any positive one).
-- `to_string()` -- renders the reduced value. *Examples:*
-  `Fraction(6, 2).to_string() == "3"` (whole numbers drop the denominator);
-  `Fraction(3, -4).to_string() == "-3/4"`; `Fraction(0, 5).to_string() ==
-  "0"`.
+**`Fraction()`** -- the default constructor.
+
+- **Example (default value):** `Fraction().num() == 0`, `Fraction().den() ==
+  1`, `Fraction().to_string() == "0"`.
+
+**`Fraction(int n)`** -- a whole number.
+
+- **Example (positive/zero/negative):** `Fraction(5).to_string() == "5"`;
+  `Fraction(0).to_string() == "0"`; `Fraction(-5).num() == -5`.
+
+**`Fraction(int numerator, int denominator)`** -- reduces and normalizes sign.
+
+- **Example (reduces to lowest terms):** `Fraction(3, 6).num() == 1`,
+  `Fraction(3, 6).den() == 2` -- **reduced by `gcd(3, 6) == 3`**.
+- **Example (sign moves to numerator):** `Fraction(3, -4).num() == -3`,
+  `Fraction(3, -4).den() == 4` -- **sign moved onto the numerator**.
+- **Example (zero normalizes):** `Fraction(0, 5).to_string() == "0"` --
+  **zero always normalizes to `0/1`**.
+- **Error case (zero denominator):** `Fraction(1, 0)` violates the
+  precondition (denominator must not be `0`) -- **behavior is
+  unspecified**, see Contract below.
+
+**`plus`/`minus`/`times`/`dividedBy`** -- return a new, already-reduced
+`Fraction`; none of them mutate `*this` or `other`.
+
+- **Example (`plus`):** `Fraction(3, 6).plus(Fraction(1, 3)).to_string() ==
+  "5/6"`.
+- **Example (`times`, sign):** `Fraction(-1, 2).times(Fraction(2,
+  3)).to_string() == "-1/3"` -- **a negative times a positive stays
+  negative**, and the result is still reduced.
+- **Example (`dividedBy`, sign):** `Fraction(1, 2).dividedBy(Fraction(-1,
+  3)).to_string() == "-3/2"` -- **dividing by a negative fraction flips the
+  sign**.
+- **Error case (divide by zero):** `Fraction(1, 2).dividedBy(Fraction(0))`
+  violates `dividedBy`'s precondition (the argument must not be
+  zero-valued) -- **behavior is unspecified**.
+
+**`equals`/`lessThan`** -- compare by value, not by raw digits.
+
+- **Example (`equals` after reduction):** `Fraction(2, 4).equals(Fraction(1,
+  2)) == true` -- **both reduce to `1/2`** before comparison.
+- **Example (`lessThan`):** `Fraction(1, 3).lessThan(Fraction(1, 2)) ==
+  true`.
+- **Example (negative vs. positive):** `Fraction(-1, 2).lessThan(Fraction(1,
+  3)) == true` -- **any negative fraction is less than any positive one**.
+
+**`to_string()`** -- renders the reduced value.
+
+- **Example (whole number):** `Fraction(6, 2).to_string() == "3"` --
+  **whole numbers drop the denominator**.
+- **Example (negative):** `Fraction(3, -4).to_string() == "-3/4"`.
+- **Example (zero):** `Fraction(0, 5).to_string() == "0"`.
 
 ### Contract
 

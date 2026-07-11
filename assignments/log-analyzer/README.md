@@ -140,15 +140,16 @@ error: cannot open <logfile>
 
 and exit with code 1.
 
-*Examples:*
-
-- `./log-analyzer visible-tests/logs/single.log` on an existing, readable
-  file -- prints the summary table and exits `0`.
-- `./log-analyzer does_not_exist.log` on a path that does not exist --
-  prints `error: cannot open does_not_exist.log` to `stderr` and exits `1`.
-- `./log-analyzer` with no argument at all -- your program should also
-  reject this (there is no `logfile` to read); the reference solution
-  prints a usage message to `stderr` and exits `1`.
+- **Example (valid file):** `./log-analyzer visible-tests/logs/single.log`
+  on an existing, readable file -- prints the summary table and **exits
+  `0`**.
+- **Error case (missing file):** `./log-analyzer does_not_exist.log` on a
+  path that does not exist -- prints `error: cannot open does_not_exist.log`
+  to `stderr` and **exits `1`**.
+- **Edge case (no argument):** `./log-analyzer` with no argument at all --
+  your program should also reject this (there is no `logfile` to read);
+  the reference solution prints a usage message to `stderr` and **exits
+  `1`**.
 
 ### Log file format
 
@@ -168,20 +169,21 @@ TIMESTAMP LEVEL MESSAGE
 A line is **malformed** if it contains fewer than two whitespace-separated
 tokens (no level field).  Malformed lines are skipped and counted.
 
-*Examples:*
-
-- `"2024-01-15T10:00:00 INFO request handled"` -- 3+ tokens, well-formed;
-  `TIMESTAMP="2024-01-15T10:00:00"`, `LEVEL="INFO"`,
-  `MESSAGE="request handled"`.
-- `"OOPS"` -- only **one** token. Reading `TIMESTAMP` succeeds (it consumes
-  `"OOPS"`), but there is nothing left for `LEVEL` to read, so this line is
-  malformed and is skipped (not counted toward any level).
-- `""` (a completely empty line, e.g. a blank line in the file) -- zero
-  tokens. Both `TIMESTAMP` and `LEVEL` fail to read. Malformed.
-- `"2024-01-15T10:00:00 DEBUG"` -- exactly two tokens and nothing after
-  the level. This is **not** malformed (it has a timestamp and a level);
-  the message is simply the empty string `""`. Your output row for this
-  line would show `DEBUG` with an empty "most recent" column.
+- **Example (well-formed):** `"2024-01-15T10:00:00 INFO request handled"`
+  -- 3+ tokens, well-formed; `TIMESTAMP="2024-01-15T10:00:00"`,
+  `LEVEL="INFO"`, **`MESSAGE="request handled"`**.
+- **Tricky case (one token):** `"OOPS"` -- only **one** token. Reading
+  `TIMESTAMP` succeeds (it consumes `"OOPS"`), but there is nothing left
+  for `LEVEL` to read, so this line is **malformed** and is skipped (not
+  counted toward any level).
+- **Edge case (empty line):** `""` (a completely empty line, e.g. a blank
+  line in the file) -- zero tokens. Both `TIMESTAMP` and `LEVEL` fail to
+  read. **Malformed.**
+- **Tricky case (empty message):** `"2024-01-15T10:00:00 DEBUG"` --
+  exactly two tokens and nothing after the level. This is **not**
+  malformed (it has a timestamp and a level); the message is simply the
+  empty string `""`. Your output row for this line would show `DEBUG`
+  with an **empty "most recent" column**.
 
 ### Output format
 
@@ -213,23 +215,22 @@ where N is the count.
 If the file is empty (or contains only malformed lines), print the header and
 then the malformed count if nonzero.
 
-*Examples:*
-
-- An empty file (0 lines at all) -- prints only the header line
-  `LEVEL     COUNT  MOST RECENT` and nothing else (no malformed line, since
-  the malformed count is 0).
-- A file containing only `"OOPS"` and `"ONEWORD"` (two malformed lines, no
-  well-formed lines) -- prints the header, no level rows (there is nothing
-  to sort or count), then `2 malformed line(s) skipped`.
-- A file where `INFO` appears twice, `ERROR` appears twice, and `WARNING`
-  appears twice (a three-way tie at count 2) -- all three still print,
-  one row each, sorted alphabetically as `ERROR`, `INFO`, `WARNING`; a tie
-  in count does not merge or reorder rows, it is simply not a special case
-  at all.
-- A message containing internal spaces, e.g. `"connection refused again"`
-  -- printed verbatim in the "MOST RECENT" column, spaces and all; only
-  *leading* whitespace before the message is stripped, never spaces
-  inside it.
+- **Empty-input case:** an empty file (0 lines at all) -- prints only the
+  header line `LEVEL     COUNT  MOST RECENT` and **nothing else** (no
+  malformed line, since the malformed count is 0).
+- **Edge case (all malformed):** a file containing only `"OOPS"` and
+  `"ONEWORD"` (two malformed lines, no well-formed lines) -- prints the
+  header, no level rows (there is nothing to sort or count), then
+  **`2 malformed line(s) skipped`**.
+- **Tricky case (three-way tie):** a file where `INFO` appears twice,
+  `ERROR` appears twice, and `WARNING` appears twice (a three-way tie at
+  count 2) -- all three still print, one row each, sorted alphabetically
+  as **`ERROR`, `INFO`, `WARNING`**; a tie in count does not merge or
+  reorder rows, it is simply not a special case at all.
+- **Example (message with spaces):** a message containing internal
+  spaces, e.g. `"connection refused again"` -- printed **verbatim** in the
+  "MOST RECENT" column, spaces and all; only *leading* whitespace before
+  the message is stripped, never spaces inside it.
 
 ### Parsing with istringstream
 

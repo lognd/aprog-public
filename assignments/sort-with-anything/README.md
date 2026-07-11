@@ -162,48 +162,41 @@ through an address, opaque to the optimizer) generally cannot match.
 Implement every function/template declared in `sort_with_anything.hpp`,
 inside the `swa` namespace.
 
-- `sort_by(v, cmp)` -> `void` -- sorts `v` in place using merge sort,
+- **`sort_by(v, cmp)` -> `void`** -- sorts `v` in place using merge sort,
   ordering elements according to `cmp` (see the comparator contract
   above). Must be **stable**. Must run in O(n log n) time. `Compare` may
   be a free function, a functor, or a lambda.
-  *Example:* `sort_by(v = {5, 3, 8, 1, 4}, [](int a, int b) { return a <
-  b; })` leaves `v == {1, 3, 4, 5, 8}`; `sort_by(v = {}, cmp)` leaves `v
-  == {}` (nothing to sort); `sort_by(v = {"z", "yy", "a", "bb"},
-  by_length_asc)` leaves `v == {"z", "a", "yy", "bb"}` (length ties broken
-  by original order, since `sort_by` must be stable).
-- `by_length_asc(a, b)` -> `bool` -- a FREE FUNCTION comparator: orders
+  - **Example (lambda):** `sort_by(v = {5, 3, 8, 1, 4}, [](int a, int b) { return a < b; })` leaves `v == {1, 3, 4, 5, 8}`.
+  - **Edge case (empty):** `sort_by(v = {}, cmp)` leaves **`v == {}`** (nothing to sort).
+  - **Tricky case (stability):** `sort_by(v = {"z", "yy", "a", "bb"}, by_length_asc)` leaves `v == {"z", "a", "yy", "bb"}` (**length ties broken by original order**, since `sort_by` must be stable).
+- **`by_length_asc(a, b)` -> `bool`** -- a FREE FUNCTION comparator: orders
   `std::string`s by ascending length.
-  *Example:* `by_length_asc("a", "bbb") == true`; `by_length_asc("bbb",
-  "a") == false`; `by_length_asc("cat", "dog") == false` (equal length 3,
-  so neither is "strictly before" the other -- a tie).
-- `ByAbsoluteValue` -- a FUNCTOR: `operator()(int a, int b)` orders ints
+  - **Example:** `by_length_asc("a", "bbb") == true`.
+  - **Example (reversed args):** `by_length_asc("bbb", "a") == false`.
+  - **Tricky case (tie):** `by_length_asc("cat", "dog") == false` (equal length 3, so **neither is "strictly before" the other** -- a tie).
+- **`ByAbsoluteValue`** -- a FUNCTOR: `operator()(int a, int b)` orders ints
   by ascending absolute value. On a tie in absolute value, the smaller
   ACTUAL value comes first (e.g. `-3` belongs before `3`, since `-3 < 3`,
   even though both have absolute value `3`).
-  *Example:* `ByAbsoluteValue{}(-3, 3) == true` (tied absolute values, `-3
-  < 3`); `ByAbsoluteValue{}(3, -3) == false` (same tie, checked the other
-  direction); `ByAbsoluteValue{}(-5, 2) == false` (absolute value 5 is not
-  less than absolute value 2, so `-5` does not belong before `2`).
-- `filter(v, keep)` -> `std::vector<T>` -- returns a new vector containing
+  - **Example (tie):** `ByAbsoluteValue{}(-3, 3) == true` (tied absolute values, **`-3 < 3`**).
+  - **Example (reversed tie):** `ByAbsoluteValue{}(3, -3) == false` (same tie, checked the other direction).
+  - **Example (no tie):** `ByAbsoluteValue{}(-5, 2) == false` (absolute value 5 is **not less than** absolute value 2, so `-5` does not belong before `2`).
+- **`filter(v, keep)` -> `std::vector<T>`** -- returns a new vector containing
   every element of `v` for which `keep(element)` is `true`, in original
   relative order. Does not modify `v`.
-  *Example:* `filter(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x % 2 ==
-  0; }) == {2, 4, 6}`; `filter(v = {}, keep) == {}` (empty input, empty
-  result); `filter(v = {1, 3, 5}, [](int x) { return x % 2 == 0; }) ==
-  {}` (no element satisfies `keep`, so the result is empty even though `v`
-  is not).
-- `for_each_apply(v, f)` -> `void` -- applies `f` to every element of `v`
+  - **Example:** `filter(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x % 2 == 0; }) == {2, 4, 6}`.
+  - **Edge case (empty input):** `filter(v = {}, keep) == {}`.
+  - **Edge case (no matches):** `filter(v = {1, 3, 5}, [](int x) { return x % 2 == 0; }) == {}` (**no element satisfies `keep`**, so the result is empty even though `v` is not).
+- **`for_each_apply(v, f)` -> `void`** -- applies `f` to every element of `v`
   IN PLACE: `f` takes a `T&` and mutates it directly.
-  *Example:* `for_each_apply(v = {1, 2, 3}, [](int& x) { x *= 10; })`
-  leaves `v == {10, 20, 30}`; `for_each_apply(v = {}, f)` leaves `v == {}`
-  (nothing to apply `f` to); `for_each_apply(v = {"a", "bb"}, [](std::string&
-  s) { s += "!"; })` leaves `v == {"a!", "bb!"}`.
-- `count_matching(v, pred)` -> `std::size_t` -- returns how many elements
+  - **Example:** `for_each_apply(v = {1, 2, 3}, [](int& x) { x *= 10; })` leaves `v == {10, 20, 30}`.
+  - **Edge case (empty):** `for_each_apply(v = {}, f)` leaves `v == {}` (nothing to apply `f` to).
+  - **Example (strings):** `for_each_apply(v = {"a", "bb"}, [](std::string& s) { s += "!"; })` leaves `v == {"a!", "bb!"}`.
+- **`count_matching(v, pred)` -> `std::size_t`** -- returns how many elements
   of `v` satisfy `pred(element)`. Does not modify `v`.
-  *Example:* `count_matching(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x
-  > 3; }) == 3`; `count_matching(v = {}, pred) == 0` (empty input, nothing
-  to count); `count_matching(v = {1, 3, 5}, [](int x) { return x % 2 ==
-  0; }) == 0` (no matches -- absent, not an error).
+  - **Example:** `count_matching(v = {1, 2, 3, 4, 5, 6}, [](int x) { return x > 3; }) == 3`.
+  - **Edge case (empty):** `count_matching(v = {}, pred) == 0`.
+  - **Edge case (no matches):** `count_matching(v = {1, 3, 5}, [](int x) { return x % 2 == 0; }) == 0` (**no matches** -- absent, not an error).
 
 `filter`, `for_each_apply`, and `count_matching` all work with any of the
 three callable species too, exactly like `sort_by`.

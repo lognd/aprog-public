@@ -225,85 +225,101 @@ public:
 | `Write` | `O_WRONLY \| O_CREAT \| O_TRUNC` | `0644` |
 | `Append` | `O_WRONLY \| O_CREAT \| O_APPEND` | `0644` |
 
-The constructor calls `::open()` with the flags above. If `::open()`
+**The constructor calls `::open()` with the flags above.** If `::open()`
 succeeds, the returned fd is stored and `is_open()` becomes true. If it
 fails (returns -1), store -1 and leave `errno` exactly as `::open()` set
 it -- do not print anything, do not throw, do not terminate. A missing
 file on `Mode::Read` is an expected outcome the caller checks with
 `is_open()`, not an error condition you handle inside `FileGuard`.
-*Example:* `FileGuard("notes.txt", Mode::Write)` on a nonexistent
-`notes.txt` creates it and leaves `is_open() == true`, `fd() >= 0` (some
-non-negative descriptor number, e.g. `3`).
-*Example:* `FileGuard("notes.txt", Mode::Write)` on a `notes.txt` that
-already contains `"old contents"` truncates it to empty -- reading it
-back afterward yields `""`, not `"old contents"`.
-*Example:* `FileGuard("missing.txt", Mode::Read)` where `missing.txt`
-does not exist leaves `is_open() == false` and `fd() == -1` -- no crash,
-no thrown exception, `errno` simply reflects whatever `::open()` set
-(typically `ENOENT`).
 
-The destructor calls `close()` if and only if `is_open()` is true.
-*Example:* a `FileGuard g("notes.txt", Mode::Write)` that falls out of
-scope normally has its fd closed automatically -- no code in the caller
-calls `close()` at all, yet the file is fully written and closed on disk.
-*Example:* a `FileGuard` whose constructor's `::open()` failed
-(`is_open() == false`) runs its destructor with no effect at all -- there
-is no fd to close, so `close()` is never actually invoked against the OS.
+- **Example (create-and-write):** `FileGuard("notes.txt", Mode::Write)` on
+  a nonexistent `notes.txt` creates it and leaves `is_open() == true`,
+  **`fd() >= 0`** (some non-negative descriptor number, e.g. `3`).
+- **Example (truncate on write):** `FileGuard("notes.txt", Mode::Write)`
+  on a `notes.txt` that already contains `"old contents"` truncates it to
+  empty -- reading it back afterward yields **`""`**, not `"old contents"`.
+- **Tricky case (missing file on read):** `FileGuard("missing.txt",
+  Mode::Read)` where `missing.txt` does not exist leaves
+  **`is_open() == false` and `fd() == -1`** -- no crash, no thrown
+  exception, `errno` simply reflects whatever `::open()` set (typically
+  `ENOENT`).
 
-`close()` itself must be safe to call zero, one, or many times: the first
-call (whether explicit or from the destructor) closes the fd and sets the
-internal state so that `is_open()` becomes false and `fd()` becomes -1;
-every call after that is a no-op.
-*Example:* after `g.close()` on an open guard, `g.is_open() == false` and
-`g.fd() == -1`.
-*Example:* calling `g.close()` a second time right after the first
-changes nothing further -- `is_open()` is still `false` and `fd()` is
-still `-1`, and no second `::close()` syscall is made on the (possibly
-already-reused) fd number.
-*Example:* calling `g.close()` on a guard whose constructor's `::open()`
-already failed (`is_open()` was already `false`) is a no-op from the
-start -- `fd()` was already `-1` and stays `-1`.
+**The destructor calls `close()` if and only if `is_open()` is true.**
 
-`write_all` must not assume a single `::write()` call writes everything --
-loop, accumulating bytes written, until either all `n` bytes are written
-(return `n`) or a `::write()` call fails (return -1). This is the same
-partial-write loop from the write-your-first-syscalls activity, now living
-inside a method.
-*Example:* `g.write_all("hi", 2) == 2` on a guard opened with `Mode::Write`.
-*Example:* `g.write_all("", 0) == 0` -- writing zero bytes trivially
-succeeds without ever calling `::write()`.
-*Example:* if the underlying `::write()` call fails partway through (say,
-the disk fills up after some bytes were already written), `write_all`
-returns `-1` rather than the partial count -- the caller cannot tell from
-the return value alone how many bytes actually made it, only that the
-requested write as a whole did not complete.
+- **Example (normal scope exit):** a `FileGuard g("notes.txt",
+  Mode::Write)` that falls out of scope normally has its fd
+  **closed automatically** -- no code in the caller calls `close()` at
+  all, yet the file is fully written and closed on disk.
+- **Edge case (already-failed open):** a `FileGuard` whose constructor's
+  `::open()` failed (`is_open() == false`) runs its destructor with
+  **no effect at all** -- there is no fd to close, so `close()` is never
+  actually invoked against the OS.
 
-`read_some` is a thin wrapper: call `::read()` once with the given buffer
-and capacity, and return exactly what it returns (bytes read, 0 at EOF -- end of file,
-meaning there is nothing left to read -- or -1 on error). Do not loop here -- that is the caller's job, and `read_all`
+**`close()` itself must be safe to call zero, one, or many times.** The
+first call (whether explicit or from the destructor) closes the fd and
+sets the internal state so that `is_open()` becomes false and `fd()`
+becomes -1; every call after that is a no-op.
+
+- **Example (single close):** after `g.close()` on an open guard,
+  **`g.is_open() == false` and `g.fd() == -1`**.
+- **Tricky case (double close):** calling `g.close()` a second time right
+  after the first changes nothing further -- `is_open()` is still `false`
+  and `fd()` is still `-1`, and **no second `::close()` syscall** is made
+  on the (possibly already-reused) fd number.
+- **Edge case (close on failed open):** calling `g.close()` on a guard
+  whose constructor's `::open()` already failed (`is_open()` was already
+  `false`) is a **no-op from the start** -- `fd()` was already `-1` and
+  stays `-1`.
+
+**`write_all` must not assume a single `::write()` call writes
+everything** -- loop, accumulating bytes written, until either all `n`
+bytes are written (return `n`) or a `::write()` call fails (return -1).
+This is the same partial-write loop from the write-your-first-syscalls
+activity, now living inside a method.
+
+- **Example (single call suffices):** `g.write_all("hi", 2)` returns
+  **`2`** on a guard opened with `Mode::Write`.
+- **Empty-input case:** `g.write_all("", 0)` returns **`0`** -- writing
+  zero bytes trivially succeeds without ever calling `::write()`.
+- **Error case (partial write then failure):** if the underlying
+  `::write()` call fails partway through (say, the disk fills up after
+  some bytes were already written), `write_all` returns **`-1`** rather
+  than the partial count -- the caller cannot tell from the return value
+  alone how many bytes actually made it, only that the requested write as
+  a whole did not complete.
+
+**`read_some` is a thin wrapper:** call `::read()` once with the given
+buffer and capacity, and return exactly what it returns (bytes read, 0 at
+EOF -- end of file, meaning there is nothing left to read -- or -1 on
+error). Do not loop here -- that is the caller's job, and `read_all`
 below is where the looping version lives.
-*Example:* on a file containing `"0123456789"`, `g.read_some(buf, 4)`
-returns `4` and fills `buf` with `"0123"` -- exactly one `::read()` call's
-worth, even though the file has 10 bytes total.
-*Example:* calling `g.read_some(buf, 64)` again immediately after, on the
-same still-open guard, continues from where the fd's read position left
-off (`"456789"`), not from the beginning of the file.
-*Example:* calling `g.read_some(buf, 64)` once the fd has already reached
-the end of the file returns `0` -- the end-of-file signal, distinct from
-`-1` (error).
 
-`read_all` reads in a loop (using a buffer of your choosing, in terms of
-`read_some` or `::read` directly) until end-of-file, accumulating everything
-read into a `std::string`, which it returns.
-*Example:* `g.read_all() == "hi"` on a file that was written with
-`write_all("hi", 2)`.
-*Example:* `g.read_all() == ""` on a freshly created, still-empty file --
-the first underlying read immediately reports end-of-file, so the loop
-never appends anything and returns an empty string, not an error.
-*Example:* calling `g.read_all()` a second time on the same guard, right
-after a first call already consumed the whole file, returns `""` again --
-the fd's read position is already at the end, so there is nothing left to
-read.
+- **Example (partial read):** on a file containing `"0123456789"`,
+  `g.read_some(buf, 4)` returns **`4`** and fills `buf` with `"0123"` --
+  exactly one `::read()` call's worth, even though the file has 10 bytes
+  total.
+- **Example (continues from read position):** calling `g.read_some(buf,
+  64)` again immediately after, on the same still-open guard, continues
+  from where the fd's read position left off (**`"456789"`**), not from
+  the beginning of the file.
+- **Edge case (EOF):** calling `g.read_some(buf, 64)` once the fd has
+  already reached the end of the file returns **`0`** -- the end-of-file
+  signal, distinct from `-1` (error).
+
+**`read_all` reads in a loop** (using a buffer of your choosing, in terms
+of `read_some` or `::read` directly) until end-of-file, accumulating
+everything read into a `std::string`, which it returns.
+
+- **Example (basic round trip):** `g.read_all()` returns **`"hi"`** on a
+  file that was written with `write_all("hi", 2)`.
+- **Empty-input case:** `g.read_all()` returns **`""`** on a freshly
+  created, still-empty file -- the first underlying read immediately
+  reports end-of-file, so the loop never appends anything and returns an
+  empty string, not an error.
+- **Tricky case (already consumed):** calling `g.read_all()` a second
+  time on the same guard, right after a first call already consumed the
+  whole file, returns **`""`** again -- the fd's read position is already
+  at the end, so there is nothing left to read.
 
 ## Files
 

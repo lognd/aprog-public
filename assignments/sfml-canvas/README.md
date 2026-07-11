@@ -155,15 +155,17 @@ computed independently for each of the four channels (r, g, b, a). Every
 row is identical -- the whole image is a horizontal gradient repeated down
 every column. If `width <= 1`, every pixel is `from`.
 
-*Example:* `make_gradient(4, 4, (0,0,0,255), (30,60,90,255))` gives columns
-`x=0 -> (0,0,0,255)`, `x=1 -> (10,20,30,255)`, `x=2 -> (20,40,60,255)`,
-`x=3 -> (30,60,90,255)`, the same down every row.
-*Edge case (width <= 1):* `make_gradient(1, 3, (10,20,30,255),
-(200,200,200,255))` -- all 3 pixels are exactly `(10,20,30,255)`; `to` is
-never reached because there is no second column to lerp toward.
-*Rounding edge case:* `make_gradient(3, 1, (0,0,0,255), (9,10,11,255))` at
-`x=1` (`t = 0.5` exactly) gives `(5,5,6,255)` -- `4.5` rounds up to `5`,
-`5.0` stays `5`, `5.5` rounds up to `6` (round-half-up, per the rule below).
+- **Example (basic gradient):** `make_gradient(4, 4, (0,0,0,255),
+  (30,60,90,255))` gives columns `x=0 -> (0,0,0,255)`, `x=1 ->
+  (10,20,30,255)`, `x=2 -> (20,40,60,255)`, **`x=3 -> (30,60,90,255)`**,
+  the same down every row.
+- **Edge case (width <= 1):** `make_gradient(1, 3, (10,20,30,255),
+  (200,200,200,255))` -- all 3 pixels are exactly **`(10,20,30,255)`**;
+  `to` is never reached because there is no second column to lerp toward.
+- **Rounding edge case:** `make_gradient(3, 1, (0,0,0,255),
+  (9,10,11,255))` at `x=1` (`t = 0.5` exactly) gives **`(5,5,6,255)`** --
+  `4.5` rounds up to `5`, `5.0` stays `5`, `5.5` rounds up to `6`
+  (round-half-up, per the rule below).
 
 ### `checkerboard(width, height, cell, a, b)`
 
@@ -173,15 +175,17 @@ Tile the image into `cell x cell` pixel blocks, alternating between colors
 color `a`, otherwise `b`. Block `(0, 0)` -- the block containing the
 top-left pixel -- is always `a`.
 
-*Example:* `checkerboard(4, 4, 2, black, white)` gives the `4x4` grid
-`A A B B / A A B B / B B A A / B B A A` (`A` = black, `B` = white) -- see
-the "Examples at a glance" section above for the full picture.
-*Edge case (1x1 image):* `checkerboard(1, 1, 2, black, white)` -- the one
-pixel is block `(0/2, 0/2) = (0, 0)`, sum `0` is even, so the pixel is
-`black`.
-*Edge case (cell bigger than the image):* `checkerboard(5, 5, 10, black,
-white)` -- every pixel falls in block `(0, 0)`, so the entire `5x5` image
-is a single solid color, `black`, with no visible tiling at all.
+- **Example (basic tiling):** `checkerboard(4, 4, 2, black, white)` gives
+  the `4x4` grid `A A B B / A A B B / B B A A / B B A A` (`A` = black,
+  `B` = white) -- see the "Examples at a glance" section above for the
+  full picture.
+- **Edge case (1x1 image):** `checkerboard(1, 1, 2, black, white)` -- the
+  one pixel is block `(0/2, 0/2) = (0, 0)`, sum `0` is even, so the pixel
+  is **`black`**.
+- **Edge case (cell bigger than the image):** `checkerboard(5, 5, 10,
+  black, white)` -- every pixel falls in block `(0, 0)`, so the entire
+  `5x5` image is **a single solid color, `black`**, with no visible
+  tiling at all.
 
 ### `draw_disk(img, cx, cy, r, color)`
 
@@ -192,15 +196,17 @@ a bounding square. Any part of the disk that would fall outside `img`'s
 bounds is simply skipped (clipped); never write outside
 `[0, img.getSize().x) x [0, img.getSize().y)`.
 
-*Example:* on a `4x4` white canvas, `draw_disk(img, 2, 2, 1, red)` paints
-exactly the plus-shaped 5 pixels `(2,1) (1,2) (2,2) (3,2) (2,3)` -- worked
-out step by step in the "Worked example" section above.
-*Edge case (r = 0):* `draw_disk(img, 5, 5, 0, red)` paints only the single
-center pixel `(5,5)` -- the distance test `0*0+0*0 <= 0*0` is true only for
-`dx = dy = 0`.
-*Edge case (fully off-image):* `draw_disk(img, -100, -100, 3, red)` on any
-image leaves every pixel untouched and does not crash or resize the image --
-every candidate pixel in the bounding square clips away.
+- **Example (basic disk):** on a `4x4` white canvas, `draw_disk(img, 2,
+  2, 1, red)` paints exactly the plus-shaped **5 pixels** `(2,1) (1,2)
+  (2,2) (3,2) (2,3)` -- worked out step by step in the "Worked example"
+  section above.
+- **Edge case (r = 0):** `draw_disk(img, 5, 5, 0, red)` paints only the
+  **single center pixel `(5,5)`** -- the distance test `0*0+0*0 <= 0*0`
+  is true only for `dx = dy = 0`.
+- **Edge case (fully off-image):** `draw_disk(img, -100, -100, 3, red)`
+  on any image leaves **every pixel untouched** and does not crash or
+  resize the image -- every candidate pixel in the bounding square clips
+  away.
 
 ### `blend(base, overlay, alpha)`
 
@@ -214,16 +220,17 @@ result_channel = base_channel * (1 - alpha) + overlay_channel * alpha
 exactly. `base` and `overlay` are always the same size in every graded
 case; the image you return must have that same size.
 
-*Example:* blending the gradient and checkerboard images from "Examples at
-a glance" at `alpha = 0.5`, pixel `(2, 0)`: base `(20,40,60,255)`, overlay
-white `(255,255,255,255)` -> `(138,148,158,255)` (channel r:
-`20*0.5 + 255*0.5 = 137.5`, which round-half-up turns into `138`).
-*Edge case (alpha = 0):* `blend(base, overlay, 0.f)` reproduces `base`
-exactly, pixel for pixel, for any two same-size images.
-*Edge case (1x1 images):* `blend` on two `1x1` images, `base = (0,0,0,255)`
-and `overlay = (9,10,11,255)`, at `alpha = 0.5` gives `(5,5,6,255)` -- the
-same rounding rule as `make_gradient`'s midpoint example, because the math
-is identical.
+- **Example (basic blend):** blending the gradient and checkerboard
+  images from "Examples at a glance" at `alpha = 0.5`, pixel `(2, 0)`:
+  base `(20,40,60,255)`, overlay white `(255,255,255,255)` ->
+  **`(138,148,158,255)`** (channel r: `20*0.5 + 255*0.5 = 137.5`, which
+  round-half-up turns into `138`).
+- **Edge case (alpha = 0):** `blend(base, overlay, 0.f)` reproduces
+  **`base` exactly**, pixel for pixel, for any two same-size images.
+- **Edge case (1x1 images):** `blend` on two `1x1` images, `base =
+  (0,0,0,255)` and `overlay = (9,10,11,255)`, at `alpha = 0.5` gives
+  **`(5,5,6,255)`** -- the same rounding rule as `make_gradient`'s
+  midpoint example, because the math is identical.
 
 ### `outline_rect(img, x, y, w, h, color)`
 
@@ -232,18 +239,19 @@ whose pixels span `[x, x + w)` horizontally and `[y, y + h)` vertically:
 its top row, bottom row, left column, and right column. Do not fill the
 interior. Clip any border pixel that would fall outside `img`'s bounds.
 
-*Example:* on a `6x6` white canvas, `outline_rect(img, 1, 1, 3, 3, black)`
-paints the 8-pixel ring around `(2, 2)` -- `(1,1) (2,1) (3,1) (1,2) (3,2)
-(1,3) (2,3) (3,3)` -- and leaves `(2, 2)` (the one interior pixel) white.
-*Edge case (rect too small to have an interior):* `outline_rect(img, 1, 1,
-2, 2, black)` on a `4x4` canvas paints all 4 pixels of the 2x2 block -- a
-2x2 rectangle's own border already covers every pixel it has, leaving no
-interior pixel behind.
-*Edge case (clipping):* `outline_rect(img, -2, -2, 7, 7, black)` on a `5x5`
-canvas paints the entire bottom row (`y = 4`) and the entire right column
-(`x = 4`) -- the parts of the border still inside `[0,5) x [0,5)` -- while
-the top row (`y = -2`) and left column (`x = -2`) are clipped away
-entirely, with no crash.
+- **Example (basic ring):** on a `6x6` white canvas, `outline_rect(img,
+  1, 1, 3, 3, black)` paints the 8-pixel ring around `(2, 2)` -- `(1,1)
+  (2,1) (3,1) (1,2) (3,2) (1,3) (2,3) (3,3)` -- and leaves **`(2, 2)`**
+  (the one interior pixel) white.
+- **Edge case (rect too small to have an interior):** `outline_rect(img,
+  1, 1, 2, 2, black)` on a `4x4` canvas paints **all 4 pixels** of the
+  2x2 block -- a 2x2 rectangle's own border already covers every pixel
+  it has, leaving no interior pixel behind.
+- **Edge case (clipping):** `outline_rect(img, -2, -2, 7, 7, black)` on a
+  `5x5` canvas paints the entire bottom row (`y = 4`) and the entire
+  right column (`x = 4`) -- the parts of the border still inside `[0,5)
+  x [0,5)` -- while the top row (`y = -2`) and left column (`x = -2`)
+  are **clipped away entirely**, with no crash.
 
 ### Rounding rule (applies to `make_gradient` and `blend`)
 

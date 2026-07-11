@@ -74,18 +74,78 @@ Euclidean variant earns bonus credit over the loop-down version.
 
 Implement the following eight functions in `number_toolkit.hpp`:
 
-| Function | Signature | Notes |
-|----------|-----------|-------|
-| `is_prime` | `bool is_prime(long long n)` | Must not test every number up to `n` -- testing divisors up to the square root of `n` is enough and required; a loop that checks every number up to `n` fails the performance test on a large prime. *Example:* `is_prime(17) == true`; `is_prime(9) == false`; `is_prime(1) == false` (anything less than `2` is never prime). |
-| `gcd` | `long long gcd(long long a, long long b)` | Loop down from `min(a, b)` for full points. Euclidean algorithm earns bonus credit. *Example:* `gcd(12, 8) == 4`; `gcd(7, 3) == 1` (coprime); `gcd(5, 5) == 5` (a number is its own gcd with itself). |
-| `digit_sum` | `long long digit_sum(long long n)` | Sum of decimal digits. Handles negatives and zero. *Example:* `digit_sum(123) == 6`; `digit_sum(-456) == 15` (negative input is treated as its absolute value); `digit_sum(0) == 0`. |
-| `count_divisors` | `long long count_divisors(long long n)` | Count all positive divisors of `n`. *Example:* `count_divisors(12) == 6`; `count_divisors(7) == 2` (every prime has exactly two divisors: `1` and itself); `count_divisors(1) == 1` (only `1` divides `1`). |
-| `nth_fibonacci` | `long long nth_fibonacci(long long n)` | 1-indexed iterative Fibonacci. `nth_fibonacci(1) == 1`. *Example:* `nth_fibonacci(1) == 1`; `nth_fibonacci(2) == 1` (the first two terms are both `1`); `nth_fibonacci(7) == 13`. |
-| `is_power_of_two` | `bool is_power_of_two(long long n)` | `n > 0` and exactly one bit set. Must use bitwise operations only -- no loops, no division. *Example:* `is_power_of_two(8) == true`; `is_power_of_two(6) == false`; `is_power_of_two(0) == false` (zero has no bits set at all, so it fails the "exactly one bit" test). |
-| `popcount` | `int popcount(unsigned long long n)` | Number of 1-bits in `n`. Must use bit manipulation (shifts and masks) -- no library functions. *Example:* `popcount(13) == 3` (`13 == 0b1101`); `popcount(0) == 0`; `popcount(1) == 1`. |
-| `is_abundant` | `bool is_abundant(long long n)` | `true` if the sum of `n`'s proper divisors (positive divisors strictly less than `n`) exceeds `n`. *Example:* `is_abundant(12) == true` (`1+2+3+4+6 = 16 > 12`); `is_abundant(6) == false` (`1+2+3 = 6`, a "perfect number", not abundant); `is_abundant(1) == false` (`1` has no proper divisors to sum). |
+**1. `is_prime` -- `bool is_prime(long long n)`.** Must not test every
+number up to `n` -- testing divisors up to the square root of `n` is
+enough and required; a loop that checks every number up to `n` fails the
+performance test on a large prime.
 
-Examples:
+- **Example (prime):** `is_prime(17) == true`.
+- **Example (composite):** `is_prime(9) == false`.
+- **Edge case (below range):** `is_prime(1) == false` -- **anything less
+  than `2` is never prime**.
+
+**2. `gcd` -- `long long gcd(long long a, long long b)`.** Loop down from
+`min(a, b)` for full points. Euclidean algorithm earns bonus credit.
+
+- **Example (common factor):** `gcd(12, 8) == 4`.
+- **Example (coprime):** `gcd(7, 3) == 1` -- **the two numbers share no
+  common factor besides `1`**.
+- **Edge case (equal inputs):** `gcd(5, 5) == 5` -- **a number is its own
+  gcd with itself**.
+
+**3. `digit_sum` -- `long long digit_sum(long long n)`.** Sum of decimal
+digits. Handles negatives and zero.
+
+- **Example (positive):** `digit_sum(123) == 6`.
+- **Example (negative):** `digit_sum(-456) == 15` -- **negative input is
+  treated as its absolute value**.
+- **Edge case (zero):** `digit_sum(0) == 0`.
+
+**4. `count_divisors` -- `long long count_divisors(long long n)`.** Count
+all positive divisors of `n`.
+
+- **Example (composite):** `count_divisors(12) == 6`.
+- **Example (prime):** `count_divisors(7) == 2` -- **every prime has
+  exactly two divisors: `1` and itself**.
+- **Edge case (one):** `count_divisors(1) == 1` -- only `1` divides `1`.
+
+**5. `nth_fibonacci` -- `long long nth_fibonacci(long long n)`.**
+1-indexed iterative Fibonacci. `nth_fibonacci(1) == 1`.
+
+- **Example (first term):** `nth_fibonacci(1) == 1`.
+- **Example (second term):** `nth_fibonacci(2) == 1` -- **the first two
+  terms are both `1`**.
+- **Example (seventh term):** `nth_fibonacci(7) == 13`.
+
+**6. `is_power_of_two` -- `bool is_power_of_two(long long n)`.** `n > 0`
+and exactly one bit set. Must use bitwise operations only -- no loops, no
+division.
+
+- **Example (power of two):** `is_power_of_two(8) == true`.
+- **Example (not a power of two):** `is_power_of_two(6) == false`.
+- **Edge case (zero):** `is_power_of_two(0) == false` -- **zero has no
+  bits set at all, so it fails the "exactly one bit" test**.
+
+**7. `popcount` -- `int popcount(unsigned long long n)`.** Number of
+1-bits in `n`. Must use bit manipulation (shifts and masks) -- no library
+functions.
+
+- **Example (multiple bits):** `popcount(13) == 3` (`13 == 0b1101`).
+- **Edge case (zero):** `popcount(0) == 0`.
+- **Edge case (one bit):** `popcount(1) == 1`.
+
+**8. `is_abundant` -- `bool is_abundant(long long n)`.** `true` if the
+sum of `n`'s proper divisors (positive divisors strictly less than `n`)
+exceeds `n`.
+
+- **Example (abundant):** `is_abundant(12) == true` (`1+2+3+4+6 = 16 >
+  12`).
+- **Example (perfect, not abundant):** `is_abundant(6) == false`
+  (`1+2+3 = 6`, a "perfect number", **not abundant**).
+- **Edge case (one):** `is_abundant(1) == false` -- **`1` has no proper
+  divisors to sum**.
+
+All eight signatures at a glance:
 
 ```cpp
 is_prime(17)          // true

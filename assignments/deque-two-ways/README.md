@@ -124,21 +124,23 @@ an array index, `index % capacity_` takes any raw index -- even one that
 has walked past the end of the array -- and folds it back into the valid
 range of physical slots.
 
-Worked example, continuing the diagram above (`capacity_ = 8`, `head_ = 5`,
-`size_ = 4`): to find where `push_back` should write the fifth element, you
-compute `(head_ + size_) % capacity_`:
+**Worked example (finding the write index for `push_back`),** continuing
+the diagram above (`capacity_ = 8`, `head_ = 5`, `size_ = 4`): to find
+where `push_back` should write the fifth element, you compute
+`(head_ + size_) % capacity_`:
 
 ```
 head_ + size_ = 5 + 4 = 9
 9 % 8 = 1     (9 divided by 8 is 1 remainder 1)
 ```
 
-So the new element goes at physical index 1, NOT physical index 9 (which
-does not exist -- the array only has 8 slots, indices 0 through 7). Every
-index calculation in `ArrayDeque<T>` -- the write position for `push_back`,
-the write position for `push_front`, the read position for `back()` --
-follows this same pattern: compute the "raw" index as if the array went on
-forever, then take it `% capacity_` to fold it back into range.
+So the new element goes at **physical index 1**, NOT physical index 9
+(which does not exist -- the array only has 8 slots, indices 0 through 7).
+Every index calculation in `ArrayDeque<T>` -- the write position for
+`push_back`, the write position for `push_front`, the read position for
+`back()` -- follows this same pattern: compute the "raw" index as if the
+array went on forever, then take it `% capacity_` to fold it back into
+range.
 
 `push_front` uses the same idea in the other direction. To move `head_`
 backward by one slot (wrapping past index 0 back to the last index),
@@ -285,12 +287,15 @@ Background above.
 
 Continuing the same deque from step 6 (capacity 8, seven live logical
 slots would still fit, but pushing enough elements eventually fills all 8
-physical slots and then goes one past): after `push_back(40)` (reusing
-the stale index-2 slot from step 7's leftover `30`), then `push_back(50)`,
-`push_back(60)`, `push_back(70)`, and `push_back(80)`, the array is
-completely full (`size_ == 8 == capacity_`) with logical order `7, 10,
-20, 40, 50, 60, 70, 80` starting at `head_ = 7`. The NEXT call,
-`push_back(90)`, must grow:
+physical slots and then goes one past):
+
+- **Setup:** `push_back(40)` (reusing the stale index-2 slot from step
+  7's leftover `30`), then `push_back(50)`, `push_back(60)`,
+  `push_back(70)`, and `push_back(80)` fill the array completely
+  (**`size_ == 8 == capacity_`**) with logical order `7, 10, 20, 40, 50,
+  60, 70, 80` starting at `head_ = 7`.
+- **Trigger case (grow on full):** the NEXT call, `push_back(90)`, must
+  grow:
 
 | | `capacity_` | `head_` | `size_` | Array | Why |
 |---|------|------|------|-------|-----|
@@ -309,37 +314,44 @@ compiling the reference solution and printing `size()`, `capacity()`,
 
 Implement every member declared in three header files:
 
-- `array_deque.hpp` -- `ArrayDeque<T>`, a circular-buffer array backend.
-  Full Big 5, `push_front`/`push_back`/`pop_front`/`pop_back` (all O(1)),
-  `front()`/`back()`, `size()`/`empty()`/`capacity()`, and a private
-  `ensure_capacity()` that doubles and re-linearizes on grow.
-  *Example (continuing the table above):* starting from an empty
-  `ArrayDeque<int>`, `push_back(10); push_back(20); push_front(5);` leaves
-  `front() == 5`, `back() == 20`, `size() == 3`. On that same deque,
-  `pop_front()` returns `true` and leaves `front() == 10`; calling
-  `pop_front()` again and again until empty, then one more time, returns
-  `false` and leaves `size() == 0`, `empty() == true`.
-- `list_deque.hpp` -- `ListDeque<T>`, a doubly linked list backend. Full
-  Big 5, the same six deque operations, `size()`/`empty()`, and `clear()`.
-  *Example:* starting from an empty `ListDeque<int>`,
-  `push_back(1); push_back(2); push_front(0);` leaves `front() == 0`,
-  `back() == 2`, `size() == 3` (verified against the reference: a new
-  node is allocated for each call and linked in via `prev`/`next`, no
-  array or capacity involved at all). `pop_front()` on that deque returns
-  `true` and leaves `front() == 1`. `pop_front()` on a default-constructed
-  (empty) `ListDeque<int>` returns `false` and leaves `head_`/`tail_` both
-  null -- there is no node to unlink.
-- `stack_queue.hpp` -- `Stack<T, D>` and `Queue<T, D>`, container adapters
-  over a deque backend `D` (defaulting to `ArrayDeque<T>`). Every member
-  delegates to a private `D deque_` member.
-  *Example:* `Stack<int> s; s.push(1); s.push(2); s.push(3);` leaves
-  `s.top() == 3` (LIFO: last pushed is first out), `s.size() == 3`; after
-  `s.pop()`, `s.top() == 2`. `Queue<int> q; q.push(1); q.push(2);
-  q.push(3);` leaves `q.front() == 1`, `q.back() == 3` (FIFO: first
-  pushed is first out); after `q.pop()`, `q.front() == 2`, `q.back()`
-  is unchanged at `3`. A default-constructed (empty) `Stack<int>`'s
-  `pop()` returns `false` because it delegates directly to
-  `ArrayDeque<int>::pop_back()`, which itself returns `false` on empty.
+- **`array_deque.hpp` -- `ArrayDeque<T>`, a circular-buffer array
+  backend.** Full Big 5, `push_front`/`push_back`/`pop_front`/`pop_back`
+  (all O(1)), `front()`/`back()`, `size()`/`empty()`/`capacity()`, and a
+  private `ensure_capacity()` that doubles and re-linearizes on grow.
+  - **Example (continuing the table above):** starting from an empty
+    `ArrayDeque<int>`, `push_back(10); push_back(20); push_front(5);`
+    leaves `front() == 5`, `back() == 20`, and **`size() == 3`**.
+  - **Example (pop until empty):** on that same deque, `pop_front()`
+    returns `true` and leaves `front() == 10`; calling `pop_front()`
+    again and again until empty, then one more time, **returns `false`**
+    and leaves `size() == 0`, `empty() == true`.
+- **`list_deque.hpp` -- `ListDeque<T>`, a doubly linked list backend.**
+  Full Big 5, the same six deque operations, `size()`/`empty()`, and
+  `clear()`.
+  - **Example (push front and back):** starting from an empty
+    `ListDeque<int>`, `push_back(1); push_back(2); push_front(0);` leaves
+    `front() == 0`, `back() == 2`, and **`size() == 3`** (verified against
+    the reference: a new node is allocated for each call and linked in
+    via `prev`/`next`, no array or capacity involved at all).
+  - **Example (pop_front):** `pop_front()` on that deque returns `true`
+    and leaves `front() == 1`.
+  - **Edge case (pop from empty):** `pop_front()` on a
+    default-constructed (empty) `ListDeque<int>` **returns `false`** and
+    leaves `head_`/`tail_` both null -- there is no node to unlink.
+- **`stack_queue.hpp` -- `Stack<T, D>` and `Queue<T, D>`, container
+  adapters over a deque backend `D`** (defaulting to `ArrayDeque<T>`).
+  Every member delegates to a private `D deque_` member.
+  - **Example (Stack is LIFO):** `Stack<int> s; s.push(1); s.push(2);
+    s.push(3);` leaves **`s.top() == 3`** (last pushed is first out) and
+    `s.size() == 3`; after `s.pop()`, `s.top() == 2`.
+  - **Example (Queue is FIFO):** `Queue<int> q; q.push(1); q.push(2);
+    q.push(3);` leaves **`q.front() == 1`**, `q.back() == 3` (first
+    pushed is first out); after `q.pop()`, `q.front() == 2`, `q.back()`
+    is unchanged at `3`.
+  - **Edge case (pop from empty stack):** a default-constructed (empty)
+    `Stack<int>`'s `pop()` **returns `false`** because it delegates
+    directly to `ArrayDeque<int>::pop_back()`, which itself returns
+    `false` on empty.
 
 `pop_front()` and `pop_back()` on both backends, and `push()`/`pop()` on
 both adapters, return `true` on success or `false` and no-op on an empty

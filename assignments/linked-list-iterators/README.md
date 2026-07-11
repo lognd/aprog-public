@@ -250,52 +250,79 @@ read from. This is exactly why every loop in this assignment checks
 Implement everything under `// YOUR TASK: forward iterators` in
 `linked_list.hpp`:
 
-- `Iterator`: constructor, `operator*`, `operator->`, prefix `operator++`,
-  postfix `operator++(int)`, `operator==`, `operator!=`
-  *Examples* (list is `10 -> 20 -> 30`, `it = list.begin()`):
-  `*it == 10`; after `++it`, `*it == 20`; `auto old = it++` (from
-  `20`) leaves `*old == 20` and `*it == 30`; `it == list.end()` is
-  `false` while `it` is at any real node, and becomes `true` only once
-  `it` has been advanced past `30`; dereferencing `list.end()` (i.e.
-  `*list.end()`) is undefined behavior and must never be done.
-- `ConstIterator`: the same six operations, `const`-qualified
-  *Examples*: `list.cbegin() == list.cend()` is `true` only for an
-  empty list; `*list.cbegin()` on `10 -> 20 -> 30` is `const int&`
-  bound to `10` -- assigning through it, e.g. `*list.cbegin() = 5;`,
-  must not compile; a `ConstIterator` constructed from an `Iterator`
-  (via the implicit converting constructor) points at the same node,
-  so `ConstIterator(list.begin()) == list.cbegin()` is `true`.
-- `begin()` / `end()` (mutable), `cbegin()` / `cend()`, and the
-  `const`-qualified `begin()` / `end()` overloads that forward to them
-  *Examples*: for `LinkedList<int> empty;` (nothing pushed),
-  `empty.begin() == empty.end()` is `true` (both wrap `nullptr`); for
-  `10 -> 20 -> 30`, `list.begin() == list.end()` is `false`; given
+**`Iterator`: constructor, `operator*`, `operator->`, prefix `operator++`,
+postfix `operator++(int)`, `operator==`, `operator!=`.**
+(list is `10 -> 20 -> 30`, `it = list.begin()`)
+
+- **Example (dereference):** `*it == 10`.
+- **Example (prefix advance):** after `++it`, `*it == 20`.
+- **Example (postfix advance):** `auto old = it++` (from `20`) leaves
+  `*old == 20` and **`*it == 30`**.
+- **Example (fence-post comparison):** `it == list.end()` is `false`
+  while `it` is at any real node, and becomes `true` only once `it`
+  has been advanced past `30`.
+- **Error case (undefined behavior):** dereferencing `list.end()`
+  (i.e. `*list.end()`) is **undefined behavior** and must never be done.
+
+**`ConstIterator`: the same six operations, `const`-qualified.**
+
+- **Example (empty-list comparison):** `list.cbegin() == list.cend()`
+  is `true` **only for an empty list**.
+- **Example (const read):** `*list.cbegin()` on `10 -> 20 -> 30` is
+  `const int&` bound to `10`.
+- **Error case (no mutation):** assigning through it, e.g.
+  `*list.cbegin() = 5;`, **must not compile**.
+- **Example (converting constructor):** a `ConstIterator` constructed
+  from an `Iterator` (via the implicit converting constructor) points
+  at the same node, so `ConstIterator(list.begin()) == list.cbegin()`
+  is **`true`**.
+
+**`begin()` / `end()` (mutable), `cbegin()` / `cend()`, and the
+`const`-qualified `begin()` / `end()` overloads that forward to them.**
+
+- **Empty-list case:** for `LinkedList<int> empty;` (nothing pushed),
+  `empty.begin() == empty.end()` is **`true`** (both wrap `nullptr`).
+- **Example (non-empty list):** for `10 -> 20 -> 30`,
+  `list.begin() == list.end()` is `false`.
+- **Example (const overload):** given
   `const LinkedList<int>& clist = list;`, `clist.begin()` returns a
   `ConstIterator` (the `const`-qualified overload), so
-  `for (int x : clist)` compiles and reads every element without
-  being able to modify any of them.
-- `find_it(value)` -- returns an `Iterator` to the first matching
-  element, or `end()` if none matches
-  *Examples*: on `10 -> 20 -> 30`, `*list.find_it(20) == 20`;
-  `list.find_it(99) == list.end()` (not present); on an empty list,
-  `empty.find_it(0) == empty.end()` (nothing to find, so it falls
-  straight through to `end()`).
-- `insert_after(pos, value)` -- see the contract above and in the header
-  *Examples*: on `10 -> 20 -> 30`, `list.insert_after(list.find_it(20),
-  25)` returns `true` and the list becomes `10 -> 20 -> 25 -> 30`;
-  `list.insert_after(list.find_it(30), 40)` (inserting after the LAST
-  node) returns `true`, the list becomes `... -> 30 -> 40`, and
-  `list.back() == 40` afterward (`tail_` was correctly updated);
-  `list.insert_after(list.end(), 99)` returns `false` and changes
-  nothing, since `end()` is a fence post with no node to insert after.
-- `erase_after(pos)` -- see the contract above and in the header
-  *Examples*: on `10 -> 20 -> 30`, `list.erase_after(list.find_it(10))`
-  returns `true` and the list becomes `10 -> 30`; calling
-  `list.erase_after(list.find_it(30))` (`30` is the last node, nothing
-  after it) returns `false` and leaves the list unchanged;
-  `list.erase_after(list.end())` also returns `false` for the same
-  reason `insert_after(list.end(), ...)` does -- `end()` is not a real
-  node to erase "after".
+  `for (int x : clist)` compiles and **reads every element without
+  being able to modify any of them**.
+
+**`find_it(value)` -- returns an `Iterator` to the first matching
+element, or `end()` if none matches.**
+
+- **Example (found):** on `10 -> 20 -> 30`, `*list.find_it(20) == 20`.
+- **Example (not found):** `list.find_it(99) == list.end()`.
+- **Empty-list case:** on an empty list, `empty.find_it(0) ==
+  empty.end()` -- nothing to find, so it falls straight through to
+  `end()`.
+
+**`insert_after(pos, value)` -- see the contract above and in the header.**
+
+- **Example (middle insert):** on `10 -> 20 -> 30`,
+  `list.insert_after(list.find_it(20), 25)` returns `true` and the
+  list becomes `10 -> 20 -> 25 -> 30`.
+- **Tricky case (insert after last node):**
+  `list.insert_after(list.find_it(30), 40)` returns `true`, the list
+  becomes `... -> 30 -> 40`, and **`list.back() == 40`** afterward
+  (`tail_` was correctly updated).
+- **Edge case (`end()`):** `list.insert_after(list.end(), 99)`
+  returns **`false`** and changes nothing, since `end()` is a fence
+  post with no node to insert after.
+
+**`erase_after(pos)` -- see the contract above and in the header.**
+
+- **Example (middle erase):** on `10 -> 20 -> 30`,
+  `list.erase_after(list.find_it(10))` returns `true` and the list
+  becomes `10 -> 30`.
+- **Tricky case (erase after last node):**
+  `list.erase_after(list.find_it(30))` (`30` is the last node,
+  nothing after it) returns **`false`** and leaves the list unchanged.
+- **Edge case (`end()`):** `list.erase_after(list.end())` also
+  returns `false` for the same reason `insert_after(list.end(), ...)`
+  does -- `end()` is not a real node to erase "after".
 
 The Big-5 and the basic push/insert/remove/find/size operations are
 already implemented for you at the top of the file -- do not modify them.

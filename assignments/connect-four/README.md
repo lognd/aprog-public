@@ -188,22 +188,49 @@ Implement the four functions declared in `board.hpp`.
 
 Find the lowest empty row in `column` and place `piece` there. Return `true` on success, `false` if the column is already full (the top cell, row 0, is not `'.'`). `main.cpp` already validates that `column` is in range (`0` to `cols - 1`) before calling `drop_piece`, so you do not need to guard against an out-of-range column yourself.
 
-*Examples* (using the main example board above, `rows = 6`, `cols = 7`):
-`drop_piece(board, 6, 7, 6, 'O') == true`, landing at `(row 5, col 6)` since column 6 is completely empty.
-`drop_piece(board, 6, 7, 0, 'X') == false`, since column 0's top cell `(row 0, col 0)` is already `'O'` -- the board is left unchanged.
-`drop_piece(board, 6, 7, 4, 'X') == true`, landing at `(row 3, col 4)` -- column 4 already has two pieces stacked, so the new one lands on top of them, not at the bottom.
+**Examples** (using the main example board above, `rows = 6`, `cols = 7`):
+
+- **Example (empty column):** `drop_piece(board, 6, 7, 6, 'O') == true`,
+  landing at **`(row 5, col 6)`** since column 6 is completely empty.
+- **Error case (full column):** `drop_piece(board, 6, 7, 0, 'X') == false`,
+  since column 0's top cell `(row 0, col 0)` is already `'O'` -- **the
+  board is left unchanged**.
+- **Tricky case (stacking):** `drop_piece(board, 6, 7, 4, 'X') == true`,
+  landing at **`(row 3, col 4)`** -- column 4 already has two pieces
+  stacked, so the new one lands on top of them, not at the bottom.
 
 ### `check_win`
 
 Return `true` if `piece` has four consecutive copies anywhere on the board. Check all four directions: horizontal, vertical, diagonal (top-left to bottom-right), and anti-diagonal (top-right to bottom-left). A run of exactly four is sufficient; longer runs also count.
 
-*Examples:* on the four positive win boards above, `check_win(board, 6, 7, 'X')` is `true` for the horizontal board (`X X X X` at cols 0-3 of row 5), the diagonal board, and the anti-diagonal board; `check_win(board, 6, 7, 'O')` is `true` for the vertical board (`O` stacked at rows 2-5 of column 2). On the main example board, `check_win(board, 6, 7, 'X') == false` even though `X` has a three-long diagonal run at `(row 2, col 2)`, `(row 3, col 3)`, `(row 4, col 4)` -- a run of three is not enough, and the cell that would extend it to four, `(row 5, col 5)`, is `'O'`.
+**Examples:**
+
+- **Example (horizontal/diagonal/anti-diagonal wins):** on the four
+  positive win boards above, `check_win(board, 6, 7, 'X')` is **`true`**
+  for the horizontal board (`X X X X` at cols 0-3 of row 5), the
+  diagonal board, and the anti-diagonal board.
+- **Example (vertical win):** `check_win(board, 6, 7, 'O')` is **`true`**
+  for the vertical board (`O` stacked at rows 2-5 of column 2).
+- **Tricky case (three-in-a-row is not enough):** on the main example
+  board, `check_win(board, 6, 7, 'X') == false` even though `X` has a
+  three-long diagonal run at `(row 2, col 2)`, `(row 3, col 3)`,
+  `(row 4, col 4)` -- a run of three is not enough, and the cell that
+  would extend it to four, `(row 5, col 5)`, is `'O'`.
 
 ### `is_full`
 
 Return `true` if no cell on the board equals `'.'`.
 
-*Examples:* on a freshly created board (every cell `'.'`), `is_full(board, 6, 7) == false`. On the main example board above, `is_full(board, 6, 7) == false` (column 6 is entirely empty). Only a board where every one of the 42 cells has been played on returns `true` -- note that a full board and a won board are independent conditions: `main.cpp` always checks `check_win` before `is_full`, so a full board that also happens to contain four-in-a-row is reported as a win, not a draw.
+**Examples:**
+
+- **Empty-input case:** on a freshly created board (every cell `'.'`),
+  `is_full(board, 6, 7) == false`.
+- **Example:** on the main example board above,
+  `is_full(board, 6, 7) == false` (column 6 is entirely empty).
+- **Edge case (full vs. won are independent):** only a board where every
+  one of the 42 cells has been played on returns `true` -- `main.cpp`
+  always checks `check_win` before `is_full`, so a full board that also
+  happens to contain four-in-a-row is reported as **a win, not a draw**.
 
 ### `computer_move`
 
@@ -215,11 +242,24 @@ Return the column the computer should play. Use this three-priority decision pro
 
 To check whether a column leads to a win, simulate: call `drop_piece` on a copy of the board, then call `check_win`. Do not use randomness -- the AI must be fully deterministic (given the same board, it must always choose the same move).
 
-*Examples* (see the four scenario boards above for the full boards):
-`computer_move` on board A (`O` three-in-a-row with two ways to complete it) `== 1` -- priority 1 fires, and of the two winning columns (`1` and `5`), the lower index wins.
-`computer_move` on board B (`X` three-in-a-row, no computer win available) `== 0` -- priority 1 finds nothing, priority 2 blocks the lower-indexed of the two threats (`0` and `4`).
-`computer_move` on an empty board `== 3` -- priorities 1 and 2 find nothing (no pieces at all), so priority 3's center heuristic picks `cols / 2 == 3`.
-`computer_move` on board C2 (center column full, alternating pieces, no win available for either side) `== 2` -- priority 3 falls back to the closest remaining column to center; columns 2 and 4 are equally close, and the tie goes to the lower index.
+**Examples** (see the four scenario boards above for the full boards):
+
+- **Example (board A, win available):** `computer_move` on board A (`O`
+  three-in-a-row with two ways to complete it) `== 1` -- priority 1
+  fires, and of the two winning columns (`1` and `5`), **the lower
+  index wins**.
+- **Example (board B, must block):** `computer_move` on board B (`X`
+  three-in-a-row, no computer win available) `== 0` -- priority 1 finds
+  nothing, priority 2 blocks the lower-indexed of the two threats (`0`
+  and `4`).
+- **Edge case (empty board):** `computer_move` on an empty board `== 3`
+  -- priorities 1 and 2 find nothing (no pieces at all), so priority 3's
+  center heuristic picks `cols / 2 == 3`.
+- **Tricky case (center full, tie-break):** `computer_move` on board C2
+  (center column full, alternating pieces, no win available for either
+  side) `== 2` -- priority 3 falls back to the closest remaining column
+  to center; columns 2 and 4 are equally close, and the tie goes to the
+  lower index.
 
 ---
 

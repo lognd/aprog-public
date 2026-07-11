@@ -121,24 +121,27 @@ Expected output:
 Your solution must be correct for any `n` such that no value in the sequence
 exceeds the bounds of `unsigned long long`.
 
-*Examples:* (all confirmed against the reference solution)
-- `collatz(1)` prints just `1` -- the base case. `n` starts already equal
-  to `1`, so the loop's "have we reached 1 yet?" check is true immediately
-  and nothing else ever prints.
-- `collatz(8)` prints `8, 4, 2, 1` (four lines). `8` is a power of two
-  (`2^3`), so every step only ever halves -- it never takes the `3n + 1`
-  branch at all.
-- `collatz(6)` prints `6, 3, 10, 5, 16, 8, 4, 2, 1` (nine lines) -- note
-  it mixes even and odd steps (`6 -> 3` halves, `3 -> 10` applies
-  `3n + 1`) before settling into the same shrinking tail as `collatz(5)`.
-- `collatz(27)` prints 112 lines and climbs as high as `9232` before
-  falling back to `1` -- a small starting value with a surprisingly long,
-  large-valued sequence; a good check that your loop does not stop early
-  and that your arithmetic does not overflow partway through.
-- `collatz(871)` prints 179 lines and peaks at `190996`, the largest
-  value in this assignment's grading cases -- confirms your
-  `unsigned long long` arithmetic holds up for bigger, longer-climbing
-  inputs.
+**Examples** (all confirmed against the reference solution):
+
+- **Example (base case, n=1):** `collatz(1)` prints just `1`. `n` starts
+  already equal to `1`, so the loop's "have we reached 1 yet?" check is
+  true immediately and **nothing else ever prints**.
+- **Example (power of two, n=8):** `collatz(8)` prints `8, 4, 2, 1`
+  (**four lines**). `8` is a power of two (`2^3`), so every step only
+  ever halves -- it never takes the `3n + 1` branch at all.
+- **Example (mixed even/odd, n=6):** `collatz(6)` prints
+  `6, 3, 10, 5, 16, 8, 4, 2, 1` (**nine lines**) -- note it mixes even
+  and odd steps (`6 -> 3` halves, `3 -> 10` applies `3n + 1`) before
+  settling into the same shrinking tail as `collatz(5)`.
+- **Tricky case (long climb, n=27):** `collatz(27)` prints **112 lines**
+  and climbs as high as **`9232`** before falling back to `1` -- a small
+  starting value with a surprisingly long, large-valued sequence; a good
+  check that your loop does not stop early and that your arithmetic does
+  not overflow partway through.
+- **Tricky case (large peak, n=871):** `collatz(871)` prints **179
+  lines** and peaks at **`190996`**, the largest value in this
+  assignment's grading cases -- confirms your `unsigned long long`
+  arithmetic holds up for bigger, longer-climbing inputs.
 
 ## Files
 

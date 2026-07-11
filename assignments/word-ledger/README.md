@@ -148,52 +148,67 @@ unpredictable.
 Implement every function declared in `word_ledger.hpp`, inside the
 `wledger` namespace:
 
-- `word_frequencies(words)` -> `std::map<std::string, int>` -- how many
-  times each distinct word appears, sorted by word.
-  *Examples:* `word_frequencies({"the", "cat", "the"})` ==
-  `{"cat": 1, "the": 2}`; `word_frequencies({})` == `{}` (empty in, empty
-  out); `word_frequencies({"Cat", "cat"})` == `{"Cat": 1, "cat": 1}` --
-  two entries, because comparison is case-sensitive and `"Cat"` sorts
-  before `"cat"` (uppercase letters have smaller ASCII values); a single
-  repeated word like `word_frequencies({"go", "go", "go"})` == `{"go": 3}`.
-- `first_occurrence_index(words)` -> `std::unordered_map<std::string, int>`
+- **`word_frequencies(words)`** -> `std::map<std::string, int>` -- how
+  many times each distinct word appears, sorted by word.
+  - **Example:** `word_frequencies({"the", "cat", "the"})` ==
+    `{"cat": 1, "the": 2}`.
+  - **Empty input:** `word_frequencies({})` == `{}`.
+  - **Tricky case (case sensitivity):** `word_frequencies({"Cat", "cat"})`
+    == `{"Cat": 1, "cat": 1}` -- **two entries**, because comparison is
+    case-sensitive and `"Cat"` sorts before `"cat"` (uppercase letters
+    have smaller ASCII values).
+  - **Example (repeated word):** `word_frequencies({"go", "go", "go"})`
+    == `{"go": 3}`.
+- **`first_occurrence_index(words)`** -> `std::unordered_map<std::string, int>`
   -- for each distinct word, the 0-based index of its first appearance.
-  Order does not matter here, so this returns the faster hash-table-backed
-  map rather than a sorted one.
-  *Examples:* `first_occurrence_index({"a", "b", "a"})` == `{"a": 0, "b":
-  1}` (note `"a"`'s SECOND appearance at index 2 does not change its
-  recorded index); `first_occurrence_index({})` == `{}`;
-  `first_occurrence_index({"only"})` == `{"only": 0}`.
-- `unique_words_sorted(words)` -> `std::set<std::string>` -- every distinct
-  word, in sorted order (a `std::set`'s own iteration order already gives
-  you this, for free).
-  *Examples:* `unique_words_sorted({"banana", "apple", "banana"})` ==
-  `{"apple", "banana"}`; `unique_words_sorted({})` == `{}`;
-  `unique_words_sorted({"Cat", "bird", "cat"})` == `{"Cat", "bird",
-  "cat"}` -- three distinct entries in ASCII order, not dictionary order
-  (`"Cat"` first, since uppercase sorts before lowercase).
-- `common_words(a, b)` -> `std::set<std::string>` -- the set
+  Order does not matter here, so this returns the faster
+  hash-table-backed map rather than a sorted one.
+  - **Example:** `first_occurrence_index({"a", "b", "a"})` == `{"a": 0,
+    "b": 1}` -- note `"a"`'s **second** appearance at index 2 does not
+    change its recorded index.
+  - **Empty input:** `first_occurrence_index({})` == `{}`.
+  - **Example (single word):** `first_occurrence_index({"only"})` ==
+    `{"only": 0}`.
+- **`unique_words_sorted(words)`** -> `std::set<std::string>` -- every
+  distinct word, in sorted order (a `std::set`'s own iteration order
+  already gives you this, for free).
+  - **Example:** `unique_words_sorted({"banana", "apple", "banana"})`
+    == `{"apple", "banana"}`.
+  - **Empty input:** `unique_words_sorted({})` == `{}`.
+  - **Tricky case (ASCII order):** `unique_words_sorted({"Cat", "bird", "cat"})`
+    == `{"Cat", "bird", "cat"}` -- three distinct entries in **ASCII
+    order, not dictionary order** (`"Cat"` first, since uppercase sorts
+    before lowercase).
+- **`common_words(a, b)`** -> `std::set<std::string>` -- the set
   **intersection**: every word that appears in both `a` and `b`.
-  *Examples:* `common_words({"cat", "dog"}, {"dog", "fish"})` ==
-  `{"dog"}`; `common_words({}, {"x"})` == `{}` (either side empty means no
-  overlap is possible); `common_words({"a", "A"}, {"a"})` == `{"a"}` --
-  `"A"` does not match `"a"` because comparison is case-sensitive.
-- `words_only_in(a, b)` -> `std::set<std::string>` -- the set
-  **difference**: every word in `a` that does not appear anywhere in `b`.
-  *Examples:* `words_only_in({"cat", "dog", "bird"}, {"dog"})` == `{"bird",
-  "cat"}`; `words_only_in({"x"}, {})` == `{"x"}` (`b` empty means nothing
-  gets excluded); `words_only_in({}, {"x"})` == `{}` (`a` empty means
-  there is nothing to report, regardless of `b`).
-- `most_frequent(words, k)` -> `std::vector<std::pair<std::string, int>>`
+  - **Example:** `common_words({"cat", "dog"}, {"dog", "fish"})` ==
+    `{"dog"}`.
+  - **Empty input:** `common_words({}, {"x"})` == `{}` -- either side
+    empty means no overlap is possible.
+  - **Tricky case (case sensitivity):** `common_words({"a", "A"}, {"a"})`
+    == `{"a"}` -- `"A"` does not match `"a"` because comparison is
+    case-sensitive.
+- **`words_only_in(a, b)`** -> `std::set<std::string>` -- the set
+  **difference**: every word in `a` that does not appear anywhere in
+  `b`.
+  - **Example:** `words_only_in({"cat", "dog", "bird"}, {"dog"})` ==
+    `{"bird", "cat"}`.
+  - **Edge case (b empty):** `words_only_in({"x"}, {})` == `{"x"}` --
+    `b` empty means nothing gets excluded.
+  - **Edge case (a empty):** `words_only_in({}, {"x"})` == `{}` -- `a`
+    empty means there is nothing to report, regardless of `b`.
+- **`most_frequent(words, k)`** -> `std::vector<std::pair<std::string, int>>`
   -- the top `k` most frequent words, ordered by count descending, with
   ties broken alphabetically ascending.
-  *Examples:* `most_frequent({"a", "b", "a", "c", "b", "a"}, 2)` ==
-  `[("a", 3), ("b", 2)]`; `most_frequent({"cat", "bird", "Cat"}, 2)` ==
-  `[("Cat", 1), ("bird", 1)]` -- a three-way count tie (all count 1),
-  broken by ASCII order, so `"Cat"` (uppercase `'C'`) beats `"bird"` and
-  `"cat"`; `most_frequent({}, 3)` == `[]` (empty input); `most_frequent({"x",
-  "y"}, 0)` == `[]` (`k <= 0` always returns empty, even with real words
-  available).
+  - **Example:** `most_frequent({"a", "b", "a", "c", "b", "a"}, 2)` ==
+    `[("a", 3), ("b", 2)]`.
+  - **Tricky case (tie-break):** `most_frequent({"cat", "bird", "Cat"}, 2)`
+    == `[("Cat", 1), ("bird", 1)]` -- a three-way count tie (all count
+    1), broken by ASCII order, so `"Cat"` (uppercase `'C'`) beats
+    `"bird"` and `"cat"`.
+  - **Empty input:** `most_frequent({}, 3)` == `[]`.
+  - **Edge case (k <= 0):** `most_frequent({"x", "y"}, 0)` == `[]` --
+    `k <= 0` always returns empty, even with real words available.
 
 The full contract for every function -- exact return type, tie-breaking
 rule, and behavior on empty input -- is documented as a comment directly

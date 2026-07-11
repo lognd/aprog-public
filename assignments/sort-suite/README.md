@@ -139,57 +139,68 @@ Implement every function declared in `sort_suite.hpp`, inside the
 `sortsuite` namespace. Every sorting function mutates the vector it is
 given directly (in place); none of them return a new vector.
 
-- `selection_sort(v)` -> `void` -- sorts `v` ascending in place using
-  selection sort (find the minimum of the remaining unsorted region,
-  swap it into place, repeat).
-  *Example:* `selection_sort` on `{5, 3, 8, 1, 4}` leaves `v` as
-  `{1, 3, 4, 5, 8}` (see the worked example above for every pass);
-  on the already-sorted `{1, 2, 3}` it leaves `v` unchanged;
-  on the reverse-sorted `{3, 2, 1}` it leaves `v` as `{1, 2, 3}`;
-  on the empty `{}` it is a no-op (`v` stays `{}`).
-- `insertion_sort(v)` -> `void` -- sorts `v` ascending in place using
-  insertion sort (grow a sorted prefix one element at a time, shifting
-  larger elements right to make room).
-  *Example:* `insertion_sort` on `{5, 3, 8, 1, 4}` leaves `v` as
-  `{1, 3, 4, 5, 8}`;
-  on the single-element `{42}` it leaves `v` as `{42}` (a documented
-  no-op, since a one-element array is already sorted);
-  on the duplicate-heavy `{2, 2, 1, 1, 3}` it leaves `v` as
-  `{1, 1, 2, 2, 3}` (duplicates are compared with `>`, not `>=`, so
-  equal elements are never needlessly shifted past each other).
-- `merge_sort(v)` -> `void` -- sorts `v` ascending using merge sort
-  (split in half recursively, sort each half, merge the two sorted
-  halves back together). May allocate an O(n) scratch array for the
-  merge step. Must run in O(n log n) time -- see Background above for
-  why this is checked directly, not just inferred from correctness.
-  *Example:* `merge_sort` on `{5, 3, 8, 1, 4}` leaves `v` as
-  `{1, 3, 4, 5, 8}`;
-  on the empty `{}` it is a documented no-op (`v` stays `{}`);
-  on the already-sorted `{1, 2, 3, 4, 5}` it leaves `v` unchanged (still
-  runs the full split/merge process, but every merge step takes
-  entirely from the left half first).
-- `stable_sort_pairs(v)` -> `void` -- sorts `v` (a vector of
-  `std::pair<int, std::string>`) ascending by `.first` ONLY, built from
-  the same merge sort logic as `merge_sort`. Must be stable: pairs with
-  equal `.first` keep their original relative order.
-  *Example:* `stable_sort_pairs` on
-  `{(2, "b"), (1, "x"), (2, "a"), (1, "y")}` leaves `v` as
-  `{(1, "x"), (1, "y"), (2, "b"), (2, "a")}` -- notice `(2, "b")` still
-  comes before `(2, "a")`, and `(1, "x")` still comes before `(1, "y")`,
-  because both pairs in each tied group kept their ORIGINAL relative
-  order (an unstable sort would be allowed to swap `"b"` and `"a"`, or
-  `"x"` and `"y"`, since both orderings are equally valid by `.first`
-  alone);
-  on the empty `{}` it is a documented no-op.
-- `is_sorted_asc(v)` -> `bool` -- returns whether `v` is currently sorted
-  in ascending order. Does not modify `v`.
-  *Example:* `is_sorted_asc({1, 2, 2, 5, 9}) == true` (duplicates are
-  fine -- ascending allows `<=` between neighbors, not strict `<`);
-  `is_sorted_asc({1, 5, 2}) == false` (`5 > 2`, so it is not ascending);
-  `is_sorted_asc({}) == true` and `is_sorted_asc({7}) == true` (an
-  empty array and a single-element array are both documented as
-  trivially sorted -- there are no neighboring pairs to violate
-  ascending order).
+**`selection_sort(v) -> void`** -- sorts `v` ascending in place using
+selection sort (find the minimum of the remaining unsorted region, swap
+it into place, repeat).
+
+- **Example (basic):** on `{5, 3, 8, 1, 4}` leaves `v` as **`{1, 3, 4,
+  5, 8}`** (see the worked example above for every pass).
+- **Edge case (already sorted):** on `{1, 2, 3}` leaves `v` unchanged.
+- **Edge case (reverse sorted):** on `{3, 2, 1}` leaves `v` as `{1, 2,
+  3}`.
+- **Empty-input case:** on `{}` is a no-op (`v` stays `{}`).
+
+**`insertion_sort(v) -> void`** -- sorts `v` ascending in place using
+insertion sort (grow a sorted prefix one element at a time, shifting
+larger elements right to make room).
+
+- **Example (basic):** on `{5, 3, 8, 1, 4}` leaves `v` as **`{1, 3, 4,
+  5, 8}`**.
+- **Edge case (single element):** on `{42}` leaves `v` as `{42}` (a
+  documented no-op, since a one-element array is already sorted).
+- **Edge case (duplicates):** on `{2, 2, 1, 1, 3}` leaves `v` as **`{1,
+  1, 2, 2, 3}`** (duplicates are compared with `>`, not `>=`, so equal
+  elements are never needlessly shifted past each other).
+
+**`merge_sort(v) -> void`** -- sorts `v` ascending using merge sort
+(split in half recursively, sort each half, merge the two sorted halves
+back together). May allocate an O(n) scratch array for the merge step.
+Must run in **O(n log n)** time -- see Background above for why this is
+checked directly, not just inferred from correctness.
+
+- **Example (basic):** on `{5, 3, 8, 1, 4}` leaves `v` as **`{1, 3, 4,
+  5, 8}`**.
+- **Empty-input case:** on `{}` is a documented no-op (`v` stays `{}`).
+- **Edge case (already sorted):** on `{1, 2, 3, 4, 5}` leaves `v`
+  unchanged (still runs the full split/merge process, but every merge
+  step takes entirely from the left half first).
+
+**`stable_sort_pairs(v) -> void`** -- sorts `v` (a vector of
+`std::pair<int, std::string>`) ascending by `.first` ONLY, built from the
+same merge sort logic as `merge_sort`. Must be stable: pairs with equal
+`.first` keep their original relative order.
+
+- **Example (stability under ties):** on `{(2, "b"), (1, "x"), (2,
+  "a"), (1, "y")}` leaves `v` as **`{(1, "x"), (1, "y"), (2, "b"), (2,
+  "a")}`** -- notice `(2, "b")` still comes before `(2, "a")`, and `(1,
+  "x")` still comes before `(1, "y")`, because both pairs in each tied
+  group kept their **original relative order** (an unstable sort would
+  be allowed to swap `"b"` and `"a"`, or `"x"` and `"y"`, since both
+  orderings are equally valid by `.first` alone).
+- **Empty-input case:** on `{}` is a documented no-op.
+
+**`is_sorted_asc(v) -> bool`** -- returns whether `v` is currently
+sorted in ascending order. Does not modify `v`.
+
+- **Example (sorted with duplicates):** `is_sorted_asc({1, 2, 2, 5,
+  9})` returns **`true`** (duplicates are fine -- ascending allows `<=`
+  between neighbors, not strict `<`).
+- **Example (not sorted):** `is_sorted_asc({1, 5, 2})` returns
+  **`false`** (`5 > 2`, so it is not ascending).
+- **Edge case (empty and single-element):** `is_sorted_asc({})` and
+  `is_sorted_asc({7})` both return **`true`** -- an empty array and a
+  single-element array are both documented as trivially sorted, since
+  there are no neighboring pairs to violate ascending order.
 
 Every function on an empty or single-element `v` is a documented no-op
 (for the four sorting functions) or returns `true` (for

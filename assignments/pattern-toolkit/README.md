@@ -280,21 +280,25 @@ virtual bool before(int a, int b) const = 0;
 `before(a, b)` returns `true` when `a` should be ordered before `b`. Implement
 three concrete strategies:
 
-- `Ascending` -- `before(a, b)` is `a < b`.
-  *Example:* `Ascending().before(2, 5) == true`; `Ascending().before(5, 2) ==
-  false`; `Ascending().before(3, 3) == false` (equal values are never
-  "before" each other).
-- `Descending` -- `before(a, b)` is `a > b`.
-  *Example:* `Descending().before(5, 2) == true`; `Descending().before(2, 5)
-  == false`; `Descending().before(3, 3) == false`.
-- `ByAbsoluteValue` -- orders by absolute value, smaller magnitude first. When
-  two values have equal absolute value (for example `-3` and `3`), break the tie
-  by actual ascending value, so `-3` comes before `3`.
-  *Example:* `ByAbsoluteValue().before(2, -3) == true` (`abs(2)=2 <
-  abs(-3)=3`); `ByAbsoluteValue().before(-3, 2) == false`; `ByAbsoluteValue()
-  .before(-3, 3) == true` (magnitudes tie at `3`, so it falls back to
-  `-3 < 3`); `ByAbsoluteValue().before(3, -3) == false` (same tie, other
-  direction).
+- **`Ascending`** -- `before(a, b)` is `a < b`.
+  - **Example:** `Ascending().before(2, 5) == true`.
+  - **Example:** `Ascending().before(5, 2) == false`.
+  - **Edge case (equal values):** `Ascending().before(3, 3) == false` --
+    **equal values are never "before" each other**.
+- **`Descending`** -- `before(a, b)` is `a > b`.
+  - **Example:** `Descending().before(5, 2) == true`.
+  - **Example:** `Descending().before(2, 5) == false`.
+  - **Edge case (equal values):** `Descending().before(3, 3) == false`.
+- **`ByAbsoluteValue`** -- orders by absolute value, smaller magnitude first.
+  When two values have equal absolute value (for example `-3` and `3`), break
+  the tie by actual ascending value, so `-3` comes before `3`.
+  - **Example:** `ByAbsoluteValue().before(2, -3) == true` (`abs(2)=2 <
+    abs(-3)=3`).
+  - **Example:** `ByAbsoluteValue().before(-3, 2) == false`.
+  - **Tricky case (tied magnitude):** `ByAbsoluteValue().before(-3, 3) ==
+    true` -- magnitudes tie at `3`, so it **falls back to `-3 < 3`**.
+  - **Tricky case (tied magnitude, reversed):** `ByAbsoluteValue().before(3,
+    -3) == false` -- same tie, other direction.
 
 Also implement the free function:
 
@@ -308,11 +312,14 @@ strategy's `before`. It must delegate every comparison to
 correct comparison-based sort is fine. `sort_with` is **not** required to be
 stable, so the relative order of elements the strategy considers equivalent is
 unspecified.
-*Example:* `sort_with({3, 1, 2, -5, 4}, Ascending())` sorts the vector to
-`{-5, 1, 2, 3, 4}`; `sort_with({3, -3, 1, -2}, ByAbsoluteValue())` sorts it
-to `{1, -2, -3, 3}` (magnitudes `1, 2, 3, 3`, tie broken ascending); an
-empty vector, `sort_with({}, Ascending())`, leaves it `{}` -- there is
-nothing to shift.
+
+- **Example:** `sort_with({3, 1, 2, -5, 4}, Ascending())` sorts the vector to
+  **`{-5, 1, 2, 3, 4}`**.
+- **Example (tie handling):** `sort_with({3, -3, 1, -2}, ByAbsoluteValue())`
+  sorts it to **`{1, -2, -3, 3}`** -- magnitudes `1, 2, 3, 3`, tie broken
+  ascending.
+- **Empty-input case:** `sort_with({}, Ascending())` leaves it **`{}`** --
+  there is nothing to shift.
 
 ### Part 2 -- Observer (`thermometer.hpp`)
 
@@ -324,40 +331,45 @@ virtual void on_temperature(double temp) = 0;
 
 `Thermometer` is the subject. Implement:
 
-- `void attach(Observer* o)` -- registers `o` for future notifications. `o` is a
-  non-owning pointer; the thermometer never allocates or frees it.
-  *Example:* after `t.attach(&alarm)`, the next `t.set_temperature(...)`
-  call reaches `alarm.on_temperature(...)`; before any `attach`, a
-  `Thermometer` with zero observers simply notifies no one.
-- `void detach(Observer* o)` -- removes `o` so it receives no further
+- **`void attach(Observer* o)`** -- registers `o` for future notifications.
+  `o` is a non-owning pointer; the thermometer never allocates or frees it.
+  - **Example:** after `t.attach(&alarm)`, the next
+    `t.set_temperature(...)` call **reaches `alarm.on_temperature(...)`**.
+  - **Empty case:** before any `attach`, a `Thermometer` with zero observers
+    simply notifies no one.
+- **`void detach(Observer* o)`** -- removes `o` so it receives no further
   notifications. Does nothing if `o` was never attached.
-  *Example:* `t.attach(&alarm); t.detach(&alarm);` then
-  `t.set_temperature(500)` leaves `alarm.count() == 0` -- it was removed
-  before the reading arrived; calling `t.detach(&alarm)` a second time (or
-  on an observer that was never attached at all) does nothing and does not
-  crash.
-- `void set_temperature(double temp)` -- calls `on_temperature(temp)` on every
-  attached observer, in the order they were attached.
-  *Example:* with `alarm` attached before `log`, `t.set_temperature(70)`
-  calls `alarm.on_temperature(70)` first, then `log.on_temperature(70)`;
-  with zero observers attached, `set_temperature` does nothing observable
-  at all.
+  - **Example:** `t.attach(&alarm); t.detach(&alarm);` then
+    `t.set_temperature(500)` leaves **`alarm.count() == 0`** -- it was
+    removed before the reading arrived.
+  - **Tricky case (double detach):** calling `t.detach(&alarm)` a second
+    time (or on an observer that was never attached at all) **does nothing
+    and does not crash**.
+- **`void set_temperature(double temp)`** -- calls `on_temperature(temp)` on
+  every attached observer, in the order they were attached.
+  - **Example (order):** with `alarm` attached before `log`,
+    `t.set_temperature(70)` calls `alarm.on_temperature(70)` **first**, then
+    `log.on_temperature(70)`.
+  - **Empty case:** with zero observers attached, `set_temperature` does
+    nothing observable at all.
 
 Implement two concrete observers:
 
-- `HighAlarm(double threshold)` -- `count()` returns how many notified
-  temperatures were **strictly greater than** `threshold`. A value equal to the
-  threshold does not count.
-  *Example:* `HighAlarm alarm(100.0);` then notifying `50.0`, `150.0`,
-  `200.0` in turn leaves `alarm.count() == 2`; notifying exactly `100.0`
-  (equal to the threshold) leaves `count()` unchanged -- it does not count;
-  a `HighAlarm` that has never been notified has `count() == 0`.
-- `TemperatureLog` -- records every notified temperature in order; `values()`
-  returns them as a `const std::vector<double>&`.
-  *Example:* notifying `1.0`, `2.0`, `3.0` in turn leaves
-  `log.values() == std::vector<double>{1.0, 2.0, 3.0}`; a fresh
-  `TemperatureLog` that has never been notified has `values() == {}`
-  (empty).
+- **`HighAlarm(double threshold)`** -- `count()` returns how many notified
+  temperatures were **strictly greater than** `threshold`. A value equal to
+  the threshold does not count.
+  - **Example:** `HighAlarm alarm(100.0);` then notifying `50.0`, `150.0`,
+    `200.0` in turn leaves **`alarm.count() == 2`**.
+  - **Edge case (equal to threshold):** notifying exactly `100.0` (equal to
+    the threshold) leaves `count()` **unchanged** -- it does not count.
+  - **Empty case:** a `HighAlarm` that has never been notified has
+    `count() == 0`.
+- **`TemperatureLog`** -- records every notified temperature in order;
+  `values()` returns them as a `const std::vector<double>&`.
+  - **Example:** notifying `1.0`, `2.0`, `3.0` in turn leaves
+    `log.values() == std::vector<double>{1.0, 2.0, 3.0}`.
+  - **Empty case:** a fresh `TemperatureLog` that has never been notified
+    has `values() == {}`.
 
 Notification order must equal attach order, and `detach` must truly remove the
 observer so it stops being notified.
@@ -380,13 +392,16 @@ every report. The exact strings are:
 - `InventoryReport::header()` returns `"=== Inventory Report ===\n"`
 - `InventoryReport::body()` returns `"Items In Stock: 42\n"`
 - `footer()` (base class, shared) returns `"--- End of Report ---\n"`
-  *Example:* `SalesReport().generate() ==
-  "=== Sales Report ===\nTotal Sales: $1000\n--- End of Report ---\n"`;
-  `InventoryReport().generate() ==
-  "=== Inventory Report ===\nItems In Stock: 42\n--- End of Report ---\n"`;
-  both share the exact same trailing `"--- End of Report ---\n"`, because
-  `footer()` is defined once, in the base class, and neither subclass
-  overrides it.
+
+**Examples:**
+
+- **Example (`SalesReport`):** `SalesReport().generate() ==
+  "=== Sales Report ===\nTotal Sales: $1000\n--- End of Report ---\n"`.
+- **Example (`InventoryReport`):** `InventoryReport().generate() ==
+  "=== Inventory Report ===\nItems In Stock: 42\n--- End of Report ---\n"`.
+- **Key fact:** both share the **exact same trailing** `"--- End of
+  Report ---\n"`, because `footer()` is defined once, in the base class,
+  and neither subclass overrides it.
 
 So `SalesReport().generate()` returns exactly:
 

@@ -205,20 +205,10 @@ Implement `TGAImage::read(filename)` and `TGAImage::write(filename)` in `src/tga
 When using `ifstream`, open with `std::ios::binary`. When using `fread`, open with
 `fopen(filename, "rb")`.
 
-*Examples:*
-- `TGAImage::read("base.tga")` on the 2x1 fixture above returns `true` and
-  leaves `header.width == 2`, `header.height == 1`,
-  `pixels == {{blue=50,green=100,red=200}, {blue=0,green=250,red=10}}`.
-- `TGAImage::read("does-not-exist.tga")` returns `false` (the `ifstream`
-  constructor fails to open the file, so `read` bails out immediately without
-  touching `pixels`).
-- `TGAImage::read("truncated.tga")` on a file that is only 10 bytes long
-  returns `false` -- the header `read` call comes up short, so the stream's
-  fail bit is set and the function must not go on to read pixels.
-- `img.write("out.tga")` after loading `base.tga` and running `flip` produces
-  an 18-byte header identical to the input's, followed by the 6 pixel bytes
-  `00 fa 0a 32 64 c8` (pixel order reversed, each pixel's own bytes
-  untouched).
+- **Example:** `TGAImage::read("base.tga")` on the 2x1 fixture above returns `true` and leaves `header.width == 2`, `header.height == 1`, `pixels == {{blue=50,green=100,red=200}, {blue=0,green=250,red=10}}`.
+- **Error case (missing file):** `TGAImage::read("does-not-exist.tga")` returns **`false`** (the `ifstream` constructor fails to open the file, so `read` bails out immediately without touching `pixels`).
+- **Error case (truncated file):** `TGAImage::read("truncated.tga")` on a file that is only 10 bytes long returns **`false`** -- the header `read` call comes up short, so the stream's fail bit is set and the function must not go on to read pixels.
+- **Example (`write` after `flip`):** `img.write("out.tga")` after loading `base.tga` and running `flip` produces an 18-byte header identical to the input's, followed by the 6 pixel bytes **`00 fa 0a 32 64 c8`** (pixel order reversed, each pixel's own bytes untouched).
 
 ### CLI
 
@@ -254,27 +244,17 @@ fails. Do not create the output file if any error occurs.
 | Operation expects `.tga` argument, file not found | `Invalid argument, file does not exist.` | non-zero |
 | Operation expects number, got non-number | `Invalid argument, expected number.` | non-zero |
 
-*Examples (confirmed by running the reference binary):*
-- `./project1.out` with no arguments prints `Project 1: Image Processing,
-  <Season> <Year>` followed by the usage block, and exits `0` (this is the
-  one case that is NOT an error).
-- `./project1.out out.png base.tga flip` -> `Invalid file name.`, exit
-  non-zero (output does not end in `.tga`).
-- `./project1.out out.tga base.png flip` -> `Invalid file name.`, exit
-  non-zero (input does not end in `.tga`, checked the same way as output).
-- `./project1.out out.tga missing.tga flip` -> `File does not exist.`, exit
-  non-zero.
-- `./project1.out out.tga base.tga bogus` -> `Invalid method name.`, exit
-  non-zero (`bogus` is not one of the recognized operation names).
-- `./project1.out out.tga base.tga addred` (no `N` given) -> `Missing
-  argument.`, exit non-zero.
-- `./project1.out out.tga base.tga addred abc` -> `Invalid argument,
-  expected number.`, exit non-zero (`abc` cannot be parsed as an integer).
-- `./project1.out out.tga base.tga multiply layer.png` -> `Invalid argument,
-  invalid file name.`, exit non-zero (the `multiply` operation's argument
-  must itself end in `.tga`).
-- `./project1.out out.tga base.tga multiply missing.tga` -> `Invalid
-  argument, file does not exist.`, exit non-zero.
+All examples below are confirmed by running the reference binary:
+
+- **Example (no args, not an error):** `./project1.out` with no arguments prints `Project 1: Image Processing, <Season> <Year>` followed by the usage block, and **exits `0`** -- this is the one case that is NOT an error.
+- **Error case (bad output extension):** `./project1.out out.png base.tga flip` -> `Invalid file name.`, exit non-zero (output does not end in `.tga`).
+- **Error case (bad input extension):** `./project1.out out.tga base.png flip` -> `Invalid file name.`, exit non-zero (input does not end in `.tga`, checked the same way as output).
+- **Error case (missing input file):** `./project1.out out.tga missing.tga flip` -> `File does not exist.`, exit non-zero.
+- **Error case (unknown operation):** `./project1.out out.tga base.tga bogus` -> `Invalid method name.`, exit non-zero (`bogus` is not a recognized operation name).
+- **Error case (missing argument):** `./project1.out out.tga base.tga addred` (no `N` given) -> `Missing argument.`, exit non-zero.
+- **Error case (non-numeric argument):** `./project1.out out.tga base.tga addred abc` -> `Invalid argument, expected number.`, exit non-zero (`abc` cannot be parsed as an integer).
+- **Error case (bad argument extension):** `./project1.out out.tga base.tga multiply layer.png` -> `Invalid argument, invalid file name.`, exit non-zero (the `multiply` operation's argument must itself end in `.tga`).
+- **Error case (missing argument file):** `./project1.out out.tga base.tga multiply missing.tga` -> `Invalid argument, file does not exist.`, exit non-zero.
 
 ### Operations
 
@@ -289,13 +269,8 @@ result = clamp(round((A * B) / 255.0))
 
 Applied per channel (R, G, B independently).
 
-*Example:* on the fixture above, `multiply(base, layer)` pixel 0 is
-`red=78, green=39, blue=20` (`round(200*100/255)=78`, and so on per channel --
-see the Worked Example section for the full derivation). Pixel 1 becomes
-`red=10, green=0, blue=0`: red is `round(10*255/255)=10`; green is `0`
-because the LAYER's green is `0` (`250*0/255=0`); blue is `0` because the
-BASE's blue is `0` (`0*128/255=0`) even though the layer's blue (`128`) is
-nonzero -- multiplying anything by a `0` operand always yields `0`.
+- **Example (pixel 0):** on the fixture above, `multiply(base, layer)` pixel 0 is **`red=78, green=39, blue=20`** (`round(200*100/255)=78`, and so on per channel -- see the Worked Example section for the full derivation).
+- **Tricky case (zero operand, pixel 1):** pixel 1 becomes `red=10, green=0, blue=0`: red is `round(10*255/255)=10`; green is `0` because the LAYER's green is `0` (`250*0/255=0`); blue is `0` because the BASE's blue is `0` (`0*128/255=0`) even though the layer's blue (`128`) is nonzero -- **multiplying anything by a `0` operand always yields `0`**.
 
 **`subtract <file.tga>`** -- Subtract layer from base.
 
@@ -303,9 +278,7 @@ nonzero -- multiplying anything by a `0` operand always yields `0`.
 result = clamp(A - B, 0, 255)
 ```
 
-*Example:* `subtract(base, layer)` pixel 1 is `red=0, green=250, blue=0` --
-`10-255=-245` and `0-128=-128` both clamp up to `0`, while `250-0=250` needs
-no clamping at all.
+- **Example (with clamping):** `subtract(base, layer)` pixel 1 is **`red=0, green=250, blue=0`** -- `10-255=-245` and `0-128=-128` both clamp up to `0`, while `250-0=250` needs no clamping at all.
 
 **`screen <file.tga>`** -- Photoshop screen blend mode.
 
@@ -313,8 +286,7 @@ no clamping at all.
 result = 255 - clamp(round(((255 - A) * (255 - B)) / 255.0))
 ```
 
-*Example:* `screen(base, layer)` pixel 0 is `red=222, green=161, blue=130`
-(`255 - round((255-200)*(255-100)/255) = 255 - 33 = 222`).
+- **Example:** `screen(base, layer)` pixel 0 is **`red=222, green=161, blue=130`** (`255 - round((255-200)*(255-100)/255) = 255 - 33 = 222`).
 
 **`overlay <file.tga>`** -- Photoshop overlay blend mode.
 
@@ -327,56 +299,39 @@ else:
     result = 255 - clamp(round(2 * (255 - base) * (255 - blend) / 255.0))
 ```
 
-*Example:* the branch is chosen by the LAYER's (`blend`) value, not the base
-image's. `overlay(base, layer)` pixel 1's blue channel has `base=0,
-blend=128`; since `blend > 127` it takes the "else" branch:
-`255 - round(2*(255-0)*(255-128)/255) = 255 - 254 = 1`. Pixel 0's red
-channel has `base=200, blend=100`; since `blend <= 127` it takes the "if"
-branch: `round(2*200*100/255) = 157`.
+The branch is chosen by the LAYER's (`blend`) value, not the base image's.
+
+- **Tricky case (else branch, pixel 1 blue):** `overlay(base, layer)` pixel 1's blue channel has `base=0, blend=128`; since **`blend > 127`** it takes the "else" branch: `255 - round(2*(255-0)*(255-128)/255) = 255 - 254 = 1`.
+- **Example (if branch, pixel 0 red):** pixel 0's red channel has `base=200, blend=100`; since **`blend <= 127`** it takes the "if" branch: `round(2*200*100/255) = 157`.
 
 **`combine <r.tga> <g.tga> <b.tga>`** -- Merge three channel images. Take the red
 channel from `r.tga`, green from `g.tga`, blue from `b.tga`.
 
-*Example:* using a third fixture `rsrc.tga` (pixel 0 = `{red=77, green=9,
-blue=9}`) as the red source, `base.tga` as the green source, and
-`layer.tga` as the blue source, `combine` pixel 0 comes out as `{red=77
-(from rsrc), green=100 (from base), blue=100 (from layer)}` -- confirmed
-against the reference binary's actual output bytes (`64 64 4d`). `rsrc`'s
-own green (`9`) and blue (`9`) values are discarded entirely; only its red
-channel is used.
+- **Example:** using a third fixture `rsrc.tga` (pixel 0 = `{red=77, green=9, blue=9}`) as the red source, `base.tga` as the green source, and `layer.tga` as the blue source, `combine` pixel 0 comes out as **`{red=77 (from rsrc), green=100 (from base), blue=100 (from layer)}`** -- confirmed against the reference binary's actual output bytes (`64 64 4d`).
+- **Tricky case (discarded channels):** `rsrc`'s own green (`9`) and blue (`9`) values are **discarded entirely**; only its red channel is used.
 
 **`flip`** -- Vertical flip. Reverse the row order.
 
-*Example:* on a 2x1 image (one row), `flip` reverses the whole pixel array,
-turning `{blue=50,green=100,red=200}, {blue=0,green=250,red=10}` into
-`{blue=0,green=250,red=10}, {blue=50,green=100,red=200}` -- confirmed against
-the reference binary's actual output bytes (`00 fa 0a 32 64 c8`). On a taller
-image, rows are reversed as whole units -- pixels within a row keep their
-left-to-right order; only which row comes first changes.
+- **Example:** on a 2x1 image (one row), `flip` reverses the whole pixel array, turning `{blue=50,green=100,red=200}, {blue=0,green=250,red=10}` into **`{blue=0,green=250,red=10}, {blue=50,green=100,red=200}`** -- confirmed against the reference binary's actual output bytes (`00 fa 0a 32 64 c8`).
+- **Tricky case (taller image):** rows are reversed as whole units -- pixels within a row keep their left-to-right order; only which row comes first changes.
 
 **`onlyred`** -- Set G = 0, B = 0 for every pixel.
 **`onlygreen`** -- Set R = 0, B = 0 for every pixel.
 **`onlyblue`** -- Set R = 0, G = 0 for every pixel.
 
-*Example:* `onlyred` on a pixel `{red=200, green=100, blue=50}` produces
-`{red=200, green=0, blue=0}` -- only the red channel survives, the other
-two are zeroed out (not replaced with red's value, so the result is a pure
-red pixel, not a gray one).
+- **Example:** `onlyred` on a pixel `{red=200, green=100, blue=50}` produces **`{red=200, green=0, blue=0}`** -- only the red channel survives, the other two are zeroed out (not replaced with red's value, so the result is a **pure red pixel, not a gray one**).
 
 **`addred N`**, **`addgreen N`**, **`addblue N`** -- Add integer `N` to one channel.
 `N` may be negative. Clamp the result.
 
-*Example:* `addred(base, 100)` on pixel 0 (`red=200`) gives `red=255`
-(`200+100=300` clamps down to `255`). `addred(base, -300)` on the same pixel
-gives `red=0` (`200-300=-100` clamps up to `0`).
+- **Example:** `addred(base, 100)` on pixel 0 (`red=200`) gives **`red=255`** (`200+100=300` clamps down to `255`).
+- **Tricky case (clamp low):** `addred(base, -300)` on the same pixel gives **`red=0`** (`200-300=-100` clamps up to `0`).
 
 **`scalered N`**, **`scalegreen N`**, **`scaleblue N`** -- Multiply one channel by
 float `N`. Clamp the result.
 
-*Example:* `scaleblue(base, 2.0)` on pixel 0 (`blue=50`) gives `blue=100`
-(`round(50*2.0)=100`, no clamping needed). `scalered(base, 5.0)` on the same
-pixel (`red=200`) gives `red=255` (`round(200*5.0)=1000` clamps down to
-`255`).
+- **Example:** `scaleblue(base, 2.0)` on pixel 0 (`blue=50`) gives **`blue=100`** (`round(50*2.0)=100`, no clamping needed).
+- **Tricky case (clamp high):** `scalered(base, 5.0)` on the same pixel (`red=200`) gives **`red=255`** (`round(200*5.0)=1000` clamps down to `255`).
 
 ### Extra credit operations
 

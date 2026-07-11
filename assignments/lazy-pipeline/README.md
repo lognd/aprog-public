@@ -48,10 +48,11 @@ lines = [
 | `list(running_count(only_level(parse_records(lines), "INFO")))` | `[1, 2, 3, 4, 5]` | one number per `INFO` record actually seen, counting up from 1 |
 | `list(chunked(list(only_level(parse_records(lines), "INFO")), 2))` | `[[{"level": "INFO", "msg": "one"}, {"level": "INFO", "msg": "two"}], [{"level": "INFO", "msg": "three"}, {"level": "INFO", "msg": "four"}], [{"level": "INFO", "msg": "five"}]]` | groups the 5 `INFO` records into chunks of 2; since 5 is not a multiple of 2, the last chunk has only 1 item -- it is still yielded, not dropped |
 
-The `take(..., 3)` row is the important one: it stops at the 3rd `INFO`
-record, which is `"INFO:three"` -- the 4th and 5th line's worth of
-`INFO` records (`"INFO:four"`, `"INFO:five"`), and everything after them,
-are never even read. The next section walks through exactly why.
+**The `take(..., 3)` row is the important one:** it stops at the 3rd
+`INFO` record, which is `"INFO:three"` -- the 4th and 5th line's worth
+of `INFO` records (`"INFO:four"`, `"INFO:five"`), and everything after
+them, are **never even read**. The next section walks through exactly
+why.
 
 ## Worked example: watch the pipeline pull one item at a time
 
@@ -83,14 +84,14 @@ one of those asks, and which raw lines get touched to answer it:
 "msg": "two"}, {"level": "INFO", "msg": "three"}]` -- exactly the
 `take(..., 3)` row from the table above.
 
-Notice `lines[5] = "ERROR:worse"`, `lines[6] = "INFO:four"`, and
-`lines[7] = "INFO:five"` are **never touched at all** -- not parsed, not
+**Notice `lines[5] = "ERROR:worse"`, `lines[6] = "INFO:four"`, and
+`lines[7] = "INFO:five"` are never touched at all** -- not parsed, not
 filtered, not looked at in any way. `parse_records` never even calls
 `next()` on `lines` a 6th time, because nothing downstream ever asked
 for a 6th item. If `lines` were reading from a multi-gigabyte log file
 instead of a Python list, this chain would only ever read the first five
-lines of that file to produce these three results -- the rest of the
-file would sit on disk, untouched. That is what "lazy" means in this
+lines of that file to produce these three results -- **the rest of the
+file would sit on disk, untouched.** That is what "lazy" means in this
 assignment's grading: not just correct output, but a source that is
 pulled from exactly as many times as necessary and no more.
 
@@ -105,7 +106,7 @@ function (uses `yield`, not `return`, to produce its values).
 def parse_records(lines: Iterable[str]) -> Iterator[dict[str, str]]:
 ```
 
-Each line is formatted `"LEVEL:message"`. For each well-formed line,
+**Each line is formatted `"LEVEL:message"`.** For each well-formed line,
 lazily yield `{"level": LEVEL, "msg": message}` (the level has any
 surrounding whitespace stripped; the message is kept exactly as-is,
 including any additional colons it may contain). A line with no colon
@@ -115,15 +116,16 @@ ahead: only pull the next line from `lines` when a caller actually asks
 `parse_records` for another record.
 
 *More examples:*
-- `list(parse_records([])) == []` -- an empty input produces an empty
-  output; the `for` loop over `lines` simply never runs.
-- `list(parse_records([":no level"])) == []` -- the text before the
-  first colon is empty (nothing to strip), so this line is malformed and
-  is skipped, just like a line with no colon at all.
-- `list(parse_records(["INFO:time is 10:30:00"])) ==
-  [{"level": "INFO", "msg": "time is 10:30:00"}]` -- only the FIRST
-  colon splits level from message; every colon after that stays part of
-  `msg` untouched.
+- **Empty input:** `list(parse_records([])) == []` -- the `for` loop
+  over `lines` simply **never runs**.
+- **Edge case (empty level):** `list(parse_records([":no level"])) ==
+  []` -- the text before the first colon is empty (nothing to strip),
+  so this line is **malformed and skipped**, just like a line with no
+  colon at all.
+- **Tricky case (extra colons):** `list(parse_records(["INFO:time is
+  10:30:00"])) == [{"level": "INFO", "msg": "time is 10:30:00"}]` --
+  only the **first colon** splits level from message; every colon after
+  that stays part of `msg` untouched.
 
 ### `only_level`
 
@@ -131,16 +133,17 @@ ahead: only pull the next line from `lines` when a caller actually asks
 def only_level(records: Iterable[dict[str, str]], level: str) -> Iterator[dict[str, str]]:
 ```
 
-Lazily yield only the records whose `"level"` value equals `level`
-exactly, preserving order.
+**Lazily yield only the records whose `"level"` value equals `level`
+exactly**, preserving order.
 
 *More examples:*
-- `list(only_level([], "INFO")) == []` -- an empty input yields nothing.
-- `list(only_level([{"level": "INFO", "msg": "a"}], "info")) == []` --
-  the comparison is exact and case-sensitive: `"info"` does not match
-  `"INFO"`.
-- `list(only_level([{"level": "ERROR", "msg": "x"}], "ERROR")) ==
-  [{"level": "ERROR", "msg": "x"}]` -- a single matching record is kept.
+- **Empty input:** `list(only_level([], "INFO")) == []`.
+- **Tricky case (case sensitivity):** `list(only_level([{"level":
+  "INFO", "msg": "a"}], "info")) == []` -- the comparison is **exact and
+  case-sensitive**: `"info"` does not match `"INFO"`.
+- **Example (single match):** `list(only_level([{"level": "ERROR",
+  "msg": "x"}], "ERROR")) == [{"level": "ERROR", "msg": "x"}]` -- **a
+  matching record is kept**.
 
 ### `take`
 
@@ -148,22 +151,23 @@ exactly, preserving order.
 def take(iterable: Iterable, n: int) -> Iterator:
 ```
 
-Yield at most `n` items from `iterable`, in order, then stop -- **and
+**Yield at most `n` items from `iterable`, in order, then stop -- and
 consume no more than `n` items from `iterable` to get them.** This is
 the laziness proof hook for the whole assignment: `take` must never pull
 an `n + 1`th item from its source just to check whether there is one.
 If `n <= 0`, yield nothing and touch nothing.
 
 *More examples:*
-- `list(take([1, 2], 5)) == [1, 2]` -- asking for more than the source
-  has is fine; `take` stops as soon as the source runs out (it never
-  errors for asking too much).
-- `list(take([1, 2, 3], 0)) == []` -- with `n = 0`, `take` returns
-  immediately without pulling a single item from `[1, 2, 3]` (this is
-  the short-circuit case: zero items requested, zero items touched).
-- `list(take([1, 2, 3, 4, 5], 3)) == [1, 2, 3]` -- with an instrumented
-  source that logs every pull, only three pulls would be logged here,
-  never a fourth "just to check" whether more remain.
+- **Example (source runs out early):** `list(take([1, 2], 5)) == [1,
+  2]` -- asking for more than the source has is fine; `take` stops as
+  soon as the source runs out (**never errors** for asking too much).
+- **Edge case (`n = 0`):** `list(take([1, 2, 3], 0)) == []` -- `take`
+  returns immediately without pulling **a single item** from `[1, 2,
+  3]` (zero items requested, zero items touched).
+- **Example (exact pull count):** `list(take([1, 2, 3, 4, 5], 3)) ==
+  [1, 2, 3]` -- with an instrumented source that logs every pull, only
+  **three pulls** would be logged here, never a fourth "just to check"
+  whether more remain.
 
 ### `running_count`
 
@@ -171,18 +175,18 @@ If `n <= 0`, yield nothing and touch nothing.
 def running_count(records: Iterable[dict[str, str]]) -> Iterator[int]:
 ```
 
-For each record pulled from `records`, in order, yield the number of
-records seen so far (starting at 1 for the first one).
+**For each record pulled from `records`, in order, yield the number of
+records seen so far** (starting at 1 for the first one).
 
 *More examples:*
-- `list(running_count([])) == []` -- nothing was ever seen, so nothing
-  is yielded (not even a `0`).
-- `list(running_count([{"level": "INFO", "msg": "a"}])) == [1]` -- a
-  single record produces a single count, `1`.
-- `list(running_count(take([{"level": "INFO", "msg": "a"}] * 10, 2))) ==
-  [1, 2]` -- chained after `take(..., 2)`, `running_count` only ever
-  sees the 2 records `take` lets through, so it only ever counts up to
-  `2`, never higher.
+- **Empty input:** `list(running_count([])) == []` -- nothing was ever
+  seen, so **nothing is yielded** (not even a `0`).
+- **Example (single record):** `list(running_count([{"level": "INFO",
+  "msg": "a"}])) == [1]`.
+- **Example (chained after `take`):** `list(running_count(take([{"level":
+  "INFO", "msg": "a"}] * 10, 2))) == [1, 2]` -- `running_count` only ever
+  sees the **2 records `take` lets through**, so it only ever counts up
+  to `2`, never higher.
 
 ### `chunked`
 
@@ -190,20 +194,21 @@ records seen so far (starting at 1 for the first one).
 def chunked(iterable: Iterable, size: int) -> Iterator[list]:
 ```
 
-Yield successive lists of up to `size` items pulled from `iterable`. If
-the number of items is not an exact multiple of `size`, the final,
+**Yield successive lists of up to `size` items pulled from `iterable`.**
+If the number of items is not an exact multiple of `size`, the final,
 shorter chunk is still yielded (not dropped). `size` must be a positive
 integer.
 
 *More examples:*
-- `list(chunked([], 3)) == []` -- an empty input produces no chunks at
-  all, not a single empty chunk.
-- `list(chunked([1, 2], 5)) == [[1, 2]]` -- when `size` is bigger than
-  the whole input, everything just becomes one (short) chunk.
-- `chunked([1, 2], 0)` does not raise the moment you call it -- like
-  every function here, `chunked` is a generator, so nothing runs until
-  you ask it for a first item; only calling `next()` on it (for example,
-  via `list(...)`) actually raises `ValueError`.
+- **Empty input:** `list(chunked([], 3)) == []` -- produces **no
+  chunks at all**, not a single empty chunk.
+- **Example (`size` bigger than input):** `list(chunked([1, 2], 5)) ==
+  [[1, 2]]` -- everything just becomes **one (short) chunk**.
+- **Tricky case (invalid `size`, lazy raise):** `chunked([1, 2], 0)`
+  does **not raise** the moment you call it -- like every function here,
+  `chunked` is a generator, so nothing runs until you ask it for a first
+  item; only calling `next()` on it (for example, via `list(...)`)
+  actually raises `ValueError`.
 
 ### Examples
 

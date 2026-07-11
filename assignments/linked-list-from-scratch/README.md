@@ -315,69 +315,85 @@ on it now behave exactly like Step 1 again.
 
 Implement every member of `LinkedList<T>` declared in `linked_list.hpp`:
 
-- Default constructor, destructor, copy constructor, copy assignment, move
-  constructor, move assignment (the full Big 5)
-  *Examples:* `LinkedList<int> a; a.push_back(1); a.push_back(2);` then
-  `LinkedList<int> b(a);` gives `b == {1, 2}` with `a` still `{1, 2}`
-  afterward, and `b` and `a` own completely separate nodes (mutating one,
-  e.g. `b.push_back(3)`, never changes the other -- `a` stays `{1, 2}`,
-  `b` becomes `{1, 2, 3}`); `LinkedList<int> c(std::move(a));` gives
-  `c == {1, 2}` and leaves `a == {}` (`a.empty() == true`, and `a` is safe
-  to keep using -- `a.push_back(9)` afterward gives `a == {9}`).
-- `push_front(value)` -- insert at the head, O(1)
-  *Examples:* on `list = {}`, `push_front(1)` gives `list == {1}` with
-  `head_ == tail_` (the single node is both); on `list = {2, 3}`,
-  `push_front(1)` gives `list == {1, 2, 3}` and `tail_` is untouched.
-- `push_back(value)` -- insert at the tail, O(1) (use the `tail_` pointer;
-  do not walk the list from `head_`)
-  *Examples:* on `list = {}`, `push_back(5)` gives `list == {5}` with
-  `head_ == tail_`; on `list = {5}`, `push_back(6)` gives `list == {5, 6}`
-  and `tail_` moves from the `5`-node to the new `6`-node.
-- `insert_at(index, value)` -- insert so the new element becomes position
-  `index`. Valid range is `[0, size()]` inclusive (`index == size()` means
-  "append"). Returns `true` on success, `false` and no-op if
-  `index > size()`. No exceptions.
-  *Examples:* on `list = {}`, `insert_at(0, 9)` returns `true` and gives
-  `list == {9}` (equivalent to `push_front`); on `list = {1, 2}`,
-  `insert_at(2, 3)` returns `true` and gives `list == {1, 2, 3}` (`index ==
-  size()` here, `2 == 2`, so this appends, equivalent to `push_back`); on
-  `list = {1, 2}`, `insert_at(5, 9)` returns `false` and leaves `list ==
-  {1, 2}` unchanged (`5 > size()`, out of range).
-- `remove_at(index)` -- remove the element at position `index`. Valid range
-  is `[0, size())`. Returns `true` on success, `false` and no-op if
+- **Default constructor, destructor, copy constructor, copy assignment,
+  move constructor, move assignment (the full Big 5).**
+  - **Example (copy):** `LinkedList<int> a; a.push_back(1); a.push_back(2);`
+    then `LinkedList<int> b(a);` gives `b == {1, 2}` with `a` still
+    `{1, 2}` afterward, and **`b` and `a` own completely separate nodes**
+    (mutating one, e.g. `b.push_back(3)`, never changes the other -- `a`
+    stays `{1, 2}`, `b` becomes `{1, 2, 3}`).
+  - **Example (move):** `LinkedList<int> c(std::move(a));` gives
+    `c == {1, 2}` and leaves `a == {}` (`a.empty() == true`), and **`a` is
+    safe to keep using** -- `a.push_back(9)` afterward gives `a == {9}`.
+- **`push_front(value)`** -- insert at the head, O(1).
+  - **Example (empty list):** on `list = {}`, `push_front(1)` gives
+    `list == {1}` with **`head_ == tail_`** (the single node is both).
+  - **Example (non-empty list):** on `list = {2, 3}`, `push_front(1)`
+    gives `list == {1, 2, 3}` and **`tail_` is untouched**.
+- **`push_back(value)`** -- insert at the tail, O(1) (use the `tail_`
+  pointer; do not walk the list from `head_`).
+  - **Example (empty list):** on `list = {}`, `push_back(5)` gives
+    `list == {5}` with **`head_ == tail_`**.
+  - **Example (non-empty list):** on `list = {5}`, `push_back(6)` gives
+    `list == {5, 6}` and **`tail_` moves** from the `5`-node to the new
+    `6`-node.
+- **`insert_at(index, value)`** -- insert so the new element becomes
+  position `index`. Valid range is `[0, size()]` inclusive
+  (`index == size()` means "append"). Returns `true` on success, `false`
+  and no-op if `index > size()`. No exceptions.
+  - **Example (index 0):** on `list = {}`, `insert_at(0, 9)` returns
+    `true` and gives `list == {9}` (**equivalent to `push_front`**).
+  - **Example (append):** on `list = {1, 2}`, `insert_at(2, 3)` returns
+    `true` and gives `list == {1, 2, 3}` (`index == size()` here,
+    `2 == 2`, so this appends -- **equivalent to `push_back`**).
+  - **Error case (out of range):** on `list = {1, 2}`, `insert_at(5, 9)`
+    returns **`false`** and leaves `list == {1, 2}` unchanged (`5 > size()`,
+    out of range).
+- **`remove_at(index)`** -- remove the element at position `index`. Valid
+  range is `[0, size())`. Returns `true` on success, `false` and no-op if
   `index >= size()` (including on an empty list). No exceptions.
-  *Examples:* on `list = {7}`, `remove_at(0)` returns `true` and gives
-  `list == {}` with `head_` and `tail_` both reset to `nullptr` (removing
-  the only element must clear both pointers, not just `head_`); on `list =
-  {1, 2, 3}`, `remove_at(2)` returns `true` and gives `list == {1, 2}`
-  with `tail_` moved back to the `2`-node (removing the tail always
-  rewires `tail_`); on `list = {}`, `remove_at(0)` returns `false` (empty
-  list, so every index is out of range); on `list = {1, 2}`,
-  `remove_at(2)` returns `false` (`2 >= size()` (`2`), out of range even
-  though `2` was a valid `insert_at` index).
-- `find(value)` -- returns the index of the first matching element, or
-  `-1` if none matches
-  *Examples:* on `list = {}`, `find(1)` returns `-1` (nothing to find); on
-  `list = {5, 10, 15}`, `find(10)` returns `1`; on `list = {5, 10, 15}`,
-  `find(99)` returns `-1` (`99` never appears).
-- `size()` -- O(1); track a running count as a member variable
-  *Examples:* on `list = {}`, `size()` returns `0`; after `list.push_back
-  (1); list.push_back(2);`, `size()` returns `2`.
-- `empty()`
-  *Examples:* on `list = {}`, `empty()` returns `true`; on `list = {1}`,
-  `empty()` returns `false`.
-- `clear()` -- frees every node and resets to the empty state; safe to
-  call more than once and safe to keep using the list afterward
-  *Examples:* on `list = {1, 2, 3}`, `clear()` gives `list == {}` with
-  `size() == 0`; calling `clear()` again right after (on the now-empty
-  list) is a safe no-op, still `list == {}`; after `clear()`, the list
-  stays usable -- `list.push_back(9)` afterward gives `list == {9}`.
-- `front()` / `back()` -- reference to the first/last element (only called
-  when the list is non-empty)
-  *Examples:* on `list = {5, 10, 15}`, `front()` returns `5` and `back()`
-  returns `15`; on `list = {42}` (a single-element list), `front()` and
-  `back()` both return `42` -- the one node is simultaneously the head and
-  the tail.
+  - **Example (remove only element):** on `list = {7}`, `remove_at(0)`
+    returns `true` and gives `list == {}` with **`head_` and `tail_` both
+    reset to `nullptr`** (removing the only element must clear both
+    pointers, not just `head_`).
+  - **Example (remove tail):** on `list = {1, 2, 3}`, `remove_at(2)`
+    returns `true` and gives `list == {1, 2}` with **`tail_` moved back**
+    to the `2`-node (removing the tail always rewires `tail_`).
+  - **Error case (empty list):** on `list = {}`, `remove_at(0)` returns
+    **`false`** (empty list, so every index is out of range).
+  - **Error case (one past valid range):** on `list = {1, 2}`,
+    `remove_at(2)` returns **`false`** (`2 >= size()` (`2`), out of range
+    even though `2` was a valid `insert_at` index).
+- **`find(value)`** -- returns the index of the first matching element, or
+  `-1` if none matches.
+  - **Empty-input case:** on `list = {}`, `find(1)` returns **`-1`**
+    (nothing to find).
+  - **Example (match):** on `list = {5, 10, 15}`, `find(10)` returns
+    **`1`**.
+  - **Example (no match):** on `list = {5, 10, 15}`, `find(99)` returns
+    **`-1`** (`99` never appears).
+- **`size()`** -- O(1); track a running count as a member variable.
+  - **Empty-input case:** on `list = {}`, `size()` returns **`0`**.
+  - **Example:** after `list.push_back(1); list.push_back(2);`, `size()`
+    returns **`2`**.
+- **`empty()`**
+  - **Empty-input case:** on `list = {}`, `empty()` returns **`true`**.
+  - **Example:** on `list = {1}`, `empty()` returns **`false`**.
+- **`clear()`** -- frees every node and resets to the empty state; safe to
+  call more than once and safe to keep using the list afterward.
+  - **Example:** on `list = {1, 2, 3}`, `clear()` gives `list == {}` with
+    `size() == 0`.
+  - **Tricky case (double clear):** calling `clear()` again right after
+    (on the now-empty list) is **a safe no-op**, still `list == {}`.
+  - **Example (reuse after clear):** after `clear()`, the list stays
+    usable -- `list.push_back(9)` afterward gives `list == {9}`.
+- **`front()` / `back()`** -- reference to the first/last element (only
+  called when the list is non-empty).
+  - **Example:** on `list = {5, 10, 15}`, `front()` returns `5` and
+    `back()` returns `15`.
+  - **Tricky case (single element):** on `list = {42}`, `front()` and
+    `back()` **both return `42`** -- the one node is simultaneously the
+    head and the tail.
 
 The full declarations, with the exact contract for each function, are
 documented as comments in `linked_list.hpp`. Do not change any function

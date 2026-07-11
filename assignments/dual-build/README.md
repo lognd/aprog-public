@@ -69,17 +69,19 @@ Write a separate compile rule for each `.o` file. Each rule must:
 
 - Use the automatic variable `$@` for the target name.
 - Use the automatic variable `$<` for the first prerequisite.
-- List every file that, if changed, should trigger a rebuild. For a `.cpp`
-  that `#include`s `stats.h`, both files are prerequisites.
+- **List every file that, if changed, should trigger a rebuild.** For a
+  `.cpp` that `#include`s `stats.h`, both files are prerequisites.
 
-  *Example (correct):* `stats.o: stats.cpp stats.h` -- running
-  `touch stats.h && make` recompiles `stats.o` (and, since `test_stats.o`
-  also lists `stats.h`, recompiles that too, then relinks).
-  *Example (the bug this catches):* if the rule instead read
-  `stats.o: stats.cpp` (missing `stats.h`), the same
-  `touch stats.h && make` prints nothing and rebuilds nothing --
-  `make -q` exits `0` ("up to date") even though the header changed. This
-  is exactly what the grader's incremental-rebuild check looks for.
+  - **Example (correct rule):** `stats.o: stats.cpp stats.h` -- running
+    `touch stats.h && make` **recompiles `stats.o`** (and, since
+    `test_stats.o` also lists `stats.h`, recompiles that too, then
+    relinks).
+  - **Tricky case (the bug this catches):** if the rule instead read
+    `stats.o: stats.cpp` (missing `stats.h`), the same
+    `touch stats.h && make` **prints nothing and rebuilds nothing** --
+    `make -q` exits `0` ("up to date") even though the header changed.
+    This is exactly what the grader's incremental-rebuild check looks
+    for.
 
 ### Variables
 
@@ -96,11 +98,13 @@ twice in a row with no edits in between should do nothing the second time
 (Make prints `` `test_stats' is up to date`` or similar); if it rebuilds
 anyway, check your `.PHONY` line first.
 
-*Example:* `.PHONY: test clean` -- with this line, `make` twice in a row
-prints `` 'test_stats' is up to date `` on the second run. *Edge case:*
-if you instead wrote `.PHONY: test clean test_stats`, every `make`
-invocation would relink `test_stats` from scratch even with no source
-changes, because Make never trusts a phony target's timestamp.
+- **Example (correct):** `.PHONY: test clean` -- with this line, `make`
+  twice in a row prints `` 'test_stats' is up to date `` on the second
+  run.
+- **Edge case (over-declaring phony):** if you instead wrote
+  `.PHONY: test clean test_stats`, **every `make` invocation would relink
+  `test_stats` from scratch** even with no source changes, because Make
+  never trusts a phony target's timestamp.
 
 ### Parallel builds
 
@@ -141,32 +145,34 @@ satisfies the following.
 6. Enable CMake testing (`enable_testing`) and register the test binary as
    a test (`add_test`).
 
-*Examples, confirmed by actually configuring and building the reference
-solution:*
+**Examples, confirmed by actually configuring and building the reference
+solution:**
 
-- `cmake -B build && cmake --build build` produces `build/libstats.a`
-  (the static library from requirement 2) and `build/test_stats` (the
-  executable from requirement 4), with `test_stats` already linked
-  against `stats` -- no missing-symbol errors at link time, because
-  requirement 5's `target_link_libraries` wired it up.
-- *Edge case -- forgetting requirement 3:* if
+- **Example (clean build):** `cmake -B build && cmake --build build`
+  produces `build/libstats.a` (the static library from requirement 2)
+  and `build/test_stats` (the executable from requirement 4), with
+  `test_stats` already linked against `stats` -- **no missing-symbol
+  errors at link time**, because requirement 5's
+  `target_link_libraries` wired it up.
+- **Edge case (forgetting requirement 3):** if
   `target_include_directories(stats PUBLIC ...)` is omitted,
   `test_stats.cpp`'s `#include "stats.h"` still happens to work in this
   particular layout (everything lives in one flat directory, so the
   compiler's default `.` search path finds it anyway) -- but drop
   `stats.h` into a subdirectory and the build breaks with
-  `fatal error: stats.h: No such file or directory` for every consumer
-  of the `stats` target, which is exactly the bug requirement 3 exists
-  to prevent.
-- `cmake -B build -DCMAKE_BUILD_TYPE=Bogus` (an unrecognized build type)
-  does not stop the configure step -- CMake accepts any string for
+  `fatal error: stats.h: No such file or directory` for **every
+  consumer** of the `stats` target, which is exactly the bug
+  requirement 3 exists to prevent.
+- **Edge case (bogus build type):** `cmake -B build
+  -DCMAKE_BUILD_TYPE=Bogus` (an unrecognized build type) does not stop
+  the configure step -- CMake accepts any string for
   `CMAKE_BUILD_TYPE` and simply skips adding optimization/debug flags it
-  does not recognize a preset for. The build still succeeds and still
-  produces `build/libstats.a` and `build/test_stats`; only the compiler
-  flags differ from a real `Release` or `Debug` build.
-- `ctest --test-dir build` after a successful build prints
-  `1/1 Test #1: test_stats ... Passed`, confirming requirement 6's
-  `add_test` registration actually runs the binary.
+  does not recognize a preset for. **The build still succeeds** and
+  still produces `build/libstats.a` and `build/test_stats`; only the
+  compiler flags differ from a real `Release` or `Debug` build.
+- **Example (ctest):** `ctest --test-dir build` after a successful build
+  prints `1/1 Test #1: test_stats ... Passed`, confirming requirement
+  6's `add_test` registration actually runs the binary.
 
 ### Why this matters
 

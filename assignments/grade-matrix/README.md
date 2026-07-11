@@ -115,12 +115,13 @@ def student_means(m: np.ndarray) -> np.ndarray:
 Returns a 1-D array of length `n_students`: each student's mean score
 across all of their assignments.
 
-*Examples:* for `m = [[80,90,70],[60,60,60],[100,50,100],[-10,40,40]]`,
-`student_means(m)` is `[80.0, 60.0, 83.333..., 23.333...]` -- the third
-student's negative score still just averages in normally (`(100 + 50 +
-100) / 3`). A single-row matrix `m = [[5., 5., 5.]]` returns `[5.0]`.
-An empty matrix with shape `(0, 3)` (no students at all) returns an
-empty array, `array([], dtype=float64)`.
+- **Example (basic):** for `m = [[80,90,70],[60,60,60],[100,50,100],[-10,40,40]]`,
+  `student_means(m)` is **`[80.0, 60.0, 83.333..., 23.333...]`** -- the
+  third student's negative score still just averages in normally
+  (`(100 + 50 + 100) / 3`).
+- **Edge case (single row):** `m = [[5., 5., 5.]]` returns **`[5.0]`**.
+- **Empty-input case (no students):** an empty matrix with shape
+  `(0, 3)` returns an empty array, **`array([], dtype=float64)`**.
 
 ### `assignment_means(m)`
 
@@ -131,12 +132,14 @@ def assignment_means(m: np.ndarray) -> np.ndarray:
 Returns a 1-D array of length `n_assignments`: each assignment's mean
 score across all students.
 
-*Examples:* for the same `m` above, `assignment_means(m)` is `[57.5,
-60.0, 67.5]` (column 0 is `(80+60+100-10)/4 = 57.5`). A single-column
-matrix `m = [[10.],[20.],[30.]]` returns `[20.0]`. An empty matrix with
-shape `(0, 3)` returns `[nan, nan, nan]` -- numpy's mean of zero
-values is not a number, and this assignment does not require guarding
-against that particular edge case.
+- **Example (basic):** for the same `m` above, `assignment_means(m)` is
+  **`[57.5, 60.0, 67.5]`** (column 0 is `(80+60+100-10)/4 = 57.5`).
+- **Edge case (single column):** `m = [[10.],[20.],[30.]]` returns
+  **`[20.0]`**.
+- **Empty-input case (no students):** an empty matrix with shape
+  `(0, 3)` returns **`[nan, nan, nan]`** -- numpy's mean of zero values
+  is not a number, and this assignment does not require guarding
+  against that particular edge case.
 
 ### `curve_to(m, target)`
 
@@ -150,14 +153,16 @@ Returns a **new** matrix, the same shape as `m`, with a per-assignment
 same amount -- the amount that assignment's own column needs to reach
 `target`, not a single matrix-wide offset.
 
-*Examples:* for `m` above, `curve_to(m, 75.0)` adds `[17.5, 15.0, 7.5]`
-to columns 0/1/2 respectively (`75 - 57.5`, `75 - 60`, `75 - 67.5`), so
-row 0 becomes `[97.5, 105.0, 77.5]`; check with
-`curve_to(m, 75.0).mean(axis=0) == [75., 75., 75.]`. Curving can push
-a score above 100 or below 0 -- row 0's second column becomes `105.0`,
-which this function does not clip (see "Going further"). On a
-single-row matrix `m = [[50., 50.]]`, every column's mean already
-equals its own value, so `curve_to(m, 60.0)` returns `[[60., 60.]]`.
+- **Example (basic):** for `m` above, `curve_to(m, 75.0)` adds
+  `[17.5, 15.0, 7.5]` to columns 0/1/2 respectively (`75 - 57.5`,
+  `75 - 60`, `75 - 67.5`), so row 0 becomes **`[97.5, 105.0, 77.5]`**;
+  check with `curve_to(m, 75.0).mean(axis=0) == [75., 75., 75.]`.
+- **Tricky case (out-of-range result):** curving can push a score above
+  100 or below 0 -- row 0's second column becomes **`105.0`**, which
+  this function does not clip (see "Going further").
+- **Edge case (single row):** `m = [[50., 50.]]` has every column's
+  mean already equal to its own value, so `curve_to(m, 60.0)` returns
+  **`[[60., 60.]]`**.
 
 ### `drop_lowest(m)`
 
@@ -174,14 +179,16 @@ one assignment (one column), there would be nothing left to average
 after dropping the only score -- return `0.0` for every student in
 that case, instead of dividing by zero.
 
-*Examples:* for `m` above, `drop_lowest(m)` is `[85.0, 60.0, 100.0,
-40.0]`. Row 1, `[60, 60, 60]`, is the all-same-value / tie case: every
-entry is the minimum, but only one `60` is dropped, leaving
-`(180 - 60) / 2 = 60.0`, the same as the mean it started with -- exactly
-the "exclude one occurrence" rule the description calls for. On a
-single-column matrix `m = [[5.],[10.]]`, there is nothing left after
-dropping the only score, so `drop_lowest(m)` returns `[0.0, 0.0]`
-rather than dividing by zero.
+- **Example (basic):** for `m` above, `drop_lowest(m)` is
+  **`[85.0, 60.0, 100.0, 40.0]`**.
+- **Tricky case (three-way tie):** row 1, `[60, 60, 60]`, is the
+  all-same-value / tie case: every entry is the minimum, but only one
+  `60` is dropped, leaving `(180 - 60) / 2` = **`60.0`**, the same as the
+  mean it started with -- exactly the "exclude one occurrence" rule
+  the description calls for.
+- **Edge case (single column):** `m = [[5.],[10.]]` has nothing left
+  after dropping the only score, so `drop_lowest(m)` returns
+  **`[0.0, 0.0]`** rather than dividing by zero.
 
 ### `passing_mask(m, threshold)`
 
@@ -193,12 +200,14 @@ Returns a 1-D boolean array of length `n_students`: `True` for every
 student whose mean score (across all assignments) is greater than or
 equal to `threshold`, `False` otherwise.
 
-*Examples:* for `m` above, `passing_mask(m, 60.0)` is `[True, True,
-True, False]` -- student 1's mean is exactly `60.0`, and `>=` means
-landing exactly on the threshold still counts as passing (the
-boundary case). `passing_mask(m, 200.0)` (a threshold nobody can
-reach) is `[False, False, False, False]`; `passing_mask(m, -100.0)`
-(a threshold everybody clears) is `[True, True, True, True]`.
+- **Example (basic):** for `m` above, `passing_mask(m, 60.0)` is
+  **`[True, True, True, False]`** -- student 1's mean is exactly
+  `60.0`, and `>=` means landing exactly on the threshold still counts
+  as passing (the boundary case).
+- **Edge case (nobody passes):** `passing_mask(m, 200.0)` (a threshold
+  nobody can reach) is **`[False, False, False, False]`**.
+- **Edge case (everybody passes):** `passing_mask(m, -100.0)` (a
+  threshold everybody clears) is **`[True, True, True, True]`**.
 
 ### `standardize(m)`
 
@@ -212,13 +221,14 @@ column. A column where every value is identical has a standard
 deviation of `0`; for that column, return all zeros instead of
 dividing by zero (and without letting numpy emit a division warning).
 
-*Examples:* for `m2 = [[70.,50.],[90.,50.],[80.,50.]]` (column 1 is
-constant), `standardize(m2)` is `[[-1.2247, 0.0], [1.2247, 0.0], [0.0,
-0.0]]` -- column 0 gets real z-scores, but column 1's zero standard
-deviation makes every one of its z-scores `0.0` instead of raising a
-division-by-zero warning (see the full trace below). A single-row
-matrix `m = [[5., 10., 20.]]` has every column constant (one value
-each), so `standardize(m)` is `[[0., 0., 0.]]`.
+- **Example (zero-std column):** for `m2 = [[70.,50.],[90.,50.],[80.,50.]]`
+  (column 1 is constant), `standardize(m2)` is
+  **`[[-1.2247, 0.0], [1.2247, 0.0], [0.0, 0.0]]`** -- column 0 gets
+  real z-scores, but column 1's zero standard deviation makes every
+  one of its z-scores `0.0` instead of raising a division-by-zero
+  warning (see the full trace below).
+- **Edge case (single row):** `m = [[5., 10., 20.]]` has every column
+  constant (one value each), so `standardize(m)` is **`[[0., 0., 0.]]`**.
 
 ### Examples
 

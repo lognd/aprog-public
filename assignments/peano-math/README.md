@@ -89,26 +89,41 @@ int exponentiate(int base, int exp);
 
 Each function's behavior, spelled out with concrete examples:
 
-- `successor(n)` -- returns `n + 1`. This is the ONLY place the `+` operator
-  is allowed to appear anywhere in the file.
-  *Example:* `successor(0) == 1`; `successor(1) == 2`; `successor(9) == 10`.
-- `add(a, b)` -- returns `a + b`, computed by calling `successor` on `a`
-  exactly `b` times (see the worked example above for the full trace).
-  *Example:* `add(2, 3) == 5`; `add(0, 5) == 5` (adding zero changes
-  nothing); `add(5, 0) == 5` (the base case -- `b` is already zero, so `a`
-  is returned immediately with no `successor` calls at all).
-- `multiply(a, b)` -- returns `a * b`, computed by adding `a` to itself
-  `b` times.
-  *Example:* `multiply(2, 3) == 6`; `multiply(0, 5) == 0` (multiplying by
-  zero is always zero, regardless of the other number); `multiply(1, 7)
-  == 7` (multiplying by one is `add`ing `a` to zero exactly once).
-- `exponentiate(base, exp)` -- returns `base` raised to the power `exp`,
-  computed by multiplying `base` by itself `exp` times.
-  *Example:* `exponentiate(2, 3) == 8`; `exponentiate(5, 0) == 1` (the
-  base case -- ANY base raised to the power zero is `1`, including
-  `exponentiate(0, 0) == 1`); `exponentiate(3, 1) == 3` (raising to the
-  power one just multiplies `base` by the identity result of the
-  zero-power base case).
+**`successor(n)` -- returns `n + 1`.** This is the ONLY place the `+`
+operator is allowed to appear anywhere in the file.
+
+- **Example (basic increments):** `successor(0) == 1`; `successor(1) ==
+  2`; `successor(9) == 10`.
+
+**`add(a, b)` -- returns `a + b`,** computed by calling `successor` on
+`a` exactly `b` times (see the worked example above for the full trace).
+
+- **Example (typical case):** `add(2, 3) == 5`.
+- **Edge case (zero left operand):** `add(0, 5) == 5` -- **adding zero
+  changes nothing**.
+- **Edge case (zero right operand / base case):** `add(5, 0) == 5` --
+  `b` is already zero, so **`a` is returned immediately with no
+  `successor` calls at all**.
+
+**`multiply(a, b)` -- returns `a * b`,** computed by adding `a` to itself
+`b` times.
+
+- **Example (typical case):** `multiply(2, 3) == 6`.
+- **Edge case (zero):** `multiply(0, 5) == 0` -- **multiplying by zero is
+  always zero**, regardless of the other number.
+- **Edge case (identity):** `multiply(1, 7) == 7` -- multiplying by one is
+  **`add`ing `a` to zero exactly once**.
+
+**`exponentiate(base, exp)` -- returns `base` raised to the power `exp`,**
+computed by multiplying `base` by itself `exp` times.
+
+- **Example (typical case):** `exponentiate(2, 3) == 8`.
+- **Edge case (zero exponent / base case):** `exponentiate(5, 0) == 1` --
+  **ANY base raised to the power zero is `1`**, including
+  `exponentiate(0, 0) == 1`.
+- **Edge case (exponent of one):** `exponentiate(3, 1) == 3` -- raising to
+  the power one just multiplies `base` by the identity result of the
+  zero-power base case.
 
 ### Contracts
 

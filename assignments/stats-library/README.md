@@ -149,41 +149,40 @@ Concrete `call == result` examples for each function, covering ties, empty
 input, and single-element input. All values below were checked against the
 reference implementation.
 
-- `mean(data)` -- the arithmetic mean (sum divided by count).
-  *Examples:* `mean({1.0, 2.0, 3.0, 4.0, 5.0}) == 3.0`;
-  `mean({7.0}) == 7.0` (a single element is its own mean);
-  `mean({})` is `NaN` (`std::isnan(mean({})) == true`).
-- `median(data)` -- the middle value once sorted; the average of the two
+- **`mean(data)`** -- the arithmetic mean (sum divided by count).
+  - **Example:** `mean({1.0, 2.0, 3.0, 4.0, 5.0}) == 3.0`.
+  - **Edge case (single element):** `mean({7.0}) == 7.0`.
+  - **Edge case (empty):** `mean({})` is **`NaN`** (`std::isnan(mean({})) == true`).
+- **`median(data)`** -- the middle value once sorted; the average of the two
   middle values when the count is even.
-  *Examples:* `median({5.0, 1.0, 3.0}) == 3.0` (sorts to `{1, 3, 5}`, middle
-  is `3.0` -- note the input did not need to already be sorted);
-  `median({1.0, 2.0, 3.0, 4.0}) == 2.5` (even count: average of `2.0` and
-  `3.0`); `median({})` is `NaN`.
-- `mode(data)` -- every value tied for the highest occurrence count,
+  - **Example (odd count):** `median({5.0, 1.0, 3.0}) == 3.0` (sorts to `{1, 3, 5}`, middle is `3.0` -- note the **input did not need to already be sorted**).
+  - **Example (even count):** `median({1.0, 2.0, 3.0, 4.0}) == 2.5` (average of `2.0` and `3.0`).
+  - **Edge case (empty):** `median({})` is `NaN`.
+- **`mode(data)`** -- every value tied for the highest occurrence count,
   sorted ascending.
-  *Examples:* `mode({1.0, 2.0, 2.0, 3.0}) == {2.0}` (only `2.0` repeats);
-  `mode({1.0, 1.0, 2.0, 2.0, 3.0}) == {1.0, 2.0}` (`1.0` and `2.0` are
-  tied at two occurrences each, `3.0` is not a mode); `mode({})` is `{}`
-  (empty in, empty out -- no exception, no NaN, since there is no single
-  numeric value to signal "no mode" with).
-- `variance(data)` -- population variance (divide by `n`, not `n - 1`).
-  *Examples:* `variance({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 8.583333...`
-  (see the worked example above); `variance({4.0, 4.0, 4.0}) == 0.0` (every
-  value equals the mean, so every squared deviation is `0`); `variance({})`
-  is `NaN`.
-- `stddev(data)` -- population standard deviation (`sqrt(variance(data))`).
-  *Examples:* `stddev({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 2.929732...`;
-  `stddev({4.0, 4.0, 4.0}) == 0.0`; `stddev({})` is `NaN`.
-- `minimum(data)` -- the smallest value.
-  *Examples:* `minimum({3.0, 1.0, 4.0}) == 1.0`; `minimum({7.0}) == 7.0`;
-  `minimum({})` is `NaN`.
-- `maximum(data)` -- the largest value.
-  *Examples:* `maximum({3.0, 1.0, 4.0}) == 4.0`; `maximum({7.0}) == 7.0`;
-  `maximum({})` is `NaN`.
-- `range(data)` -- `maximum(data) - minimum(data)`.
-  *Examples:* `range({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 8.0` (`10.0 -
-  2.0`); `range({7.0}) == 0.0` (a single element is both the min and the
-  max, so the range is `0`); `range({})` is `NaN`.
+  - **Example (single mode):** `mode({1.0, 2.0, 2.0, 3.0}) == {2.0}` (only `2.0` repeats).
+  - **Example (multiple modes):** `mode({1.0, 1.0, 2.0, 2.0, 3.0}) == {1.0, 2.0}` (`1.0` and `2.0` are **tied at two occurrences each**, `3.0` is not a mode).
+  - **Edge case (empty):** `mode({})` is **`{}`** (empty in, empty out -- no exception, no NaN, since there is no single numeric value to signal "no mode" with).
+- **`variance(data)`** -- population variance (divide by `n`, not `n - 1`).
+  - **Example:** `variance({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 8.583333...` (see the worked example above).
+  - **Edge case (all equal):** `variance({4.0, 4.0, 4.0}) == 0.0` (every value equals the mean, so every squared deviation is `0`).
+  - **Edge case (empty):** `variance({})` is `NaN`.
+- **`stddev(data)`** -- population standard deviation (`sqrt(variance(data))`).
+  - **Example:** `stddev({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 2.929732...`.
+  - **Edge case (all equal):** `stddev({4.0, 4.0, 4.0}) == 0.0`.
+  - **Edge case (empty):** `stddev({})` is `NaN`.
+- **`minimum(data)`** -- the smallest value.
+  - **Example:** `minimum({3.0, 1.0, 4.0}) == 1.0`.
+  - **Edge case (single element):** `minimum({7.0}) == 7.0`.
+  - **Edge case (empty):** `minimum({})` is `NaN`.
+- **`maximum(data)`** -- the largest value.
+  - **Example:** `maximum({3.0, 1.0, 4.0}) == 4.0`.
+  - **Edge case (single element):** `maximum({7.0}) == 7.0`.
+  - **Edge case (empty):** `maximum({})` is `NaN`.
+- **`range(data)`** -- `maximum(data) - minimum(data)`.
+  - **Example:** `range({2.0, 4.0, 4.0, 4.0, 9.0, 10.0}) == 8.0` (`10.0 - 2.0`).
+  - **Edge case (single element):** `range({7.0}) == 0.0` (a single element is both the min and the max, so the range is **`0`**).
+  - **Edge case (empty):** `range({})` is `NaN`.
 
 You must also:
 

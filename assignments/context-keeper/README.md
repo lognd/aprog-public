@@ -144,11 +144,20 @@ journal and returns `self`. `__exit__` appends `"close"` to the journal
 exception is propagating through it -- and does **not** suppress:
 whatever exception was in flight keeps propagating.
 
-*Examples:*
-- `journal = []`; `with Workspace(journal): pass` -> `journal == ["open", "close"]` (clean exit still journals both).
-- `journal = []`; `with Workspace(journal): raise ValueError("boom")` -> `journal == ["open", "close"]` **and** the `ValueError` still propagates out of the `with` block (`Workspace` never suppresses).
-- Two `Workspace`s nested, inner one raises: `journal == ["open", "open", "close", "close"]` -- exits happen in reverse order of entries, and the exception still escapes both.
-- `ws = Workspace(journal)`; after `with ws: pass`, `ws.journal is journal` -- it is the *same* list object, not a copy, so appends are visible to the caller immediately.
+**Examples:**
+- **Example (clean exit):** `journal = []`; `with Workspace(journal): pass`
+  -> `journal == ["open", "close"]` -- clean exit still journals both.
+- **Example (exception propagates):** `journal = []`;
+  `with Workspace(journal): raise ValueError("boom")` ->
+  `journal == ["open", "close"]` **and** the `ValueError` still
+  propagates out of the `with` block (`Workspace` never suppresses).
+- **Tricky case (nested, inner raises):** two `Workspace`s nested, inner
+  one raises: `journal == ["open", "open", "close", "close"]` -- exits
+  happen in **reverse order** of entries, and the exception still
+  escapes both.
+- **Example (shared reference):** `ws = Workspace(journal)`; after
+  `with ws: pass`, `ws.journal is journal` -- it is the *same* list
+  object, not a copy, so appends are visible to the caller immediately.
 
 
 
@@ -167,11 +176,19 @@ propagates normally, unsuppressed. Every exception it actually
 suppresses gets its type's name (e.g. `"ValueError"`) appended, in
 order, to a `.caught` list attribute (an empty list at construction).
 
-*Examples:*
-- `with Muffle(ValueError): raise ValueError("boom")` -> nothing escapes the `with` block; `m.caught == ["ValueError"]` (exact type match).
-- `class MyValueError(ValueError): pass`; `with Muffle(ValueError): raise MyValueError("boom")` -> also suppressed, because `MyValueError` is a *subclass* of `ValueError`; `m.caught == ["MyValueError"]`.
-- `with Muffle(ValueError): raise TypeError("nope")` -> the `TypeError` is NOT suppressed and keeps propagating; `m.caught` stays `[]` (only exceptions actually caught get recorded).
-- `m = Muffle(ValueError)`; `with m: pass` (nothing raised) -> `m.caught == []`; `__exit__` still runs and returns `False`, but there is nothing to suppress or record.
+**Examples:**
+- **Example (exact type match):** `with Muffle(ValueError): raise ValueError("boom")`
+  -> nothing escapes the `with` block; `m.caught == ["ValueError"]`.
+- **Example (subclass match):** `class MyValueError(ValueError): pass`;
+  `with Muffle(ValueError): raise MyValueError("boom")` -> also
+  suppressed, because `MyValueError` is a *subclass* of `ValueError`;
+  `m.caught == ["MyValueError"]`.
+- **Tricky case (type mismatch):** `with Muffle(ValueError): raise TypeError("nope")`
+  -> the `TypeError` is **NOT suppressed** and keeps propagating;
+  `m.caught` stays `[]` (only exceptions actually caught get recorded).
+- **Empty case (nothing raised):** `m = Muffle(ValueError)`; `with m: pass`
+  -> `m.caught == []`; `__exit__` still runs and returns `False`, but
+  there is nothing to suppress or record.
 
 ### `transaction`
 
@@ -190,11 +207,21 @@ discards the working copy entirely -- `ledger` is left exactly as it
 was before the `with` block started -- and the exception continues
 propagating (this function never suppresses anything).
 
-*Examples:*
-- `ledger = [1, 2, 3]`; `with transaction(ledger) as working: working.append(4)` -> after the block, `ledger == [1, 2, 3, 4]` (clean exit commits).
-- `ledger = [1, 2, 3]`; `with transaction(ledger) as working: working.append(4); raise ValueError` -> after the block (caught by an outer `try`/`except`), `ledger == [1, 2, 3]` unchanged -- the exception rolled the working copy back before it ever reached `ledger`.
-- `with transaction(ledger) as working: assert working is not ledger` -- `working` is always a fresh copy (`list(ledger)`), never the same object, so mutating it never touches `ledger` until commit.
-- `ledger = []`; `with transaction(ledger) as working: pass` -> `ledger == []` still -- committing an unchanged empty copy onto an empty ledger is a no-op, not an error.
+**Examples:**
+- **Example (clean commit):** `ledger = [1, 2, 3]`;
+  `with transaction(ledger) as working: working.append(4)` -> after the
+  block, `ledger == [1, 2, 3, 4]`.
+- **Tricky case (rollback on exception):** `ledger = [1, 2, 3]`;
+  `with transaction(ledger) as working: working.append(4); raise ValueError`
+  -> after the block (caught by an outer `try`/`except`),
+  `ledger == [1, 2, 3]` **unchanged** -- the exception rolled the
+  working copy back before it ever reached `ledger`.
+- **Example (fresh copy):** `with transaction(ledger) as working: assert working is not ledger`
+  -- `working` is always a fresh copy (`list(ledger)`), never the same
+  object, so mutating it never touches `ledger` until commit.
+- **Empty-input case:** `ledger = []`; `with transaction(ledger) as working: pass`
+  -> `ledger == []` still -- committing an unchanged empty copy onto an
+  empty ledger is a no-op, not an error.
 
 ### `divide_or`
 
@@ -206,10 +233,14 @@ Returns `a / b`. If that division raises `ZeroDivisionError` (i.e.
 `b == 0`), returns `fallback` instead. No other exception type is
 caught here.
 
-*Examples:*
-- `divide_or(10.0, 2.0, -1.0) == 5.0` -- ordinary division, no error, `fallback` unused.
-- `divide_or(10.0, 0.0, -1.0) == -1.0` -- `b == 0` raises `ZeroDivisionError`, caught and replaced with `fallback`.
-- `divide_or(0.0, 5.0, -1.0) == 0.0` -- dividing zero by a nonzero number is not an error; the real result (`0.0`) is returned, not `fallback`.
+**Examples:**
+- **Example (ordinary division):** `divide_or(10.0, 2.0, -1.0) == 5.0`
+  -- no error, `fallback` unused.
+- **Error case (division by zero):** `divide_or(10.0, 0.0, -1.0) == -1.0`
+  -- `b == 0` raises `ZeroDivisionError`, caught and replaced with `fallback`.
+- **Edge case (zero numerator):** `divide_or(0.0, 5.0, -1.0) == 0.0` --
+  dividing zero by a nonzero number is not an error; the real result
+  (`0.0`) is returned, not `fallback`.
 
 ### `cleanup_chain`
 
@@ -224,11 +255,17 @@ exception's type name (e.g. `"ValueError"`) in a returned list, in the
 order the failures happened. Steps that succeed contribute nothing to
 the returned list.
 
-*Examples:*
-- `cleanup_chain([lambda: None, lambda: None])` -> `[]` -- both steps ran and succeeded, so nothing is recorded.
-- `cleanup_chain([ok, bad, ok])` where `bad` raises `ValueError` -> `["ValueError"]`, and `ok` (both copies) still ran -- one failure does not stop the chain.
-- Two failing steps, e.g. `bad1` raises `KeyError` then `bad2` raises `TypeError` -> `["KeyError", "TypeError"]`, in the exact order the failures happened, not the order the steps appear if some are skipped.
-- `cleanup_chain([])` -> `[]` -- an empty step list is not an error, it just returns an empty list immediately.
+**Examples:**
+- **Example (all succeed):** `cleanup_chain([lambda: None, lambda: None])`
+  -> `[]` -- both steps ran and succeeded, so nothing is recorded.
+- **Example (one failure, chain continues):** `cleanup_chain([ok, bad, ok])`
+  where `bad` raises `ValueError` -> `["ValueError"]`, and `ok` (both
+  copies) still ran -- **one failure does not stop the chain**.
+- **Tricky case (two failures, order preserved):** `bad1` raises
+  `KeyError` then `bad2` raises `TypeError` -> `["KeyError", "TypeError"]`,
+  in the exact order the failures happened.
+- **Empty-input case:** `cleanup_chain([])` -> `[]` -- an empty step
+  list is not an error, it just returns an empty list immediately.
 
 ### Examples
 

@@ -37,19 +37,26 @@ std::vector<std::vector<std::string>> parse_csv(std::string text);
 Each element of the outer vector is one row.  Each element of the inner
 vector is one field.  Row 0 is the first line of the input.
 
-*Examples (all confirmed against the reference solution):*
-- `parse_csv("a,b,c")` -> `{{"a", "b", "c"}}` -- one row, three plain fields.
-- `parse_csv("a,\"b,c\"")` -> `{{"a", "b,c"}}` -- the comma inside quotes does
-  not split the field; see the step-by-step trace below for exactly why.
-- `parse_csv("a,\"say \"\"hi\"\"\",b")` -> `{{"a", "say \"hi\"", "b"}}` -- the
-  `""` escape inside a quoted field collapses to one literal `"`.
-- `parse_csv("")` -> `{{}}` -- one row with **zero fields**, not zero rows;
-  `parse_csv` never returns an empty outer vector.
-- `parse_csv("a,b\n\nc,d")` -> `{{"a","b"}, {}, {"c","d"}}` -- the blank line
-  in the middle produces its own zero-field row rather than being skipped.
-- There is no error case: `parse_csv` takes a `std::string` and always
-  returns some `vector<vector<string>>`, even for malformed-looking input
-  like an unterminated quote -- there is nothing for it to throw or fail on.
+**Behavior, with examples confirmed against the reference solution:**
+
+- **Example (plain fields):** `parse_csv("a,b,c")` -> `{{"a", "b", "c"}}` --
+  **one row, three plain fields.**
+- **Example (quoted comma):** `parse_csv("a,\"b,c\"")` -> `{{"a", "b,c"}}` --
+  **the comma inside quotes does not split the field**; see the step-by-step
+  trace below for exactly why.
+- **Example (escaped quote):** `parse_csv("a,\"say \"\"hi\"\"\",b")` ->
+  `{{"a", "say \"hi\"", "b"}}` -- **the `""` escape inside a quoted field
+  collapses to one literal `"`.**
+- **Edge case (empty input):** `parse_csv("")` -> `{{}}` -- one row with
+  **zero fields**, not zero rows; `parse_csv` never returns an empty outer
+  vector.
+- **Edge case (blank line mid-input):** `parse_csv("a,b\n\nc,d")` ->
+  `{{"a","b"}, {}, {"c","d"}}` -- **the blank line in the middle produces its
+  own zero-field row** rather than being skipped.
+- **Error case:** there is none -- `parse_csv` takes a `std::string` and
+  **always returns some `vector<vector<string>>`**, even for malformed-looking
+  input like an unterminated quote; there is nothing for it to throw or fail
+  on.
 
 ### Parsing rules (RFC 4180 subset)
 
@@ -123,7 +130,7 @@ comma inside quotes, an empty field, and an escaped quote, all at once:
 | 3 | `He said "hi"` (shown with real quote characters) | `""` inside a quoted field is RFC 4180's escape for a single literal `"` -- so `""hi""` becomes `"hi"` in the final string |
 
 `parse_csv` returns one row containing exactly these 4 fields:
-`rows[0] = {"101", "Smith, John", "", "He said \"hi\""}`.
+**`rows[0] = {"101", "Smith, John", "", "He said \"hi\""}`.**
 
 Two more small cases worth knowing, each confirmed by running the reference
 solution:

@@ -171,17 +171,24 @@ allowed and ignored; an optional leading `+` or `-` is allowed.
   argument (unlike the `invalid_argument` messages above, this one does not
   strip leading/trailing spaces and tabs before reporting `s`).
 
-*Examples:* `parse_int("42") == 42`; `parse_int(" -17 ") == -17` (spaces and
-tabs trimmed before parsing); `parse_int("") == ` throws `std::invalid_argument`
-with `what() == "parse_int: empty string"`; `parse_int("   ") == ` throws the
-same (whitespace-only counts as empty); `parse_int("+") == ` throws
-`std::invalid_argument` with `what() == "parse_int: no digits found in '+'"`;
-`parse_int("12a") == ` throws `std::invalid_argument` with
-`what() == "parse_int: invalid character 'a' in '12a'"`;
-`parse_int("  -2147483649  ") == ` throws `std::out_of_range` with
-`what() == "parse_int: value out of int range in '  -2147483649  '"` (note
-the untrimmed original string appears in this particular message, unlike the
-`invalid_argument` cases above).
+- **Example (basic parse):** `parse_int("42") == 42`.
+- **Example (trimming):** `parse_int(" -17 ") == -17` -- **spaces and tabs
+  are trimmed before parsing**.
+- **Error case (empty string):** `parse_int("")` throws
+  `std::invalid_argument` with **`what() == "parse_int: empty string"`**.
+- **Edge case (whitespace-only):** `parse_int("   ")` throws the same --
+  **whitespace-only counts as empty**.
+- **Error case (lone sign):** `parse_int("+")` throws
+  `std::invalid_argument` with
+  **`what() == "parse_int: no digits found in '+'"`**.
+- **Error case (invalid character):** `parse_int("12a")` throws
+  `std::invalid_argument` with
+  **`what() == "parse_int: invalid character 'a' in '12a'"`**.
+- **Error case (out of range):** `parse_int("  -2147483649  ")` throws
+  `std::out_of_range` with
+  **`what() == "parse_int: value out of int range in '  -2147483649  '"`**
+  (note the **untrimmed original string** appears in this particular
+  message, unlike the `invalid_argument` cases above).
 
 ### `Fraction parse_fraction(const std::string& s)`
 
@@ -198,18 +205,23 @@ Parses `"a/b"` into a `Fraction`. `a` and `b` follow the same digit rules as
 - Throws `std::domain_error` if the denominator parses to exactly zero:
   `"parse_fraction: denominator cannot be zero in '<s>'"`.
 
-*Examples:* `parse_fraction("3/4") == Fraction{3, 4}`;
-`parse_fraction("-3/-4") == Fraction{-3, -4}` (no reduction to lowest terms is
-required or performed); `parse_fraction("34") == ` throws
-`std::invalid_argument` with
-`what() == "parse_fraction: expected exactly one '/' in '34'"` (no slash at
-all); `parse_fraction("1/2/3") == ` throws the same kind, with
-`what() == "parse_fraction: expected exactly one '/' in '1/2/3'"` (too many
-slashes); `parse_fraction("a/4") == ` throws `std::invalid_argument` with
-`what() == "parse_fraction: invalid character 'a' in 'a'"` (same shape as
-`parse_int`'s message, but naming `parse_fraction`); `parse_fraction("3/0")
-== ` throws `std::domain_error` with
-`what() == "parse_fraction: denominator cannot be zero in '3/0'"`.
+- **Example (basic parse):** `parse_fraction("3/4") == Fraction{3, 4}`.
+- **Example (both signs negative):** `parse_fraction("-3/-4") ==
+  Fraction{-3, -4}` -- **no reduction to lowest terms** is required or
+  performed.
+- **Error case (no slash):** `parse_fraction("34")` throws
+  `std::invalid_argument` with
+  **`what() == "parse_fraction: expected exactly one '/' in '34'"`**.
+- **Error case (too many slashes):** `parse_fraction("1/2/3")` throws the
+  same kind, with
+  **`what() == "parse_fraction: expected exactly one '/' in '1/2/3'"`**.
+- **Error case (malformed numerator):** `parse_fraction("a/4")` throws
+  `std::invalid_argument` with
+  **`what() == "parse_fraction: invalid character 'a' in 'a'"`** (same shape
+  as `parse_int`'s message, but naming `parse_fraction`).
+- **Error case (zero denominator):** `parse_fraction("3/0")` throws
+  `std::domain_error` with
+  **`what() == "parse_fraction: denominator cannot be zero in '3/0'"`**.
 
 ### `std::vector<int> parse_int_list(const std::string& s, char sep)`
 
@@ -219,16 +231,20 @@ propagate out of `parse_int_list` completely unchanged** -- the exact same
 exception type, and the exact same `what()` message `parse_int` itself
 would have produced for that piece. Do not catch, wrap, or rewrap it.
 
-*Examples:* `parse_int_list("1,2,3", ',') == std::vector<int>{1, 2, 3}`;
-`parse_int_list("", ',') == std::vector<int>{}` (empty string, empty list --
-not an error); `parse_int_list("5", ',') == std::vector<int>{5}` (no
-separator found means one single piece); `parse_int_list("1,x,3", ',') == `
-throws `std::invalid_argument` with
-`what() == "parse_int: invalid character 'x' in 'x'"` (note the message says
-`parse_int`, not `parse_int_list` -- it is the unmodified exception
-`parse_int("x")` itself would have thrown); `parse_int_list("1,,3", ',') == `
-throws `std::invalid_argument` with `what() == "parse_int: empty string"`
-(the middle piece, between two commas, is empty).
+- **Example (basic split):** `parse_int_list("1,2,3", ',') ==
+  std::vector<int>{1, 2, 3}`.
+- **Empty-input case:** `parse_int_list("", ',') == std::vector<int>{}` --
+  **empty string, empty list, not an error**.
+- **Edge case (no separator found):** `parse_int_list("5", ',') ==
+  std::vector<int>{5}` -- no separator found means **one single piece**.
+- **Error case (propagated unchanged):** `parse_int_list("1,x,3", ',')`
+  throws `std::invalid_argument` with
+  **`what() == "parse_int: invalid character 'x' in 'x'"`** (note the
+  message says `parse_int`, not `parse_int_list` -- it is the **unmodified
+  exception** `parse_int("x")` itself would have thrown).
+- **Error case (empty middle piece):** `parse_int_list("1,,3", ',')` throws
+  `std::invalid_argument` with **`what() == "parse_int: empty string"`** --
+  the middle piece, between two commas, is empty.
 
 ### `int parse_int_or(const std::string& s, int fallback)`
 
@@ -238,12 +254,14 @@ this assignment required to use `try`/`catch` itself** -- every other
 function in this file either throws directly or (in `parse_int_list`'s
 case) deliberately lets an exception pass through untouched.
 
-*Examples:* `parse_int_or("5", -1) == 5` (parse succeeds, fallback unused);
-`parse_int_or("bad", -1) == -1` (malformed input, `std::invalid_argument`
-caught and swallowed); `parse_int_or("99999999999999", -1) == -1` (valid
-digits but out of `int` range -- `std::out_of_range` is also caught, since
-`parse_int_or` catches both exception types); `parse_int_or("", 0) == 0`
-(empty string is malformed too).
+- **Example (success, fallback unused):** `parse_int_or("5", -1) == 5`.
+- **Example (malformed input):** `parse_int_or("bad", -1) == -1` --
+  `std::invalid_argument` is **caught and swallowed**.
+- **Edge case (out of range):** `parse_int_or("99999999999999", -1) == -1`
+  -- valid digits but out of `int` range; **`std::out_of_range` is also
+  caught**, since `parse_int_or` catches both exception types.
+- **Empty-input case:** `parse_int_or("", 0) == 0` -- **empty string is
+  malformed too**.
 
 ### `class ScopedTally`
 
@@ -253,14 +271,16 @@ correctly even when the destructor runs because an exception is unwinding
 the stack through a `ScopedTally` -- that is precisely the guarantee this
 class exists to demonstrate.
 
-*Examples:* constructing `ScopedTally t(tally)` when `tally == 0` leaves
-`tally == 1`; letting `t` go out of scope normally afterward brings it back
-to `tally == 0`; constructing `ScopedTally t(tally)` and then `throw`-ing
-past it (so its destructor runs during unwinding, not because the enclosing
-block ended normally) still brings `tally` back down by exactly one -- e.g.
-`tally == 0` before, `tally == 1` while `t` is alive and the exception is in
-flight, `tally == 0` again once the exception has been caught further up the
-stack.
+- **Example (normal scope exit):** constructing `ScopedTally t(tally)` when
+  `tally == 0` leaves **`tally == 1`**; letting `t` go out of scope normally
+  afterward brings it back to **`tally == 0`**.
+- **Tricky case (unwinding through a throw):** constructing
+  `ScopedTally t(tally)` and then `throw`-ing past it (so its destructor
+  runs during unwinding, not because the enclosing block ended normally)
+  still brings `tally` back down by exactly one: `tally == 0` before,
+  `tally == 1` while `t` is alive and the exception is in flight, then
+  **`tally == 0` again** once the exception has been caught further up the
+  stack.
 
 ## Getting started
 

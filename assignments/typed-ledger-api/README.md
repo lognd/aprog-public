@@ -187,57 +187,60 @@ on its own -- no code in `app.py` builds this body by hand.
 | `PUT` | `/items/{item_id}` | Fully **replace** an existing item's `name` and `qty` from an `Item` body. `200` with the replaced object, shaped by `response_model`, or `404` with `{"detail": "not found"}` if the id does not exist. An invalid body produces FastAPI's own `422`. |
 
 **Examples for `GET /items`:**
-- Fresh app, nothing created yet: `client.get("/items")` -> `200`,
-  `[]` -- an empty ledger is a `200` with an empty array, not a `404`.
-- After creating two items: `client.get("/items")` -> `200`,
-  `[{"id": 1, ...}, {"id": 2, ...}]` -- every item currently stored,
-  in the order they were created.
-- After deleting the only item: `client.get("/items")` -> `200`,
-  `[]` again -- back to empty, same as the fresh-app case.
+- **Example (empty ledger):** fresh app, nothing created yet ->
+  `client.get("/items")` returns `200`, `[]` -- **an empty ledger is a
+  `200` with an empty array, not a `404`**.
+- **Example (after two creates):** `client.get("/items")` -> `200`,
+  `[{"id": 1, ...}, {"id": 2, ...}]` -- every item currently stored, in
+  the order they were created.
+- **Example (after delete):** `client.get("/items")` -> `200`, `[]`
+  again -- back to empty, same as the fresh-app case.
 
 **Examples for `GET /items/{item_id}`:**
-- Existing id: `client.get("/items/1")` -> `200`,
+- **Example (existing id):** `client.get("/items/1")` -> `200`,
   `{"id": 1, "name": "pen", "qty": 3}`.
-- Absent id (never created, or already deleted): `client.get("/items/999")`
-  -> `404`, `{"detail": "not found"}`.
-- Non-integer id in the URL: `client.get("/items/abc")` -> `422`
-  (not `404`) -- `item_id` is declared as `int`, so a value that cannot
-  even be parsed as an integer fails FastAPI's path validation before
-  your route body runs at all, exactly like an invalid JSON body does.
+- **Error case (absent id):** `client.get("/items/999")` (never
+  created, or already deleted) -> `404`, `{"detail": "not found"}`.
+- **Tricky case (non-integer id in the URL):** `client.get("/items/abc")`
+  -> **`422`, not `404`** -- `item_id` is declared as `int`, so a value
+  that cannot even be parsed as an integer fails FastAPI's path
+  validation before your route body runs at all, exactly like an
+  invalid JSON body does.
 
 **Examples for `POST /items`:**
-- Valid body: `client.post("/items", json={"name": "pen", "qty": 3})`
+- **Example (valid body):** `client.post("/items", json={"name": "pen", "qty": 3})`
   -> `201`, `{"id": 1, "name": "pen", "qty": 3}`.
-- Missing field: `client.post("/items", json={"qty": 3})` -> `422`
-  with `"detail"` listing `{"loc": ["body", "name"], "type": "missing", ...}`
-  -- no item is created.
-- Wrong type: `client.post("/items", json={"name": "pen", "qty": "lots"})`
+- **Error case (missing field):** `client.post("/items", json={"qty": 3})`
+  -> `422` with `"detail"` listing `{"loc": ["body", "name"], "type": "missing", ...}`
+  -- **no item is created**.
+- **Error case (wrong type):** `client.post("/items", json={"name": "pen", "qty": "lots"})`
   -> `422` with `"type": "int_parsing"` for the `qty` field -- a string
   that cannot be parsed as an int is rejected, not silently coerced.
-- `bool` for `qty`: `client.post("/items", json={"name": "pen", "qty": True})`
-  -> `422` -- `True`/`False` looks like an `int` in Python (`bool` is
-  an `int` subclass) but is not a valid quantity, so it must be
+- **Tricky case (bool for qty):** `client.post("/items", json={"name": "pen", "qty": True})`
+  -> `422` -- `True`/`False` looks like an `int` in Python (`bool` is an
+  `int` subclass) but **is not a valid quantity**, so it must be
   rejected rather than accepted as `1`/`0`.
 
 **Examples for `DELETE /items/{item_id}`:**
-- Existing id: `client.delete("/items/1")` -> `204`, empty body (not
-  even `{}` -- `204 No Content` means literally no body).
-- Absent id: `client.delete("/items/999")` -> `404`,
+- **Example (existing id):** `client.delete("/items/1")` -> `204`,
+  empty body (not even `{}` -- **`204 No Content` means literally no
+  body**).
+- **Error case (absent id):** `client.delete("/items/999")` -> `404`,
   `{"detail": "not found"}`.
-- Deleting the same id twice: the first call is `204`; the second call
-  on that same id is `404`, because the item is already gone.
+- **Tricky case (delete twice):** the first call on an id is `204`; the
+  **second call on that same id is `404`**, because the item is already
+  gone.
 
 **Examples for `PUT /items/{item_id}`:**
-- Existing id, valid full body: `client.put("/items/1", json={"name": "pencil", "qty": 5})`
+- **Example (existing id, valid full body):** `client.put("/items/1", json={"name": "pencil", "qty": 5})`
   -> `200`, `{"id": 1, "name": "pencil", "qty": 5}` -- both fields
   replaced, `id` unchanged.
-- Absent id: `client.put("/items/999", json={"name": "x", "qty": 1})`
+- **Error case (absent id):** `client.put("/items/999", json={"name": "x", "qty": 1})`
   -> `404`, `{"detail": "not found"}`.
-- Partial body (only `name`, missing `qty`) against an id that DOES
-  exist: `client.put("/items/1", json={"name": "pencil"})` -> `422`
-  (not a partial merge) -- `PUT` requires a complete `Item` body, and
-  the existing item is left completely unchanged when the body is
-  invalid.
+- **Tricky case (partial body against an existing id):** `client.put("/items/1", json={"name": "pencil"})`
+  (only `name`, missing `qty`) -> **`422`, not a partial merge** -- `PUT`
+  requires a complete `Item` body, and the existing item is left
+  completely unchanged when the body is invalid.
 
 `PUT` replaces the item's entire content -- it does not merge in just
 the fields present in the request body, same as the Flask assignment.

@@ -102,13 +102,16 @@ define its own `reverse` or `find`).
 void reverse(int* arr, int n);
 ```
 
-Reverse arr[0..n-1] in-place. Use two pointers: one starting at the front, one at
-the back, moving toward each other.
+**Reverse `arr[0..n-1]` in-place.** Use two pointers: one starting at the
+front, one at the back, moving toward each other.
 
-*Examples:* `arr = {5, 3, 8, 3, 1}` then `reverse(arr, 5)` leaves
-`arr == {1, 3, 8, 3, 5}`; `arr = {1, 2}` then `reverse(arr, 2)` leaves
-`arr == {2, 1}`; `arr = {7}` then `reverse(arr, 1)` leaves `arr == {7}`
-unchanged (a single element, or `n == 0`, has nothing to swap).
+- **Example (odd length):** `arr = {5, 3, 8, 3, 1}` then `reverse(arr, 5)`
+  leaves **`arr == {1, 3, 8, 3, 5}`**.
+- **Example (even length):** `arr = {1, 2}` then `reverse(arr, 2)` leaves
+  **`arr == {2, 1}`**.
+- **Edge case (single element):** `arr = {7}` then `reverse(arr, 1)` leaves
+  `arr == {7}` **unchanged** (a single element, or `n == 0`, has nothing to
+  swap).
 
 ### `find`
 
@@ -116,13 +119,16 @@ unchanged (a single element, or `n == 0`, has nothing to swap).
 const int* find(const int* arr, int n, int target);
 ```
 
-Return a pointer to the first occurrence of target, or nullptr if not found.
-Walk the array with a pointer, not an index.
+**Return a pointer to the first occurrence of `target`, or `nullptr` if not
+found.** Walk the array with a pointer, not an index. (`arr = {5, 3, 8, 3,
+1}` for all examples below.)
 
-*Examples:* `arr = {5, 3, 8, 3, 1}`; `find(arr, 5, 8)` returns a pointer to
-`arr[2]` (`*find(arr, 5, 8) == 8`); `find(arr, 5, 3)` returns a pointer to
-`arr[1]` -- the FIRST `3`, not the one at index 3; `find(arr, 5, 9)` returns
-`nullptr` because `9` is absent.
+- **Example (found once):** `find(arr, 5, 8)` returns a pointer to `arr[2]`
+  (**`*find(arr, 5, 8) == 8`**).
+- **Tricky case (duplicate values):** `find(arr, 5, 3)` returns a pointer to
+  `arr[1]` -- **the FIRST `3`**, not the one at index 3.
+- **Example (not found):** `find(arr, 5, 9)` returns **`nullptr`** because
+  `9` is absent.
 
 ### `copy_ints`
 
@@ -130,12 +136,15 @@ Walk the array with a pointer, not an index.
 void copy_ints(int* dst, const int* src, int n);
 ```
 
-Copy n ints from src to dst. Advance both pointers simultaneously.
+**Copy `n` ints from `src` to `dst`.** Advance both pointers simultaneously.
+(`src = {5, 3, 8, 3, 1}`, `dst` uninitialized, for all examples below.)
 
-*Examples:* `src = {5, 3, 8, 3, 1}`, `dst` uninitialized; `copy_ints(dst, src,
-5)` leaves `dst == {5, 3, 8, 3, 1}` and `src` unchanged; `copy_ints(dst, src,
-0)` leaves `dst` untouched (nothing to copy); copying `n` elements never
-writes to `dst[n]` or beyond.
+- **Example (full copy):** `copy_ints(dst, src, 5)` leaves **`dst == {5, 3,
+  8, 3, 1}`** and `src` unchanged.
+- **Empty-input case:** `copy_ints(dst, src, 0)` leaves `dst` **untouched**
+  (nothing to copy).
+- **Edge case (bounds):** copying `n` elements never writes to `dst[n]` or
+  beyond.
 
 ### `str_len`
 
@@ -143,12 +152,15 @@ writes to `dst[n]` or beyond.
 size_t str_len(const char* s);
 ```
 
-Return the number of characters before the null terminator -- the `'\0'` byte that
-C strings use to mark where the text ends, since a `char*` has no built-in length of
-its own. Advance the pointer until you reach `'\0'`.
+**Return the number of characters before the null terminator** -- the
+`'\0'` byte that C strings use to mark where the text ends, since a `char*`
+has no built-in length of its own. Advance the pointer until you reach
+`'\0'`.
 
-*Examples:* `str_len("hello") == 5`; `str_len("") == 0` (the buffer holds a
-single `'\0'` byte and nothing else); `str_len("a")` == `1`.
+- **Example (typical string):** `str_len("hello")` returns **`5`**.
+- **Empty-input case:** `str_len("")` returns **`0`** (the buffer holds a
+  single `'\0'` byte and nothing else).
+- **Edge case (single character):** `str_len("a")` returns **`1`**.
 
 ### `str_copy`
 
@@ -156,13 +168,15 @@ single `'\0'` byte and nothing else); `str_len("a")` == `1`.
 char* str_copy(char* dst, const char* src);
 ```
 
-Copy src into dst including the null terminator. Returns dst.
+**Copy `src` into `dst` including the null terminator.** Returns `dst`.
 
-*Examples:* `str_copy(dst, "hello")` leaves `dst` holding `"hello"` (six
-bytes written: `'h','e','l','l','o','\0'`) and returns the same pointer
-passed in as `dst`; `str_copy(dst, "")` writes just the single `'\0'` byte
-and leaves `dst` an empty string; `dst` must be large enough to hold
-`str_len(src) + 1` characters, or the copy overruns the buffer.
+- **Example (typical string):** `str_copy(dst, "hello")` leaves `dst`
+  holding `"hello"` (**six bytes written**: `'h','e','l','l','o','\0'`) and
+  returns the same pointer passed in as `dst`.
+- **Empty-input case:** `str_copy(dst, "")` writes just the single `'\0'`
+  byte and leaves `dst` **an empty string**.
+- **Edge case (buffer size):** `dst` must be large enough to hold
+  `str_len(src) + 1` characters, or the copy overruns the buffer.
 
 ### `str_compare`
 
@@ -170,15 +184,19 @@ and leaves `dst` an empty string; `dst` must be large enough to hold
 int str_compare(const char* a, const char* b);
 ```
 
-Compare two C strings lexicographically (character by character, the way words are
-ordered in a dictionary), like `strcmp`. Return negative, zero, or positive.
+**Compare two C strings lexicographically** (character by character, the
+way words are ordered in a dictionary), like `strcmp`. Return negative,
+zero, or positive.
 
-*Examples:* `str_compare("abc", "abc") == 0` (identical, including both
-`'\0'` bytes matching); `str_compare("apple", "apply")` is negative (the
-strings match through `"appl"`, then `'e'` (101) is less than `'y'` (121));
-`str_compare("abc", "ab")` is positive (matches through `"ab"`, then `"abc"`
-still has `'c'` (99) while `"ab"` has already hit `'\0'` (0) -- a
-longer string that starts with a shorter one always compares greater).
+- **Example (identical strings):** `str_compare("abc", "abc")` returns
+  **`0`** (identical, including both `'\0'` bytes matching).
+- **Example (differing character):** `str_compare("apple", "apply")` is
+  **negative** -- the strings match through `"appl"`, then `'e'` (101) is
+  less than `'y'` (121).
+- **Tricky case (prefix string):** `str_compare("abc", "ab")` is
+  **positive** -- matches through `"ab"`, then `"abc"` still has `'c'` (99)
+  while `"ab"` has already hit `'\0'` (0). A longer string that starts with
+  a shorter one always compares greater.
 
 ### `str_reverse`
 
@@ -186,14 +204,16 @@ longer string that starts with a shorter one always compares greater).
 char* str_reverse(char* s);
 ```
 
-Reverse the string in-place (up to, but not including, the null terminator).
-Returns s.
+**Reverse the string in-place** (up to, but not including, the null
+terminator). Returns `s`.
 
-*Examples:* `s = "hello"` (in a mutable buffer) then `str_reverse(s)` leaves
-`s == "olleh"` and returns the same pointer passed in; `s = "a"` then
-`str_reverse(s)` leaves `s == "a"` unchanged (one character, nothing to
-swap); `s = ""` then `str_reverse(s)` leaves `s == ""` unchanged (the
-`'\0'` itself never moves).
+- **Example (typical string):** `s = "hello"` (in a mutable buffer) then
+  `str_reverse(s)` leaves **`s == "olleh"`** and returns the same pointer
+  passed in.
+- **Edge case (single character):** `s = "a"` then `str_reverse(s)` leaves
+  `s == "a"` **unchanged** (one character, nothing to swap).
+- **Empty-input case:** `s = ""` then `str_reverse(s)` leaves `s == ""`
+  **unchanged** (the `'\0'` itself never moves).
 
 ### `str_find_char`
 
@@ -201,13 +221,16 @@ swap); `s = ""` then `str_reverse(s)` leaves `s == ""` unchanged (the
 const char* str_find_char(const char* s, char c);
 ```
 
-Return a pointer to the first occurrence of c in s, or nullptr if not found.
+**Return a pointer to the first occurrence of `c` in `s`, or `nullptr` if
+not found.**
 
-*Examples:* `str_find_char("hello", 'l')` returns a pointer to index 2 -- the
-FIRST `'l'` in `"he[l]lo"`, not the second one at index 3;
-`str_find_char("hello", 'z')` returns `nullptr` (`'z'` never appears);
-`str_find_char("", 'a')` returns `nullptr` (an empty string has no
-characters before its terminator to match against).
+- **Tricky case (duplicate characters):** `str_find_char("hello", 'l')`
+  returns a pointer to **index 2** -- the FIRST `'l'` in `"he[l]lo"`, not
+  the second one at index 3.
+- **Example (not found):** `str_find_char("hello", 'z')` returns
+  **`nullptr`** (`'z'` never appears).
+- **Empty-input case:** `str_find_char("", 'a')` returns **`nullptr`** (an
+  empty string has no characters before its terminator to match against).
 
 ## Files
 

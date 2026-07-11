@@ -125,41 +125,50 @@ The functions split into four groups:
 
 **Read-only** -- take `const char*` grid, never write through it:
 `cell_at`, `cell_is`, `count_cells`, `grids_equal`, `row_contains`, `find_in_row`
-*Example:* `cell_at(cg, 3, 1, 1) == 'E'`. These functions accept either `cg`
-(`const char*`) or `grid` (`char*`) as their first argument -- a non-const
-pointer can always be passed where const is expected, so `cell_at(grid, 3, 1,
-1)` compiles too. There is no writing tricky case here because these
-functions never take a `char*` parameter at all.
+
+- **Example:** `cell_at(cg, 3, 1, 1) == 'E'`. These functions accept
+  either `cg` (`const char*`) or `grid` (`char*`) as their first
+  argument -- a non-const pointer can always be passed where const is
+  expected, so `cell_at(grid, 3, 1, 1)` compiles too.
+- **No writing tricky case here** -- these functions never take a
+  `char*` parameter at all.
 
 **Pointer-into-grid** -- return a pointer directly into the array, not a copy.
 The return type must match the input's const-ness:
 `row_ptr` (returns `const char*` from `const char*`),
 `row_ptr_mut` (returns `char*` from `char*`)
-*Example:* `row_ptr(cg, 3, 1)` returns a `const char*` equal to `grid + 3`
-(row 1's start); `row_ptr_mut(grid, 3, 1)` returns a `char*` equal to the same
-address, but writable. `char* p = row_ptr(cg, 3, 1);` does **not** compile --
-`row_ptr` always returns `const char*`, and you cannot assign that into a
-plain `char*` variable without a cast (and this assignment forbids
-`const_cast`, so there is no legal way around it -- call `row_ptr_mut` on a
-non-const grid instead if you need a writable row pointer).
+
+- **Example:** `row_ptr(cg, 3, 1)` returns a `const char*` equal to
+  `grid + 3` (row 1's start); `row_ptr_mut(grid, 3, 1)` returns a
+  `char*` equal to the same address, but **writable**.
+- **Error case (dropping const):** `char* p = row_ptr(cg, 3, 1);` does
+  **not** compile -- `row_ptr` always returns `const char*`, and you
+  cannot assign that into a plain `char*` variable without a cast (and
+  this assignment forbids `const_cast`, so there is no legal way
+  around it -- call `row_ptr_mut` on a non-const grid instead if you
+  need a writable row pointer).
 
 **Write** -- take `char*` grid, modify it:
 `set_cell`, `fill_grid`, `fill_row`
-*Example:* `set_cell(grid, 3, 0, 0, 'Z')` sets `grid[0]` to `'Z'`.
-`set_cell(cg, 3, 0, 0, 'Z')` does **not** compile -- `cg` is `const char*`,
-and `set_cell` needs `char*` to legally write; passing a const pointer where a
-write is required is precisely the violation `const` is designed to catch.
-`fill_row(grid, 3, 0, 'X')` sets row 0 to `X X X`; `fill_row(cg, 3, 0, 'X')`
-fails to compile for the identical reason.
+
+- **Example:** `set_cell(grid, 3, 0, 0, 'Z')` sets `grid[0]` to `'Z'`.
+- **Error case (const source):** `set_cell(cg, 3, 0, 0, 'Z')` does
+  **not** compile -- `cg` is `const char*`, and `set_cell` needs
+  `char*` to legally write; passing a const pointer where a write is
+  required is precisely the violation `const` is designed to catch.
+- **Error case (same rule, `fill_row`):** `fill_row(grid, 3, 0, 'X')`
+  sets row 0 to `X X X`; `fill_row(cg, 3, 0, 'X')` fails to compile for
+  the identical reason.
 
 **Mixed** -- `const char*` source, `char*` destination:
 `copy_row`, `copy_grid`
-*Example:* `copy_row(cg, 3, 2, dst)` (with `dst` a separate writable 3-char
-buffer) reads row 2 (`G H I`) from the const source `cg` and writes it into
-`dst`, leaving `dst == {'G','H','I'}`. Swapping the argument order --
-`copy_row(dst, 3, 2, cg)` -- does **not** compile, because `cg`'s type,
-`const char*`, cannot be used as the fourth (`char* dst`) parameter, which
-must be writable.
+
+- **Example:** `copy_row(cg, 3, 2, dst)` (with `dst` a separate
+  writable 3-char buffer) reads row 2 (`G H I`) from the const source
+  `cg` and writes it into `dst`, leaving `dst == {'G','H','I'}`.
+- **Error case (swapped arguments):** `copy_row(dst, 3, 2, cg)` does
+  **not** compile, because `cg`'s type, `const char*`, cannot be used
+  as the fourth (`char* dst`) parameter, which must be writable.
 
 ## Files
 

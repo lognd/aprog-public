@@ -161,37 +161,30 @@ public:
 
 Implement four classes that inherit from `TextFilter`:
 
-- `UppercaseFilter` -- converts every alphabetic character to uppercase.
+- **`UppercaseFilter`** -- converts every alphabetic character to uppercase.
   Non-alphabetic characters are left unchanged.
-  *Examples:* `UppercaseFilter().apply("hello, World!") == "HELLO, WORLD!"`;
-  `UppercaseFilter().apply("!!! ,,, ???") == "!!! ,,, ???"` (no letters, so
-  nothing changes); `UppercaseFilter().apply("") == ""`.
-- `TrimFilter` -- removes leading and trailing whitespace. Interior
+  - **Example:** `UppercaseFilter().apply("hello, World!") == "HELLO, WORLD!"`.
+  - **Edge case (no letters):** `UppercaseFilter().apply("!!! ,,, ???") == "!!! ,,, ???"` (nothing changes).
+  - **Edge case (empty):** `UppercaseFilter().apply("") == ""`.
+- **`TrimFilter`** -- removes leading and trailing whitespace. Interior
   whitespace is left unchanged. Whitespace is any character for which
   `std::isspace` returns true.
-  *Examples:* `TrimFilter().apply("  hi  there  ") == "hi  there"` (only the
-  ends are trimmed; the interior double space stays); `TrimFilter().apply("
-  ") == ""` (a string that is entirely whitespace trims down to nothing);
-  `TrimFilter().apply("") == ""`.
-- `CensorFilter(std::string word)` -- stores `word` in the constructor.
+  - **Example:** `TrimFilter().apply("  hi  there  ") == "hi  there"` (only the ends are trimmed; **the interior double space stays**).
+  - **Edge case (all whitespace):** `TrimFilter().apply("   ") == ""` (a string that is entirely whitespace trims down to nothing).
+  - **Edge case (empty):** `TrimFilter().apply("") == ""`.
+- **`CensorFilter(std::string word)`** -- stores `word` in the constructor.
   `apply()` replaces every non-overlapping occurrence of `word` with
   asterisks of the same length, scanning left to right. If `word` is empty,
   `apply()` returns the input unchanged.
-  *Examples:* `CensorFilter("cat").apply("catcat") == "******"` (two
-  back-to-back, non-overlapping matches, each replaced independently);
-  `CensorFilter("cat").apply("the CAT sat") == "the CAT sat"` (matching is
-  case-sensitive, so an uppercase `CAT` is not touched by a lowercase
-  `"cat"` filter); `CensorFilter("").apply("anything") == "anything"` (empty
-  word means no censoring at all).
-- `SqueezeSpacesFilter` -- collapses every run of two or more consecutive
+  - **Example:** `CensorFilter("cat").apply("catcat") == "******"` (two back-to-back, non-overlapping matches, each replaced independently).
+  - **Tricky case (case-sensitive):** `CensorFilter("cat").apply("the CAT sat") == "the CAT sat"` (matching is case-sensitive, so an **uppercase `CAT` is not touched** by a lowercase `"cat"` filter).
+  - **Edge case (empty word):** `CensorFilter("").apply("anything") == "anything"` (empty word means **no censoring at all**).
+- **`SqueezeSpacesFilter`** -- collapses every run of two or more consecutive
   space characters (`' '`) into a single space. Tabs, newlines, and other
   whitespace are left unchanged, and single spaces are left unchanged.
-  *Examples:* `SqueezeSpacesFilter().apply("a   b") == "a b"`;
-  `SqueezeSpacesFilter().apply("a\t\tb   c") == "a\t\tb c"` (tabs are not
-  spaces, so the `\t\t` run is left exactly as-is while the three-space run
-  collapses); `SqueezeSpacesFilter().apply("!!!   ???") == "!!! ???"`
-  (works on punctuation-only strings too, since it only ever looks at
-  spaces).
+  - **Example:** `SqueezeSpacesFilter().apply("a   b") == "a b"`.
+  - **Tricky case (tabs vs. spaces):** `SqueezeSpacesFilter().apply("a\t\tb   c") == "a\t\tb c"` (tabs are not spaces, so the `\t\t` run is left exactly as-is while the three-space run collapses).
+  - **Example (punctuation-only):** `SqueezeSpacesFilter().apply("!!!   ???") == "!!! ???"` (works on punctuation-only strings too, since it only ever looks at spaces).
 
 Also implement:
 
@@ -205,11 +198,11 @@ order, and returns the final string. `filters` holds non-owning pointers --
 the caller keeps ownership of the filter objects, and `apply_filters` must
 not call `new` or `delete`. An empty `filters` vector returns `s` unchanged.
 
-*Examples:* with `TrimFilter trim;` and `UppercaseFilter up;`,
-`apply_filters("  hello  ", {&trim, &up}) == "HELLO"`; reversing the order,
-`apply_filters("  hello  ", {&up, &trim}) == "HELLO"` too, since trimming
-whitespace and uppercasing letters don't interfere with each other here;
-`apply_filters("anything", {}) == "anything"` (empty filter list).
+With `TrimFilter trim;` and `UppercaseFilter up;`:
+
+- **Example:** `apply_filters("  hello  ", {&trim, &up}) == "HELLO"`.
+- **Example (order reversed):** `apply_filters("  hello  ", {&up, &trim}) == "HELLO"` too, since **trimming and uppercasing don't interfere** with each other here.
+- **Edge case (empty filter list):** `apply_filters("anything", {}) == "anything"`.
 
 ### Part 2 -- templates (compile-time polymorphism)
 
@@ -225,11 +218,9 @@ std::string apply_twice(const std::string& s, const F& f);
 
 Returns `f.apply(f.apply(s))`.
 
-*Examples:* `apply_twice("a     b", SqueezeSpacesFilter{}) == "a b"` (one pass
-already collapses the whole run, so the second pass has nothing left to do);
-`apply_twice("  hi  ", TrimFilter{}) == "hi"` (same reasoning: after the
-first trim there is no more whitespace at the ends for the second trim to
-remove); `apply_twice("", UppercaseFilter{}) == ""`.
+- **Example:** `apply_twice("a     b", SqueezeSpacesFilter{}) == "a b"` (one pass already collapses the whole run, so **the second pass has nothing left to do**).
+- **Example:** `apply_twice("  hi  ", TrimFilter{}) == "hi"` (same reasoning: after the first trim there is no more whitespace for the second trim to remove).
+- **Edge case (empty):** `apply_twice("", UppercaseFilter{}) == ""`.
 
 ```cpp
 template <typename F>
@@ -244,10 +235,8 @@ hold different filter types in one container; `apply_all` takes a vector of
 `F` by value, so every element must be the exact same type, and that type
 never needs to inherit from anything.
 
-*Examples:* `apply_all("a   b", std::vector<SqueezeSpacesFilter>{SqueezeSpacesFilter{}, SqueezeSpacesFilter{}})
-== "a b"` (running the same idempotent filter twice in the vector produces
-the same result as running it once); `apply_all("anything", std::vector<UppercaseFilter>{}) == "anything"`
-(empty filter vector).
+- **Example (idempotent filter twice):** `apply_all("a   b", std::vector<SqueezeSpacesFilter>{SqueezeSpacesFilter{}, SqueezeSpacesFilter{}}) == "a b"` (running the same idempotent filter twice in the vector produces **the same result as running it once**).
+- **Edge case (empty filter vector):** `apply_all("anything", std::vector<UppercaseFilter>{}) == "anything"`.
 
 ```cpp
 template <typename F>
@@ -264,10 +253,10 @@ const` -- it does not need to inherit from `TextFilter`. The hidden test
 suite instantiates these templates with a small struct defined only in the
 test file to confirm this.
 
-*Examples:* `is_idempotent("  hi  ", TrimFilter{}) == true` (trimming twice
-never removes more than trimming once); `is_idempotent("a   b", SqueezeSpacesFilter{}) == true`
-(same idea: once every run of spaces is down to one space, squeezing again
-changes nothing). Note that all four Part 1 filters happen to be idempotent
+- **Example:** `is_idempotent("  hi  ", TrimFilter{}) == true` (trimming twice never removes more than trimming once).
+- **Example:** `is_idempotent("a   b", SqueezeSpacesFilter{}) == true` (once every run of spaces is down to one space, squeezing again **changes nothing**).
+
+Note that all four Part 1 filters happen to be idempotent
 on every input, for reasons specific to what each one does -- `is_idempotent`
 itself does not know that; it only ever calls `apply` twice and compares.
 The hidden tests exercise a custom, non-idempotent `apply()` (defined only in

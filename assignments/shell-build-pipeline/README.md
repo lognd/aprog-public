@@ -53,57 +53,61 @@ To check whether a file is newer than another, use:
 
 ## Task
 
-Fill in `build.sh`. The script must:
+Fill in `build.sh`. The script must do **four** things:
 
-1. Run `g++ -E`, `g++ -S`, `g++ -c`, and `g++` (link) as separate invocations.
-   *Example:* `g++ -E greet.cpp -o greet.i` produces a 22,733-line expanded
-   file from a 5-line source file (see the worked example below).
-   *Example:* `g++ -S greet.i -o greet.s` produces 490 lines of assembly
-   containing the mangled symbol
-   `_Z5greetRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE`.
-   *Tricky case:* `g++ -c greet.s -o greet.o` only works if `greet.s` already
-   exists -- run it against a missing file (e.g. `g++ -c doesnotexist.s -o
-   x.o`) and the assembler reports `Error: can't open doesnotexist.s for
-   reading: No such file or directory` and exits nonzero; your script must not
-   treat that as success.
-2. Only run each stage if the input file is newer than the output file (or the output does not exist yet).
-   *Example:* on the very first run, no `.i`/`.s`/`.o` files exist yet, so
-   every stage's `[ ! -f "${src}.i" ]` check is true and every stage runs.
-   *Example:* run the script a second time with nothing changed -- every
-   `-nt` (newer-than) check is now false, so `g++` is not invoked again and
-   `greet.o`'s modification time is unchanged (verified with `stat -c %Y
-   greet.o` before and after).
-   *Tricky case:* `touch greet.cpp` and rerun -- only `greet.i`, `greet.s`,
-   `greet.o`, and the relinked `program` get newer modification times;
-   `main.o` and `math_utils.o` are untouched, because their own `.cpp` inputs
-   did not change (verified: after touching only `greet.cpp` and rebuilding,
-   `main.o`'s and `math_utils.o`'s timestamps were identical before and
-   after, while `greet.o` and `program` both got strictly newer timestamps).
-3. Redirect compiler error output to `build.log` using `2>` or `2>>`.
-   *Example:* a clean build's `build.log` contains just `22` -- the pipe
-   count from item 4 below, with zero compiler errors appended after it.
-   *Example (error case):* if `greet.cpp` has a syntax error (a missing
-   closing `}`), `build.log` gains real `g++` diagnostics, e.g.
-   `greet.cpp:4:35: error: expected '}' at end of input`, followed by
-   `Assembler messages: Error: can't open greet.s for reading` and
-   `/usr/bin/ld: cannot find greet.o: No such file or directory` -- because
-   the later stages still ran (nothing stops them) but had nothing to
-   consume, so each one failed loudly into `build.log` instead of silently;
-   `program` is correctly never produced.
-   *Empty-input case:* preprocessing a completely empty `.cpp` file still
-   succeeds and produces a small non-empty `.i` file (6 lines of boilerplate
-   `#` line markers, no error) -- an empty file is not the same as a missing
-   one.
-4. Use at least one pipe -- for example, count how many lines the preprocessor produces
-   before you save the result to disk.
-   *Example:* `cat main.cpp greet.cpp math_utils.cpp | wc -l` prints `22`
-   (13 + 5 + 4 lines across the three source files), which the reference
-   script appends to `build.log` at the very start of the run.
-   *Example:* `g++ -E main.cpp | wc -l` prints `22733`+ lines (the expanded
-   size of just one translation unit) -- a different, much larger number
-   than the raw source line count, which is exactly the point of this
-   pipe: it makes the "preprocessing expands the file a lot" fact visible
-   as a single piped number instead of something you have to take on faith.
+**1. Run the four stages as separate `g++` invocations** -- preprocess
+(`-E`), compile to assembly (`-S`), assemble (`-c`), then link.
+
+- **Example (preprocess):** `g++ -E greet.cpp -o greet.i` expands a
+  **5-line source into a 22,733-line** `.i` file.
+- **Example (compile):** `g++ -S greet.i -o greet.s` produces **490 lines
+  of assembly**, containing the mangled symbol
+  `_Z5greetRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE`.
+- **Tricky case (missing input):** `g++ -c greet.s -o greet.o` only works
+  if `greet.s` exists. Run it on a missing file --
+  `g++ -c doesnotexist.s -o x.o` -- and the assembler prints `Error: can't
+  open doesnotexist.s for reading: No such file or directory` and **exits
+  nonzero**. Your script must not treat that as success.
+
+**2. Skip a stage when its output is already up to date** -- run a stage
+only if its input is newer than its output (or the output does not exist
+yet).
+
+- **Example (first run):** no `.i`/`.s`/`.o` files exist yet, so every
+  stage's `[ ! -f "${src}.i" ]` check is true and **every stage runs**.
+- **Example (unchanged rerun):** run the script again with nothing changed
+  -- every `-nt` (newer-than) check is now false, so **`g++` is never
+  invoked** and `greet.o`'s timestamp is unchanged (`stat -c %Y greet.o` is
+  identical before and after).
+- **Tricky case (one file changed):** `touch greet.cpp` and rerun. Only
+  `greet.i`, `greet.s`, `greet.o`, and the relinked `program` get newer
+  timestamps; **`main.o` and `math_utils.o` are untouched**, because their
+  own `.cpp` inputs did not change.
+
+**3. Send compiler error output to `build.log`** using `2>` or `2>>`.
+
+- **Example (clean build):** `build.log` contains just `22` (the pipe count
+  from requirement 4), with **zero compiler errors** after it.
+- **Error case (syntax error):** give `greet.cpp` a missing closing `}` and
+  `build.log` gains real diagnostics -- `greet.cpp:4:35: error: expected
+  '}' at end of input`, then `Assembler messages: Error: can't open greet.s
+  for reading` and `/usr/bin/ld: cannot find greet.o: No such file or
+  directory`. The later stages still ran but had nothing to consume, so
+  each **failed loudly into `build.log`**, and `program` is correctly never
+  produced.
+- **Empty-input case:** preprocessing a completely empty `.cpp` still
+  succeeds and produces a small **non-empty** `.i` (6 lines of `#` line
+  markers, no error) -- an empty file is not a missing one.
+
+**4. Use at least one pipe** -- for example, count how many lines the
+preprocessor produces before saving the result.
+
+- **Example (raw source count):** `cat main.cpp greet.cpp math_utils.cpp |
+  wc -l` prints **`22`** (13 + 5 + 4 lines), which the reference script
+  appends to `build.log` at the start of the run.
+- **Example (expanded count):** `g++ -E main.cpp | wc -l` prints
+  **`22733`+** -- far larger than the raw count, which is the whole point:
+  it makes "preprocessing expands the file a lot" visible as one number.
 
 The project has three translation units (a translation unit is one `.cpp`
 file plus everything it `#include`s -- the compiler runs the four stages

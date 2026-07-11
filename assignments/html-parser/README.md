@@ -118,21 +118,24 @@ Strip all HTML tags and return the plain text.  Apply these rules in order:
    - All other tags (including `<b>`, `<i>`, `<u>`, and unknown tags) -> strip
 5. Characters outside any tag are appended to the output unchanged.
 
-*Examples:*
+**Examples:**
 
-- `to_text("") == ""` -- empty input, nothing to strip.
-- `to_text("no tags here") == "no tags here"` -- no `<` at all, every
-  character is copied through unchanged.
-- `to_text("<b>Hi<br>there</b>") == "Hi\nthere"` -- `<b>` and `</b>` are
-  stripped (they carry no special meaning), `<br>` becomes a newline.
-- `to_text("a < b") == "a < b"` -- the `<` here never finds a matching `>`
-  anywhere in the rest of the string, so rule 2 says to treat it as a
-  literal character; the whole string passes through unchanged.
-- `to_text("<p></p>") == "\n\n"` -- the open `<p>` appends `\n\n`; the close
-  `</p>` is a close tag, so it is stripped and contributes nothing.
-- `to_text("<BR>") == "\n"` -- tag names are matched case-insensitively
-  (rule 3 lowercases before comparing), so uppercase `<BR>` is still
-  recognized as `br`.
+- **Empty input:** `to_text("") == ""` -- **nothing to strip**.
+- **Example (no tags):** `to_text("no tags here") == "no tags here"` -- no
+  `<` at all, **every character is copied through unchanged**.
+- **Example (basic strip):** `to_text("<b>Hi<br>there</b>") == "Hi\nthere"`
+  -- `<b>` and `</b>` are stripped (they carry no special meaning), and
+  **`<br>` becomes a newline**.
+- **Tricky case (unmatched `<`):** `to_text("a < b") == "a < b"` -- the `<`
+  here never finds a matching `>` anywhere in the rest of the string, so
+  rule 2 says to treat it as a literal character; **the whole string passes
+  through unchanged**.
+- **Example (`<p>` tag):** `to_text("<p></p>") == "\n\n"` -- the open `<p>`
+  appends `\n\n`; the close `</p>` is a close tag, so it is stripped and
+  **contributes nothing**.
+- **Example (case-insensitive):** `to_text("<BR>") == "\n"` -- tag names
+  are matched case-insensitively (rule 3 lowercases before comparing), so
+  **uppercase `<BR>` is still recognized as `br`**.
 
 ### `int count_tag(const std::string& html, const std::string& tag_name)`
 
@@ -140,17 +143,20 @@ Count the number of opening (non-closing) occurrences of `tag_name` in `html`.
 Tag name matching is case-insensitive.  Malformed tags (no closing `>`) are not
 counted.  Close tags (starting with `/`) are not counted.
 
-*Examples:*
+**Examples:**
 
-- `count_tag("", "b") == 0` -- empty input, nothing to count.
-- `count_tag("<b>hi</b>", "x") == 0` -- `tag_name` "x" never appears at all.
-- `count_tag("<b><B><b>", "b") == 3` -- three open tags, matched
-  case-insensitively (`<B>` counts the same as `<b>`).
-- `count_tag("</b>", "b") == 0` -- the only tag present is a CLOSE tag
-  (starts with `/`), so it is not counted; the open-tag count is zero.
-- `count_tag("<bad", "bad") == 0` -- `<bad` never finds a closing `>`, so
-  it is malformed and is not counted, even though the tag name would
-  otherwise match.
+- **Empty input:** `count_tag("", "b") == 0` -- **nothing to count**.
+- **Example (absent tag):** `count_tag("<b>hi</b>", "x") == 0` -- `tag_name`
+  `"x"` **never appears at all**.
+- **Example (case-insensitive, multiple):** `count_tag("<b><B><b>", "b") ==
+  3` -- **three open tags**, matched case-insensitively (`<B>` counts the
+  same as `<b>`).
+- **Tricky case (close tag only):** `count_tag("</b>", "b") == 0` -- the
+  only tag present is a CLOSE tag (starts with `/`), so it is not counted;
+  **the open-tag count is zero**.
+- **Tricky case (malformed tag):** `count_tag("<bad", "bad") == 0` -- `<bad`
+  never finds a closing `>`, so it is malformed and is **not counted**, even
+  though the tag name would otherwise match.
 
 ---
 

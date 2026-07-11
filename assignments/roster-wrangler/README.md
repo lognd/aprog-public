@@ -49,30 +49,41 @@ def index_by_key(roster: list[dict]) -> dict[tuple[str, str], int]:
 
 ### Per-function examples
 
-- `group_by_section(roster)`
-  - `group_by_section([{"name": "Zoe", "section": "A", "grade": 50}]) == {"A": ["Zoe"]}` -- a single record still becomes a one-name list, not a bare string.
-  - `group_by_section([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "A", "grade": 95}]) == {"A": ["Alice", "Alice"]}` -- this function does NOT deduplicate; `dedupe_names` is the function for that job.
-  - `group_by_section([]) == {}` -- empty roster in, empty dict out.
-- `dedupe_names(roster)`
-  - `dedupe_names([{"name": "Bob", "section": "A", "grade": 1}, {"name": "Bob", "section": "B", "grade": 2}]) == ["Bob"]` -- same name, two different sections, still counts as one student and is kept once.
-  - `dedupe_names([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Bob", "section": "A", "grade": 80}]) == ["Alice", "Bob"]` -- no duplicates present, so every name passes through unchanged.
-  - `dedupe_names([]) == []` -- empty roster in, empty list out.
-- `section_averages(roster)`
-  - `section_averages([{"name": "A", "section": "X", "grade": 1}, {"name": "B", "section": "X", "grade": 1}, {"name": "C", "section": "X", "grade": 2}]) == {"X": 1.33}` -- `(1 + 1 + 2) / 3 = 1.3333...`, rounded to 2 places, not truncated.
-  - `section_averages([{"name": "Alice", "section": "A", "grade": 90}]) == {"A": 90.0}` -- a single record is its own average, and the result is still a `float` (`90.0`, not the `int` `90`).
-  - `section_averages([]) == {}` -- empty roster in, empty dict out; there is no section to divide zero grades by, so nothing is computed.
-- `top_student_per_section(roster)`
-  - `top_student_per_section([{"name": "Zack", "section": "A", "grade": 90}, {"name": "Amy", "section": "A", "grade": 90}]) == {"A": "Amy"}` -- exact tie on grade; alphabetically-first name wins regardless of which record came first in the roster.
-  - `top_student_per_section([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "A", "grade": 60}]) == {"A": "Alice"}` -- the SAME student appears twice with different grades for the same section; the higher grade (`90`) is the one that counts.
-  - `top_student_per_section([]) == {}` -- empty roster in, empty dict out.
-- `enrollment_sets(roster_a, roster_b)`
-  - `enrollment_sets([{"name": "Bob", "section": "A", "grade": 1}], [{"name": "Bob", "section": "A", "grade": 1}]) == (set(), {"Bob"}, set())` -- identical single-student rosters: nobody is "only in A" or "only in B", `Bob` is in both.
-  - `enrollment_sets([], [{"name": "Eve", "section": "C", "grade": 100}]) == (set(), set(), {"Eve"})` -- an empty first roster means the "only in A" and "in both" sets are empty; everyone in `roster_b` falls into "only in B".
-  - `enrollment_sets([], []) == (set(), set(), set())` -- both rosters empty, all three sets empty.
-- `index_by_key(roster)`
-  - `index_by_key([{"name": "Bob", "section": "A", "grade": 1}, {"name": "Bob", "section": "A", "grade": 9}]) == {("Bob", "A"): 9}` -- the SAME `(name, section)` pair appears twice with different grades; the map ends up holding only the LAST one (`9`), the earlier `1` is fully overwritten, not averaged or summed.
-  - `index_by_key([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "B", "grade": 70}]) == {("Alice", "A"): 90, ("Alice", "B"): 70}` -- same name, different sections, so these are two DIFFERENT keys, not a collision.
-  - `index_by_key([]) == {}` -- empty roster in, empty dict out.
+**`group_by_section(roster)`**
+
+- **Example (single record):** `group_by_section([{"name": "Zoe", "section": "A", "grade": 50}])` returns `{"A": ["Zoe"]}` -- a single record still becomes a one-name list, not a bare string.
+- **Tricky case (no dedup):** `group_by_section([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "A", "grade": 95}])` returns `{"A": ["Alice", "Alice"]}` -- this function does **not deduplicate**; `dedupe_names` is the function for that job.
+- **Empty-input case:** `group_by_section([])` returns `{}`.
+
+**`dedupe_names(roster)`**
+
+- **Example (same name, different sections):** `dedupe_names([{"name": "Bob", "section": "A", "grade": 1}, {"name": "Bob", "section": "B", "grade": 2}])` returns `["Bob"]` -- same name, two different sections, still counts as **one** student and is kept once.
+- **Example (no duplicates):** `dedupe_names([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Bob", "section": "A", "grade": 80}])` returns `["Alice", "Bob"]` -- no duplicates present, so every name passes through unchanged.
+- **Empty-input case:** `dedupe_names([])` returns `[]`.
+
+**`section_averages(roster)`**
+
+- **Example (rounding):** `section_averages([{"name": "A", "section": "X", "grade": 1}, {"name": "B", "section": "X", "grade": 1}, {"name": "C", "section": "X", "grade": 2}])` returns `{"X": 1.33}` -- `(1 + 1 + 2) / 3 = 1.3333...`, **rounded to 2 places**, not truncated.
+- **Example (single record):** `section_averages([{"name": "Alice", "section": "A", "grade": 90}])` returns `{"A": 90.0}` -- a single record is its own average, and the result is still a **`float`** (`90.0`, not the `int` `90`).
+- **Empty-input case:** `section_averages([])` returns `{}` -- there is no section to divide zero grades by, so nothing is computed.
+
+**`top_student_per_section(roster)`**
+
+- **Tricky case (exact tie):** `top_student_per_section([{"name": "Zack", "section": "A", "grade": 90}, {"name": "Amy", "section": "A", "grade": 90}])` returns `{"A": "Amy"}` -- exact tie on grade; **alphabetically-first name wins** regardless of which record came first in the roster.
+- **Tricky case (same student, correction):** `top_student_per_section([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "A", "grade": 60}])` returns `{"A": "Alice"}` -- the same student appears twice with different grades for the same section; the **higher grade (`90`)** is the one that counts.
+- **Empty-input case:** `top_student_per_section([])` returns `{}`.
+
+**`enrollment_sets(roster_a, roster_b)`**
+
+- **Example (overlap):** `enrollment_sets([{"name": "Bob", "section": "A", "grade": 1}], [{"name": "Bob", "section": "A", "grade": 1}])` returns `(set(), {"Bob"}, set())` -- identical single-student rosters: nobody is "only in A" or "only in B", **`Bob` is in both**.
+- **Edge case (empty first roster):** `enrollment_sets([], [{"name": "Eve", "section": "C", "grade": 100}])` returns `(set(), set(), {"Eve"})` -- an empty first roster means the "only in A" and "in both" sets are empty; everyone in `roster_b` falls into **"only in B"**.
+- **Empty-input case:** `enrollment_sets([], [])` returns `(set(), set(), set())`.
+
+**`index_by_key(roster)`**
+
+- **Tricky case (last write wins):** `index_by_key([{"name": "Bob", "section": "A", "grade": 1}, {"name": "Bob", "section": "A", "grade": 9}])` returns `{("Bob", "A"): 9}` -- the same `(name, section)` pair appears twice with different grades; the map ends up holding only the **last one (`9`)**, the earlier `1` is fully overwritten, not averaged or summed.
+- **Example (different sections, no collision):** `index_by_key([{"name": "Alice", "section": "A", "grade": 90}, {"name": "Alice", "section": "B", "grade": 70}])` returns `{("Alice", "A"): 90, ("Alice", "B"): 70}` -- same name, different sections, so these are **two different keys**, not a collision.
+- **Empty-input case:** `index_by_key([])` returns `{}`.
 
 ### Examples
 

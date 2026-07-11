@@ -112,35 +112,60 @@ def is_palindrome_sentence(text):
 ```
 
 **`word_count(text)` examples:**
-- `word_count("the quick brown fox") == 4` -- four space-separated words
-- `word_count("") == 0` -- an empty text has zero words (not an error)
-- `word_count("!!!") == 0` -- punctuation-only text also has zero words; `!` is never part of a word
+- **Example:** `word_count("the quick brown fox") == 4` -- four
+  space-separated words.
+- **Empty-input case:** `word_count("") == 0` -- an empty text has
+  **zero** words (not an error).
+- **Edge case (punctuation only):** `word_count("!!!") == 0` --
+  punctuation-only text also has zero words; `!` is never part of a word.
 
 **`unique_words_sorted(text)` examples:**
-- `unique_words_sorted("the fox and the hound") == ['and', 'fox', 'hound', 'the']` -- four distinct words, alphabetical
-- `unique_words_sorted("The the THE") == ['THE', 'The', 'the']` -- all three are DIFFERENT words (case-sensitive); sorted order is by character code, so all-uppercase `THE` comes first, then `The`, then all-lowercase `the`
-- `unique_words_sorted("") == []` -- empty text, empty list, never an error
+- **Example:** `unique_words_sorted("the fox and the hound") == ['and', 'fox', 'hound', 'the']`
+  -- four distinct words, alphabetical.
+- **Tricky case (case sensitivity):** `unique_words_sorted("The the THE") == ['THE', 'The', 'the']`
+  -- all three are **DIFFERENT** words (case-sensitive); sorted order is
+  by character code, so all-uppercase `THE` comes first, then `The`,
+  then all-lowercase `the`.
+- **Empty-input case:** `unique_words_sorted("") == []` -- empty text,
+  empty list, never an error.
 
 **`word_frequencies(text)` examples:**
-- `word_frequencies("a b a c b a") == {'a': 3, 'b': 2, 'c': 1}` -- one entry per distinct word, mapped to its count
-- `word_frequencies("The the") == {'The': 1, 'the': 1}` -- case-sensitive, so this is two entries, not one merged into `2`
-- `word_frequencies("") == {}` -- empty text produces an empty dict, not an error and not `None`
+- **Example:** `word_frequencies("a b a c b a") == {'a': 3, 'b': 2, 'c': 1}`
+  -- one entry per distinct word, mapped to its count.
+- **Tricky case (case sensitivity):** `word_frequencies("The the") == {'The': 1, 'the': 1}`
+  -- case-sensitive, so this is **two entries**, not one merged into `2`.
+- **Empty-input case:** `word_frequencies("") == {}` -- empty text
+  produces an empty dict, not an error and not `None`.
 
 **`most_frequent(text, k)` examples:**
-- `most_frequent("a b a c b a", 2) == ['a', 'b']` -- `a` (count 3) then `b` (count 2), the two highest counts
-- `most_frequent("a a c b", 3) == ['a', 'b', 'c']` -- `b` and `c` tie at count 1; the tie is broken alphabetically, ascending
-- `most_frequent("a b a c b a", 0) == []` -- `k <= 0` (zero, or negative) always returns `[]`, never an error
-- `most_frequent("a b c", 100) == ['a', 'b', 'c']` -- asking for more words than exist (`k` larger than the number of distinct words) just returns every distinct word, still ranked; it does not raise or pad the result
+- **Example:** `most_frequent("a b a c b a", 2) == ['a', 'b']` -- `a`
+  (count 3) then `b` (count 2), the two highest counts.
+- **Tricky case (tie-break):** `most_frequent("a a c b", 3) == ['a', 'b', 'c']`
+  -- `b` and `c` tie at count 1; the tie is broken **alphabetically,
+  ascending**.
+- **Edge case (k <= 0):** `most_frequent("a b a c b a", 0) == []` --
+  `k <= 0` (zero, or negative) always returns `[]`, never an error.
+- **Edge case (k larger than distinct words):** `most_frequent("a b c", 100) == ['a', 'b', 'c']`
+  -- asking for more words than exist just returns every distinct word,
+  still ranked; it does not raise or pad the result.
 
 **`reverse_words(text)` examples:**
-- `reverse_words("the quick brown fox") == 'fox brown quick the'` -- words in reverse order, single spaces, punctuation gone for good
-- `reverse_words("") == ''` -- empty text reverses to an empty string
-- `reverse_words("one") == 'one'` -- a single word reversed is itself
+- **Example:** `reverse_words("the quick brown fox") == 'fox brown quick the'`
+  -- words in reverse order, single spaces, punctuation gone for good.
+- **Empty-input case:** `reverse_words("") == ''` -- empty text reverses
+  to an empty string.
+- **Edge case (single word):** `reverse_words("one") == 'one'` -- a
+  single word reversed is itself.
 
 **`is_palindrome_sentence(text)` examples:**
-- `is_palindrome_sentence("A man, a plan, a canal: Panama") == True` -- ignoring case and punctuation this reads `amanaplanacanalpanama` both forwards and backwards
-- `is_palindrome_sentence("this is not a palindrome") == False` -- reads differently forwards and backwards
-- `is_palindrome_sentence("") == True` -- an empty text has no letters at all, so there is nothing to contradict; it counts as a (trivial) palindrome
+- **Example:** `is_palindrome_sentence("A man, a plan, a canal: Panama") == True`
+  -- ignoring case and punctuation this reads `amanaplanacanalpanama`
+  both forwards and backwards.
+- **Example (non-palindrome):** `is_palindrome_sentence("this is not a palindrome") == False`
+  -- reads differently forwards and backwards.
+- **Empty-input case:** `is_palindrome_sentence("") == True` -- an empty
+  text has no letters at all, so there is nothing to contradict; it
+  counts as a (trivial) palindrome.
 
 ### Examples
 

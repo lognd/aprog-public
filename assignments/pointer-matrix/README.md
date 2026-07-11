@@ -253,35 +253,43 @@ Return the value at row `r`, column `c` of matrix `m`.
 `cols` is the number of columns per row.
 You may assume `r` and `c` are in bounds.
 The `const int*` parameter signals that this function is read-only.
-*Example:* for `m = {1,2,3,4,5,6,7,8,9,10,11,12}` (3 rows, 4 cols),
-`mat_get(m, 4, 0, 0) == 1`; `mat_get(m, 4, 1, 2) == 7`;
-`mat_get(m, 4, 2, 3) == 12` (the last element).
+
+- **Example (first element):** for `m = {1,2,3,4,5,6,7,8,9,10,11,12}` (3
+  rows, 4 cols), `mat_get(m, 4, 0, 0)` is **`1`**.
+- **Example (interior element):** `mat_get(m, 4, 1, 2)` is **`7`**.
+- **Example (last element):** `mat_get(m, 4, 2, 3)` is **`12`**.
 
 **`void mat_set(int* m, int cols, int r, int c, int val)`**
 Set the element at row `r`, column `c` to `val`.
 No return value; the matrix is modified in place.
-*Example:* `mat_set(m, 4, 1, 2, 99)` followed by `mat_get(m, 4, 1, 2)`
-returns `99` (it overwrote the `7` from the example above); `mat_set(m, 4,
-0, 3, -1)` followed by `mat_get(m, 4, 0, 3)` returns `-1` (negative values
-are stored the same way as positive ones -- there is nothing special
-about them).
+
+- **Example (overwrite):** `mat_set(m, 4, 1, 2, 99)` followed by
+  `mat_get(m, 4, 1, 2)` returns **`99`** (it overwrote the `7` from the
+  example above).
+- **Example (negative value):** `mat_set(m, 4, 0, 3, -1)` followed by
+  `mat_get(m, 4, 0, 3)` returns **`-1`** -- negative values are stored the
+  same way as positive ones, there is nothing special about them.
 
 **`void mat_fill(int* m, int rows, int cols, int val)`**
 Set every element in the matrix to `val`.
 Both `rows` and `cols` are needed to know the total element count.
-*Example:* `mat_fill(m, 3, 4, 0)` on the 12-element matrix above sets
-all 12 flat elements to `0`, so every subsequent `mat_get(m, 4, r, c)`
-returns `0`; `mat_fill(m, 1, 1, 7)` on a 1x1 matrix sets its single
-element to `7` (the smallest possible matrix still works -- `rows*cols`
-is just `1`).
+
+- **Example (whole matrix):** `mat_fill(m, 3, 4, 0)` on the 12-element
+  matrix above sets **all 12 flat elements to `0`**, so every subsequent
+  `mat_get(m, 4, r, c)` returns `0`.
+- **Edge case (1x1 matrix):** `mat_fill(m, 1, 1, 7)` on a 1x1 matrix sets
+  its single element to `7` -- the smallest possible matrix still works
+  since **`rows*cols` is just `1`**.
 
 **`void mat_add(const int* a, const int* b, int* dst, int rows, int cols)`**
 Element-wise addition: `dst[r][c] = a[r][c] + b[r][c]` for every cell.
 `a` and `b` are read-only; `dst` is written.
 All three matrices have the same dimensions.
-*Example:* `a = {1,2,3,4}`, `b = {10,20,30,40}` (both 2x2), `mat_add(a, b,
-dst, 2, 2)` gives `dst = {11,22,33,44}`; if every element of `b` is `0`,
-`dst` ends up identical to `a` (adding zero changes nothing).
+
+- **Example (basic add):** `a = {1,2,3,4}`, `b = {10,20,30,40}` (both
+  2x2), `mat_add(a, b, dst, 2, 2)` gives **`dst = {11,22,33,44}`**.
+- **Edge case (add zero):** if every element of `b` is `0`, `dst` ends up
+  **identical to `a`** -- adding zero changes nothing.
 
 **`void mat_transpose(const int* src, int* dst, int rows, int cols)`**
 Write the transpose of `src` into `dst`.
@@ -293,45 +301,60 @@ This is the most common wrong-answer trap in this assignment.  Think carefully:
 if `src` has 3 rows and 5 columns, `dst` has 5 rows and 3 columns.  The offset
 formula for `dst` uses `rows` (the original row count) as its column count,
 not `cols`.
-*Example:* square case: `src = {1,2,3,4}` (2x2), `mat_transpose(src, dst,
-2, 2)` gives `dst = {1,3,2,4}` (rows `{1,3}` and `{2,4}`). Non-square
-case: `src = {1,2,3,4,5,6}` (2 rows, 3 cols), `mat_transpose(src, dst, 2,
-3)` gives `dst = {1,4,2,5,3,6}` (3 rows, 2 cols: `{1,4}`, `{2,5}`,
-`{3,6}`). For the 3x4 matrix `m` from the examples above, `mat_transpose(m,
-dst, 3, 4)` gives a 4x3 result with rows `{1,5,9}`, `{2,6,10}`,
-`{3,7,11}`, `{4,8,12}` -- the original COLUMNS of `m` become the rows of
-`dst`.
+
+- **Example (square case):** `src = {1,2,3,4}` (2x2),
+  `mat_transpose(src, dst, 2, 2)` gives `dst = {1,3,2,4}` -- rows
+  **`{1,3}`** and **`{2,4}`**.
+- **Example (non-square case):** `src = {1,2,3,4,5,6}` (2 rows, 3 cols),
+  `mat_transpose(src, dst, 2, 3)` gives `dst = {1,4,2,5,3,6}` -- **3 rows,
+  2 cols**: `{1,4}`, `{2,5}`, `{3,6}`.
+- **Example (3x4 matrix `m`):** `mat_transpose(m, dst, 3, 4)` gives a
+  **4x3 result** with rows `{1,5,9}`, `{2,6,10}`, `{3,7,11}`, `{4,8,12}`
+  -- the original COLUMNS of `m` become the rows of `dst`.
 
 **`int mat_row_sum(const int* m, int cols, int r)`**
 Return the sum of all elements in row `r`.
 Only `cols` is needed, not `rows`, because you only access one row.
-*Example:* for the 3x4 matrix `m` above, `mat_row_sum(m, 4, 0) == 10`
-(`1+2+3+4`); `mat_row_sum(m, 4, 2) == 42` (`9+10+11+12`, the last row).
+
+- **Example (first row):** for the 3x4 matrix `m` above,
+  `mat_row_sum(m, 4, 0)` is **`10`** (`1+2+3+4`).
+- **Example (last row):** `mat_row_sum(m, 4, 2)` is **`42`**
+  (`9+10+11+12`).
 
 **`int mat_col_sum(const int* m, int rows, int cols, int c)`**
 Return the sum of all elements in column `c`.
 Both `rows` and `cols` are needed to step from one row to the next.
-*Example:* for the same 3x4 matrix `m`, `mat_col_sum(m, 3, 4, 0) == 15`
-(`1+5+9`); `mat_col_sum(m, 3, 4, 3) == 24` (`4+8+12`, the last column).
+
+- **Example (first column):** for the same 3x4 matrix `m`,
+  `mat_col_sum(m, 3, 4, 0)` is **`15`** (`1+5+9`).
+- **Example (last column):** `mat_col_sum(m, 3, 4, 3)` is **`24`**
+  (`4+8+12`).
 
 **`bool mat_is_symmetric(const int* m, int n)`**
 `m` is a square `n x n` matrix.
 Return `true` if `m[r][c] == m[c][r]` for all `r` and `c`.
 Return `false` on the first pair that differs.
-*Example:* `s = {1,2,3,2,4,5,3,5,6}` (3x3), `mat_is_symmetric(s, 3) ==
-true`; `m2 = {1,2,3,4}` (2x2), `mat_is_symmetric(m2, 2) == false`
-(`m2[0][1] = 2` but `m2[1][0] = 3`); `m3 = {5}` (1x1),
-`mat_is_symmetric(m3, 1) == true` (a single element has no off-diagonal
-pair to fail, so it is trivially symmetric).
+
+- **Example (symmetric):** `s = {1,2,3,2,4,5,3,5,6}` (3x3),
+  `mat_is_symmetric(s, 3)` is **`true`**.
+- **Example (not symmetric):** `m2 = {1,2,3,4}` (2x2),
+  `mat_is_symmetric(m2, 2)` is **`false`** (`m2[0][1] = 2` but
+  `m2[1][0] = 3`).
+- **Edge case (1x1 matrix):** `m3 = {5}` (1x1), `mat_is_symmetric(m3, 1)`
+  is **`true`** -- a single element has no off-diagonal pair to fail, so
+  it is trivially symmetric.
 
 **`void mat_print(const int* m, int rows, int cols)`**
 Print the matrix, one row per line, elements separated by spaces.
 The last element on a line has no trailing space.
 Use `printf` or `std::cout`; either is fine.
-*Example:* `mat_print(m, 3, 4)` on the 3x4 matrix above prints exactly
-three lines, `"1 2 3 4"`, `"5 6 7 8"`, `"9 10 11 12"`, each followed by a
-newline and none with a trailing space; `mat_print(row, 1, 3)` on a
-single-row matrix `row = {7,8,9}` prints one line, `"7 8 9"`.
+
+- **Example (3x4 matrix):** `mat_print(m, 3, 4)` on the 3x4 matrix above
+  prints exactly **three lines**, `"1 2 3 4"`, `"5 6 7 8"`,
+  `"9 10 11 12"`, each followed by a newline and none with a trailing
+  space.
+- **Edge case (single row):** `mat_print(row, 1, 3)` on a single-row
+  matrix `row = {7,8,9}` prints **one line**, `"7 8 9"`.
 
 Example for a 2x3 matrix with values 1-6:
 ```

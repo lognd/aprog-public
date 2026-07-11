@@ -66,51 +66,52 @@ app instance from `create_app()`, showing exactly how the ledger's state
 changes after each call. Every status code and JSON body below was
 confirmed by running the reference solution directly.
 
-1. `GET /items` (fresh app, nothing created yet)
+1. **`GET /items`** (fresh app, nothing created yet)
    -> `200`, body `[]`
-   Why: the ledger starts empty, so listing it returns an empty JSON
+   **Why:** the ledger starts empty, so listing it returns an empty JSON
    array, not `404` or `null` -- "no items" is a valid, successful list.
 
-2. `POST /items` with body `{"name": "pen", "qty": 3}`
+2. **`POST /items`** with body `{"name": "pen", "qty": 3}`
    -> `201`, body `{"id": 1, "name": "pen", "qty": 3}`
-   Why: `201 Created` (not `200`) signals a new resource came into
+   **Why:** `201 Created` (not `200`) signals a new resource came into
    existence; the server assigns `id: 1` since this is the first item
    ever created in this app instance.
 
-3. `GET /items/1`
+3. **`GET /items/1`**
    -> `200`, body `{"id": 1, "name": "pen", "qty": 3}`
-   Why: reading back the item just created returns exactly what was
+   **Why:** reading back the item just created returns exactly what was
    stored, including the server-assigned `id`.
 
-4. `PUT /items/1` with body `{"name": "pencil"}` (missing `qty`)
+4. **`PUT /items/1`** with body `{"name": "pencil"}` (missing `qty`)
    -> `400`, body `{"error": "missing or invalid 'qty'"}`
-   Why: this is a validation error, not a "not found" -- item `1` exists,
-   but the replacement body is invalid, so the request is rejected before
-   any state changes.
+   **Why:** this is a validation error, not a "not found" -- item `1`
+   exists, but the replacement body is invalid, so the request is
+   rejected **before any state changes**.
 
-5. `GET /items/1` (immediately after step 4)
+5. **`GET /items/1`** (immediately after step 4)
    -> `200`, body `{"id": 1, "name": "pen", "qty": 3}`
-   Why: this confirms the invalid `PUT` in step 4 left the item
-   completely unchanged -- still `"name": "pen"`, still `"qty": 3`. A
-   `PUT` that fails validation must never partially apply.
+   **Why:** this confirms the invalid `PUT` in step 4 left the item
+   **completely unchanged** -- still `"name": "pen"`, still `"qty": 3`.
+   A `PUT` that fails validation must never partially apply.
 
-6. `DELETE /items/1`
+6. **`DELETE /items/1`**
    -> `204`, empty body
-   Why: `204 No Content` is the correct success status for a delete --
-   there is no resource left to describe, so the body is empty (not
+   **Why:** `204 No Content` is the correct success status for a delete
+   -- there is no resource left to describe, so the body is empty (not
    `{}` and not `null`).
 
-7. `GET /items/1` (immediately after step 6)
+7. **`GET /items/1`** (immediately after step 6)
    -> `404`, body `{"error": "not found"}`
-   Why: the item is gone, so it is no longer gettable -- this is the same
-   `404` shape used everywhere in the API, not a special "deleted" status.
+   **Why:** the item is gone, so it is no longer gettable -- this is the
+   same `404` shape used everywhere in the API, not a special "deleted"
+   status.
 
-8. `POST /items` with body `{"name": "paper", "qty": 10}`
+8. **`POST /items`** with body `{"name": "paper", "qty": 10}`
    -> `201`, body `{"id": 2, "name": "paper", "qty": 10}`
-   Why: this is the key "ids are never reused" behavior -- even though
-   id `1` was deleted and the ledger is empty again, the next id assigned
-   is `2`, not `1`. The id counter only ever increases, independent of
-   deletions.
+   **Why:** this is the key "ids are never reused" behavior -- even
+   though id `1` was deleted and the ledger is empty again, the **next
+   id assigned is `2`, not `1`**. The id counter only ever increases,
+   independent of deletions.
 
 ---
 
@@ -148,47 +149,63 @@ deleted.
 | `DELETE` | `/items/<id>` | Delete an item. `204` with an empty body, or `404` with `{"error": "not found"}`. |
 | `PUT` | `/items/<id>` | Fully **replace** an existing item's `name` and `qty`. `200` with the replaced object, `404` with `{"error": "not found"}` if the id does not exist, or `400` with `{"error": "..."}` if the new body is missing or the wrong type. |
 
-*`GET /items` examples:* on a brand-new app, `GET /items` returns `200`
-with body `[]` (an empty array, not `404` -- an empty ledger is still a
-valid, successful list). After creating one item, it returns `200` with
-`[{"id": 1, "name": "pen", "qty": 3}]`. Deleting that item afterward
-returns the list to `[]` again -- items removed by `DELETE` disappear
-from this list immediately.
+**`GET /items` examples:**
+- **Example (empty ledger):** brand-new app -> `GET /items` returns
+  `200` with body `[]` -- **an empty array, not `404`**, since an empty
+  ledger is still a valid, successful list.
+- **Example (after create):** after creating one item -> `200` with
+  `[{"id": 1, "name": "pen", "qty": 3}]`.
+- **Example (after delete):** deleting that item afterward returns the
+  list to `[]` again -- **items removed by `DELETE` disappear from this
+  list immediately**.
 
-*`GET /items/<id>` examples:* `GET /items/1` right after creating item
-`1` returns `200` with `{"id": 1, "name": "pen", "qty": 3}`. `GET
-/items/999` (an id that was never created) returns `404` with
-`{"error": "not found"}`. `GET /items/abc` (a non-integer id) never
-reaches your route handler at all: because the route is declared with
-the `<int:item_id>` converter, Flask's own routing fails to match it and
-returns its own built-in HTML `404` page, not your JSON error shape.
+**`GET /items/<id>` examples:**
+- **Example (existing id):** `GET /items/1` right after creating item
+  `1` returns `200` with `{"id": 1, "name": "pen", "qty": 3}`.
+- **Error case (absent id):** `GET /items/999` (an id that was never
+  created) returns `404` with `{"error": "not found"}`.
+- **Tricky case (non-integer id):** `GET /items/abc` never reaches your
+  route handler at all -- because the route is declared with the
+  `<int:item_id>` converter, Flask's own routing fails to match it and
+  returns **its own built-in HTML 404 page, not your JSON error shape**.
 
-*`POST /items` examples:* `POST /items` with `{"name": "pen", "qty":
-3}` on an empty ledger returns `201` with `{"id": 1, "name": "pen",
-"qty": 3}`. `POST /items` with `{"qty": 3}` (missing `name`) returns
-`400` with `{"error": "missing or invalid 'name'"}`. `POST /items` with
-`{"name": "pen", "qty": true}` returns `400` with `{"error": "missing
-or invalid 'qty'"}` -- `True`/`False` must be rejected as a `qty` even
-though `bool` is technically a subclass of `int` in Python. `POST
-/items` with no JSON body at all (or a non-JSON body) returns `400`
-with `{"error": "invalid JSON body"}`, checked before `name`/`qty` are
-even looked at.
+**`POST /items` examples:**
+- **Example (valid body):** `POST /items` with `{"name": "pen", "qty":
+  3}` on an empty ledger returns `201` with `{"id": 1, "name": "pen",
+  "qty": 3}`.
+- **Error case (missing name):** `POST /items` with `{"qty": 3}`
+  returns `400` with `{"error": "missing or invalid 'name'"}`.
+- **Tricky case (bool qty):** `POST /items` with `{"name": "pen",
+  "qty": true}` returns `400` with `{"error": "missing or invalid
+  'qty'"}` -- **`True`/`False` must be rejected as a `qty`** even though
+  `bool` is technically a subclass of `int` in Python.
+- **Error case (no body):** `POST /items` with no JSON body at all (or
+  a non-JSON body) returns `400` with `{"error": "invalid JSON body"}`,
+  checked **before** `name`/`qty` are even looked at.
 
-*`DELETE /items/<id>` examples:* `DELETE /items/1` on an existing item
-`1` returns `204` with an empty body (not `{}`, not `null` -- just
-nothing). `DELETE /items/999` (never created, or already deleted)
-returns `404` with `{"error": "not found"}`. Deleting an id does not
-free it for reuse: after deleting item `1`, the next `POST /items` is
-still assigned `id: 2`, never `id: 1` again.
+**`DELETE /items/<id>` examples:**
+- **Example (existing id):** `DELETE /items/1` on an existing item `1`
+  returns `204` with an **empty body** (not `{}`, not `null` -- just
+  nothing).
+- **Error case (absent id):** `DELETE /items/999` (never created, or
+  already deleted) returns `404` with `{"error": "not found"}`.
+- **Tricky case (id reuse):** deleting an id does not free it for
+  reuse -- after deleting item `1`, the next `POST /items` is **still
+  assigned `id: 2`**, never `id: 1` again.
 
-*`PUT /items/<id>` examples:* `PUT /items/1` with `{"name": "pen",
-"qty": 4}` on an existing item `1` returns `200` with `{"id": 1, "name":
-"pen", "qty": 4}` -- the entire item is replaced, not merged. `PUT
-/items/999` with a valid body returns `404` with `{"error": "not
-found"}` -- checked before the body is even validated. `PUT /items/1`
-with `{"name": "pencil"}` (missing `qty`) returns `400` with `{"error":
-"missing or invalid 'qty'"}`, and afterward `GET /items/1` still shows
-the OLD, unchanged item -- a failed `PUT` must never partially apply.
+**`PUT /items/<id>` examples:**
+- **Example (full replace):** `PUT /items/1` with `{"name": "pen",
+  "qty": 4}` on an existing item `1` returns `200` with `{"id": 1,
+  "name": "pen", "qty": 4}` -- **the entire item is replaced, not
+  merged**.
+- **Error case (absent id):** `PUT /items/999` with a valid body
+  returns `404` with `{"error": "not found"}` -- checked **before** the
+  body is even validated.
+- **Tricky case (invalid body leaves item unchanged):** `PUT /items/1`
+  with `{"name": "pencil"}` (missing `qty`) returns `400` with
+  `{"error": "missing or invalid 'qty'"}`, and afterward `GET /items/1`
+  still shows the **old, unchanged item** -- a failed `PUT` must never
+  partially apply.
 
 `PUT` replaces the item's entire content -- it does not merge in
 just the fields present in the request body. A `PUT` with an invalid
