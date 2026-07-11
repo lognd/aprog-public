@@ -307,6 +307,7 @@ strings, including the trailing newlines, precisely.
 ## Compilation and Testing
 
 ```bash
+cd visible-tests
 mkdir build && cd build
 cmake .. -DSUBMISSION_DIR=<path-to-your-submission>
 cmake --build .
