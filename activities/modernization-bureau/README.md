@@ -50,6 +50,11 @@ All ten answers are correct and the program prints the passphrase.
 - If two answers seem close (e.g. `enum class` vs. `enum struct`, or
   `nullptr` vs. `0`), the explanation for the wrong answer spells out
   exactly why the distinction matters.
+- Answer with the short technical term itself (a keyword, or the
+  feature's usual name, like `auto` or `enum class`) -- not a full
+  sentence describing it. If your first guess is a reasonable synonym
+  and it is rejected, try the more standard/official name for the
+  feature.
 
 ## Going further
 
