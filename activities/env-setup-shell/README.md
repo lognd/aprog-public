@@ -425,6 +425,19 @@ shell config file.
 
 ---
 
+## Verify completion
+
+Run the `shell-check` binary that matches your platform (see the table
+under "Picking the right binary" above). If it prints a passphrase
+between two dashed lines, your shell is working and this activity is
+complete -- submit that passphrase to your instructor.
+
+If instead you see "command not found," "Exec format error," or a
+permission error, revisit the `chmod +x` step and double-check you
+picked the binary for your actual platform and processor architecture.
+
+---
+
 ## TROUBLESHOOTING
 
 ### WSL: "Please enable the Virtual Machine Platform Windows feature"
