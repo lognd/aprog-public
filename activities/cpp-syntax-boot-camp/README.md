@@ -16,6 +16,18 @@ with a semicolon (`;`), the same way a sentence ends with a period. A
 time (a box with a name on it); a **function** is a named, reusable block
 of statements that can take input and hand back a result.
 
+Every snippet below starts with the same three pieces of boilerplate, so it
+is worth naming them once here instead of in every snippet. `#include
+<iostream>` is a preprocessor directive -- an instruction handled before
+compilation even begins -- that pulls in the code needed to print things to
+the screen (`<string>` does the same for `std::string` text, in the
+snippets that use it). `int main() { ... }` declares the function named
+`main`, which is where every C++ program starts running; the statements
+inside its `{ }` braces are what actually executes. `std::` in front of a
+name like `std::cout` or `std::string` means "this name comes from the
+standard library" -- the collection of ready-made tools that ship with
+every C++ compiler.
+
 In this activity you will read twelve tiny, complete C++ programs, one at a
 time. For each one, you predict exactly what it will print, before you run
 it. This "predict, then verify" loop -- guessing first, then checking your
