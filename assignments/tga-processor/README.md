@@ -84,7 +84,7 @@ reference binary run on these exact files (verified with `xxd`, not guessed):
 | `screen(base, layer)` pixel 0 | `red=222, green=161, blue=130` | `255-round((255-200)*(255-100)/255) = 255-33 = 222`, and similarly for green/blue |
 | `overlay(base, layer)` pixel 0 | `red=157, green=78, blue=39` | layer's red channel is `100` (`<=127`), so the "dark blend" branch applies: `round(2*200*100/255)=157` |
 | `flip` on base | pixel 0 becomes old pixel 1, pixel 1 becomes old pixel 0 | with only one row, "reverse the row order" is the same as reversing the whole pixel array |
-| `onlyred` on base pixel 0 | `red=200, green=200, blue=200` | onlyred does not zero the other channels -- it COPIES red into green and blue, turning the pixel into a red-channel grayscale swatch |
+| `onlyred` on base pixel `{200, 100, 50}` | `red=200, green=0, blue=0` | onlyred keeps the red channel and zeroes green and blue -- the pixel becomes pure red, not gray |
 | `addred(base, 100)` pixel 0 | `red=255` | `200+100=300`, clamped down to `255` |
 | `addred(base, -300)` pixel 0 | `red=0` | `200-300=-100`, clamped up to `0` |
 | `scaleblue(base, 2.0)` pixel 0 | `blue=100` | `round(50*2.0)=100`, no clamping needed |
@@ -358,16 +358,10 @@ left-to-right order; only which row comes first changes.
 **`onlygreen`** -- Set R = 0, B = 0 for every pixel.
 **`onlyblue`** -- Set R = 0, G = 0 for every pixel.
 
-*Example (per this spec):* `onlyred` on a pixel `{red=200, green=100,
-blue=50}` produces `{red=200, green=0, blue=0}` -- only the red channel
-survives, the other two are zeroed out, not replaced with red's value.
-NOTE: the reference binary in this course's solutions tree currently
-implements `onlyred`/`onlygreen`/`onlyblue` by COPYING the surviving
-channel's value into the other two channels instead (e.g. `onlyred` on
-`{red=200, green=100, blue=50}` produces `{red=200, green=200, blue=200}`,
-verified with `xxd` against its actual output) -- if your grader's expected
-output does not match the "zero the other channels" reading above, follow
-whatever the grader's Catch2/pixel-diff tests actually expect instead.
+*Example:* `onlyred` on a pixel `{red=200, green=100, blue=50}` produces
+`{red=200, green=0, blue=0}` -- only the red channel survives, the other
+two are zeroed out (not replaced with red's value, so the result is a pure
+red pixel, not a gray one).
 
 **`addred N`**, **`addgreen N`**, **`addblue N`** -- Add integer `N` to one channel.
 `N` may be negative. Clamp the result.
