@@ -37,6 +37,14 @@ double-free) or only an "allocated by" trace (which points to a bounds
 overflow or, if the report appears at program exit with no crash-site
 trace at all, a leak).
 
+You will also see a lot of noise you can safely ignore: raw hex addresses
+like `0xf9d2acc00b64`, `pc`, `bp`, and `sp` values, and `thread T0` (every
+program in this activity runs on a single THREAD -- one independent
+sequence of execution within the program -- so it is always thread
+number 0). None of that noise changes from question to question; the
+questions below can always be answered from the headline and the `#0`
+frames alone.
+
 ## Concepts covered
 
 - Reading the structure of an AddressSanitizer report: headline,
