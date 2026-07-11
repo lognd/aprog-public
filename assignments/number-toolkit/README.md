@@ -63,8 +63,8 @@ is_abundant(6)        // false  (1+2+3 = 6, perfect, not abundant)
 
 | File | Purpose |
 |------|---------|
-| `assets/number_toolkit.hpp` | Starter header -- implement all five functions here |
-| `visible-tests/test_visible.cpp` | Visible test driver; exercises all five functions |
+| `assets/number_toolkit.hpp` | Starter header -- implement all eight functions here |
+| `visible-tests/test_visible.cpp` | Visible test driver; exercises all eight functions |
 
 ## Compilation and Testing
 
@@ -87,17 +87,32 @@ g++ -std=c++17 -o toolkit_test visible-tests/test_visible.cpp -Iassets
 
 ## Grading
 
-| Component             | Points |
-|-----------------------|--------|
-| Visible correctness   | 50     |
-| Hidden correctness    | 40     |
-| is_prime performance  | 10     |
-| **Total**             | **100** |
-| Euclidean GCD bonus   | +5     |
+| Component                          | Points |
+|-------------------------------------|--------|
+| `is_prime` -- visible correctness   | 10     |
+| `is_prime` -- hidden correctness    | 12     |
+| `is_prime` -- performance           | 10     |
+| `gcd` -- visible correctness        | 10     |
+| `gcd` -- hidden correctness         | 8      |
+| `digit_sum` -- visible correctness  | 10     |
+| `digit_sum` -- hidden correctness   | 4      |
+| `count_divisors` -- visible correctness | 10 |
+| `count_divisors` -- hidden correctness  | 8  |
+| `nth_fibonacci` -- visible correctness  | 10 |
+| `nth_fibonacci` -- hidden correctness   | 8  |
+| **Total**                            | **100** |
+| Euclidean GCD bonus (`gcd`)          | +5     |
 
 The performance test calls `is_prime(999999937)` with a 0.1-second time limit.
 Trial division up to the square root of `n` finishes in microseconds; a loop
 that checks every number up to `n` does not pass.
+
+`is_power_of_two`, `popcount`, and `is_abundant` are required -- the visible
+test driver will not compile without correct signatures, and a wrong
+implementation fails its `assert`s -- but they are not yet separately
+weighted in the autograder's point map above. Get them right anyway: a
+failing `assert` in `visible-tests/test_visible.cpp` stops that program
+before it reaches later checks.
 
 ## Submission
 
