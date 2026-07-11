@@ -44,14 +44,18 @@ might be `./prog`, `/usr/local/bin/prog`, or something else). Do not assume
 ("usage: prog <file>").
 
 **`argv[argc]` is guaranteed to be `nullptr`.** The standard requires this
-sentinel value, the same way null-terminated strings guarantee a `'\0'` at
-the end. This is why some code loops over `argv` with `while (*argv)`
-instead of tracking an index against `argc` -- both are correct, but the
-sentinel is what makes the pointer-walking version safe.
+sentinel value -- a special marker that signals "the sequence ends here"
+without being a real element itself, the same way null-terminated strings
+guarantee a `'\0'` at the end. This is why some code loops over `argv` with
+`while (*argv)` instead of tracking an index against `argc` -- both are
+correct, but the sentinel is what makes the pointer-walking version safe.
 
 **`argv[argc]` is a null pointer, not an empty string.** Every element from
 `argv[0]` through `argv[argc-1]` is a valid, readable C string. Dereferencing
-`argv[argc]` as if it pointed to a string is undefined behavior. The array
+`argv[argc]` as if it pointed to a string is undefined behavior -- the C++
+standard makes no promise about what happens (it might crash, print
+garbage, or happen to look correct by luck) once your code does this. The
+array
 has `argc + 1` pointer slots even though only `argc` of them point at real
 arguments.
 

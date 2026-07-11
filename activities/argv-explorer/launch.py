@@ -62,7 +62,7 @@ _BLOB = "faa1657f70aeef42a4da521b19d8f75d1c9438d772b4571adbf3c041822e81a25ac3349
 QUESTIONS = json.loads(r"""
 [
   {
-    "prompt": "You run: ./prog foo bar\nWhat is argc?",
+    "prompt": "You run: ./prog foo bar\nWhat is argc?\n\n  Type just the number.",
     "hint": "argc counts ALL strings including the program name."
   },
   {
@@ -70,15 +70,15 @@ QUESTIONS = json.loads(r"""
     "hint": "It is set by the shell before your program even starts."
   },
   {
-    "prompt": "What is argv[argc]?",
+    "prompt": "What is argv[argc]?\n\n  Type exactly: nullptr",
     "hint": "The standard guarantees a sentinel at the end of the argument list."
   },
   {
-    "prompt": "What is the type of argv?",
+    "prompt": "What is the type of argv?\n\n  Type exactly: char**",
     "hint": "Each element is a C string; argv is an array of those."
   },
   {
-    "prompt": "You want to convert argv[1] to an integer. Which standard function does that?",
+    "prompt": "You want to convert argv[1] to an integer. Which standard function does that?\n\n  Type exactly: std::stoi",
     "hint": "There are two common options: an older C one and a newer C++ one."
   },
   {
