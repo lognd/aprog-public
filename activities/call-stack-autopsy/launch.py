@@ -69,7 +69,7 @@ QUESTIONS = json.loads(r"""
   },
   {
     "fn": "parse_number",
-    "prompt": "Look at the source code. The bug is on line 12 of parse_number:\n\n    if (pos >= (int)expr.size()) {\n        return eval(expr, pos);   // BUG IS HERE\n    }\n\nThis block is supposed to handle the case where pos is past the end of the string. What SHOULD this line do instead of calling eval?",
+    "prompt": "Look at the source code. The bug is on line 12 of parse_number:\n\n    if (pos >= (int)expr.size()) {\n        return eval(expr, pos);   // BUG IS HERE\n    }\n\nThis block is supposed to handle the case where pos is past the end of the string. What SHOULD this line do instead of calling eval?\n\n  Answer in the form: return <value> (one word after return, no semicolon).",
     "code": "int parse_number(const std::string& expr, int pos) {\n    if (pos >= (int)expr.size()) {\n        return eval(expr, pos);   // line 12 -- the bug\n    }\n    // ... rest of function\n}",
     "hint": "When pos is past the end, there are no more digits to read. What is the correct value to return when there is nothing left to parse?"
   },
