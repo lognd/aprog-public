@@ -38,7 +38,12 @@ the purpose -- the point is to fix the type, not to cast the promise away.
 python3 launch.py
 ```
 
-A shell opens inside a fresh copy of the project.
+A shell opens inside a fresh copy of the project. Use any editor available
+(`nano`, `vim`, `code .`) to open and edit the `.cpp` files, for example:
+
+```bash
+nano label.cpp
+```
 
 ### Step 1 -- read the error in label.cpp
 
