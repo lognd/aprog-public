@@ -82,13 +82,25 @@ Not every file you find is trustworthy. Some exist specifically to waste
 your time if you include them without checking first -- read before you
 commit.
 
+## Getting started
+
 This activity requires root access to mount the sandbox filesystem as a
 loopback device -- a way of treating a plain disk-image file as if it were
-a real, mountable drive, without any physical hardware involved.
+a real, mountable drive, without any physical hardware involved. Your
+shell will prompt you for your password (this is what `sudo` -- "run this
+one command as an administrator" -- always does); typing it is expected
+and normal.
 
 ```bash
 sudo python3 launch.py
 ```
+
+You will need a terminal text editor to add the `#include` lines in Step
+5. `nano` is preinstalled on almost every Linux system and is the
+simplest option: `nano <file>` opens the file, you type to edit it
+directly, `Ctrl+O` then `Enter` saves, and `Ctrl+X` exits back to the
+shell. If you already know `vim` or another terminal editor, use that
+instead.
 
 ### Step 1 -- get your bearings
 
