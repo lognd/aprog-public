@@ -89,11 +89,18 @@ course, or anything else you want people to know.
 
 ---
 
-## Step 8: Get your passphrase
+## Verify completion
 
-The server onboarding flow provides the passphrase automatically once
-you complete the steps it asks. Check your onboarding checklist or
-look for a welcome message in the server.
+Once you have joined the server, set your nickname, read #rules and
+#staff-intros, and posted in #student-intros, this activity is
+complete. Unlike the other env-setup activities, there is no
+`launch.py` to run -- the passphrase below is your confirmation:
+
+```
+did-you-ask-the-duck
+```
+
+Submit that phrase to record completion.
 
 ---
 
@@ -102,13 +109,6 @@ look for a welcome message in the server.
 ### The invite link says "expired" or "invalid"
 
 Invite links can expire. Contact your instructor for a fresh link.
-
-### I do not see an onboarding flow or welcome message
-
-Some Discord clients show onboarding differently. Look for a checklist
-icon near the top of the channel list, or a banner across the top of
-the screen when you first join. If you cannot find it, ask in
-#student-intros and a staff member or duckie will help.
 
 ### Discord is blocked on my network
 
