@@ -47,7 +47,9 @@ Format rules:
 - **Hex block:** up to 16 bytes per line; each byte is two lowercase hex digits
   followed by a space.  If the last line has fewer than 16 bytes, pad the
   remaining columns with three spaces each so the ASCII block stays aligned.
-- **Separator:** two spaces between the hex block and the ASCII block.
+- **Separator:** one additional space after the last hex column's own
+  trailing space -- two spaces total between the last hex digit and the
+  first ASCII character.
 - **ASCII block:** each byte that is printable (0x20 through 0x7e inclusive)
   appears as itself; all other bytes appear as `.`.
 - **Newline:** each output line ends with `\n`.
