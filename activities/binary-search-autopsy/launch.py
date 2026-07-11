@@ -67,27 +67,27 @@ QUESTIONS = json.loads(r"""
     "hint": "int can only represent values up to roughly 2.1 billion (INT_MAX). If lo and hi are both large valid array indices -- say, both over 1 billion, for an array with over 2 billion elements -- what happens when you compute lo + hi BEFORE dividing by 2?"
   },
   {
-    "prompt": "Diagnose this binary search over a sorted array using the half-open range [lo, hi).",
+    "prompt": "Diagnose this binary search over a sorted array using the half-open range [lo, hi). Type exactly one of: infinite loop on some inputs / skips the answer / out-of-bounds read / integer overflow on huge arrays / correct",
     "code": "int lo = 0, hi = n;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (v[mid] < target) {\n        lo = mid;        // <-- look here: should this be mid + 1?\n    } else {\n        hi = mid;\n    }\n}\nreturn (lo < n && v[lo] == target) ? lo : -1;",
     "hint": "Trace it by hand on a 2-element candidate range where the too-small branch is taken: lo = 3, hi = 4. mid = 3 + (4-3)/2 = 3 (integer division rounds down, landing mid on lo itself). If v[3] < target, what does lo become -- and did the range actually shrink?"
   },
   {
-    "prompt": "Diagnose this binary search over a sorted array. It mixes the half-open [lo, hi) convention (hi starts at n, one PAST the last index) with the closed-interval update style hi = mid - 1.",
+    "prompt": "Diagnose this binary search over a sorted array. It mixes the half-open [lo, hi) convention (hi starts at n, one PAST the last index) with the closed-interval update style hi = mid - 1. Type exactly one of: infinite loop on some inputs / skips the answer / out-of-bounds read / integer overflow on huge arrays / correct",
     "code": "int lo = 0, hi = n;   // hi starts at n -- one PAST the last valid index\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (v[mid] < target) {\n        lo = mid + 1;\n    } else if (v[mid] > target) {\n        hi = mid - 1;   // <-- look here: should this be `hi = mid`?\n    } else {\n        return mid;\n    }\n}\nreturn -1;",
     "hint": "hi is supposed to mean 'one PAST the last candidate' in this convention (that's why it starts at n, not n - 1). If v[mid] > target, mid itself is definitely NOT the answer -- but could mid still be a valid boundary that hi = mid - 1 wrongly excludes from ever being reconsidered as the new hi?"
   },
   {
-    "prompt": "Diagnose this binary search over a sorted array. hi is initialized to n, and the loop condition uses <=.",
+    "prompt": "Diagnose this binary search over a sorted array. hi is initialized to n, and the loop condition uses <=. Type exactly one of: infinite loop on some inputs / skips the answer / out-of-bounds read / integer overflow on huge arrays / correct",
     "code": "int lo = 0, hi = n;   // <-- look here: hi = n, not n - 1\nwhile (lo <= hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (v[mid] == target) return mid;\n    if (v[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n}\nreturn -1;",
     "hint": "This is the CLOSED-interval convention (`lo <= hi`, and hi = mid - 1 on the too-big branch, both consistent with each other) -- except hi is initialized one too high. What is the very first mid computed for an array of size n, and is v[mid] always a valid read?"
   },
   {
-    "prompt": "Diagnose this binary search over a sorted array using the half-open [lo, hi) convention. The comparison branches have been swapped relative to the canonical version.",
+    "prompt": "Diagnose this binary search over a sorted array using the half-open [lo, hi) convention. The comparison branches have been swapped relative to the canonical version. Type exactly one of: infinite loop on some inputs / skips the answer / out-of-bounds read / integer overflow on huge arrays / correct",
     "code": "int lo = 0, hi = n;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (v[mid] < target) {\n        hi = mid;         // <-- look here: swapped with the branch below\n    } else {\n        lo = mid + 1;      // <-- look here: swapped with the branch above\n    }\n}\nreturn (lo - 1 >= 0 && v[lo - 1] == target) ? lo - 1 : -1;",
     "hint": "In a correctly ascending-sorted search, finding v[mid] < target means the answer (if present) must be to the RIGHT of mid, so lo should move up past mid. Here, v[mid] < target moves hi DOWN instead -- what does that do to the direction the search actually narrows in?"
   },
   {
-    "prompt": "Diagnose this binary search over a sorted array. This is the canonical half-open [lo, hi) implementation used throughout invariant-inspector and search-stepper.",
+    "prompt": "Diagnose this binary search over a sorted array. This is the canonical half-open [lo, hi) implementation used throughout invariant-inspector and search-stepper. Type exactly one of: infinite loop on some inputs / skips the answer / out-of-bounds read / integer overflow on huge arrays / correct",
     "code": "int lo = 0, hi = n;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (v[mid] < target) {\n        lo = mid + 1;\n    } else {\n        hi = mid;\n    }\n}\nreturn (lo < n && v[lo] == target) ? lo : -1;",
     "hint": "Check every category this activity has covered: does mid's computation risk overflow for ordinary array sizes? Does the range always shrink? Does the direction of each branch match what the comparison actually implies? Is every array access guarded?"
   }
