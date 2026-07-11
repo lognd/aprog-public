@@ -3,8 +3,6 @@
 You will write a shell script that does exactly what `make` does -- but without `make`.
 By the time you finish, you will understand the problem Makefiles were invented to solve.
 
----
-
 ## Learning goals
 
 - Understand the four compilation stages: preprocess, compile, assemble, link
@@ -53,7 +51,7 @@ To check whether a file is newer than another, use:
 
 ---
 
-## Your task
+## Task
 
 Fill in `build.sh`. The script must:
 
@@ -74,10 +72,6 @@ main.cpp       greet.cpp       math_utils.cpp
 Each one must pass through all four stages independently. The link step combines all three
 object files into a single `program` binary.
 
----
-
-## The project
-
 `main.cpp` uses functions defined in `greet.cpp` and `math_utils.cpp`.
 When compiled and run correctly, `./program` produces:
 
@@ -87,37 +81,7 @@ answer: 42
 passphrase: STAGES_COMPLETE
 ```
 
----
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| `build.sh` | Your build script -- fill this in |
-| `greet.h` / `greet.cpp` | Greeting function |
-| `math_utils.h` / `math_utils.cpp` | Arithmetic functions |
-| `main.cpp` | Entry point |
-
----
-
-## Running locally
-
-Copy all files into one directory and run:
-
-```bash
-bash build.sh
-./program
-```
-
-Or use the provided test script:
-
-```bash
-bash visible-tests/test_local.sh
-```
-
----
-
-## Exploring with pipes
+### Exploring with pipes
 
 Before your script is complete, try these one-liners to see what each stage does:
 
@@ -135,6 +99,59 @@ g++ -S greet.i -o /dev/stdout 2>/dev/null | grep -c 'call'
 ```
 
 These patterns -- pipe to `wc`, `grep`, redirect stderr -- belong in your `build.sh` too.
+
+---
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `build.sh` | Your build script -- fill this in |
+| `greet.h` / `greet.cpp` | Greeting function |
+| `math_utils.h` / `math_utils.cpp` | Arithmetic functions |
+| `main.cpp` | Entry point |
+
+## Compilation and Testing
+
+Copy all files into one directory and run:
+
+```bash
+bash build.sh
+./program
+```
+
+Or use the provided test script:
+
+```bash
+bash visible-tests/test_local.sh
+```
+
+## Constraints
+
+- The script must be named `build.sh`.
+- Do not use `make`, `cmake`, or any build tool other than `g++` and plain
+  shell commands -- the point of this assignment is to replicate what those
+  tools do under the hood.
+- Each of the four stages (preprocess, compile, assemble, link) must be a
+  separate `g++` invocation with the matching flag (`-E`, `-S`, `-c`, or no
+  flag for the link step). Do not collapse stages together.
+
+---
+
+## Grading
+
+| Component | Points |
+|-----------|--------|
+| Build succeeds (required to proceed) | 0 |
+| Program produces correct output | 30 |
+| Incremental: changed file chain is rebuilt | 40 |
+| Redirection used (`build.log` created) | 15 |
+| Pipe used in script | 15 |
+| **Total** | **100** |
+
+## Submission
+
+Submit a single file named `build.sh`. Do not rename it.
 
 ---
 
@@ -198,21 +215,6 @@ Only `greet.i`, `greet.s`, `greet.o`, and `program` should be updated.
 Check with `ls -lt` to see modification times.
 
 </details>
-
----
-
-## Grading
-
-| Section | Points | Visibility |
-|---------|--------|-----------|
-| Build succeeds | 0 (gate) | Visible |
-| Program produces correct output | 30 pts | Visible |
-| Incremental: changed file chain is rebuilt | 40 pts | Visible |
-| Redirection used (`build.log` created) | 15 pts | Visible |
-| Pipe used in script | 15 pts | Visible |
-| All four stages explicitly invoked | +5 extra credit | Visible |
-
-**Total: 100 pts + 5 extra credit**
 
 ## Going further
 
