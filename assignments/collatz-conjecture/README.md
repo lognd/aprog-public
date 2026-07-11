@@ -26,6 +26,7 @@ You are given the following header file:
 
 **`collatz.hpp`**
 ```cpp
+#pragma once
 #include <iostream>
 
 void collatz(unsigned long long n) {
@@ -36,7 +37,10 @@ void collatz(unsigned long long n) {
 Implement the `collatz` function so that it prints each value in the sequence,
 one per line, starting from `n` and ending when it reaches `1`.
 
-Your function will be called from a `main.cpp` provided by the grader. For example:
+Your function will be called from a `main.cpp` provided by the grader, which
+reads `n` from the command line and passes it to `collatz`. The visible test
+driver below calls it directly with a fixed value so you can check your work
+locally without any command-line arguments:
 
 ```cpp
 #include "collatz.hpp"
