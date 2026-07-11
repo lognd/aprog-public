@@ -23,11 +23,18 @@ back before the whole array is sorted -- this activity asks about
 individual passes, not just the final sorted result, because that is
 where the actual mechanics live.
 
-A **swap** exchanges the values at two positions in the array. An
+A **swap** exchanges the values at two positions in the array. A
+**comparison** is a single check of which of two values is smaller (or
+whether they are equal) -- every question that asks "how many
+comparisons" is asking you to count these checks one at a time. An
 **in-place** algorithm rearranges the array using only a small, fixed
 amount of extra memory (a few temporary variables), no matter how large
 the array is -- bubble sort, selection sort, and insertion sort are all
-in-place. Merge sort is not: its merge step needs a **scratch array**, a
+in-place. Merge sort is different: it works by repeatedly taking two
+already-sorted arrays (halves of the original) and combining them into
+one sorted array, one element at a time, by comparing the front of each
+half and outputting whichever is smaller -- this combining process is
+called a **merge step**. A merge step needs a **scratch array**, a
 separate block of memory (proportional in size to the data being
 merged) to build the merged result in, because it cannot safely
 overwrite either of the two sorted halves it is still reading from.
