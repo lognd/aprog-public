@@ -62,7 +62,7 @@ _BLOB = "abdfc683e9eecb51b234f2199f703210750f4ab01914a47f1a15d3e8f1446233a3a0e14
 QUESTIONS = json.loads(r"""
 [
   {
-    "prompt": "Every C++ expression's value category (lvalue, xvalue, prvalue, and the composite groupings glvalue and rvalue) can be produced by asking exactly TWO independent yes/no questions about the expression -- nothing else matters. Which two questions are they?\n\nType exactly one of: does it have identity? / can it be safely moved from? / is it named? / is it a literal? / is it a pointer? / is it const? / does it live on the stack? / does it live on the heap?",
+    "prompt": "Every C++ expression's value category (lvalue, xvalue, prvalue, and the composite groupings glvalue and rvalue) can be produced by asking exactly TWO independent yes/no questions about the expression -- nothing else matters. Which PAIR of questions are they?\n\nType exactly one of: does it have identity? / can it be safely moved from? / is it named? / is it a literal? / is it a pointer? / is it const? / does it live on the stack? / does it live on the heap?\n\n(Answer with the correct PAIR, joined the same way it appears above, e.g. \"does it have identity? / can it be safely moved from?\" if that pair were correct -- the eight items above form four candidate pairs in order.)",
     "hint": "Identity means: can you take its address and refer to it again later, by name or otherwise? Movable-from means: is it safe to steal its guts, because nothing will look at it again after this expression? Every one of the five leaf/composite categories falls out of just those two independent answers."
   },
   {

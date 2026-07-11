@@ -196,6 +196,7 @@ functions using `std::unique_ptr` and `std::make_unique`:
 ## Compilation and Testing
 
 ```bash
+cd visible-tests
 mkdir build && cd build
 cmake .. -DSUBMISSION_DIR=<path-to-your-submission>
 cmake --build .
