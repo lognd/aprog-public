@@ -20,15 +20,20 @@ _INCLUDE_DIRS = ["/usr/include", "/usr/local/include", "/opt/homebrew/include"]
 _SFML_PROGRAM = """\
 #include <SFML/Graphics.hpp>
 #include <cstdio>
+// Deliberately uses only API that is identical on SFML 2 and SFML 3 (a
+// default-constructed sf::Image is empty, size 0x0, in both), so this check
+// verifies your install -- headers present, libraries link, program runs --
+// without caring which major version you installed. The create-vs-resize API
+// difference between the two versions is exercised in the sfml-canvas
+// assignment, not here.
 int main() {
     sf::Image img;
-    img.create(2, 2, sf::Color::Red);
     sf::Vector2u size = img.getSize();
     std::printf("%u %u\\n", size.x, size.y);
     return 0;
 }
 """
-_EXPECTED_OUTPUT = "2 2"
+_EXPECTED_OUTPUT = "0 0"
 
 
 def _banner(title):
@@ -138,6 +143,13 @@ def _compile_link_test(include_dir):
            "-lsfml-graphics", "-lsfml-window", "-lsfml-system"]
     if include_dir not in ("/usr/include",):
         cmd.insert(1, f"-I{include_dir}")
+        # A non-default include prefix (e.g. /usr/local, /opt/homebrew) means
+        # the matching libraries live under <prefix>/lib, which the linker
+        # does not search by default -- point both the link step (-L) and the
+        # runtime loader (-rpath) at it so the test also *runs*.
+        lib_dir = os.path.join(os.path.dirname(include_dir), "lib")
+        cmd.insert(2, f"-L{lib_dir}")
+        cmd.insert(3, f"-Wl,-rpath,{lib_dir}")
     ok, msg = _run(cmd)
 
     if not ok:

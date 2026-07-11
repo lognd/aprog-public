@@ -14,13 +14,27 @@ SFML (Simple and Fast Multimedia Library) is a C++ library for 2D
 graphics, windows, audio, and input. The course project uses it, so
 you need it installed and linkable before that assignment starts.
 
-This course targets the **SFML 2.x** API. Some package managers now
-install SFML 3.x by default, which renamed and changed several
-functions (for example, `sf::Image::create` became
-`sf::Image::resize`). If the verification step below fails to
-*compile* even though you are sure SFML installed successfully, check
-the version you got (see the troubleshooting section) -- you may have
-SFML 3.x and need to request the 2.x package explicitly.
+This course targets the **SFML 3.x** API -- the current release. The
+graded SFML assignment (sfml-canvas) is built and tested against SFML
+3, so that is the version to install. SFML 3 renamed and changed
+several functions relative to the older 2.x line (for example,
+`sf::Image::create(w, h, color)` became `img.resize({w, h}, color)`,
+and pixel access takes a coordinate pair: `img.setPixel({x, y},
+color)` instead of `img.setPixel(x, y, color)`).
+
+<details>
+<summary>I already have SFML 2.x installed -- can I still use it?</summary>
+
+For this activity, yes: the verification program below only uses API
+that is identical on both versions, so it passes on either. For the
+graded sfml-canvas assignment, no -- that assignment is compiled
+against SFML 3, so its functions must use the SFML 3 API. If your
+package manager only offers 2.x, the assignment's README lists the
+handful of 2.x-vs-3.x call differences so you can develop locally on
+2.x and adjust, but the version you submit against is 3.x. When in
+doubt, install SFML 3.
+
+</details>
 
 <details>
 <summary>What is a media library?</summary>
@@ -40,14 +54,41 @@ the same way on Linux, macOS, and Windows.
 
 ## Linux (Ubuntu / Debian -- including WSL)
 
+Ubuntu/Debian's `apt` package `libsfml-dev` currently installs SFML
+**2.5.1**, not the SFML 3 this course targets. There are two options.
+
+**Option A -- build SFML 3 from source (recommended).** This is the
+reliable way to get SFML 3 on any Linux distribution. Install the build
+tools and SFML's own dependencies, then compile and install it under
+`/usr/local`:
+
 ```bash
 sudo apt update
-sudo apt install -y libsfml-dev
+sudo apt install -y build-essential cmake git \
+    libx11-dev libxrandr-dev libxcursor-dev libxi-dev \
+    libudev-dev libgl1-mesa-dev libfreetype-dev \
+    libopenal-dev libflac-dev libvorbis-dev
+
+git clone --branch 3.0.0 --depth 1 https://github.com/SFML/SFML.git
+cd SFML
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+cmake --build build -j"$(nproc)"
+sudo cmake --install build
+sudo ldconfig          # refresh the dynamic-linker cache for /usr/local/lib
 ```
 
-Verify the headers are present:
+This installs the headers under `/usr/local/include/SFML` and the
+libraries under `/usr/local/lib`.
+
+**Option B -- use the apt SFML 2.5.1.** If you would rather not build
+from source, `sudo apt install -y libsfml-dev` gets you SFML 2.5.1.
+This activity's check still passes on it, but remember the graded
+sfml-canvas assignment is compiled against SFML 3 -- see that
+assignment's README for the 2.x-vs-3.x call differences.
+
+Verify the headers are present (source build):
 ```bash
-ls /usr/include/SFML
+ls /usr/local/include/SFML
 ```
 
 You should see directories like `Graphics`, `Window`, `Audio`, and
@@ -141,7 +182,10 @@ The script checks two things:
 1. That the SFML headers (`SFML/Graphics.hpp`) are present in a
    standard include path.
 2. That a small real C++ program using SFML actually compiles, links,
-   and runs: it creates a 2x2 red `sf::Image` and prints its size.
+   and runs: it constructs an empty `sf::Image` and prints its size
+   (`0 0`). This program deliberately uses only calls that are spelled
+   the same on SFML 2 and 3, so the install check itself does not
+   depend on which version you have.
 
 <details>
 <summary>What does "compile, link, and run" mean here, and why check
@@ -197,21 +241,25 @@ This is a compiler error -- the include path does not contain SFML's
 headers. Confirm the package installed and that you are not pointing
 your build at a different, older SFML you installed previously.
 
-### "no member named 'create' in 'sf::Image'" (or similar)
+### "no member named 'resize' in 'sf::Image'" (or similar)
 
-This is a compiler error that means SFML installed, but as version 3.x
-instead of the 2.x this course targets. SFML 3 renamed several
-functions; `sf::Image::create` became `sf::Image::resize`. Check your
-installed version:
+This is a compiler error that means SFML installed, but as the older
+version 2.x instead of the 3.x this course targets. SFML 3 renamed
+several functions; the 2.x `sf::Image::create(w, h, color)` became
+`img.resize({w, h}, color)`, and `setPixel`/`getPixel` now take a
+coordinate pair (`{x, y}`) instead of two separate arguments. Check
+your installed version:
 
 ```bash
 pkg-config --modversion sfml-graphics
+# if that reports nothing for a source build, try:
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig pkg-config --modversion sfml-graphics
 ```
 
-If it reports `3.x`, look for a way to request SFML 2.x from your
-package manager (for example, a version-suffixed package or formula
-name), or ask on the course forum for the current recommended command
-for your platform.
+If it reports `2.x`, install SFML 3 (on Linux, build from source per
+Option A above; on macOS, current Homebrew installs SFML 3 directly).
+You can develop against 2.x if you must -- the sfml-canvas README lists
+the exact call differences -- but the graded build uses 3.x.
 
 ### g++ not found
 
