@@ -27,7 +27,9 @@ Read each short program and predict what it prints. Correct predictions
 unlock an explanation of the key difference between the two string
 representations. All six correct answers together unlock the passphrase.
 
-No compilation needed.
+The launcher compiles and runs each snippet itself (with g++ or clang++)
+to check your prediction against the real output -- you do not need to
+compile anything yourself, but a C++ compiler must be installed.
 
 ## Getting started
 
