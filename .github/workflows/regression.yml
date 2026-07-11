@@ -93,11 +93,13 @@ jobs:
         run: pip install lograder
 
       - name: Install test and grader dependencies
-        # pytest drives the suite; ruff is invoked by the make-the-linter-happy
-        # activity; numpy/flask/fastapi/httpx/pydantic are runtime dependencies
-        # of the Python assignment reference solutions (grade-matrix,
-        # tiny-ledger-api, typed-ledger-api, ...) that the graders build and run.
-        run: pip install pytest ruff numpy flask fastapi httpx pydantic
+        # pytest drives the suite; ruff + ty are invoked by the
+        # make-the-linter-happy activity and by the TyCheck annotation bonus in
+        # the tiny-ledger-api/typed-ledger-api graders; numpy/flask/fastapi/
+        # httpx/pydantic are runtime dependencies of the Python assignment
+        # reference solutions (grade-matrix, the ledger APIs, ...) that the
+        # graders build and run.
+        run: pip install pytest ruff ty numpy flask fastapi httpx pydantic
 
       - name: Regression tests
         working-directory: aprog-private
