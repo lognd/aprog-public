@@ -80,7 +80,7 @@ SNIPPETS = json.loads(r"""
     "title": "signed/unsigned comparison trap",
     "platform_note": "int = 32 bits signed, unsigned int = 32 bits (any platform)",
     "code": "#include <iostream>\nint main() {\n    int i = -1;\n    unsigned int u = 1;\n    std::cout << (i < u ? 1 : 0) << \"\\n\";\n}",
-    "prompt": "Is -1 less than 1u? Enter 1 (yes) or 0 (no)."
+    "prompt": "Is the int -1 less than the unsigned int 1? Enter 1 (yes) or 0 (no)."
   },
   {
     "id": 4,
@@ -115,7 +115,7 @@ SNIPPETS = json.loads(r"""
     "title": "unsigned subtraction wraparound",
     "platform_note": "unsigned int = 32 bits (any platform)",
     "code": "#include <iostream>\nint main() {\n    unsigned int a = 5, b = 10;\n    std::cout << (a - b) << \"\\n\";\n}",
-    "prompt": "What does 5u - 10u print?"
+    "prompt": "The program subtracts two unsigned ints, 5 - 10. What does it print?"
   },
   {
     "id": 9,
@@ -149,7 +149,7 @@ SNIPPETS = json.loads(r"""
 """)
 ITEM_SECRETS = json.loads(r"""
 [
-  "ie~z4W~4gB6oxvyrZQ;>@W4NTIat|BzZ<WLlZ<W&vc%T&IS&$k?wLrKh6l>dU0|A9qafN&ao2%%oKqR%iGY0)WW)%-d&+fj{UkZ*hrHy*wb$LqV^HJ|gmh>c%j$|*;iTyQJC(zRmvs;n0kYc+04THHJ<9c6tJe|XvI2Ne;<o1<#J7jI8^4{wv}X{{NrFn37@W;Oc<f%g$yD|6^Yq<GZ3-*TScJqJ3f$@mvMQ;ga=(zO=yRP(B1n2rU76hQ&;_HRPHLh147iYtM2T4>Fu%{{P<?gYi~NjA{mgNRcnkK}*YX&P!h;C=xAH>G$pT>fO;*pHz<Bkmu()W-N7EwmjZx~9id}d*V%{Sjl2<elTwDIU>yK=u7$kU*5|Zi0*0T!M<mPg4^Enqs|DdFM3man<00(E~1nr}(k5{V_#cBzmf|MxIuw(2y2VD}8mzzUp(Xb94MWh^v-k349",
+  "ie~z4W~4gB6oxvyrgB~l@W4NTIe5jElW7m&p}jFd*R7K>3YOz)?wLrKh6m2nU0|A9B_Y~U@z;)ad@LDanSy<CY{oXgYtmIQeIz^OmyD#&wzu8L<4a0;l+|?J3*PuY_?%=Y5JY3X)->7WIs-kM2wKXcnlVS5>J@|NJ*nE5<v##*Ss{VMPNA^sEOWmG9xy!Btk9%UdBx`Ng|S72>XD07j)u`L>S#@EQL^1fyBD3c1F9QgotX<;23I|^JWTWrWA!n<MP>6SE(v+g@T}`&;E-Z$(zTO*3V^>E<!j>+A%Fjr90*{RJn3nVlmj?AVRsHzKF2YPz<67hwj6~WnIz#d+XIES3T)$dsoo<VlCLxoL_7Aq`wI+C#hbO!ZM8nn@dW>I&6tcG+1L=?SBF`|6VH$prYSeZ$lgb!5?d;?M`^^Yrjaycc)~K<$ArG4E5d0sbTt$",
   "<`#NtB35f0EWL#D;ztv1xK4viV9Au7<^e+nk<Cn8WmD#n)(m{7A5NMyRQQsL36*qVZEcGd_ndUz=OajkvwB(H@vazrbg@N!JG>Jb$nc2_74+md5KeE}12aEPEPluBAY{3=nAX=j|8+5h*aq)cd*z_gV(MGkvXs(E6cbHTb{KmyCaIrHmukXoI095fe}%FalD46Qh!<=&x&=3PkKTW&>_c!N8FEEK=et30-SWk#$)CQXyLjs$An71ei(=+ywY!;WB>nukQm3J*%TXj9LV(4|SHR{u>*q?pcu7o1`5K^p!|H|yRyLP_1Uu4;emB-}VI&4hY&6`?{Mk>jl~UoZm>Ug`-eWtf+px<((p%Z=68+(mPgllJ&<iNYD<P<jY{^{QB-=zuvb~BxzvbjaJU`X8grBk$1lQ|$q1cynR?j|t^bM@i7i<fHFULHigNq1N_9kzWBhGL(sF5rlqxMiBmQvuW$_WV-Wq&l|b++#&A^",
   "p$T`ixaJQ{^2A>@+-eY`70GS;Y?HsoV}x%XcGknf#L=K3E*UYOwDg&2K8gi=)fv~itiW-jTggtI_m{##&lg|{C<Vgl_hbQO-dj87KHxXi<Go+Z9A;SgzR{lIXetVe_5KDYT3LW*0>Ma5EE^9FJ<W_uB0ecZQ3^No)J76;QSxa)(n%A$uX<1nBkP{x_n7!!5oqN@$v3=!@7R?o=7dPu^-8lkN7D#TiAeGtYik4oNjUxA{4f<hO)B|xZdX<-D_>gMUbZyky;Ru%6_e_Jqr$ZSoCcti>|9!bRPITI*uclk<LS}dsX#CU9`baxT$MPfV#K`~QUWrBzid%!s4_Y09V!&u$G|cNeGG|eF?6`Zy@fpJsCLrnjYva4x7`-UPMAryh@Y`79A*k@7_YDKvWI5sB6RR+@*C+k*PJ4o&($fN9elU?@g}A>B&%2S1iB^9P5q)BMyA_I&nGUs;C!<",
   "`7^Fj62Vb;@~Pcf5X#0~<_IF>U_77B19xO=fJ2q?bt|eBiK|F$RJlm4)6f-jp9zjUagOdWy@$WoCf=xlQs!1=!S(7*mH1r~*0<oy;(N||^{MY8%ga|h=A5l#E+RV<XsM)^=WZrxyeM>UFUh`1e-z2CVW-PUP0zJq!W3eIuh<t8PM87L9iVzjL_J@*A;sZOJF4o%dH!bnvtr25QMkz1SePUG29)YLKiw&vYV|BUG=XQo=aVA@>T=W|TrtP?z+LkvBf*{6K3`mu@k$#sS`~EgS6aaMXX_ixb>7g=cTY1$Oi#k{YIUrK!ZvU5@DU&a2uq%*)GGd&POyvsW29mn=V$C!&vDLPi%pa&8>=Sy52*7!eE-ga(EKJR3w637RCE6n0a3U;I7mJ4=Vk0~tNGYSnV@YnfDQLzHX-DS$z?#pvMEDOLk47uVl<qo_NI~<_sp!Hz4Ti9qg%HAfv_NGIbrAw&-!OE3Yk|NobVqA0mh~W<9*ZRJ;zL!<GW5Pfy~d>+0EEzjcjvcbV7+|hI_5!-rNdB|NE%a",
