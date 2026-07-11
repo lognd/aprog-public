@@ -1,10 +1,11 @@
 // visible-tests/test_visible.cpp
 // These tests use the same harness as your test_stats.cpp.
-// Build: g++ -std=c++17 -I../assets/include -I../assets/src test_visible.cpp ../assets/src/statslib/stats.cpp -o test_visible
+// Build (from your project root): g++ -std=c++17 -I include -I src \
+//     visible-tests/test_visible.cpp src/statslib/stats.cpp -o test_visible
 // Run:   ./test_visible
 
-#include "../assets/src/testing_harness/harness.hpp"
-#include "../assets/include/stats.hpp"
+#include "../src/testing_harness/harness.hpp"
+#include "../include/stats.hpp"
 #include <vector>
 
 TEST_CASE("mean -- integers") {
