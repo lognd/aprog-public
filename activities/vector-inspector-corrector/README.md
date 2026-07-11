@@ -17,7 +17,7 @@ Your job is to figure out why and fix it.
 - `std::vector` internal buffer: capacity vs. size and how they differ
 - Reallocation: when the buffer is full, the vector allocates a new one and copies everything
 - `reserve`: pre-allocating capacity to prevent reallocation during a known-size insertion loop
-- Iterator and pointer invalidation: why any saved pointer into a vector becomes invalid after reallocation
+- Why a reallocation makes the vector's old buffer address stale: anything that remembers where an element used to live can end up wrong after the buffer moves
 
 ## Getting started
 
@@ -73,9 +73,12 @@ The launcher will check your work automatically and reveal the passphrase.
 
 The table shows zero `<-- buffer moved!` entries.
 
-Every time a vector reallocates, any pointer or reference you had saved into
-its elements becomes invalid -- it points to memory that was already freed.
-This kind of bug is very hard to track down.
+Every time a vector reallocates, any address you had saved for one of its
+elements becomes stale -- it refers to memory that was already freed. If
+your program had that old address written down somewhere, using it would
+read or write freed memory. This kind of bug is very hard to track down,
+and it is one of the main reasons later material on pointers and iterators
+spends so much time on "invalidation" rules for each container.
 
 ## Hints
 
