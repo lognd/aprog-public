@@ -29,6 +29,12 @@ these rules:
   `long long` and Pointer are 64-bit).
 - `long` is 8 bytes on 64-bit Linux/macOS (LP64) but 4 bytes on 64-bit Windows (LLP64).
 - `long long` is guaranteed to be at least 8 bytes everywhere since C++11.
+- The last question uses a `struct` (a way to group several variables under one
+  name -- you will cover this in depth later in the course). For now, all you
+  need to know is that `sizeof` of a struct is the sum of the sizes of its
+  members, plus any extra padding bytes the compiler inserts so each member
+  starts at an address matching its own size ("alignment"). Since every member
+  in that struct is a 1-byte `char`, no padding is needed.
 
 ## Concepts covered
 
