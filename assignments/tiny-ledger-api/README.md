@@ -19,7 +19,7 @@ introduced: GET, POST, PUT, DELETE.
 - Write Flask routes using the `@app.get`/`@app.post`/`@app.put`/
   `@app.delete` decorators, matching each route to the HTTP method
   that fits its action
-- Use the APP FACTORY pattern (`create_app()` returning a fresh
+- Use the **app factory** pattern (`create_app()` returning a fresh
   `Flask` instance) to keep server state isolated per app instance,
   instead of relying on fragile module-level globals
 - Return exact status codes (200, 201, 204, 400, 404) and exact JSON

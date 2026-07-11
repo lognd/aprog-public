@@ -138,8 +138,11 @@ python -m pytest visible-tests/test_visible.py -v
 - Type hints are required on every function's parameters and return
   type, matching the signatures above. Plain `np.ndarray` hints are
   fine -- `numpy.typing.NDArray` is not required.
-- `numpy` is the only third-party import allowed (plus the standard
-  library and `typing`).
+- `numpy` is the only third-party import allowed, plus `typing` and
+  anything from the standard library **except** `math`, `itertools`,
+  `functools`, and `collections.abc` -- those are blocked so you solve
+  this with numpy's own vectorized operations, not a workaround
+  borrowed from another module.
 - **No `for` or `while` keyword may appear anywhere in `matrix_ops.py`.**
   This is checked mechanically before your correctness tests even run.
   Every function must be written using numpy's own vectorized
