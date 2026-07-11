@@ -17,7 +17,7 @@
 // Per-channel rounding rule (applies to every function below that produces
 // a new channel value from a fractional computation): round to the nearest
 // integer using round-half-up, i.e.
-//     channel = static_cast<sf::Uint8>(value + 0.5f)
+//     channel = static_cast<std::uint8_t>(value + 0.5f)
 // where `value` is the exact (double/float) computed channel value before
 // rounding.
 sf::Image make_gradient(unsigned width, unsigned height, sf::Color from, sf::Color to);
