@@ -3,7 +3,7 @@
 C++'s `int`, `float`, and `double` have direct Python counterparts, but
 several of the operations you do with them behave differently in ways that
 will silently produce a wrong answer if you assume C++'s rules. This
-activity is seven questions, each built around a tiny snippet, covering
+activity is eight questions, each built around a tiny snippet, covering
 Python's split of C++'s single `/` into two operators, a rounding rule
 that is not "always round up," integers that never overflow, and the one
 piece of advice worth memorizing even though you will not fully see why
@@ -31,7 +31,7 @@ detail, not a guarantee, unlike the `None`/`True`/`False` singletons.)
 
 ## How it works
 
-The launcher shows you seven short pieces of Python code, one at a time,
+The launcher shows you eight short pieces of Python code, one at a time,
 along with a hint. Read the code and type your answer -- most questions
 ask for a specific printed value, and one asks you to explain, in your own
 words, why a particular habit is unsafe. A correct answer shows a short
@@ -47,7 +47,7 @@ python3 launch.py
 
 ## You will know you are done when...
 
-You have correctly answered all seven questions and the launcher shows
+You have correctly answered all eight questions and the launcher shows
 you a passphrase.
 
 ## Hints
