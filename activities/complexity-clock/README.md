@@ -62,6 +62,26 @@ All seven functions print the same answer. Note which ones are fast and
 which ones are slow. Open `clock.cpp` and read every function while the
 numbers are still fresh.
 
+<details>
+<summary>A few constructs in clock.cpp you may not have seen yet</summary>
+
+- `switch (i % 4) { case 0: ... }` (in `frank`) is a multi-way branch: it
+  jumps straight to the `case` label matching the value in parentheses,
+  instead of a chain of `if`/`else if`. Each `case` is checked once per
+  pass through the switch, the same as one `if` arm would be.
+- `do { ... } while (i < N);` (in `dave`) is a loop whose condition is
+  checked at the bottom, so the body always runs at least once before
+  the check happens -- the mirror image of a regular `while` loop, which
+  checks first.
+- `continue;` (in `eve` and `grace`) immediately jumps to the next pass
+  of the loop, skipping any code below it on that pass. It does not exit
+  the loop the way `break` does.
+
+None of these appear in the quiz questions below -- they matter only if
+you want to fully understand every function in `clock.cpp`.
+
+</details>
+
 ### Step 3 -- exit and start the quiz
 
 ```

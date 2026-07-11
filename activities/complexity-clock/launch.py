@@ -64,7 +64,7 @@ QUESTIONS = json.loads(r"""
   {
     "fn": "alice",
     "prompt": "Alice's function has one marked line (// <--). When n = 10, how many times does it execute?",
-    "code": "long long alice() {\n    return (long long)N * (N + 1) / 2;  // <--\n}",
+    "code": "long long alice() {\n    return (long long)n * (n + 1) / 2;  // <--\n}",
     "hint": "Does this function have a loop?"
   },
   {
