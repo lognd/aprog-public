@@ -72,15 +72,6 @@ The launcher checks your work automatically.
 
 The launcher prints the passphrase.
 
-## Going further
-
-- Find a case where variable shadowing is intentional and useful. Write a
-  short example and explain why it is clearer than renaming the variable.
-- Look up `-Wshadow` in GCC. Enable it on a real project and see what it
-  flags. Is every warning a real bug?
-- Write a function that uses `static` intentionally to generate a sequence
-  of unique IDs. Then write a thread-safe version using `std::mutex`.
-
 ## Hints
 
 <details>
@@ -124,3 +115,12 @@ intentional (see `next_id` in `explore.cpp`) or accidental. If `result`
 should start at zero for each call, `static` is wrong.
 
 </details>
+
+## Going further
+
+- Find a case where variable shadowing is intentional and useful. Write a
+  short example and explain why it is clearer than renaming the variable.
+- Look up `-Wshadow` in GCC. Enable it on a real project and see what it
+  flags. Is every warning a real bug?
+- Write a function that uses `static` intentionally to generate a sequence
+  of unique IDs. Then write a thread-safe version using `std::mutex`.
