@@ -1,5 +1,11 @@
 # Activity: Pythonic or Not
 
+"Pythonic" and "idiomatic" both mean the same thing here: written the way
+an experienced Python programmer would naturally write it, using the
+language's own built-in tools instead of translating a habit from another
+language line-for-line. Code can be perfectly correct -- it runs, it
+produces the right output -- without being idiomatic.
+
 Every snippet in this activity runs correctly. That is the point: coming
 from C++, your instincts will produce Python code that *works* but does not
 read the way an experienced Python programmer would write it. This activity
