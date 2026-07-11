@@ -18,7 +18,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(const-qualifier-toolkit_tests test_catch.cpp)
+add_executable(const-qualifier-toolkit_tests test_catch.cpp "${SUBMISSION_DIR}/grid.cpp")
 target_include_directories(const-qualifier-toolkit_tests PRIVATE "${SUBMISSION_DIR}")
 target_link_libraries(const-qualifier-toolkit_tests PRIVATE Catch2::Catch2WithMain)
 target_compile_options(const-qualifier-toolkit_tests PRIVATE -Wall -Wextra -g)
