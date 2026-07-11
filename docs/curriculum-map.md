@@ -59,9 +59,9 @@ Assignments:
 ## 6. Control & Functions (untested)
 
 Activities:
-- `complexity-clock` -- benchmark seven equivalent functions and diagnose why one is dramatically slower as input grows
-- `scope-safari` -- fix scope bugs (shadowing, static locals, loop-body scope) until program output matches
 - `control-gauntlet` -- fix three buggy programs involving short-circuit evaluation, break/continue, and De Morgan's law
+- `scope-safari` -- fix scope bugs (shadowing, static locals, loop-body scope) until program output matches
+- `complexity-clock` -- benchmark seven equivalent functions and diagnose why one is dramatically slower as input grows
 
 Assignments:
 - `number-toolkit` -- implement five number-theory functions (is_prime, gcd, digit_sum, count_divisors, nth_fibonacci) under complexity constraints
