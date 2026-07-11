@@ -41,7 +41,11 @@ automatically to check your work.
 python3 launch.py
 ```
 
-A shell opens with the broken programs.
+A shell opens with the broken programs.  Edit the `.cpp` files in place with
+any text editor available in the shell (`nano eof_loop.cpp`, `vim
+eof_loop.cpp`, or `code .` if you have VS Code set up) -- there is no
+separate "submit" step; the launcher checks whatever is on disk when you
+`exit`.
 
 ### Step 1 -- understand what each program should do
 
