@@ -161,9 +161,11 @@ roster against every name in the other.
 - All six functions must be **pure**: no `print`, no reading from a file,
   no mutating the `roster` (or any record inside it) that was passed in.
 - **Type-annotation bonus (10 pts):** every function must annotate all of
-  its parameters and its return type. The starter file has them filled in --
-  keep them exactly as given; do not widen or remove them. The bonus is
-  awarded only when every function is fully annotated. A separate,
+  its parameters and its return type. The starter's signatures are left
+  UNANNOTATED on purpose -- add the hints yourself, matching the fully typed
+  signatures in the Interface section above (for example
+  `def group_by_section(roster: list[dict]) -> dict[str, list[str]]:`). The
+  bonus is awarded only when every function is fully annotated. A separate,
   informational [ty](https://docs.astral.sh/ty/) check then flags any
   annotation that does not hold up -- `ty check roster.py` should report no
   errors once your implementation is type-correct.
@@ -180,4 +182,5 @@ roster against every name in the other.
 ## Submission
 
 Submit your implementation as `roster.py`. Do not rename the module, and
-do not change any function's name, parameter list, or type hints.
+do not change any function's name or parameter list (you should, however,
+add type hints -- that is the bonus).

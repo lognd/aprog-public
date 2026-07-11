@@ -8,7 +8,12 @@
 # Do not rename this file. Do not import anything except (optionally)
 # typing -- every function here is implementable with plain Python, no
 # standard-library modules required (the reference solution uses none).
-# Type hints are REQUIRED on every method signature.
+#
+# The signatures below are left UNANNOTATED on purpose: the type-annotation
+# bonus asks you to add the parameter and return-type hints yourself (the
+# exact types are in the README). A classmethod that returns its own class
+# annotates its return as "Temperature" (a string, because the class is not
+# finished being defined at that point).
 
 
 class Temperature:
@@ -16,22 +21,22 @@ class Temperature:
 
     # TODO: a class attribute, absolute_zero, holding -273.15.
 
-    def __init__(self, celsius: float) -> None:
+    def __init__(self, celsius):
         """Construct from a Celsius value; rejects anything below absolute zero."""
         raise NotImplementedError
 
     @classmethod
-    def from_fahrenheit(cls, f: float) -> "Temperature":
+    def from_fahrenheit(cls, f):
         """Build a Temperature from a Fahrenheit value: C = (F - 32) * 5/9."""
         raise NotImplementedError
 
     @classmethod
-    def from_kelvin(cls, k: float) -> "Temperature":
+    def from_kelvin(cls, k):
         """Build a Temperature from a Kelvin value: C = K - 273.15."""
         raise NotImplementedError
 
     @staticmethod
-    def is_physical(celsius: float) -> bool:
+    def is_physical(celsius):
         """Return True if celsius is at or above absolute zero (-273.15)."""
         raise NotImplementedError
 
@@ -42,14 +47,14 @@ class Temperature:
 
     # TODO: a read-only kelvin property: K = C + 273.15.
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         """Exact format: Temperature(<celsius to one decimal place>C)."""
         raise NotImplementedError
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other):
         """Equal if both are Temperature and their celsius values differ by < 1e-9."""
         raise NotImplementedError
 
-    def __lt__(self, other: "Temperature") -> bool:
+    def __lt__(self, other):
         """Ordered by celsius value."""
         raise NotImplementedError

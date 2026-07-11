@@ -22,19 +22,24 @@
 # around requests.get(url).json() or httpx.get(url).json() -- but
 # that wrapper is intentionally not part of this assignment.
 
+# The signatures below are left UNANNOTATED on purpose: the type-annotation
+# bonus asks you to add the hints yourself (the exact types are in the
+# README). The `Fetch` type alias below is provided ready to annotate the
+# first parameter of every function with.
+
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable  # noqa: F401 -- for you to annotate with
 
 Fetch = Callable[[str], tuple[int, dict[str, Any] | list[Any] | None]]
 
 
-def get_user(fetch: Fetch, user_id: int) -> dict[str, Any] | None:
+def get_user(fetch, user_id):
     """Fetch one user by id from GET /users/<id>. Return None on a 404."""
     raise NotImplementedError
 
 
-def list_all_users(fetch: Fetch) -> list[dict[str, Any]]:
+def list_all_users(fetch):
     """Fetch every user by following pagination starting at /users?page=1.
 
     Each page response looks like {"items": [...], "next": "/users?page=N"
@@ -44,12 +49,12 @@ def list_all_users(fetch: Fetch) -> list[dict[str, Any]]:
     raise NotImplementedError
 
 
-def count_active(fetch: Fetch) -> int:
+def count_active(fetch):
     """Paginate through every user and count how many have active=True."""
     raise NotImplementedError
 
 
-def safe_get(fetch: Fetch, path: str, retries: int) -> dict[str, Any] | list[Any] | None:
+def safe_get(fetch, path, retries):
     """Call fetch(path), retrying only on a >=500 status, at most `retries`
     extra attempts beyond the first. Never retry a 4xx. Return the parsed
     body on any non-5xx response, or None if every attempt returned 5xx.
@@ -57,7 +62,7 @@ def safe_get(fetch: Fetch, path: str, retries: int) -> dict[str, Any] | list[Any
     raise NotImplementedError
 
 
-def merge_profiles(fetch: Fetch, ids: list[int]) -> dict[int, dict[str, Any]]:
+def merge_profiles(fetch, ids):
     """Fetch each id in `ids` via GET /users/<id> and return a dict mapping
     id -> profile for every id that was found, silently skipping any id
     that comes back as a 404.

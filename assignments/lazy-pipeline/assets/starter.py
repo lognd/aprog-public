@@ -7,34 +7,37 @@
 # typing -- itertools is specifically forbidden, since the whole point
 # of this assignment is to hand-write the pause/resume logic yourself,
 # not reach for itertools.islice or itertools.chain to do it for you.
-# Type hints (Iterable/Iterator annotations) are REQUIRED on every
-# function signature.
+#
+# The signatures below are left UNANNOTATED on purpose: the type-annotation
+# bonus asks you to add the Iterable/Iterator hints yourself (the exact
+# types are in the README's per-function spec). Iterable and Iterator are
+# imported below, ready for you to annotate with.
 
 from __future__ import annotations
 
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator  # noqa: F401 -- for you to annotate with
 
 
-def parse_records(lines: Iterable[str]) -> Iterator[dict[str, str]]:
+def parse_records(lines):
     """Lazily parse "LEVEL:message" lines into {"level", "msg"} dicts, skipping malformed lines."""
     raise NotImplementedError
 
 
-def only_level(records: Iterable[dict[str, str]], level: str) -> Iterator[dict[str, str]]:
+def only_level(records, level):
     """Lazily filter records down to those whose "level" equals level exactly."""
     raise NotImplementedError
 
 
-def take(iterable: Iterable, n: int) -> Iterator:
+def take(iterable, n):
     """Yield at most n items from iterable, consuming no more than n items from the source."""
     raise NotImplementedError
 
 
-def running_count(records: Iterable[dict[str, str]]) -> Iterator[int]:
+def running_count(records):
     """Yield the cumulative count of records seen so far, one per input record."""
     raise NotImplementedError
 
 
-def chunked(iterable: Iterable, size: int) -> Iterator[list]:
+def chunked(iterable, size):
     """Yield successive lists of up to size items; the final partial chunk is included."""
     raise NotImplementedError
