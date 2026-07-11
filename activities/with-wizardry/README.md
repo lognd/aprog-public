@@ -3,9 +3,12 @@
 C++'s RAII (Resource Acquisition Is Initialization) guarantees a
 destructor runs when an object leaves scope, no matter how it leaves --
 normal return, or an exception unwinding the stack. Python's `with`
-statement is the closest cousin to that idea: `__enter__` runs before
-the block, `__exit__` runs after it, guaranteed, whether the block
-finished normally or an exception blew through it. This activity is
+statement is the closest cousin to that idea: any object that defines
+both an `__enter__` method (setup) and an `__exit__` method (teardown)
+is called a context manager, and writing `with some_object:` guarantees
+`__enter__` runs before the indented block and `__exit__` runs after
+it, whether the block finished normally or an exception blew through
+it. This activity is
 nine short Python programs that prove that guarantee directly, alongside
 the full `try`/`except`/`else`/`finally` ordering rules and the
 `@contextlib.contextmanager` shorthand for writing one without a class
