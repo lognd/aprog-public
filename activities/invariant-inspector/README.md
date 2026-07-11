@@ -8,7 +8,7 @@ what the loop has accomplished once it is done. This is the informal,
 engineering-flavored version of an invariant: not a formal mathematical
 proof, just a disciplined habit of naming "what stays true here, every
 single time control passes through this point," so you can trust a
-loop's correctness by inspection instead of by guessing and hoping. Nine
+loop's correctness by inspection instead of by guessing and hoping. Eight
 small, real loops are on the table here -- a running sum, a max-so-far
 tracker, binary search's shrinking range, a two-pointer reversal, one
 step of quicksort's partition, the Euclidean GCD algorithm, an
