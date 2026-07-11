@@ -64,6 +64,17 @@ This opens a text editor with a list of commits, one per line, each
 prefixed with a command word like `pick`. Change `pick` to `drop` on the
 commits you want gone, then save and close the editor.
 
+<details>
+<summary>What does this editor look like?</summary>
+
+This activity sets your editor to `nano` for the duration of the shell, so
+you do not need to know any other editor's keys. Nano shows its commands at
+the bottom of the screen: use the arrow keys to move the cursor, type over
+`pick` to change it to `drop`, then press `Ctrl+O` (Write Out) and `Enter`
+to save, and `Ctrl+X` to exit.
+
+</details>
+
 ### Step 3 -- reconcile the feature branch
 
 The feature branch diverged from main some time ago -- it and main each
@@ -80,6 +91,21 @@ Resolve any conflicts, then switch back to main and merge:
 ```bash
 git merge feature/user-input
 ```
+
+<details>
+<summary>What is a conflict?</summary>
+
+A conflict happens when git tries to replay or combine a change and cannot
+tell automatically how to merge it -- usually because the same lines of a
+file were edited differently on each branch. Git pauses and marks the file
+with `<<<<<<<` / `=======` / `>>>>>>>` markers showing both versions; you
+edit the file to keep the correct text, remove the markers, then run
+`git add <file>` followed by `git rebase --continue` (or `git commit` for a
+plain merge) to finish. This particular puzzle does not require resolving
+any conflicts, but it is good to know what the term means before you run
+into one for real.
+
+</details>
 
 ### Step 4 -- exit
 

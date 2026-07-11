@@ -43,6 +43,17 @@ def main():
         die("unexpected zip structure")
     repo_dir = os.path.join(work_dir, entries[0])
 
+    # Interactive rebase opens whatever editor git is configured to use.
+    # On a machine with no core.editor/EDITOR/VISUAL set, git falls back to
+    # vi, which is not beginner-friendly (no on-screen instructions for how
+    # to save and quit). Force nano for this repo so the on-screen "^O
+    # Write Out" / "^X Exit" hints are always there, regardless of the
+    # student's system configuration.
+    subprocess.run(
+        ["git", "-C", repo_dir, "config", "core.editor", "nano"],
+        check=False,
+    )
+
     rcfile = tempfile.NamedTemporaryFile(mode="w", suffix=".rc", delete=False)
     rcfile.write(textwrap.dedent(f"""\
         PS1='\\u@git-heist:\\W\\$ '
