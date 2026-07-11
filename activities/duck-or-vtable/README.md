@@ -28,7 +28,7 @@ code is using and what that choice costs or buys you.
 
 ## How it works
 
-You are shown eight short C++ programs, each using either a virtual
+You are shown several short C++ programs, each using either a virtual
 interface or a function template to handle more than one type uniformly.
 Every question asks something pointed and specific about the code shown:
 does it compile, is the decision made at compile time or run time, can a
@@ -51,7 +51,7 @@ python3 launch.py
 
 ## You will know you are done when...
 
-You have answered all eight questions correctly and the activity prints
+You have answered all nine questions correctly and the activity prints
 your passphrase.
 
 ## Hints
