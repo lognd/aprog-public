@@ -18,7 +18,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(fraction-arithmetic_tests test_catch.cpp)
+add_executable(fraction-arithmetic_tests test_catch.cpp "${SUBMISSION_DIR}/fraction.cpp")
 target_include_directories(fraction-arithmetic_tests PRIVATE "${SUBMISSION_DIR}")
 target_link_libraries(fraction-arithmetic_tests PRIVATE Catch2::Catch2WithMain)
 target_compile_options(fraction-arithmetic_tests PRIVATE -Wall -Wextra -g)
