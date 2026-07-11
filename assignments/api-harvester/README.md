@@ -124,8 +124,7 @@ before any test can run.
   `>= 500` status.
 - `list_all_users` must follow `next` until it is `None`; it must not
   stop after the first page.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern
-  Python type checker, run over `harvester.py`) earns a bonus.
+- **Type-annotation bonus (10 pts):** every function must annotate all of its parameters and its return type. The bonus is awarded only when every function is fully annotated; a separate, informational [ty](https://docs.astral.sh/ty/) check then flags any annotation on `harvester.py` that does not hold up.
 
 ## Grading
 
@@ -134,7 +133,7 @@ before any test can run.
 | Import/token constraints (gate)                | 5      |
 | Visible correctness tests                      | 35     |
 | Hidden correctness tests                       | 50     |
-| Clean `ty` type-check (bonus)                  | 10     |
+| Complete type annotations (bonus)              | 10     |
 | **Total**                                      | **100** |
 
 Hidden tests cover: pagination boundaries (empty, single-page,

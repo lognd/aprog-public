@@ -151,8 +151,7 @@ python -m pytest visible-tests/test_visible.py -v
 - `standardize` must not raise or print a division-by-zero warning for
   a constant column; use `np.where` (or an equivalent guard) to avoid
   ever actually dividing by zero.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern
-  Python type checker, run over `matrix_ops.py`) earns a bonus.
+- **Type-annotation bonus (10 pts):** every function must annotate all of its parameters and its return type. The bonus is awarded only when every function is fully annotated; a separate, informational [ty](https://docs.astral.sh/ty/) check then flags any annotation on `matrix_ops.py` that does not hold up.
 
 ## Grading
 
@@ -161,7 +160,7 @@ python -m pytest visible-tests/test_visible.py -v
 | Loop-keyword and import constraints (gate) | 10     |
 | Visible correctness tests               | 30     |
 | Hidden correctness tests                | 50     |
-| Clean `ty` type-check (bonus)           | 10     |
+| Complete type annotations (bonus)       | 10     |
 | **Total**                               | **100** |
 
 Hidden tests cover: single-student and single-assignment matrices,
