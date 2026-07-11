@@ -8,7 +8,7 @@ activity walks you through each one so you can distinguish them precisely.
 
 | Keyword | Applies to | Read-only? | When is the value set? |
 |---------|-----------|------------|------------------------|
-| `const` | variables, parameters, member functions (functions that belong to a class/struct) | yes | compile time OR runtime |
+| `const` | variables, parameters | yes | compile time OR runtime |
 | `constexpr` | variables and functions | yes (for variables) | must be evaluable at compile time |
 | `consteval` | functions only | N/A | must be called at compile time |
 | `constinit` | variables only | NO | must be initialized at compile time |
@@ -82,31 +82,9 @@ its own object file before linking) depend on each other, initialization
 order is undefined. `constinit` ensures no
 dynamic initialization is needed, eliminating the hazard.
 
-### `const` member functions
-
-A member function is a function that belongs to a class or struct (you
-will meet classes formally later in the course, but the short version:
-a class bundles data together with functions that operate on that data,
-called member functions; the data fields themselves are called data
-members). Marking a member function `const` promises that calling it
-will not modify the object's data members:
-
-```cpp
-struct Counter {
-    int value;
-    int get() const { return value; }   // read-only: cannot modify value
-};
-```
-
-This lets const objects call the function safely, since the compiler
-enforces that the function never writes to a data member (unless that
-member is explicitly marked `mutable`, an escape hatch you are unlikely
-to need yet).
-
 ## Concepts covered
 
 - `const` position relative to `*`: pointer-to-const vs const-pointer vs both
-- `const` member functions and what they prevent
 - `const` references as the idiomatic way to pass large objects without copying
 - `constexpr`: compile-time evaluation, implies read-only for variables
 - `consteval`: immediate functions that must be called at compile time (C++20)
@@ -114,8 +92,8 @@ to need yet).
 
 ## How it works
 
-Eleven questions covering pointer const declarations, const member
-functions, const references, constexpr, consteval, and constinit. Each
+Ten questions covering pointer const declarations, const references,
+constexpr, consteval, and constinit. Each
 question has a hint. The activity unlocks a passphrase when all answers are
 correct.
 
@@ -127,7 +105,7 @@ python3 launch.py
 
 ## You will know you are done when...
 
-All eleven questions are correct and the program prints the passphrase.
+All ten questions are correct and the program prints the passphrase.
 
 ## Going further
 
