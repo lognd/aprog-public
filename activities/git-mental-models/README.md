@@ -236,13 +236,15 @@ the passphrase.
 ## Hints
 
 <details>
-<summary>Hint 1 -- distinguishing an invariant fact from a coincidence</summary>
+<summary>Hint 1 -- distinguishing what a command does from what it looks like it does</summary>
 
-Several questions offer an answer that is TRUE for the example shown but
-would not hold in general (for example, "a is always greater than b" in a
-GCD-style loop, or "i always equals j"). Ask yourself: does this statement
-hold at the very FIRST moment, before anything has run, for every possible
-starting input -- not just the one pictured?
+Several questions offer an answer that sounds plausible but describes what
+you might expect a command to do from its name, not what it actually does
+under the hood (for example, assuming `git branch` copies files, or that
+`git commit` moves HEAD directly instead of moving the branch it follows).
+When in doubt, go back to the object-graph model in the Background section:
+commits are snapshots with parent pointers, branches are movable names, and
+HEAD just follows whichever branch is checked out.
 
 </details>
 
