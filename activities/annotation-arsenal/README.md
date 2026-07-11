@@ -7,7 +7,7 @@ Python has its own version of both ideas -- type annotations and generic
 type variables -- but with a critical difference: nothing in the Python
 language itself ever enforces them. An annotation, in Python, is a piece
 of documentation, not a rule the interpreter checks. This activity is
-nine questions on reading, choosing, and reasoning about annotations
+ten questions on reading, choosing, and reasoning about annotations
 correctly, including exactly where that "documentation, not a rule"
 distinction bites -- and where a checker like `ty` or `mypy` steps in to
 catch what the interpreter itself will not.
@@ -27,13 +27,16 @@ catch what the interpreter itself will not.
 
 ## How it works
 
-The launcher shows you nine short code snippets or signatures, one at a
+The launcher shows you ten short code snippets or signatures, one at a
 time, each with a specific question: pick the correct annotation, decide
 what a checker would report, or reason about a tradeoff. Type your
-answer and press Enter. A correct answer shows a short explanation and
-moves you on; a wrong answer explains the specific misconception behind
-that guess and asks you to try again. All nine must be answered
-correctly to receive the passphrase.
+answer and press Enter. Some answers are short (a single annotation, like
+`dict[str, int]`); others are a full sentence -- in both cases, the
+launcher checks for an EXACT match to the expected wording, so read the
+prompt carefully and answer in the same terms it uses. A correct answer
+shows a short explanation and moves you on; a wrong answer explains the
+specific misconception behind that guess and asks you to try again. All
+ten must be answered correctly to receive the passphrase.
 
 ## Getting started
 
@@ -43,7 +46,7 @@ python3 launch.py
 
 ## You will know you are done when...
 
-You have correctly answered all nine questions and the launcher shows
+You have correctly answered all ten questions and the launcher shows
 you a passphrase.
 
 ## Hints
@@ -87,6 +90,6 @@ sharing the default shares the same list object.
 - Write your own generic function with two TypeVars, `T` and `U`, that
   takes a `dict[T, U]` and returns a `list[tuple[T, U]]`. What would the
   equivalent C++ function template signature look like?
-- Fix the mutable-default trap from question 7 yourself: rewrite
+- Fix the mutable-default trap from question 8 yourself: rewrite
   `add_item` using the `bucket: list[str] | None = None` idiom, and
   confirm with a couple of calls that each one now gets its own list.
