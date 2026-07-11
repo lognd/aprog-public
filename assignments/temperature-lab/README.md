@@ -187,8 +187,7 @@ python -m pytest visible-tests/test_visible.py -v
   `collections`, `enum`, `attr`/`attrs`, or `pint` -- write the property,
   classmethod, staticmethod, and dunder logic yourself rather than
   reaching for a shortcut that generates it for you.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern Python
-  type checker, run over `temperature.py`) earns a bonus.
+- **Type-annotation bonus (10 pts):** every method and function must annotate all of its parameters (except a leading `self`/`cls`) and its return type. The bonus is awarded only when everything is fully annotated; a separate, informational [ty](https://docs.astral.sh/ty/) check then flags any annotation on `temperature.py` that does not hold up.
 
 ## Grading
 
@@ -197,7 +196,7 @@ python -m pytest visible-tests/test_visible.py -v
 | Import constraints (gate)            | 5      |
 | Visible correctness tests            | 35     |
 | Hidden correctness tests             | 50     |
-| Clean `ty` type-check (bonus)        | 10     |
+| Complete type annotations (bonus)    | 10     |
 | **Total**                            | **100** |
 
 ## Submission

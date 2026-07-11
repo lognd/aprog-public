@@ -161,8 +161,7 @@ python -m pytest visible-tests/test_visible.py -v
   `exc_type` only; every other exception type must propagate normally.
 - `transaction` must never mutate the original `ledger` argument except
   at the moment of a clean commit.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern Python
-  type checker, run over `context_keeper.py`) earns a bonus.
+- **Type-annotation bonus (10 pts):** every method and function must annotate all of its parameters (except a leading `self`/`cls`) and its return type. The bonus is awarded only when everything is fully annotated; a separate, informational [ty](https://docs.astral.sh/ty/) check then flags any annotation on `context_keeper.py` that does not hold up.
 
 ## Grading
 
@@ -171,7 +170,7 @@ python -m pytest visible-tests/test_visible.py -v
 | Import constraints (gate)            | 5      |
 | Visible correctness tests            | 35     |
 | Hidden correctness tests             | 50     |
-| Clean `ty` type-check (bonus)        | 10     |
+| Complete type annotations (bonus)    | 10     |
 | **Total**                            | **100** |
 
 Hidden tests cover: exit-on-exception ordering (including nested
