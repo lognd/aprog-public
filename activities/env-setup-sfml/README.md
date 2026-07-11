@@ -14,6 +14,14 @@ SFML (Simple and Fast Multimedia Library) is a C++ library for 2D
 graphics, windows, audio, and input. The course project uses it, so
 you need it installed and linkable before that assignment starts.
 
+This course targets the **SFML 2.x** API. Some package managers now
+install SFML 3.x by default, which renamed and changed several
+functions (for example, `sf::Image::create` became
+`sf::Image::resize`). If the verification step below fails to
+*compile* even though you are sure SFML installed successfully, check
+the version you got (see the troubleshooting section) -- you may have
+SFML 3.x and need to request the 2.x package explicitly.
+
 <details>
 <summary>What is a media library?</summary>
 
@@ -188,6 +196,22 @@ dpkg -L libsfml-dev | grep libsfml-graphics
 This is a compiler error -- the include path does not contain SFML's
 headers. Confirm the package installed and that you are not pointing
 your build at a different, older SFML you installed previously.
+
+### "no member named 'create' in 'sf::Image'" (or similar)
+
+This is a compiler error that means SFML installed, but as version 3.x
+instead of the 2.x this course targets. SFML 3 renamed several
+functions; `sf::Image::create` became `sf::Image::resize`. Check your
+installed version:
+
+```bash
+pkg-config --modversion sfml-graphics
+```
+
+If it reports `3.x`, look for a way to request SFML 2.x from your
+package manager (for example, a version-suffixed package or formula
+name), or ask on the course forum for the current recommended command
+for your platform.
 
 ### g++ not found
 
