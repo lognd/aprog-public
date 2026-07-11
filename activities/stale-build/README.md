@@ -13,13 +13,6 @@ rule lists a target (the file to produce), its prerequisites (the files
 it depends on), and a recipe (the commands to run if the target is out of
 date).
 
-## Concepts covered
-
-- How `make` uses file timestamps to decide what to rebuild
-- The prerequisite list in a Makefile rule and what happens when a file is omitted
-- Why a header file that defines a compile-time constant must be a listed dependency
-- The difference between a clean build (always correct) and an incremental build (correct only with complete prerequisites)
-
 ## Background
 
 `sieve.cpp` implements a trial-division primality test. For each candidate
@@ -32,6 +25,13 @@ calls `prime_count()` and prints the result.
 Because `SIEVE_LIMIT` is a compile-time constant, changing it in `limits.h`
 only takes effect if the files that include it are recompiled. That is the
 key to this problem.
+
+## Concepts covered
+
+- How `make` uses file timestamps to decide what to rebuild
+- The prerequisite list in a Makefile rule and what happens when a file is omitted
+- Why a header file that defines a compile-time constant must be a listed dependency
+- The difference between a clean build (always correct) and an incremental build (correct only with complete prerequisites)
 
 ## How it works
 
