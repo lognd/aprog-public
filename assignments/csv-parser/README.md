@@ -98,6 +98,31 @@ g++ -std=c++17 -o test visible-tests/test_csv_parser.cpp
 ./test
 ```
 
+## Grading
+
+| Component                | Points |
+|---------------------------|--------|
+| Compilation                | 0*     |
+| simple_row                 | 8      |
+| two_rows                   | 7      |
+| crlf                       | 7      |
+| quoted_comma                | 8      |
+| escaped_quote               | 8      |
+| quoted_newline              | 8      |
+| empty_middle                | 7      |
+| trailing_comma              | 7      |
+| empty_line                  | 7      |
+| readme_example              | 8      |
+| multiline_quoted_rows       | 7      |
+| all_empty_fields            | 5      |
+| whitespace_not_trimmed      | 5      |
+| single_column               | 5      |
+| many_rows                   | 3      |
+| **Total**                  | **100** |
+
+`*` Compilation is a gate, not a scored component -- your submission must
+compile before any test case can run.
+
 ## Submission
 
 Submit a single file named `csv_parser.hpp`. Do not rename it.
