@@ -59,7 +59,7 @@ python3 launch.py
 
 ## You will know you are done when...
 
-You have correctly answered all nine scenarios and the launcher prints the
+You have correctly answered all eight scenarios and the launcher prints the
 activity's passphrase.
 
 ## Hints
