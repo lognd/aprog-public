@@ -5,9 +5,9 @@ than by position -- a **key** is a value used to find something, like a
 word used to find its count. This assignment asks you to implement a small
 text-analysis toolkit, entirely as free functions over an already
 tokenized `std::vector<std::string>` of words (no file reading, no
-splitting a sentence apart -- that part is done for you), exercising all
-four of the standard library's associative containers:
-`std::map`, `std::unordered_map`, `std::set`, and `std::unordered_set`.
+splitting a sentence apart -- that part is done for you), exercising
+three of the standard library's associative containers:
+`std::map`, `std::unordered_map`, and `std::set`.
 
 ---
 
