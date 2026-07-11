@@ -217,6 +217,9 @@ CONTRACT
   ssize_t read (int fd, void       *buf, size_t count);
   ssize_t write(int fd, const void *buf, size_t count);
 
+ssize_t is a signed integer type (unlike size_t, which is unsigned) --
+signed so it can represent -1 for "error" alongside a byte count.
+
 read() asks the kernel for up to 'count' bytes from 'fd' into 'buf'.
 Return values:
    > 0   bytes actually transferred (may be less than count -- normal)
@@ -277,8 +280,11 @@ on Linux), every subsequent open() returns -1 with errno EMFILE.  No
 new files can be opened.  This is called an fd leak.  It behaves like
 a memory leak: invisible in small tests, fatal in long-running programs.
 
-Unlike fclose() from the C standard library, close() does NOT flush any
-user-space buffer.  It only releases the kernel-side slot.
+close() only releases the kernel-side slot; it does not do any extra
+bookkeeping on your program's side.  (Later, when you use C++ file
+streams, you will meet a related function, fclose(), that also flushes
+a buffer -- a temporary holding area in your own program's memory.
+close() has no such buffer to flush.)
 
 CONTRACT
   Every open() must be matched with exactly one close().
@@ -302,7 +308,8 @@ ever calling close()?
   #include <string.h>   // strerror()
 
 When a system call fails (returns -1), it sets the global integer errno
-to a code describing why.  errno is thread-local; each thread has its own.
+to a code describing why.  For every program you write in this course,
+treat errno as one shared variable that the last failed call set.
 
 Common errno values:
   ENOENT   -- No such file or directory
