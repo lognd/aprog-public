@@ -5,10 +5,11 @@ abstract. This activity asks a sharper question: **what does that
 deduction actually cost you when the program runs?** Seven small,
 fully deterministic programs show `auto`'s rules producing real,
 observable differences in printed output -- a copy that silently
-diverges from the original it was made from, a range-for mutation
-that does or does not stick depending on one `&`, and a numeric
-literal's exact type changing which arithmetic operation actually
-executes.
+diverges from the original it was made from, a range-for (a `for`
+loop that visits each element of a container, like a `std::vector`
+or `std::map`, in turn without any manual indexing) mutation that
+does or does not stick depending on one `&`, and a numeric literal's
+exact type changing which arithmetic operation actually executes.
 
 ## Concepts covered
 
@@ -80,10 +81,11 @@ the exact fractional result instead.
   the end that prints `p.first`, using `auto` (not `auto&`) this time.
   Does using `auto` for a read-only pass like that cost you anything
   besides an unnecessary copy?
-- Change snippet 5's ternary to `false ? i : d` instead of
-  `true ? i : d`. Predict the new output before running it -- does the
-  ternary's overall TYPE change, or only which branch's value gets
-  selected?
+- Change snippet 5's conditional operator (informally called a
+  "ternary" because it takes three operands) to `false ? i : d`
+  instead of `true ? i : d`. Predict the new output before running it
+  -- does the expression's overall TYPE change, or only which
+  branch's value gets selected?
 - Look up `std::is_same_v` (from `<type_traits>`) and use
   `static_assert` to check, at compile time, whether `decltype(copy)`
   in snippet 1 really is `int` and not `int&`.
