@@ -10,9 +10,18 @@ a time, none of them wrong in isolation, adding up to something that rots.
 
 ## Concepts covered
 
-- Recognizing five specific code smells by name: shotgun surgery,
-  copy-paste divergence, rigid switch on type, boolean parameter creep,
-  and the god function
+- Recognizing five specific code smells by name:
+  - shotgun surgery -- one conceptual change forces edits scattered
+    across many separate places right now
+  - copy-paste divergence -- two copies of the same logic have already
+    silently drifted apart because a fix reached only one of them
+  - rigid switch on type -- a function keeps growing one more
+    if/else-if (or switch) branch every time a new case shows up
+  - boolean parameter creep -- a function has accumulated so many
+    true/false parameters that a call site like `doThing(true, false,
+    true)` is unreadable without checking the signature
+  - the god function -- one function has absorbed too many unrelated
+    responsibilities (I/O, math, formatting, networking, ...) at once
 - How each smell typically arises from a sequence of individually
   reasonable decisions, not one bad one
 - Which refactor (restructuring code without changing what it does)
