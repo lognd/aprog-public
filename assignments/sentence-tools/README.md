@@ -105,6 +105,7 @@ The `SUBMISSION_DIR` variable tells CMake where to find your
 | Visible tests (Catch2) | 30 |
 | Hidden tests (Catch2) | 60 |
 | Memory safety (Valgrind) | 10 |
+| **Total** | **100** |
 | Extra credit (ASan) | +10 |
 
 Catch2 is the test-writing library used above. Valgrind is a tool that runs
