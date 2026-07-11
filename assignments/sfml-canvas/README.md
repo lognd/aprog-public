@@ -26,10 +26,22 @@ and look at.
 
 An `sf::Image` is a 2D grid of `sf::Color` values -- one color per pixel,
 each stored as four 8-bit numbers: red, green, blue, and alpha (opacity),
-every value from 0 to 255. You create one with a width and height, read
-any pixel with `img.getPixel(x, y)`, and write any pixel with
-`img.setPixel(x, y, color)`. Coordinates use SFML's usual convention:
-`(0, 0)` is the top-left corner, `x` grows right, `y` grows **down**.
+every value from 0 to 255. You size one with `img.resize({width,
+height}, color)` (or build it directly, `sf::Image img({width, height},
+color)`), read any pixel with `img.getPixel({x, y})`, and write any
+pixel with `img.setPixel({x, y}, color)` -- in SFML 3 a pixel
+coordinate is a single `sf::Vector2u`, hence the `{x, y}` braces.
+Coordinates use SFML's usual convention: `(0, 0)` is the top-left
+corner, `x` grows right, `y` grows **down**.
+
+> **SFML version:** this assignment is graded against **SFML 3**, so use
+> the SFML 3 spellings above. If you only have the older SFML 2.x
+> installed, the equivalent calls are `img.create(width, height,
+> color)`, `img.getPixel(x, y)`, and `img.setPixel(x, y, color)` (two
+> separate integer arguments, and `sf::Uint8` in place of
+> `std::uint8_t`) -- you can develop against 2.x, but the version you
+> submit against is 3. See the [Install SFML
+> activity](../../activities/env-setup-sfml/) for getting SFML 3.
 
 This is a different object from `sf::RenderWindow` (which opens an actual
 window on screen) and `sf::RenderTexture` (which renders to a GPU
@@ -101,7 +113,7 @@ Both functions compute a fractional channel value (a float) and must
 round it to an integer 0-255 for storage in `sf::Color`. Use round-half-up:
 
 ```cpp
-sf::Uint8 channel = static_cast<sf::Uint8>(value + 0.5f);
+std::uint8_t channel = static_cast<std::uint8_t>(value + 0.5f);
 ```
 
 where `value` is the exact computed float, before rounding. This matters
@@ -127,9 +139,11 @@ cmake --build .
 ```
 
 `SUBMISSION_DIR` tells CMake where to find your `canvas.hpp` and
-`canvas.cpp`. This requires SFML installed locally (on Debian/Ubuntu,
-`sudo apt install libsfml-dev`); the grading server installs it
-automatically, so you do not need to configure anything for submission.
+`canvas.cpp`. This requires **SFML 3** installed locally (note that
+Debian/Ubuntu's `apt` package `libsfml-dev` still installs SFML 2.5.1 --
+see the [Install SFML activity](../../activities/env-setup-sfml/) for
+building SFML 3); the grading server provides SFML 3 automatically, so
+you do not need to configure anything for submission.
 
 ## Constraints
 
