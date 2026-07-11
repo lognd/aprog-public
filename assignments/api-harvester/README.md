@@ -100,9 +100,16 @@ print(fetch("/users/999"))        # (404, None)
 
 ## Compilation and Testing
 
+Put your finished `harvester.py` in this assignment's directory
+(next to `README.md`), then run:
+
 ```bash
-python -m pytest visible-tests/test_visible.py -v
+SUBMISSION_DIR=. python -m pytest visible-tests/test_visible.py -v
 ```
+
+`SUBMISSION_DIR` tells the test file where to import `harvester.py`
+from. Without it, the test file raises `KeyError: 'SUBMISSION_DIR'`
+before any test can run.
 
 ## Constraints
 
