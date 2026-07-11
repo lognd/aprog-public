@@ -234,3 +234,7 @@ CLAUDE.md
 FINDINGS*.md
 findings*.md
 TODO.md
+
+# log-analyzer's fixture files are intentionally named *.log (its whole
+# domain is log files) -- un-ignore them so they can be committed.
+!assignments/log-analyzer/visible-tests/logs/*.log
