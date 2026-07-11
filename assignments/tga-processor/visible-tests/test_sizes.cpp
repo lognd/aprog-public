@@ -1,6 +1,5 @@
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-#include "../assets/src/tga.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include "tga.hpp"
 
 TEST_CASE("TGAHeader is exactly 18 bytes", "[struct-size]") {
     REQUIRE(sizeof(TGAHeader) == 18);

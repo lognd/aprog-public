@@ -276,7 +276,11 @@ mkdir -p output
 To run the visible tests:
 
 ```bash
-cd visible-tests && make
+cd visible-tests
+mkdir -p build && cd build
+cmake ..
+make
+./tga-processor_tests
 ```
 
 ---
