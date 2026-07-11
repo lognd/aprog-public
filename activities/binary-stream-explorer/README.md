@@ -44,9 +44,23 @@ Use `sizeof()` rather than magic numbers where possible.
 python3 launch.py
 ```
 
-A shell opens with `reader.cpp` and `data.bin`.
+A shell opens with `reader.cpp` and `data.bin`.  Use any editor available
+(`nano`, `vim`, `code .`) to open and edit `reader.cpp`, for example:
+
+```bash
+nano reader.cpp
+```
 
 ### Step 1 -- read the hex dump and the format spec
+
+Before the blanks, notice that `reader.cpp` declares `struct Record { ... };`
+near the top of the file.  A `struct` is just a named group of variables
+(called fields) stored back-to-back in memory, in the order they are
+declared.  `Record` groups an `id`, a `score`, and a `name` into one type;
+`r.id` reads the `id` field of a variable `r` of type `Record`.  You will
+cover structs formally in a later section -- for now, all you need is that a
+`Record` is 16 bytes (4 + 4 + 8) laid out contiguously, which is exactly why
+`sizeof(Record)` gives the right record size below.
 
 Study the hex dump printed in the banner.  Match each group of bytes to the
 format spec: a magic number (a fixed, recognizable sequence of bytes at the
