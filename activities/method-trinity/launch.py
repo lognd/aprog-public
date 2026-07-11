@@ -72,7 +72,7 @@ SNIPPETS = json.loads(r"""
     "id": 2,
     "title": "a classmethod receives cls -- an alternate constructor that stays polymorphic",
     "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\n    @classmethod\n    def named_fido(cls):\n        return cls(\"Fido\")\n\nclass Dog(Animal):\n    pass\n\na = Animal.named_fido()\nd = Dog.named_fido()\nprint(type(a).__name__)\nprint(type(d).__name__)\n",
-    "prompt": "@classmethod makes named_fido receive the CLASS it was called through as its first argument, cls, instead of an instance as self. named_fido calls cls(\"Fido\") -- not Animal(\"Fido\") by name -- so calling it through Dog makes cls be Dog, and cls(\"Fido\") constructs a Dog, not an Animal. This is how a classmethod can serve as an alternate constructor that still works correctly for subclasses. What two lines does this print?",
+    "prompt": "@classmethod makes named_fido receive the CLASS it was called through as its first argument, cls, instead of an instance as self. named_fido calls cls(\"Fido\") -- not Animal(\"Fido\") by name -- so calling it through Dog makes cls be Dog, and cls(\"Fido\") constructs a Dog, not an Animal. This is how a classmethod can serve as an alternate constructor that still works correctly for subclasses. (type(x).__name__ just reads back, as a plain string, the name of whatever class x is -- used here only for display.) What two lines does this print?",
     "platform_note": "any platform, CPython 3.10+"
   },
   {
