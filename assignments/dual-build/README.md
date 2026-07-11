@@ -56,7 +56,22 @@ minimum it should enable `-std=c++17`.
 
 ### Phony targets
 
-Declare `.PHONY` for any target that is not a real file.
+Declare `.PHONY` for any target that is not a real file. `test` and `clean`
+belong there. `test_stats`, `stats.o`, and `test_stats.o` do **not** --
+they are real files on disk, and declaring them phony forces Make to
+rebuild them on every invocation even when nothing changed. Running `make`
+twice in a row with no edits in between should do nothing the second time
+(Make prints `` `test_stats' is up to date`` or similar); if it rebuilds
+anyway, check your `.PHONY` line first.
+
+### Parallel builds
+
+A Makefile with a correct, complete prerequisite list for every rule
+already supports `make -j4` with no extra work -- Make uses the
+prerequisite graph you wrote to figure out which rules are independent and
+can run concurrently. Grading runs `make -j4` as a check (see the table
+below); you do not need to add anything beyond what Parts 1's Rules and
+Variables sections already ask for.
 
 ### Why this matters
 
@@ -102,9 +117,11 @@ requested, project files on Windows.
 
 ## Checking your work locally
 
-The `visible-tests/check.sh` script runs both builds and reports pass/fail
-for each stage. Run it from the project root (the directory containing your
-`Makefile` and `CMakeLists.txt`):
+The `visible-tests/check.sh` script exercises every row of the grading
+table below -- both builds, the incremental rebuild, the parallel build,
+the Makefile structure checks, and the CMake/ctest run -- and reports
+pass/fail for each stage. Run it from the project root (the directory
+containing your `Makefile` and `CMakeLists.txt`):
 
     bash visible-tests/check.sh
 
@@ -128,7 +145,9 @@ The script requires `make`, `cmake`, and `g++` to be available.
 - Add a `compile_commands.json` target to your CMakeLists.txt (set
   `CMAKE_EXPORT_COMPILE_COMMANDS=ON`) and open the project in an IDE that
   uses it. What does the IDE gain from this file?
-- Extend the Makefile to support parallel builds (`make -j4`). Does it
-  already work? If not, what prerequisite is missing?
+- Deliberately remove `stats.h` from a prerequisite list, run `make -j4`,
+  and watch it still "succeed" with a stale object file -- parallelism
+  makes a missing dependency more dangerous, not less, because two rules
+  that should have run in a fixed order may now race.
 - Look up `cmake --preset` (CMake 3.19+). Write a `CMakePresets.json` that
   defines a debug and a release preset.
