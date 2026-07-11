@@ -73,7 +73,7 @@ dev = [
 requires-dist = [
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "jinja2", specifier = ">=3.1.0" },
-    { name = "lograder", specifier = ">=0.3.8" },
+    { name = "lograder", specifier = ">=0.3.9" },
     { name = "pydantic", specifier = ">=2.12.0" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.0" },
@@ -285,7 +285,7 @@ wheels = [
 
 [[package]]
 name = "lograder"
-version = "0.3.8"
+version = "0.3.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansi2html" },
@@ -299,9 +299,9 @@ dependencies = [
     { name = "tree-sitter-python" },
     { name = "types-colorama" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2d/67/6447ef90bb5fb417f9039d4cac568fc41c954a89715a197954fb04558cda/lograder-0.3.8.tar.gz", hash = "sha256:d88e1f398653d5bfd7aebe3a7f34b04e8918d07a3f37e57f5ed81e5623d79de5", size = 125954, upload-time = "2026-07-10T20:31:50.131Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/67/2dfdb6657dcb1c6d440bcab5ae568cff847c3d5d4903e4d950eadaf7c190/lograder-0.3.9.tar.gz", hash = "sha256:fd35890f69ddd9c34b98c8149da86ebff9735a6d1c5bb0bcac6245b6918781a5", size = 127901, upload-time = "2026-07-11T17:41:58.312Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/9e/0df79b806387761a9446840a4f2479fd4b58f00ec6fb586c7907faf3e20f/lograder-0.3.8-py3-none-any.whl", hash = "sha256:b81a41c966517ffe65f44c8b315c0767cd5c84da0e016f0dcfe854d0b54e60ec", size = 193630, upload-time = "2026-07-10T20:31:48.667Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/7e/df875d3d6cb6355bddba1007babc0a2b63ef0eab82659111a2f40f397404/lograder-0.3.9-py3-none-any.whl", hash = "sha256:2c04cba6a00b367c34d0e14ad0dce8612102a7c833ab7d5b272d5184f62c26b3", size = 196488, upload-time = "2026-07-11T17:41:59.58Z" },
 ]
 
 [[package]]

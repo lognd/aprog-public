@@ -160,11 +160,14 @@ indexing into each tuple by position.
 - All six functions must be **pure**: no `print`, no reading from a file,
   no mutating anything outside the function. Given the same arguments, each
   function must always return the same result.
-- A clean run of [ty](https://docs.astral.sh/ty/) (a fast, modern Python
-  type checker, run over `phrasebook.py`) earns a small bonus. This is not
-  required to pass the assignment, but it is worth practicing -- add type
-  hints to your function signatures (`def word_count(text: str) -> int:`)
-  once your logic works, and see what `ty check phrasebook.py` reports.
+- **Type-annotation bonus (10 pts):** fully annotate every one of the six
+  functions -- each parameter and the return type, e.g.
+  `def word_count(text: str) -> int:`. The bonus is awarded only when all six
+  signatures are completely annotated. A separate, informational `ty` check
+  (a fast, modern Python [type checker](https://docs.astral.sh/ty/)) then runs
+  over `phrasebook.py` to flag annotations that do not hold up -- fix any it
+  reports. The bonus is not required to pass the assignment, but earning it
+  means actually typing your code, not just leaving it unannotated.
 
 ## Grading
 
@@ -173,7 +176,7 @@ indexing into each tuple by position.
 | No `re`/`collections` shortcuts     | 0 (gate) |
 | Visible correctness tests           | 40     |
 | Hidden correctness tests            | 50     |
-| Clean `ty` type-check (bonus)       | 10     |
+| Complete type annotations (bonus)   | 10     |
 
 ## Submission
 
