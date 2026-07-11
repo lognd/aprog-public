@@ -131,20 +131,20 @@ positive example of each:
 ```
 Horizontal (row 5, cols 0-3):     Vertical (col 2, rows 2-5):
 X X X X . . .                     . . . . . . .
-                                   . . . . . . .
-                                   . . O . . . .
-                                   . . O . . . .
-                                   . . O . . . .
-                                   . . O . . . .
+. . . . . . .                     . . . . . . .
+. . . . . . .                     . . O . . . .
+. . . . . . .                     . . O . . . .
+. . . . . . .                     . . O . . . .
+. . . . . . .                     . . O . . . .
 
 Diagonal, top-left to bottom-right   Anti-diagonal, top-right to bottom-left
-(cols 0-3, rows 4-1):                 (cols 3-6, rows 4-1):
-. . . . . . .                         . . . . . . .
-. . . X . . .                         . . . . . . X
-. . X . . . .                         . . . . . X .
-. X . . . . .                         . . . . X . .
-X . . . . . .                         . . . X . . .
-. . . . . . .                         . . . . . . .
+(cols 0-3, rows 4-1):                (cols 3-6, rows 4-1):
+. . . . . . .                        . . . . . . .
+X . . . . . .                        . . . . . . X
+. X . . . . .                        . . . . . X .
+. . X . . . .                        . . . . X . .
+. . . X . . .                        . . . X . . .
+. . . . . . .                        . . . . . . .
 ```
 
 `check_win(board, 6, 7, 'X')` is `true` for the diagonal and anti-diagonal
