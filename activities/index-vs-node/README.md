@@ -2,10 +2,17 @@
 
 "O(n)" and "O(1)" describe how cost SCALES, but they can make two very
 different structures look interchangeable at a glance. This activity makes
-the cost of dynamic-array and linked-list operations concrete: given an
-exact sequence of elements and an exact operation, you compute the exact
-number of element shifts, pointer hops, or resulting size/capacity --
-numbers you can count on your fingers, not just complexity classes.
+the cost of dynamic-array and linked-list operations concrete. A dynamic
+array stores elements back to back in one block of memory and reaches any
+element directly by index; a linked list stores each element in its own
+**node** (a small block holding one value plus a pointer to the next node)
+and can only be reached by starting at the first node (`head`) and
+following those pointers one at a time. A **shift** is one element moving
+to a different index inside the array (to open up or close a gap); a
+**pointer hop** is one `->next` step taken while walking a linked list.
+Given an exact sequence of elements and an exact operation, you compute
+the exact number of shifts, hops, or resulting size/capacity -- numbers
+you can count on your fingers, not just complexity classes.
 
 ## Concepts covered
 
@@ -14,8 +21,10 @@ numbers you can count on your fingers, not just complexity classes.
   insertion requires to reach a given index
 - Contrasting O(1) index arithmetic (dynamic array) with O(n) sequential
   pointer-chasing (linked list) using real numbers instead of just symbols
-- Amortized growth: tracing a dynamic array's capacity-doubling sequence to
-  compute its exact size and capacity after a run of `push_back` calls
+- Amortized growth (a single expensive operation's cost spread out over
+  many cheap ones that come after it): tracing a dynamic array's
+  capacity-doubling sequence to compute its exact size and capacity after
+  a run of `push_back` calls
 
 ## How it works
 
