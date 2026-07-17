@@ -1,9 +1,10 @@
 # Study Guide 2: Environment Setup
 
 This module gets your machine ready for the entire course: a Unix-like
-shell, Python plus its tooling, two C/C++ compiler families, the CMake and
-Make build tools, SFML, an IDE, git/GitHub, and the class Discord. Every
-later row assumes all eight of these activities are complete.
+shell, Python plus its tooling and virtual environments, two C/C++ compiler
+families, the CMake and Make build tools, SFML, an IDE, git/GitHub, and the
+class Discord. Every later row assumes all nine of these activities are
+complete.
 
 ## Know before you start
 
@@ -43,12 +44,40 @@ Concept: Python and its tooling
 - Know that `uv tool install <name>` installs a command-line tool into its
   own isolated environment, avoiding conflicts with system Python or other
   tools.
-- Know that a virtual environment (venv) is a private, isolated copy of
-  Python's package directory for one project, created so that
-  `pip install` cannot break the system Python installation.
 - Know that "externally managed environment" errors on modern Linux exist
   to stop bare `pip install` from touching system-managed packages, and
   that a venv (or `uv tool install`) is the standard fix.
+
+Concept: virtual environments
+- Know that a virtual environment (venv) is a private, per-project copy of
+  Python's package directory, created so that two projects needing two
+  different versions of the same package cannot break each other, and so
+  that `pip install` cannot damage the system Python installation.
+- Know that a package is a reusable library installed rather than written,
+  and that PyPI (the Python Package Index) is the public repository `pip`
+  and `uv` download packages from -- so a first install needs a network.
+- Know that `pip` installs a package into whichever environment is
+  currently active, which is why activating the right venv first is what
+  decides where the package lands.
+- Be able to build a venv the classic way: `python3 -m venv venv` to create
+  it (`-m` runs a stdlib module as a program), `source venv/bin/activate`
+  to turn it on, `pip install <pkg>` to install into it, and `deactivate`
+  to turn it back off.
+- Know that activation is done with the `source` builtin because `source`
+  runs the script's commands in the *current* shell, which is the only way
+  an on/off switch can affect that shell; an activated venv announces
+  itself by prefixing the prompt with `(venv)`.
+- Be able to build a venv the modern way with `uv`: `uv venv <dir>` creates
+  the environment and `uv pip install --python <dir> <pkg>` installs into
+  it without activating anything first.
+- Know that the two workflows are the same two ideas ("make an
+  environment", "install a package into it") expressed by two different
+  tools, and that `uv`'s fuller project workflow (`uv init`, `uv add`,
+  `uv run`) removes manual activation entirely -- which is how this
+  course's own `aprog` tool is run.
+- Know that inside a venv folder, `pyvenv.cfg` records which base Python
+  built it and `lib/python3.*/site-packages/` is where installed packages
+  actually live -- that directory *is* the private package folder.
 
 Concept: compilers
 - Know that a compiler translates human-readable source code into machine
@@ -103,7 +132,11 @@ Concept: git and GitHub
       modern Linux, and what fixes it.
 - [ ] Name one classic/modern tool pair used for Python formatting and one
       used for type checking.
+- [ ] Create a virtual environment, activate it, install a package into it,
+      and deactivate it -- using both `python3 -m venv`/`pip` and `uv`.
+- [ ] Explain why activation uses `source` rather than running the activate
+      script as a normal program.
 
 ## Practiced in
 
-`env-setup-shell`, `env-setup-python`, `env-setup-compiler`, `env-setup-build-tools`, `env-setup-sfml`, `env-setup-ide`, `env-setup-git`, `env-setup-discord`
+`env-setup-shell`, `env-setup-python`, `venv-workshop`, `env-setup-compiler`, `env-setup-build-tools`, `env-setup-sfml`, `env-setup-ide`, `env-setup-git`, `env-setup-discord`
