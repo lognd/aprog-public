@@ -1,0 +1,49 @@
+check_base = "main"
+
+[graph]
+# generated/** is entirely produced by `aprog generate-config` (see
+# docs/architecture/generated-configs.md); files carry no human authorship,
+# are documented "committed, do not hand-edit" in the README, and CI already
+# fails on drift via `aprog check-generated --all`. Excluded so frob's
+# obligations only cover handwritten code, not regenerated artifacts.
+exclude = ["generated/**"]
+
+[gates.severity]
+# Legacy-adoption baseline: snapshot-wide obligations warn on the
+# un-annotated legacy surface while annotation coverage grows; diff-scoped
+# and drift rules stay hard errors.
+COV001 = "warn"
+TEST001 = "warn"
+TEST002 = "warn"
+TEST003 = "warn"
+TEST005 = "warn"
+TEST006 = "warn"
+
+[testing]
+min_unit_cases = 1
+
+[gates.docs]
+# DOC001 flags 76 orphans: the entire docs/study-guides/ curriculum (62
+# guides + README), docs/course-arc.md, docs/curriculum-map.md,
+# docs/readme-style.md, and 9 docs/tools/aprog-*.md command pages. None of
+# these are linked from docs/README.md (the actual docs root -- DOC001's
+# root convention is docs/index.md, which this repo doesn't have) or from
+# any other doc. Hand-linking 76 files during adoption is out of scope (no
+# source/doc changes); disabling doc-link enforcement here instead. Real
+# fix tracked in a ticket: either link study-guides/tools pages from
+# docs/README.md, or add docs/index.md as the recognized root.
+include = []
+
+[check]
+# ruff/ty report pre-existing repo-wide lint/type debt (1026 ruff errors,
+# 147 ty diagnostics) unrelated to frob adoption; fixing that debt is out of
+# scope here (no source changes -- see adoption ticket for cleanup). Skipped
+# so `frob check` exercises the frob-specific stages (gates, cycle, dup,
+# arch, exports) this adoption pass is actually responsible for.
+skip = ["ruff", "ty"]
+
+[[test.runner]]
+language = "python"
+command = ["uv", "run", "pytest", "-q", "--no-testmon", "{ids}"]
+all_command = ["uv", "run", "pytest", "-q", "--no-testmon"]
+cwd = "."

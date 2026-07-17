@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 .claude/*
+.frob/
 FROBLEMS.md
 LOGRADER-IDEA.md
 .idea/*
@@ -238,3 +239,6 @@ TODO.md
 # log-analyzer's fixture files are intentionally named *.log (its whole
 # domain is log files) -- un-ignore them so they can be committed.
 !assignments/log-analyzer/visible-tests/logs/*.log
+
+# slidegen -- untracked local slide-authoring utility (never commit)
+slidegen/

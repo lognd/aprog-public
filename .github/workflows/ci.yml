@@ -1,5 +1,8 @@
 name: CI
 
+# Both triggers are path-filtered to code only. Documentation-only changes
+# (docs/**, *.md) must never fire CI: there is nothing for ruff, ty, or
+# pytest to check in them, and the run would only burn Actions minutes.
 on:
   push:
     branches: [main]
@@ -10,6 +13,12 @@ on:
       - "pyproject.toml"
       - ".github/workflows/ci.yml"
   pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "activities/**"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
 
 jobs:
   test:
