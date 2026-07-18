@@ -16,6 +16,8 @@ scope:
 - docs/README.md
 evidence: []
 attachments: []
+acceptance: []
+threat: null
 ```
 frob.toml sets [gates.docs] include = [] to fully disable DOC001 because DOC001's root-reachability walk only recognizes docs/index.md + top-level README.md as roots. This repo's real docs index is docs/README.md, which links only ~17 of the ~93 files under docs/. Real orphans: the entire docs/study-guides/ curriculum (62 guides + README), docs/course-arc.md, docs/curriculum-map.md, docs/readme-style.md, and 9 docs/tools/aprog-*.md command pages. Fix: either link these from docs/README.md (or a new docs/index.md), or restructure study-guides/tools into their own linked indices, then flip [gates.docs] include back to the default.
 
@@ -33,6 +35,8 @@ scope:
 - src/aprog/**,tests/unit/**
 evidence: []
 attachments: []
+acceptance: []
+threat: null
 ```
 frob check --only gates reports 1081 TEST001 (no frob:tests unit edge) + related TEST002 warnings, mostly on src/aprog/commands, src/aprog/models, src/aprog/utils public symbols. These are currently warn-severity legacy debt (see [gates.severity] in frob.toml). Pick a slice of commands/models per ticket and bind frob:tests directives to existing/new unit tests until TEST001/TEST002 can be flipped back to error for that slice.
 
@@ -50,5 +54,46 @@ scope:
 - src/aprog/utils/**,src/aprog/paths.py,tests/integration/**
 evidence: []
 attachments: []
+acceptance: []
+threat: null
 ```
 TEST003 flags src/aprog/utils and src/aprog/paths.py as interfaces (public symbols imported cross-package) with 0/1 integration edges. Add frob:tests ... kind="integration" edges bound to real tests/integration/ coverage for these two.
+
+<!-- ticket:T-0004 -->
+```yaml
+id: T-0004
+title: Adopt strata self-model (design/aprog-public.strata) and drive frob sys audit
+  clean
+state: done
+kind: docs
+origin: agent
+created: '2026-07-18'
+blocked_by: []
+parent: null
+scope:
+- design/aprog-public.strata
+evidence:
+- tests/test_design_model.py::test_frob_sys_audit_proves_clean
+- tests/test_design_model.py::test_strata_model_exists
+attachments: []
+acceptance: []
+threat: null
+```
+Pilot: model the real component graph (cli/commands/models/utils/core, isolated activities+slidegen, foreign submission service), measured capability surface, and true isolation claims; guard with a pytest regression.
+
+## Done report
+
+design/aprog-public.strata landed: 10 nodes (foreign submission_service;
+cli/commands/models/utils/core; isolated activities + slidegen; content),
+11 flows (all measured import or I/O edges), 6 assert claims (all
+PROVED) plus 5 assume claims discharging the THREAT003 obligations that
+measured exec/fetch_url capabilities drag in (CWE-78 on commands/
+activities/content, CWE-918 on content/slidegen). Capability surface
+measured with frob's scanner per node; SYS100 caught 4 undeclared
+capabilities on content/slidegen during development, of which the
+content net/fetch_url pair traces to a scanner false positive
+(capability pattern matching inside comment text at
+assignments/api-harvester/assets/starter.py:22 -- noted in the model
+and reported upstream). `frob sys audit` exits 0: PROVED across 9
+views, self-conformance PROVED. Regression guard:
+tests/test_design_model.py.
